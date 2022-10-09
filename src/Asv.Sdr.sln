@@ -5,11 +5,15 @@ VisualStudioVersion = 16.0.32228.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Asv.Sdr", "Asv.Sdr\Asv.Sdr.csproj", "{01ED7436-6B0A-4DD4-8EAC-EE17A05FC4C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Asv.Sdr.Test", "Asv.Sdr.Test\Asv.Sdr.Test.csproj", "{981EC339-E0F2-431B-A2C1-42028D680E67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Asv.Sdr.Test", "Asv.Sdr.Test\Asv.Sdr.Test.csproj", "{981EC339-E0F2-431B-A2C1-42028D680E67}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Devices", "Devices", "{23AAEBA9-FCAA-41B4-B658-DA308EBFFF16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Asv.Sdr.LimeSdr", "Asv.Sdr.LimeSdr\Asv.Sdr.LimeSdr.csproj", "{192F30EF-118D-4135-A2C3-238CCC5E3BC8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Asv.Sdr.LimeSdr", "Asv.Sdr.LimeSdr\Asv.Sdr.LimeSdr.csproj", "{192F30EF-118D-4135-A2C3-238CCC5E3BC8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Asv.Sdr.Simulate", "Asv.Sdr.Simulate\Asv.Sdr.Simulate.csproj", "{1E6E0ED5-1AE1-4EE1-9D5C-EF56B8830E3A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Asv.Sdr.Viewer", "Asv.Sdr.Viewer\Asv.Sdr.Viewer.csproj", "{6164819E-4F60-4E1E-B5D8-F141ADF61680}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,12 +33,21 @@ Global
 		{192F30EF-118D-4135-A2C3-238CCC5E3BC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{192F30EF-118D-4135-A2C3-238CCC5E3BC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{192F30EF-118D-4135-A2C3-238CCC5E3BC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E6E0ED5-1AE1-4EE1-9D5C-EF56B8830E3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E6E0ED5-1AE1-4EE1-9D5C-EF56B8830E3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E6E0ED5-1AE1-4EE1-9D5C-EF56B8830E3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E6E0ED5-1AE1-4EE1-9D5C-EF56B8830E3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6164819E-4F60-4E1E-B5D8-F141ADF61680}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6164819E-4F60-4E1E-B5D8-F141ADF61680}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6164819E-4F60-4E1E-B5D8-F141ADF61680}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6164819E-4F60-4E1E-B5D8-F141ADF61680}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{192F30EF-118D-4135-A2C3-238CCC5E3BC8} = {23AAEBA9-FCAA-41B4-B658-DA308EBFFF16}
+		{1E6E0ED5-1AE1-4EE1-9D5C-EF56B8830E3A} = {23AAEBA9-FCAA-41B4-B658-DA308EBFFF16}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7927B6F0-E62E-4535-A9B4-9633E99719DA}

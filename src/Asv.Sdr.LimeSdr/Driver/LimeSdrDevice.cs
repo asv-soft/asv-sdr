@@ -18,6 +18,7 @@ namespace Asv.Sdr.LimeSdr
 
         static LimeSdrDevice()
         {
+            LibHelper.CheckLibraryFiles();
             _callback = new LogCallBack(OnLmsLog);
             GC.KeepAlive(_callback);
             LMS_RegisterLogHandler(_callback);

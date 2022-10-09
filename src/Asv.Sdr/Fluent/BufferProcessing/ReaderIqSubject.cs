@@ -1,0 +1,81 @@
+using System;
+using System.Buffers;
+using System.Reactive.Subjects;
+using Asv.Common;
+using Asv.Sdr.V2;
+
+namespace Asv.Sdr
+{
+    public class ReaderIqSubject<TOut> : DisposableOnceWithCancel, IReaderIqSubject<TOut>
+    {
+        private readonly Subject<Memory<TOut>> _onData = new();
+        protected readonly TOut[] Buffer;
+        protected readonly Memory<TOut> Memory;
+
+        public ReaderIqSubject(int size, bool useArrayPool)
+        {
+            if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
+            OutputBufferSize = size;
+            if (useArrayPool)
+            {
+                Buffer = ArrayPool<TOut>.Shared.Rent(size);
+                Disposable.AddAction(() => ArrayPool<TOut>.Shared.Return(Buffer));
+            }
+            else
+            {
+                Buffer = new TOut[size];
+            }
+            Memory = new Memory<TOut>(Buffer, 0, size);
+        }
+
+        protected void Publish()
+        {
+            if (IsDisposed == false)
+                _onData.OnNext(Memory);
+        }
+
+        public int OutputBufferSize { get; }
+
+        public IDisposable Subscribe(IObserver<Memory<TOut>> observer) => _onData.Subscribe(observer);
+
+        protected override void InternalDisposeOnce()
+        {
+            base.InternalDisposeOnce();
+            _onData.OnCompleted();
+            _onData.Dispose();
+        }
+    }
+
+    public abstract class ReaderIqSubject<TIn, TOut> : ReaderIqSubject<TOut>
+    {
+        protected ReaderIqSubject(IReaderIqSubject<TIn> input, int outputSize, bool useArrayPool) : base(outputSize, useArrayPool)
+        {
+            Disposable.Add(input.Subscribe(OnData));
+        }
+
+        private void OnData(Memory<TIn> buffer)
+        {
+            Process(buffer.Span, Memory.Span);
+            Publish();
+        }
+
+        protected abstract void Process(ReadOnlySpan<TIn> input, Span<TOut> output);
+    }
+
+    public delegate void ProcessDelegate<TIn, TOut>(ReadOnlySpan<TIn> input, Span<TOut> output);
+
+    public class ReaderIqCallbackSubject<TIn, TOut> : ReaderIqSubject<TIn, TOut>
+    {
+        private readonly ProcessDelegate<TIn, TOut> _processCallback;
+
+        public ReaderIqCallbackSubject(IReaderIqSubject<TIn> input, int outputSize, ProcessDelegate<TIn, TOut> processCallback, bool useArrayPool) : base(input, outputSize, useArrayPool)
+        {
+            _processCallback = processCallback ?? throw new ArgumentNullException(nameof(processCallback));
+        }
+
+        protected override void Process(ReadOnlySpan<TIn> input, Span<TOut> output)
+        {
+            _processCallback(input, output);
+        }
+    }
+}

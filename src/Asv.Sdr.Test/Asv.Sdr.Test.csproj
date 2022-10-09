@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <TargetFrameworks>net461;net5.0;net6.0;</TargetFrameworks>
+    <TargetFrameworks>net5.0;net6.0;</TargetFrameworks>
 	<LangVersion>9.0</LangVersion>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -18,6 +17,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Asv.Sdr.Simulate\Asv.Sdr.Simulate.csproj" />
   </ItemGroup>
 
 </Project>
