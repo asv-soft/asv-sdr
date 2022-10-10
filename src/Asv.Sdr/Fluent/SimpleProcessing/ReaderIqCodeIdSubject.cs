@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive.Subjects;
 using System.Text;
+using System.Threading;
 using Asv.Common;
 
 namespace Asv.Sdr
@@ -11,7 +12,7 @@ namespace Asv.Sdr
     public class ReaderIqCodeIdSubject:DisposableOnce, IObservable<string>
     {
 
-        private static ReadOnlyDictionary<string, char> AlphabetData => new(new Dictionary<string, char>()
+        private static ReadOnlyDictionary<string, char> AlphabetData { get; } = new(new Dictionary<string, char>()
         {
             {
                 ".-",
@@ -229,10 +230,19 @@ namespace Asv.Sdr
         private double _noSignalTime;
 
         private const int BetweenWordTime = 1000;
-        private const double DotTimeTime = 100.0;
-        private List<char> _symbols = new();
-        private List<char> _word = new();
-        
+        private const double DotTimeTime = 150.0;
+        private readonly List<char> _symbols = new();
+        private readonly List<char> _word = new();
+        private double _statDotTimeMs;
+        private int _statDotCount;
+        private double _statDashTimeMs;
+        private int _statDashCount;
+        private double _statCharPause;
+        private int _statCharPauseCound;
+        private double _statSymbolPause;
+        private int _statSymbolPauseCound;
+
+
 
         public ReaderIqCodeIdSubject(IObservable<double> amSubject, double amMin, double amMax, int fftBufferSize, int sampleRate)
         {
@@ -261,32 +271,21 @@ namespace Asv.Sdr
                         switch (delay)
                         {
                             case <= 2:
+                                _statSymbolPause += _noSignalTime;
+                                ++_statCharPauseCound;
                                 break;
-                            case <= 5:
+                            case <= 4:
                             {
                                 var str = new string(_symbols.ToArray());
-                                if (AlphabetData.TryGetValue(str, out var ch))
-                                {
-                                    _word.Add(ch);
-                                }
-                                else
-                                {
-                                    _word.Add('?');
-                                }
+                                _word.Add(AlphabetData.TryGetValue(str, out var ch) ? ch : '\0');
                                 _symbols.Clear();
+                                _statCharPause += _noSignalTime;
                                 break;
                             }
                             default:
                             {
                                 var str = new string(_symbols.ToArray());
-                                if (AlphabetData.TryGetValue(str, out var ch))
-                                {
-                                    _word.Add(ch);
-                                }
-                                else
-                                {
-                                    _word.Add('?');
-                                }
+                                _word.Add(AlphabetData.TryGetValue(str, out var ch) ? ch : '\0');
                                 _symbols.Clear();
                                 if (_word.Count != 0)
                                 {
@@ -294,6 +293,12 @@ namespace Asv.Sdr
                                     _subject.OnNext(str1);
                                     _word.Clear();
                                     _symbols.Clear();
+                                    _statDashCount = 0;
+                                    _statDashTimeMs = 0;
+                                    _statDotCount = 0;
+                                    _statDotTimeMs = 0;
+                                    _statSymbolPause = 0;
+                                    _statCharPause = 0;
                                 }
                                 break;
                             }
@@ -317,10 +322,14 @@ namespace Asv.Sdr
                         if (delay <= 2)
                         {
                             _symbols.Add('.');
+                            _statDotTimeMs +=(int)_signalTime;
+                            ++_statDotCount;
                         }
                         else
                         {
                             _symbols.Add('-');
+                            _statDashTimeMs += (int)_signalTime;
+                            ++_statDashCount;
                         }
                     }
                     break;
