@@ -33,10 +33,92 @@ namespace Asv.Sdr
             return new ReaderIqParallelSubject<T>(src);
         }
 
-        public static IReaderIqSubject<TOut> Zip<TIn1,TIn2,TOut>(this IReaderIqSubject<TIn1> src, IReaderIqSubject<TIn2> second, ProcessDelegate<TIn1,TIn2,TOut> processCallback, int outputSize, bool useArrayPool = false)
+        #region Delta phase
+
+        public static IReaderIqSubject<double> DiffPhase(this IReaderIqSubject<float> src, bool useArrayPool = true)
+        {
+            return new ReaderIqDiffPhaseFloat(src, useArrayPool);
+        }
+
+        public static IReaderIqSubject<double> DiffPhase(this IReaderIqSubject<double> src, bool useArrayPool = true)
+        {
+            return new ReaderIqDiffPhaseDouble(src, useArrayPool);
+        }
+
+        #endregion
+
+        #region I and Q manipulation
+
+        public static IReaderIqSubject<TOut> Zip<TIn1, TIn2, TOut>(this IReaderIqSubject<TIn1> src, IReaderIqSubject<TIn2> second, ProcessDelegate<TIn1, TIn2, TOut> processCallback, int outputSize, bool useArrayPool = false)
         {
             return new ReaderIqZipSubjectCallback<TIn1, TIn2, TOut>(src, second, outputSize, processCallback,
                 useArrayPool);
+        }
+
+        public static IReaderIqSubject<double> CopyIToQ(this IReaderIqSubject<double> src, bool useArrayPool = true)
+        {
+            return new ReaderIqCopyIToQDouble(src, useArrayPool);
+        }
+
+        public static IReaderIqSubject<double> CopyIToQ(this IReaderIqSubject<float> src, bool useArrayPool = true)
+        {
+            return new ReaderIqCopyIToQFloat(src, useArrayPool);
+        }
+
+        public static IReaderIqSubject<double> CopyQToI(this IReaderIqSubject<double> src, bool useArrayPool = true)
+        {
+            return new ReaderIqCopyQToIDouble(src, useArrayPool);
+        }
+
+        public static IReaderIqSubject<double> CopyQToI(this IReaderIqSubject<float> src, bool useArrayPool = true)
+        {
+            return new ReaderIqCopyQToIFloat(src, useArrayPool);
+        }
+
+        public static IReaderIqSubject<double> MoveIToQ(this IReaderIqSubject<double> src, bool useArrayPool = true)
+        {
+            return new ReaderIqMoveIToQDouble(src, useArrayPool);
+        }
+
+        public static IReaderIqSubject<double> MoveIToQ(this IReaderIqSubject<float> src, bool useArrayPool = true)
+        {
+            return new ReaderIqMoveIToQFloat(src, useArrayPool);
+        }
+
+        public static IReaderIqSubject<double> MoveQToI(this IReaderIqSubject<double> src, bool useArrayPool = true)
+        {
+            return new ReaderIqMoveQToIDouble(src, useArrayPool);
+        }
+
+        public static IReaderIqSubject<double> MoveQToI(this IReaderIqSubject<float> src, bool useArrayPool = true)
+        {
+            return new ReaderIqMoveQToIFloat(src, useArrayPool);
+        }
+
+        public static IReaderIqSubject<double> Select(this IReaderIqSubject<float> src,
+            ProcessValueDelegate<float, double> iCallback, ProcessValueDelegate<float, double> qCallback,
+            bool useArrayPool = true)
+        {
+            return new ReaderIqSelectIAndQSubject<float, double>(src, iCallback, qCallback, useArrayPool);
+        }
+
+        public static IReaderIqSubject<double> Select(this IReaderIqSubject<double> src,
+            ProcessValueDelegate<double, double> iCallback, ProcessValueDelegate<double, double> qCallback,
+            bool useArrayPool = true)
+        {
+            return new ReaderIqSelectIAndQSubject<double, double>(src, iCallback, qCallback, useArrayPool);
+        }
+
+        public static IReaderIqSubject<double> Select(this IReaderIqSubject<float> src,
+            ProcessIWithQValueDelegate<float, double> callback, bool useArrayPool = true)
+        {
+            return new ReaderIqSelectIWithQSubject<float, double>(src, callback, useArrayPool);
+        }
+
+        public static IReaderIqSubject<double> Select(this IReaderIqSubject<double> src,
+            ProcessIWithQValueDelegate<double, double> callback, bool useArrayPool = true)
+        {
+            return new ReaderIqSelectIWithQSubject<double, double>(src, callback, useArrayPool);
         }
 
         public static IReaderIqSubject<TOut> Select<TIn, TOut>(this IReaderIqSubject<TIn> src,
@@ -50,6 +132,8 @@ namespace Asv.Sdr
         {
             return new ReaderIqCallbackSubject<TIn, TIn>(src, src.OutputBufferSize, callback, useArrayPool);
         }
+
+        #endregion
 
         #region Fft
 
@@ -109,23 +193,37 @@ namespace Asv.Sdr
 
         #region I and Q filter
 
-        public static IReaderIqSubject<double> AddIqFilter(this IReaderIqSubject<double> src, IDspFilter imFilter, IDspFilter reFilter, bool useArrayPool = true)
+        public static IReaderIqSubject<double> AddIqFilter(this IReaderIqSubject<double> src, IDspFilter iFilter, IDspFilter qFilter, bool useArrayPool = true)
         {
-            return new ReaderIqFilterIqDouble(src, imFilter, reFilter, useArrayPool);
+            return new ReaderIqFilterIqDouble(src, iFilter, qFilter, useArrayPool);
         }
-        public static IReaderIqSubject<double> AddIqFilter(this IReaderIqSubject<float> src, IDspFilter imFilter, IDspFilter reFilter, bool useArrayPool = true)
+        public static IReaderIqSubject<double> AddIqFilter(this IReaderIqSubject<float> src, IDspFilter iFilter, IDspFilter qFilter, bool useArrayPool = true)
         {
-            return new ReaderIqFilterIqFloat(src, imFilter, reFilter, useArrayPool);
-        }
-
-        public static IReaderIqSubject<double> AddIFilter(this IReaderIqSubject<double> src, IDspFilter imFilter, bool useArrayPool = true)
-        {
-            return new ReaderIqFilterIDouble(src, imFilter, useArrayPool);
+            return new ReaderIqFilterIqFloat(src, iFilter, qFilter, useArrayPool);
         }
 
-        public static IReaderIqSubject<double> AddIFilter(this IReaderIqSubject<float> src, IDspFilter imFilter, bool useArrayPool = true)
+        public static IReaderIqSubject<double> AddIFilter(this IReaderIqSubject<double> src, IDspFilter iFilter, bool useArrayPool = true)
         {
-            return new ReaderIqFilterIFloat(src, imFilter, useArrayPool);
+            return new ReaderIqFilterIDouble(src, iFilter, useArrayPool);
+        }
+
+        public static IReaderIqSubject<double> AddIFilter(this IReaderIqSubject<float> src, IDspFilter iFilter, bool useArrayPool = true)
+        {
+            return new ReaderIqFilterIFloat(src, iFilter, useArrayPool);
+        }
+
+        #endregion
+
+        #region FM modulation
+
+        public static IObservable<double> GetPhase(this IReaderIqSubject<double> src, int sampleRate, int freqHz)
+        {
+            return new ReaderIqPhaseDoubleSubject(src, sampleRate, freqHz);
+        }
+
+        public static IObservable<double> GetPhase(this IReaderIqSubject<float> src, int sampleRate, int freqHz)
+        {
+            return new ReaderIqPhaseFloatSubject(src, sampleRate, freqHz);
         }
 
         #endregion
@@ -196,6 +294,11 @@ namespace Asv.Sdr
         public static IObservable<(double, double)> AverageFilter(this IObservable<(double, double)> src, int windowSize1, int windowSize2)
         {
             return new ReactiveDsp2ArgsFilter(src, new MovingAverageDspFilter(windowSize1), new MovingAverageDspFilter(windowSize2));
+        }
+
+        public static IObservable<double> AverageRadianFilter(this IObservable<double> src, int windowSize)
+        {
+            return new ReactiveDspFilter(src, new MovingAverageRadianDspFilter(windowSize));
         }
 
         #endregion

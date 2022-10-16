@@ -9,9 +9,13 @@
              x:DataType="viewer:VorPageViewModel">
 
 	<DockPanel>
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+        <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
             <TextBlock Text="CodeId"/>
             <TextBlock Text="{CompiledBinding CodeId}"/>
+        </StackPanel>
+        <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
+            <TextBlock Text="Azimuth"/>
+            <TextBlock Text="{CompiledBinding Azimuth}"/>
         </StackPanel>
         <Grid RowDefinitions="*,*" ColumnDefinitions="*,*">
 

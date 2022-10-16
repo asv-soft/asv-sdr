@@ -78,4 +78,54 @@ namespace Asv.Sdr
             _processCallback(input, output);
         }
     }
+
+    public delegate TOut ProcessValueDelegate<in TIn, out TOut>(TIn input,int index);
+
+    public class ReaderIqSelectIAndQSubject<TIn, TOut> : ReaderIqSubject<TIn, TOut>
+    {
+        private readonly ProcessValueDelegate<TIn, TOut> _processCallbackI;
+        private readonly ProcessValueDelegate<TIn, TOut> _processCallbackQ;
+        private readonly int _size;
+
+        public ReaderIqSelectIAndQSubject(IReaderIqSubject<TIn> input, ProcessValueDelegate<TIn,TOut> iCallback, ProcessValueDelegate<TIn, TOut> qCallback, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
+        {
+            _processCallbackI = iCallback ?? throw new ArgumentNullException(nameof(iCallback));
+            _processCallbackQ = qCallback ?? throw new ArgumentNullException(nameof(qCallback));
+            _size = input.OutputBufferSize / 2;
+        }
+
+        protected override void Process(ReadOnlySpan<TIn> input, Span<TOut> output)
+        {
+            for (var i = 0; i < _size; i++)
+            {
+                output[i * 2] = _processCallbackI(input[i * 2], i);
+                output[i * 2 + 1] = _processCallbackQ(input[i * 2 + 1], i);
+            }
+        }
+    }
+
+    public delegate void ProcessIWithQValueDelegate<in TIn, TOut>(TIn inputI, TIn inputQ, int index, out TOut outI, out TOut outQ);
+
+    public class ReaderIqSelectIWithQSubject<TIn, TOut> : ReaderIqSubject<TIn, TOut>
+    {
+        private readonly ProcessIWithQValueDelegate<TIn, TOut> _processCallback;
+        
+        private readonly int _size;
+
+        public ReaderIqSelectIWithQSubject(IReaderIqSubject<TIn> input, ProcessIWithQValueDelegate<TIn, TOut> callback, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
+        {
+            _processCallback = callback ?? throw new ArgumentNullException(nameof(callback));
+            _size = input.OutputBufferSize / 2;
+        }
+
+        protected override void Process(ReadOnlySpan<TIn> input, Span<TOut> output)
+        {
+            for (var i = 0; i < _size; i++)
+            {
+                _processCallback(input[i * 2], input[i * 2 + 1], i, out var iValue, out var qValue);
+                output[i * 2] = iValue;
+                output[i * 2 + 1] = qValue;
+            }
+        }
+    }
 }
