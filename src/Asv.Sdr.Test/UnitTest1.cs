@@ -42,7 +42,7 @@ namespace Asv.Sdr.Test
             var sw = new Stopwatch();
             sw.Start();
             var eve = new AutoResetEvent(false);
-            var source = src1.Zip<double,double,double>(src2, (input1, input2, output) =>
+            var source = src1.IqZip<double,double,double>(src2, (input1, input2, output) =>
             {
                 _output.WriteLine($"ZIP:{DateTime.Now:O}");
                 sw.Stop();

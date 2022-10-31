@@ -10,13 +10,26 @@
 
 	<DockPanel>
         <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
-            <TextBlock Text="CodeId"/>
+            <TextBlock Text="CodeId: "/>
             <TextBlock Text="{CompiledBinding CodeId}"/>
         </StackPanel>
         <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
-            <TextBlock Text="Azimuth"/>
+            <TextBlock Text="Azimuth: "/>
             <TextBlock Text="{CompiledBinding Azimuth}"/>
         </StackPanel>
+        <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
+            <TextBlock Text="MeasureTime: "/>
+            <TextBlock Text="{CompiledBinding MeasureTime}"/>
+        </StackPanel>
+        <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
+            <TextBlock Text="AM30: "/>
+            <TextBlock Text="{CompiledBinding Am30}"/>
+        </StackPanel>
+        <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
+            <TextBlock Text="RSSI: "/>
+            <TextBlock Text="{CompiledBinding Rssi}"/>
+        </StackPanel>
+		<CheckBox IsChecked="{CompiledBinding IsParallel, Mode=TwoWay}"></CheckBox>
         <Grid RowDefinitions="*,*" ColumnDefinitions="*,*">
 
             <avalonia:AvaPlot Grid.Row="0" Grid.Column="0" Name="AvaPlot00"/>

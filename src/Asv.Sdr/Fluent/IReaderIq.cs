@@ -33,6 +33,12 @@ namespace Asv.Sdr
             return new ReaderIqParallelSubject<T>(src);
         }
 
+        public static IReaderIqSubject<TOut> IqZip<TIn1, TIn2, TOut>(this IReaderIqSubject<TIn1> src, IReaderIqSubject<TIn2> second, ProcessDelegate<TIn1, TIn2, TOut> processCallback, int outputSize, bool useArrayPool = false)
+        {
+            return new ReaderIqZipSubjectCallback<TIn1, TIn2, TOut>(src, second, outputSize, processCallback,
+                useArrayPool);
+        }
+
         #region Delta phase
 
         public static IReaderIqSubject<double> DiffPhase(this IReaderIqSubject<float> src, bool useArrayPool = true)
@@ -49,11 +55,7 @@ namespace Asv.Sdr
 
         #region I and Q manipulation
 
-        public static IReaderIqSubject<TOut> Zip<TIn1, TIn2, TOut>(this IReaderIqSubject<TIn1> src, IReaderIqSubject<TIn2> second, ProcessDelegate<TIn1, TIn2, TOut> processCallback, int outputSize, bool useArrayPool = false)
-        {
-            return new ReaderIqZipSubjectCallback<TIn1, TIn2, TOut>(src, second, outputSize, processCallback,
-                useArrayPool);
-        }
+        
 
         public static IReaderIqSubject<double> CopyIToQ(this IReaderIqSubject<double> src, bool useArrayPool = true)
         {

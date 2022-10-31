@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Asv.Sdr.LimeSdr;
 using Asv.Tools;
@@ -45,6 +46,18 @@ namespace Asv.Sdr.Viewer
         [Reactive]
         public string Azimuth { get; set; }
 
+        [Reactive]
+        public string MeasureTime { get; set; }
+
+        [Reactive]
+        public string Am30 { get; set; }
+
+        [Reactive]
+        public string Rssi { get; set; }
+
+        [Reactive]
+        public bool? IsParallel { get; set; }
+
         private void Init()
         {
             var dev = LimeSdrDevice.GetAvailableDevices().FirstOrDefault();
@@ -79,37 +92,59 @@ namespace Asv.Sdr.Viewer
             _signal111 = _plot.AvaPlot11.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
             _signal112 = _plot.AvaPlot11.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
 
-            var source = lime.Sample(_bufferSize, out var start);
+            var source = lime.Sample(_bufferSize, out var start).Magnitude().Parallel();
 
             var phase1 = source
-                .Magnitude()
                 .AddIFilter(new BandpassFilter(_sampleRate, 9960))
                 .CopyIToQ()
-                .FrequencyShift(_sampleRate,9960)
+                .FrequencyShift(_sampleRate, 9960)
                 .AddIqFilter(new LowpassFilter(_sampleRate, 1050), new LowpassFilter(_sampleRate, 1050))
                 .MagnitudeAndPhase()
                 .DiffPhase()
                 .MoveQToI()
-                .AddIFilter(new LowpassFilter(_sampleRate,100))
+                .AddIFilter(new LowpassFilter(_sampleRate, 100))
                 .Fft1d()
                 .GetPhase(_sampleRate, 30);
-            var phase2 = source
-                .Magnitude()
-                .AddIFilter(new LowpassFilter(_sampleRate,100))
-                .Fft1d()
-                .GetPhase(_sampleRate, 30);
-            phase2
+            var mainFft = source
+                .AddIFilter(new LowpassFilter(_sampleRate, 100))
+                .Fft1d();
+
+            Observable.Timer(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1)).Subscribe(_ =>
+            {
+                Rssi = lime.GetLevel(CancellationToken.None).Result.ToString("F2");
+            } );
+
+            var phase2 = mainFft.GetPhase(_sampleRate, 30);
+
+            var am30 = mainFft.GetAm(_sampleRate, 30).AverageFilter(10)
+                .Sample(TimeSpan.FromSeconds(1))
+                .Subscribe(_=>Am30 = _.ToString("P2"));
+            
+
+            var values = phase2
                 .Zip(phase1, DspMathEx.GetDistanceAngleRad)
-                .AverageRadianFilter(10)
+                .AverageRadianFilter(30)
+                .TimeInterval();
+
+            var averageTime = values
+                .TimeInterval()
+                .Select(_ => _.Interval.TotalMilliseconds)
+                .AverageFilter(10)
+                .Sample(TimeSpan.FromSeconds(1))
+                .Subscribe(_=> MeasureTime = TimeSpan.FromMilliseconds(_).ToString("g"));
+
+            values
                 .Sample(TimeSpan.FromMilliseconds(100)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(_ =>
                 {
                     var index = (_azimuthIndex++) % _readSamples;
-                    var azimuth = _ * 180.0 / Math.PI + 2.62; // 11.5;
+                    var azimuth = _.Value * 180.0 / Math.PI + 2.62; // 11.5;
                     if (azimuth < 0) azimuth += 360.0;
                     Azimuth = azimuth.ToString("F2");
                     _signal001.Update(index, azimuth);
                     _plot.AvaPlot00.Refresh();
                 });
+
+
             // phase2
             //     .Zip(phase11, DspMathEx.GetDistanceAngleRad)
             //     .AverageRadianFilter(30)
