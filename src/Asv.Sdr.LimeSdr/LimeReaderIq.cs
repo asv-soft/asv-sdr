@@ -38,13 +38,16 @@ namespace Asv.Sdr.LimeSdr
         private async Task Init(LimeSourceIqConfig config)
         {
             
+            
             await _device.EnableChannel(LmsChannel.Rx, config.Channel, true, DisposeCancel);
+            await _device.EnableChannel(LmsChannel.Tx, config.Channel, true, DisposeCancel);
             await _device.SetSampleRate(config.SampleRate, 0, DisposeCancel);
             await _device.SetFrequency(LmsChannel.Rx, config.Channel, config.Frequency, DisposeCancel);
             await _device.SetAntenna(LmsChannel.Rx, config.Channel, (uint)config.Path, DisposeCancel);
             await _device.SetBandWidth(LmsChannel.Rx, config.Channel, config.BandWidth, DisposeCancel);
             await _device.SetNormalizedGain(LmsChannel.Rx, config.Channel, config.Gain, DisposeCancel);
             await _device.EnableRSSIMeasure(1);
+            // await _device.WriteLMSParam(LimeSdrParams.LMS7_G_PGA_RBB_R3, 24, DisposeCancel);
             if (config.LmsLpfEnable == true)
             {
                 await _device.SetLPFBw(LmsChannel.Rx, config.Channel, config.LmsLpfBandWidth, DisposeCancel);
@@ -54,7 +57,7 @@ namespace Asv.Sdr.LimeSdr
             {
                 await _device.SetLPF(LmsChannel.Rx, config.Channel, false, DisposeCancel);
             }
-
+            
             if (config.GfirEnable)
             {
                 await _device.SetGFIRLPF(LmsChannel.Rx, config.Channel, true, config.GfirBandWidth, DisposeCancel);
@@ -63,13 +66,13 @@ namespace Asv.Sdr.LimeSdr
             {
                 await _device.SetGFIRLPF(LmsChannel.Rx, config.Channel, false, 96_000, DisposeCancel);
             }
-
+            
             if (config.LmsSelfCalibrate)
             {
                 await _device.Calibrate(LmsChannel.Rx, config.Channel, config.BandWidth, 0, DisposeCancel);
             }
-
-
+        
+            
             _rxStream = await _device.CreateStream(LmsChannel.Rx, config.Channel, (uint)config.SampleRate);
             await _rxStream.Start(DisposeCancel);
         }
@@ -84,7 +87,7 @@ namespace Asv.Sdr.LimeSdr
 
         public Task<int> Read(Memory<float> iqBuffer, CancellationToken cancel = default)
         {
-            return _rxStream.Read(iqBuffer, 1000, DisposeCancel);
+            return _rxStream.Read(iqBuffer, 5000, DisposeCancel);
         }
     }
 }

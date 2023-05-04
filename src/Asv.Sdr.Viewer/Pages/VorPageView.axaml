@@ -29,7 +29,8 @@
             <TextBlock Text="RSSI: "/>
             <TextBlock Text="{CompiledBinding Rssi}"/>
         </StackPanel>
-		<CheckBox IsChecked="{CompiledBinding IsParallel, Mode=TwoWay}"></CheckBox>
+        <Button DockPanel.Dock="Top" Command="{Binding ClearCommand}">Clear</Button>
+		
         <Grid RowDefinitions="*,*" ColumnDefinitions="*,*">
 
             <avalonia:AvaPlot Grid.Row="0" Grid.Column="0" Name="AvaPlot00"/>

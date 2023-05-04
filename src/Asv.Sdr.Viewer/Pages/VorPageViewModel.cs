@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
@@ -34,6 +36,7 @@ namespace Asv.Sdr.Viewer
         private SignalPlot _signal112;
         private int _diffPhaseIndex;
         private int _azimuthIndex2;
+        private bool _clear;
 
         public VorPageViewModel() : base("vor")
         {
@@ -63,22 +66,25 @@ namespace Asv.Sdr.Viewer
             var dev = LimeSdrDevice.GetAvailableDevices().FirstOrDefault();
             var device = new LimeSdrDevice(dev, true);
             
-            _sampleRate = 98_000;
-            _readSamples = (int)(_sampleRate / 30 * 1);
+            _sampleRate = 48_000;
+            _readSamples = (int)(_sampleRate / 30 * 3);
             _bufferSize = _readSamples * 2; // I + Q buffer
             var skip = 20;
             var lime = new LimeReaderIq(device, new LimeSourceIqConfig
             {
-                Frequency = 110_000_000,
+                Frequency = 113_000_000,
                 BandWidth = 32_000,
-                Gain = 0.69,
+                Gain = 1,
                 SampleRate = _sampleRate,
                 GfirEnable = true,
                 GfirBandWidth = 32_000,
                 LmsLpfEnable = true,
                 LmsLpfBandWidth = 32_000,
                 LmsSelfCalibrate = true,
-                Path = LmsPathRx.LMS_PATH_LNAL,
+                Channel = 0,
+                Path = LmsPathRx.LMS_PATH_LNAH,
+                
+
             });
             _signal001 = _plot.AvaPlot00.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
             _signal002 = _plot.AvaPlot00.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
@@ -92,7 +98,14 @@ namespace Asv.Sdr.Viewer
             _signal111 = _plot.AvaPlot11.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
             _signal112 = _plot.AvaPlot11.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
 
-            var source = lime.Sample(_bufferSize, out var start).Magnitude().Parallel();
+            var source = lime.Sample(_bufferSize, out var start)
+                .Magnitude()
+                //.HalfOverlap()
+                //.WindowFilter(WindowFilterEnum.Cosine)
+                .Parallel();
+            var phase1Tick = 0;
+            var phase2Tick = 0;
+            var diffTIck = 0;
 
             var phase1 = source
                 .AddIFilter(new BandpassFilter(_sampleRate, 9960))
@@ -114,17 +127,20 @@ namespace Asv.Sdr.Viewer
                 Rssi = lime.GetLevel(CancellationToken.None).Result.ToString("F2");
             } );
 
-            var phase2 = mainFft.GetPhase(_sampleRate, 30);
+            var phase2 = mainFft
+                .GetPhase(_sampleRate, 30);
 
-            var am30 = mainFft.GetAm(_sampleRate, 30).AverageFilter(10)
+            var am30 = mainFft.GetAm(_sampleRate, 30)
+                .AverageFilter(10)
                 .Sample(TimeSpan.FromSeconds(1))
                 .Subscribe(_=>Am30 = _.ToString("P2"));
             
 
             var values = phase2
-                .Zip(phase1, DspMathEx.GetDistanceAngleRad)
-                .AverageRadianFilter(30)
-                .TimeInterval();
+                .ParallelJoin(phase1, DspMathEx.GetDistanceAngleRad)
+                //.KalmanRadianFilter(0.03,1)
+                .AverageRadianFilter(10)
+                .TimeInterval().Publish().RefCount();
 
             var averageTime = values
                 .TimeInterval()
@@ -132,14 +148,27 @@ namespace Asv.Sdr.Viewer
                 .AverageFilter(10)
                 .Sample(TimeSpan.FromSeconds(1))
                 .Subscribe(_=> MeasureTime = TimeSpan.FromMilliseconds(_).ToString("g"));
-
+            var angle = new List<double>();
             values
-                .Sample(TimeSpan.FromMilliseconds(100)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(_ =>
+                .ObserveOn(RxApp.MainThreadScheduler).Subscribe(_ =>
                 {
+                    if (_clear)
+                    {
+                        _clear = false;
+                        angle.Clear();
+                        _azimuthIndex = 0;
+                    }
                     var index = (_azimuthIndex++) % _readSamples;
+                    
                     var azimuth = _.Value * 180.0 / Math.PI + 2.62; // 11.5;
                     if (azimuth < 0) azimuth += 360.0;
-                    Azimuth = azimuth.ToString("F2");
+                    angle.Add(azimuth);
+                    var avg = DspMathEx.GetAvgAngleDeg(angle);
+                    var err = Math.Sqrt(angle.Select(__ =>
+                                            DspMathEx.GetDistanceAngleDeg(__, avg) *
+                                            DspMathEx.GetDistanceAngleDeg(__, avg)).Sum() /
+                                        angle.Count);
+                    Azimuth = $"{azimuth:F1} (avg:{avg:F1}, dev:{err:F1}, err:{Math.Abs(angle.Min() - angle.Max()):F1})";
                     _signal001.Update(index, azimuth);
                     _plot.AvaPlot00.Refresh();
                 });
@@ -225,7 +254,7 @@ namespace Asv.Sdr.Viewer
 
 
 
-            // var amCodeId = source.Magnitude().Fft1d().GetAm(_sampleRate, 1020);
+             var amCodeId = source.Fft1d().GetAm(_sampleRate, 1020);
             //
             // amCodeId.ObserveOn(RxApp.MainThreadScheduler).Subscribe(data =>
             // {
@@ -233,7 +262,7 @@ namespace Asv.Sdr.Viewer
             //     _signal001.Update(index, data);
             //     _plot.AvaPlot00.Refresh();
             // });
-            // amCodeId.CodeId(0.05, 0.20, _readSamples, _sampleRate).Subscribe(_ => CodeId = _);
+             amCodeId.CodeId(0.05, 0.20, _readSamples, _sampleRate).Subscribe(_ => CodeId = _);
 
 
 
@@ -268,7 +297,10 @@ namespace Asv.Sdr.Viewer
 
         }
 
-
+        public void ClearCommand()
+        {
+            _clear = true;
+        }
 
         public void InitGraph((AvaPlot AvaPlot00, AvaPlot AvaPlot01, AvaPlot AvaPlot10, AvaPlot AvaPlot11) plot)
         {

@@ -42,7 +42,7 @@ namespace Asv.Sdr
                 output[i * 2 + 1] = DspMathEx.GetDistanceAngleRad(input[i * 2 + 1], input[(i + 1) * 2 + 1]);
             }
             output[_size * 2] = input[_size * 2];
-            output[_size * 2 + 1] = 0;
+            output[_size * 2 + 1] = output[(_size -1) * 2 + 1]; // copy last value
 
         }
     }

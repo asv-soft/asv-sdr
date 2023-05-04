@@ -7,8 +7,8 @@ namespace Asv.Sdr
     public static class DspMathEx
     {
         private const double Pi2 = 2 * Math.PI;
-        private const double PiDev180Deg = Math.PI / 180;
-        private const double Deg180DevPi = Math.PI / 180;
+        private const double PiDev180Deg = Math.PI / 180.0;
+        private const double Deg180DevPi = 180.0 / Math.PI;
 
         public static double Phase(double x, double y)
         {

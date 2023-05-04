@@ -32,6 +32,7 @@ namespace Asv.Sdr
         {
             for (var i = 0; i < OutputBufferSize / 2; i++)
             {
+                //output[i * 2] = Math.Sqrt((double)input[i * 2] * (double)input[i * 2] + (double)input[i * 2 + 1] * (double)input[i * 2 + 1]);
                 output[i * 2] = DspMathEx.Abs(input[i * 2], input[i * 2 + 1]);
                 output[i * 2 + 1] = 0;
             }

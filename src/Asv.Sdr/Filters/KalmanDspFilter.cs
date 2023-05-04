@@ -1,5 +1,28 @@
-﻿namespace Asv.Sdr
+﻿using System;
+
+namespace Asv.Sdr
 {
+
+    public class KalmanRadianDspFilter:IDspFilter
+    {
+        private readonly KalmanDspFilter _cos;
+        private readonly KalmanDspFilter _sin;
+
+        public KalmanRadianDspFilter(double q, double r, double f = 1, double h = 1)
+        {
+            _cos = new KalmanDspFilter(q, r, f, h);
+            _sin = new KalmanDspFilter(q, r, f, h);
+        }
+        public double Process(double input)
+        {
+            var cos = Math.Cos(input);
+            var sin = Math.Sin(input);
+            var x = _cos.Process(cos);
+            var y = _sin.Process(sin);
+            return Math.Atan2(y, x);
+
+        }
+    }
     public class KalmanDspFilter:IDspFilter
     {
         /// <summary>

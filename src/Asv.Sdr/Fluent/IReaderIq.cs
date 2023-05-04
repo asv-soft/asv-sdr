@@ -242,6 +242,11 @@ namespace Asv.Sdr
             return new ReaderIqAm2Subject(src, sampleRate, am1Freq,am2Freq);
         }
 
+        public static IObservable<TResult> ParallelJoin<TFirst, TSecond, TResult>(this IObservable<TFirst> first, IObservable<TSecond> second, Func<TFirst,TSecond,TResult> resultSelector)
+        {
+            return new ReactiveParallelJoin<TFirst, TSecond, TResult>(first,second, resultSelector);
+        }
+
         public static IObservable<double> GetDdm(this IObservable<double> am1, IObservable<double> am2)
         {
             return am1.Zip(am2).Select(_ => _.First - _.Second);
@@ -264,6 +269,11 @@ namespace Asv.Sdr
         public static IObservable<double> KalmanFilter(this IObservable<double> src, double measurementNoise, double deviceNoise)
         {
             return new ReactiveDspFilter(src, new KalmanDspFilter(measurementNoise, deviceNoise));
+        }
+        
+        public static IObservable<double> KalmanRadianFilter(this IObservable<double> src, double measurementNoise, double deviceNoise)
+        {
+            return new ReactiveDspFilter(src, new KalmanRadianDspFilter(measurementNoise, deviceNoise));
         }
 
         public static IObservable<(double, double)> KalmanFilter(this IObservable<(double, double)> src, double measurementNoise1, double deviceNoise1, double measurementNoise2, double deviceNoise2)

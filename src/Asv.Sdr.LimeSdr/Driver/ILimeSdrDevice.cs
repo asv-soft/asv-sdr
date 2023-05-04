@@ -128,6 +128,7 @@ namespace Asv.Sdr.LimeSdr
             await src.WriteLMSParam(LimeSdrParams.LMS7_CAPSEL, 0, cancel);
             await src.WriteLMSParam(LimeSdrParams.LMS7_CAPTURE, 0, cancel);
             await src.WriteLMSParam(LimeSdrParams.LMS7_CAPTURE, 1, cancel);
+            await src.WriteLMSParam(LimeSdrParams.LMS7_CAPTURE, 0, cancel);
             var val1 = (uint)await src.ReadLMSReg(0x040E, cancel);
             var val2 = (uint)await src.ReadLMSReg(0x040F, cancel);
             return ((val1 & 0x3) | (val2 << 2)) & 0x3FFFF;
