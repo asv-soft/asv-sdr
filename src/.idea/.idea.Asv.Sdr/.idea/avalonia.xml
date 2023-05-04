@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="Asv.Sdr.Viewer/Pages/VorPageView.axaml" value="Asv.Sdr.Viewer/Asv.Sdr.Viewer.csproj" />
+      </map>
+    </option>
+  </component>
+</project>
