@@ -9,35 +9,37 @@
              x:DataType="viewer:VorPageViewModel">
 
 	<DockPanel>
-        <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
-            <TextBlock Text="CodeId: "/>
-            <TextBlock Text="{CompiledBinding CodeId}"/>
-        </StackPanel>
-        <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
-            <TextBlock Text="Azimuth: "/>
-            <TextBlock Text="{CompiledBinding Azimuth}"/>
-        </StackPanel>
-        <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
-            <TextBlock Text="MeasureTime: "/>
-            <TextBlock Text="{CompiledBinding MeasureTime}"/>
-        </StackPanel>
-        <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
-            <TextBlock Text="AM30: "/>
-            <TextBlock Text="{CompiledBinding Am30}"/>
-        </StackPanel>
-        <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal">
-            <TextBlock Text="RSSI: "/>
-            <TextBlock Text="{CompiledBinding Rssi}"/>
-        </StackPanel>
+        <!-- <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal"> -->
+        <!--     <TextBlock Text="CodeId: "/> -->
+        <!--     <TextBlock Text="{CompiledBinding CodeId}"/> -->
+        <!-- </StackPanel> -->
+        <!-- <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal"> -->
+        <!--     <TextBlock Text="Azimuth: "/> -->
+        <!--     <TextBlock Text="{CompiledBinding Azimuth}"/> -->
+        <!-- </StackPanel> -->
+        <!-- <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal"> -->
+        <!--     <TextBlock Text="MeasureTime: "/> -->
+        <!--     <TextBlock Text="{CompiledBinding MeasureTime}"/> -->
+        <!-- </StackPanel> -->
+        <!-- <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal"> -->
+        <!--     <TextBlock Text="AM30: "/> -->
+        <!--     <TextBlock Text="{CompiledBinding Am30}"/> -->
+        <!-- </StackPanel> -->
+        <!-- <StackPanel Margin="10" DockPanel.Dock="Top" Orientation="Horizontal"> -->
+        <!--     <TextBlock Text="RSSI: "/> -->
+        <!--     <TextBlock Text="{CompiledBinding Rssi}"/> -->
+        <!-- </StackPanel> -->
         <Button DockPanel.Dock="Top" Command="{Binding ClearCommand}">Clear</Button>
-		
-        <Grid RowDefinitions="*,*" ColumnDefinitions="*,*">
-
-            <avalonia:AvaPlot Grid.Row="0" Grid.Column="0" Name="AvaPlot00"/>
-            <avalonia:AvaPlot Grid.Row="0" Grid.Column="1" Name="AvaPlot01"/>
-            <avalonia:AvaPlot Grid.Row="1" Grid.Column="0" Name="AvaPlot10"/>
-            <avalonia:AvaPlot Grid.Row="1" Grid.Column="1" Name="AvaPlot11"/>
-        </Grid>
+        <TextBlock DockPanel.Dock="Top" FontFamily="Consolas" Text="{Binding CustomText}"/>
+        <TextBlock DockPanel.Dock="Top" FontFamily="Consolas" Text="{Binding CustomText2}"/>
+        <TextBlock DockPanel.Dock="Top" FontFamily="Consolas" Text="{Binding CustomText3}"/>
+        <avalonia:AvaPlot Grid.Row="0" Grid.Column="0" Name="AvaPlot00"/>
+        <!-- <Grid RowDefinitions="*,*" ColumnDefinitions="*,*"> -->
+        <!--     ~1~ <avalonia:AvaPlot Grid.Row="0" Grid.Column="0" Name="AvaPlot00"/> @1@ -->
+        <!--     <avalonia:AvaPlot Grid.Row="0" Grid.Column="1" Name="AvaPlot01"/> -->
+        <!--     <avalonia:AvaPlot Grid.Row="1" Grid.Column="0" Name="AvaPlot10"/> -->
+        <!--     <avalonia:AvaPlot Grid.Row="1" Grid.Column="1" Name="AvaPlot11"/> -->
+        <!-- </Grid> -->
 	</DockPanel>
 
 

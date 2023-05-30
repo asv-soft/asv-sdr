@@ -21,9 +21,9 @@ namespace Asv.Sdr.Viewer
             this.WhenActivated(disp =>
             {
                 AvaPlot00.Plot.Style(Style.Gray1);
-                AvaPlot01.Plot.Style(Style.Gray1);
-                AvaPlot10.Plot.Style(Style.Gray1);
-                AvaPlot11.Plot.Style(Style.Gray1);
+                // AvaPlot01.Plot.Style(Style.Gray1);
+                // AvaPlot10.Plot.Style(Style.Gray1);
+                // AvaPlot11.Plot.Style(Style.Gray1);
                 this.WhenAnyValue(_ => _.ViewModel)
                     .WhereNotNull()
                     .Subscribe(_ => Init())
@@ -36,7 +36,7 @@ namespace Asv.Sdr.Viewer
         {
             if (ViewModel == null) return;
             AvaPlot00.Plot.Clear();
-            ViewModel.InitGraph((AvaPlot00, AvaPlot01, AvaPlot10, AvaPlot11));
+            ViewModel.InitGraph(AvaPlot00);
         }
     }
 }

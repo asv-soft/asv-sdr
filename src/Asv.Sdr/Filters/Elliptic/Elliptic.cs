@@ -37,4 +37,14 @@ namespace Asv.Sdr
             return sumNum;
         }
     }
+    
+    public class CustomLowPassElliptic8kHzFilter : EllipticFilterBase
+    {
+        public CustomLowPassElliptic8kHzFilter() : base(
+            new[] { 3.55913675e-02, 1.543561252e-02, 1.554841621e-02, 7.140834236e-02 },
+            new[] { 9.78033577e-02, -0.6706407089, 2.124672252, -3.813517492, 4.307268182, -2.841026455 })
+        {
+        }
+    }
+    
 }
