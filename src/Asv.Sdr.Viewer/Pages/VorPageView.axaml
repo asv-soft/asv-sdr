@@ -33,12 +33,17 @@
         <TextBlock DockPanel.Dock="Top" FontFamily="Consolas" Text="{Binding CustomText}"/>
         <TextBlock DockPanel.Dock="Top" FontFamily="Consolas" Text="{Binding CustomText2}"/>
         <TextBlock DockPanel.Dock="Top" FontFamily="Consolas" Text="{Binding CustomText3}"/>
-        <avalonia:AvaPlot Grid.Row="0" Grid.Column="0" Name="AvaPlot00"/>
-        <!-- <Grid RowDefinitions="*,*" ColumnDefinitions="*,*"> -->
-        <!--     ~1~ <avalonia:AvaPlot Grid.Row="0" Grid.Column="0" Name="AvaPlot00"/> @1@ -->
-        <!--     <avalonia:AvaPlot Grid.Row="0" Grid.Column="1" Name="AvaPlot01"/> -->
-        <!--     <avalonia:AvaPlot Grid.Row="1" Grid.Column="0" Name="AvaPlot10"/> -->
-        <!--     <avalonia:AvaPlot Grid.Row="1" Grid.Column="1" Name="AvaPlot11"/> -->
+        <TextBlock DockPanel.Dock="Top" FontFamily="Consolas" Text="{Binding CustomText4}"/>
+        <TextBlock DockPanel.Dock="Top" FontFamily="Consolas" Text="{Binding CustomText5}"/>
+        <TextBlock DockPanel.Dock="Top" FontFamily="Consolas" Text="{Binding CustomText6}"/>
+        <TextBlock DockPanel.Dock="Top" FontFamily="Consolas" Text="{Binding CustomText7}"/>
+        <Grid RowDefinitions="*,*" ColumnDefinitions="*,*">
+	        <avalonia:AvaPlot Grid.Row="0" Grid.Column="0" Name="AvaPlot00"/>
+	        <avalonia:AvaPlot Grid.Row="0" Grid.Column="1" Name="AvaPlot01"/>
+	        <avalonia:AvaPlot Grid.Row="1" Grid.Column="0" Name="AvaPlot10"/>
+	        <avalonia:AvaPlot Grid.Row="1" Grid.Column="1" Name="AvaPlot11"/>    
+        </Grid>
+        
         <!-- </Grid> -->
 	</DockPanel>
 

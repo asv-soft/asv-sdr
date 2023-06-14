@@ -33,6 +33,11 @@ namespace Asv.Sdr
             return new ReaderIqParallelSubject<T>(src);
         }
 
+        public static IReaderIqSubject<T> SplitSample<T>(this IReaderIqSubject<T> src, int samplesCnt, bool useArrayPool = false)
+        {
+            return new ReaderIqSplitSample<T>(src, samplesCnt, useArrayPool);
+        }
+        
         public static IReaderIqSubject<TOut> IqZip<TIn1, TIn2, TOut>(this IReaderIqSubject<TIn1> src, IReaderIqSubject<TIn2> second, ProcessDelegate<TIn1, TIn2, TOut> processCallback, int outputSize, bool useArrayPool = false)
         {
             return new ReaderIqZipSubjectCallback<TIn1, TIn2, TOut>(src, second, outputSize, processCallback,
@@ -222,10 +227,20 @@ namespace Asv.Sdr
         {
             return new ReaderIqPhaseDoubleSubject(src, sampleRate, freqHz);
         }
+        
+        public static IObservable<(double, double)> GetPhase(this IReaderIqSubject<double> src, int sampleRate, int freq1Hz, int freq2Hz)
+        {
+            return new ReaderIqPhase2DoubleSubject(src, sampleRate, freq1Hz, freq2Hz);
+        }
 
         public static IObservable<double> GetPhase(this IReaderIqSubject<float> src, int sampleRate, int freqHz)
         {
             return new ReaderIqPhaseFloatSubject(src, sampleRate, freqHz);
+        }
+        
+        public static IObservable<(double, double)> GetPhase(this IReaderIqSubject<float> src, int sampleRate, int freq1Hz, int freq2Hz)
+        {
+            return new ReaderIqPhase2FloatSubject(src, sampleRate, freq1Hz, freq2Hz);
         }
 
         #endregion
@@ -264,6 +279,19 @@ namespace Asv.Sdr
 
         #endregion
 
+        #region Frequency offset
+
+        public static IObservable<double> FrequencyOffset(this IReaderIqSubject<float> src, short fOffset)
+        {
+            return new ReaderIqFrequencyOffsetFloatSubject(src, fOffset);
+        }
+        public static IObservable<double> FrequencyOffset(this IReaderIqSubject<double> src, short fOffset)
+        {
+            return new ReaderIqFrequencyOffsetDoubleSubject(src, fOffset);
+        }
+
+        #endregion
+        
         #region Kalman filter
 
         public static IObservable<double> KalmanFilter(this IObservable<double> src, double measurementNoise, double deviceNoise)

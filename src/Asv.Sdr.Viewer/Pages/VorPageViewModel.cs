@@ -23,27 +23,40 @@ namespace Asv.Sdr.Viewer
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VorPageViewModel:MainShellPageBase
     {
-        private SignalPlot _signal001;
         private int _readSamples;
         private int _bufferSize;
-        private AvaPlot _plot;
         private int _sampleRate;
+        
+        private int _azimuthIndex;
+        private int _azimuthIndex2;
+        private int _diffPhaseIndex;
+        private bool _clear;
+        
+        private string _rssi;
+        
+        private AvaPlot _plot00;
+        private SignalPlot _signal001;
         private SignalPlot _signal002;
+        private SignalPlot _signal003;
+        
+        private AvaPlot _plot01;
         private SignalPlot _signal011;
         private SignalPlot _signal012;
-        private int _azimuthIndex;
+        
+        private AvaPlot _plot10;
         private SignalPlot _signal101;
         private SignalPlot _signal102;
+        
+        private AvaPlot _plot11;
         private SignalPlot _signal111;
         private SignalPlot _signal112;
-        private int _diffPhaseIndex;
-        private int _azimuthIndex2;
-        private bool _clear;
-        private string _rssi;
-        private SignalPlot _signal003;
+        
+        private string _codeId;
+        private int _phaseBuffSize;
 
         public VorPageViewModel() : base("vor")
         {
+            Title = "ILS";
             Task.Factory.StartNew(() => Init(), TaskCreationOptions.LongRunning);
         }
 
@@ -70,8 +83,10 @@ namespace Asv.Sdr.Viewer
             var dev = LimeSdrDevice.GetAvailableDevices().FirstOrDefault();
             var device = new LimeSdrDevice(dev, true);
             _sampleRate = 96_000;
-            _readSamples = (int)(_sampleRate / 30 * 5);
+            _readSamples = (int)(_sampleRate / 30.0 * 5);
             _bufferSize = _readSamples * 2; // I + Q buffer
+            
+            
             var lime = new LimeReaderIq(device, new LimeSourceIqConfig
             {
                 Frequency = 110_000_000-16_000,
@@ -87,18 +102,21 @@ namespace Asv.Sdr.Viewer
                 Path = LmsPathRx.LMS_PATH_LNAH,
             });
             var size = 300;
-            _signal001 = _plot.Plot.AddSignal(new double[size]);
-            _signal002 = _plot.Plot.AddSignal(new double[size]);
-            _signal003 = _plot.Plot.AddSignal(new double[size]);
+            _signal001 = _plot00.Plot.AddSignal(new double[size]);
+            _signal002 = _plot00.Plot.AddSignal(new double[size]);
+            _signal003 = _plot00.Plot.AddSignal(new double[size]);
             
-            // _signal011 = _plot.AvaPlot01.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
-            // _signal012 = _plot.AvaPlot01.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
-            //
-            // _signal101 = _plot.AvaPlot10.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
-            // _signal102 = _plot.AvaPlot10.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
-            //
-            // _signal111 = _plot.AvaPlot11.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
-            // _signal112 = _plot.AvaPlot11.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
+            var factor = _sampleRate / _readSamples;
+            _phaseBuffSize = (int)Math.Round(150.0 / factor) * 4;
+            
+            _signal011 = _plot01.Plot.AddSignal(new double[_phaseBuffSize]);
+            _signal012 = _plot01.Plot.AddSignal(new double[_phaseBuffSize]);
+            
+            _signal101 = _plot10.Plot.AddSignal(new double[_phaseBuffSize]);
+            _signal102 = _plot10.Plot.AddSignal(new double[_phaseBuffSize]);
+            
+            _signal111 = _plot11.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
+            _signal112 = _plot11.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
 
             var source = lime.Sample(_bufferSize, out var start).Parallel();
 
@@ -126,18 +144,21 @@ namespace Asv.Sdr.Viewer
                     RxApp.MainThreadScheduler.Schedule(() =>
                     {
                         CustomText = $"DDM[{_.Length}]: {ddm:P2} (dev:{ddmDev:P2}, err:{ddmAbsErr:P2}) \n" +
-                                     $"SDM: {sdm:P2} (dev:{sdmDev:P2}, err:{sdmAbsErr:P2}) P:{_rssi}";
-                                     _plot.Refresh();
+                                     $"SDM: {sdm:P2} (dev:{sdmDev:P2}, err:{sdmAbsErr:P2})  \nP:{_rssi}";
+                                     _plot00.Refresh();
                     });
                 });
             Observable.Timer(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1)).Subscribe(_ =>
             {
                 _rssi = lime.GetLevel(CancellationToken.None).Result.ToString("F2");
-            } );
-            source
+            });
+
+
+            var lowPassFilter = source
                 //.AddIqFilter(new LowpassFilter(_sampleRate,16000),new LowpassFilter(_sampleRate,16000))
                 //.AddIqFilter(new CustomLowPassElliptic8kHzFilter(),new CustomLowPassElliptic8kHzFilter())
-                .AddIqFilter(new IlsLowPass(),new IlsLowPass())
+                .AddIqFilter(new IlsLowPass(), new IlsLowPass()).Parallel();
+            lowPassFilter
                 .Magnitude()
                 // .HalfOverlap()
                 //.WindowFilter(WindowFilterEnum.Cosine)
@@ -167,9 +188,11 @@ namespace Asv.Sdr.Viewer
                         //_plot.Refresh();
                     });
                 });
+
+            var highPassFilter = source
+                .AddIqFilter(new IlsHighPass(), new IlsHighPass()).Parallel(); 
             
-            source
-                .AddIqFilter(new IlsHighPass(),new IlsHighPass())
+            highPassFilter
                 .Magnitude()
                 .Fft1d()
                 .GetAm(_sampleRate, 90, 150)
@@ -191,10 +214,115 @@ namespace Asv.Sdr.Viewer
                     RxApp.MainThreadScheduler.Schedule(() =>
                     {
                         CustomText3 = $"DDM[{_.Length}]: {ddm:P2} (dev:{ddmDev:P2}, err:{ddmAbsErr:P2}) \n" +
-                                      $"SDM: {sdm:P2} (dev:{sdmDev:P2}, err:{sdmAbsErr:P2})";
+                                      $"SDM: {sdm:P2} (dev:{sdmDev:P2}, err:{sdmAbsErr:P2}) \n" +
+                                      $"CodeID: {_codeId}";
                         //_plot.Refresh();
                     });
                 });
+            
+            
+            
+            
+            var readSamplesStep = (int)(_sampleRate / 30.0); // 90 Hz and 150 Hz => НОД 30  -  samples per 1/30 sec
+            var sampleRateCount = _sampleRate * (30.0 / 1000.0); // 30 ms
+            var rate = (int)Math.Floor(sampleRateCount / readSamplesStep) + 1;
+            var samplesCnt = rate * readSamplesStep * 2; // I + Q
+            
+            source
+                .SplitSample(samplesCnt)
+                .Magnitude()
+                .Fft1d()
+                .GetAm(_sampleRate, 1020)
+                .CodeId(0.05, 0.20, rate * readSamplesStep, _sampleRate)
+                .Subscribe(_ =>
+                {
+                    _codeId = _;
+                });
+
+            source
+                .FrequencyOffset(16_000)
+                .RollingBuffer(TimeSpan.FromSeconds(10))
+                .Subscribe(_ =>
+            {
+                var freqOffset = _.Average();
+                var freqOffsetDev = Math.Sqrt(_.Select(x=>(x-freqOffset)*(x-freqOffset)).Sum() / (_.Length - 1));
+                var freqOffsetAbsErr = Math.Abs(_.Min() - _.Max()) / 2.0;
+                
+                RxApp.MainThreadScheduler.Schedule(() =>
+                {
+                    CustomText4 = $"FreqOffset: {freqOffset:F2} (dev:{freqOffsetDev:F2}, err:{freqOffsetAbsErr:F2})";
+                    //_plot.Refresh();
+                });
+            });
+            lowPassFilter
+                .FrequencyOffset(16_000)
+                .RollingBuffer(TimeSpan.FromSeconds(10))
+                .Subscribe(_ =>
+                {
+                    var freqOffset = _.Average();
+                    var freqOffsetDev = Math.Sqrt(_.Select(x=>(x-freqOffset)*(x-freqOffset)).Sum() / (_.Length - 1));
+                    var freqOffsetAbsErr = Math.Abs(_.Min() - _.Max()) / 2.0;
+                
+                    RxApp.MainThreadScheduler.Schedule(() =>
+                    {
+                        CustomText5 = $"FreqOffset CRS: {freqOffset:F2} (dev:{freqOffsetDev:F2}, err:{freqOffsetAbsErr:F2})";
+                        //_plot.Refresh();
+                    });
+                });
+            
+            highPassFilter
+                .FrequencyOffset(16_000)
+                .RollingBuffer(TimeSpan.FromSeconds(10))
+                .Subscribe(_ =>
+                {
+                    var freqOffset = _.Average();
+                    var freqOffsetDev = Math.Sqrt(_.Select(x=>(x-freqOffset)*(x-freqOffset)).Sum() / (_.Length - 1));
+                    var freqOffsetAbsErr = Math.Abs(_.Min() - _.Max()) / 2.0;
+                
+                    RxApp.MainThreadScheduler.Schedule(() =>
+                    {
+                        CustomText6 = $"FreqOffset CLR: {freqOffset:F2} (dev:{freqOffsetDev:F2}, err:{freqOffsetAbsErr:F2})";
+                    });
+                });
+
+            var clrPhases = lowPassFilter
+                .Magnitude()
+                .Fft1d()
+                .GetPhase(_sampleRate, 90, 150);
+            var crsPhases = highPassFilter
+                .Magnitude()
+                .Fft1d()
+                .GetPhase(_sampleRate, 90, 150);
+            
+
+            clrPhases
+                .ParallelJoin(crsPhases, (clr,crs) => (MathEx.GetDistanceAngleRad(clr.Item1, crs.Item1),
+                MathEx.GetDistanceAngleRad(clr.Item2, crs.Item2)))
+                .RollingBuffer(TimeSpan.FromSeconds(10))
+                .Subscribe(_ =>
+                {
+                    var diff90 = _.Select(__ => __.Item1).ToArray();
+                    var diff150 = _.Select(__ => __.Item2).ToArray();
+                    var phi90CrsVsClr = diff90.Average();
+                    var phi90CrsVsClrDev =
+                        Math.Sqrt(diff90.Select(x => (x - phi90CrsVsClr) * (x - phi90CrsVsClr)).Sum() / (diff90.Length - 1));
+                    var phi90CrsVsClrErr = Math.Abs(diff90.Min() - diff90.Max()) / 2.0;
+                    
+                    var phi150CrsVsClr = diff150.Average();
+                    var phi150CrsVsClrDev =
+                        Math.Sqrt(diff150.Select(x => (x - phi150CrsVsClr) * (x - phi150CrsVsClr)).Sum() / (diff150.Length - 1));
+                    var phi150CrsVsClrErr = Math.Abs(diff150.Min() - diff150.Max()) / 2.0;
+                    
+                
+                RxApp.MainThreadScheduler.Schedule(() =>
+                {
+                    CustomText7 =
+                        $"Phi90CrsVsClr: {phi90CrsVsClr*180/Math.PI:F2} (dev:{phi90CrsVsClrDev*180/Math.PI:F2}, err:{phi90CrsVsClrErr*180/Math.PI:F2}) | Phi150CrsVsClr: {phi150CrsVsClr*180/Math.PI:F2} (dev:{phi150CrsVsClrDev*180/Math.PI:F2}, err:{phi150CrsVsClrErr*180/Math.PI:F2})";
+                    //_plot.Refresh();
+                });
+            });
+                
+            
             //
             // _azimuthIndex = 0;
             //     source
@@ -486,6 +614,15 @@ namespace Asv.Sdr.Viewer
         //
         //
         // }
+        
+        [Reactive]
+        public string CustomText7 { get; set; }
+        [Reactive]
+        public string CustomText6 { get; set; }
+        [Reactive]
+        public string CustomText5 { get; set; }
+        [Reactive]
+        public string CustomText4 { get; set; }
         [Reactive]
         public string CustomText3 { get; set; }
         [Reactive]
@@ -498,9 +635,12 @@ namespace Asv.Sdr.Viewer
             _clear = true;
         }
 
-        public void InitGraph(AvaPlot plot)
+        public void InitGraph(AvaPlot plot00, AvaPlot plot01, AvaPlot plot10, AvaPlot plot11)
         {
-            _plot = plot;
+            _plot00 = plot00;
+            _plot01 = plot01;
+            _plot10 = plot10;
+            _plot11 = plot11;
         }
     }
     
