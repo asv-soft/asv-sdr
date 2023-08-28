@@ -53,6 +53,7 @@ namespace Asv.Sdr.Viewer
         
         private string _codeId;
         private int _phaseBuffSize;
+        private SignalPlot _signal004;
 
         public VorPageViewModel() : base("vor")
         {
@@ -102,227 +103,482 @@ namespace Asv.Sdr.Viewer
                 Path = LmsPathRx.LMS_PATH_LNAH,
             });
             var size = 300;
-            _signal001 = _plot00.Plot.AddSignal(new double[size]);
-            _signal002 = _plot00.Plot.AddSignal(new double[size]);
-            _signal003 = _plot00.Plot.AddSignal(new double[size]);
+            // _signal001 = _plot00.Plot.AddSignal(new double[size]);
+            // _signal002 = _plot00.Plot.AddSignal(new double[size]);
+            // _signal003 = _plot00.Plot.AddSignal(new double[size]);
+            _signal001 = _plot00.Plot.AddSignal(new double[500], _sampleRate);
+            _signal002 = _plot01.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
+            _signal003 = _plot10.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
+            _signal004 = _plot11.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
             
-            var factor = _sampleRate / _readSamples;
-            _phaseBuffSize = (int)Math.Round(150.0 / factor) * 4;
             
-            _signal011 = _plot01.Plot.AddSignal(new double[_phaseBuffSize]);
-            _signal012 = _plot01.Plot.AddSignal(new double[_phaseBuffSize]);
             
-            _signal101 = _plot10.Plot.AddSignal(new double[_phaseBuffSize]);
-            _signal102 = _plot10.Plot.AddSignal(new double[_phaseBuffSize]);
-            
-            _signal111 = _plot11.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
-            _signal112 = _plot11.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
+            // var factor = _sampleRate / _readSamples;
+            // _phaseBuffSize = (int)Math.Round(150.0 / factor) * 4;
+            //
+            // _signal011 = _plot01.Plot.AddSignal(new double[_phaseBuffSize]);
+            // _signal012 = _plot01.Plot.AddSignal(new double[_phaseBuffSize]);
+            //
+            // _signal101 = _plot10.Plot.AddSignal(new double[_phaseBuffSize]);
+            // _signal102 = _plot10.Plot.AddSignal(new double[_phaseBuffSize]);
+            //
+            // _signal111 = _plot11.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
+            // _signal112 = _plot11.Plot.AddSignal(new double[_bufferSize / 2], _sampleRate);
 
             var source = lime.Sample(_bufferSize, out var start).Parallel();
 
-            
-            
-            source
-                .Magnitude()
-                .Fft1d()
-                .GetAm(_sampleRate, 90, 150)
-                .AverageFilter(10, 10)
-                .RollingBuffer(TimeSpan.FromSeconds(10))
-                .Subscribe(_ =>
-                {
-                    var ddm = _.Select(x=>x.Item2 - x.Item1).Average();
-                    var sdm = _.Select(x=>x.Item2 + x.Item1).Average();
-                    var ddmDev = Math.Sqrt(_.Select(x=>x.Item2 - x.Item1).Select(x=>(x-ddm)*(x-ddm)).Sum() / (_.Length -1));
-                    var sdmDev = Math.Sqrt(_.Select(x=>x.Item2 + x.Item1).Select(x=>(x-sdm)*(x-sdm)).Sum() / (_.Length -1));
-                    var ddmAbsErr = Math.Abs(_.Select(x => x.Item2 - x.Item1).Min() - _.Select(x => x.Item2 - x.Item1).Max())/2.0;
-                    var sdmAbsErr = Math.Abs(_.Select(x => x.Item2 + x.Item1).Min() - _.Select(x => x.Item2 + x.Item1).Max())/2.0;
-                    for (var index = 0; index < _.Length; index++)
-                    {
-                        var item = _[index];
-                        _signal001.Update(index, (item.Item2 - item.Item1)*100);
-                    }
-                    RxApp.MainThreadScheduler.Schedule(() =>
-                    {
-                        CustomText = $"DDM[{_.Length}]: {ddm:P2} (dev:{ddmDev:P2}, err:{ddmAbsErr:P2}) \n" +
-                                     $"SDM: {sdm:P2} (dev:{sdmDev:P2}, err:{sdmAbsErr:P2})  \nP:{_rssi}";
-                                     _plot00.Refresh();
-                    });
-                });
-            Observable.Timer(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1)).Subscribe(_ =>
-            {
-                _rssi = lime.GetLevel(CancellationToken.None).Result.ToString("F2");
-            });
 
-
+            
             var lowPassFilter = source
                 //.AddIqFilter(new LowpassFilter(_sampleRate,16000),new LowpassFilter(_sampleRate,16000))
                 //.AddIqFilter(new CustomLowPassElliptic8kHzFilter(),new CustomLowPassElliptic8kHzFilter())
                 .AddIqFilter(new IlsLowPass(), new IlsLowPass()).Parallel();
+            
             lowPassFilter
                 .Magnitude()
-                // .HalfOverlap()
-                //.WindowFilter(WindowFilterEnum.Cosine)
-                // .AddIqFilter(new LowpassFilter(_sampleRate, 1050),new LowpassFilter(_sampleRate, 1050))
-                .Fft1d()
-                .GetAm(_sampleRate, 90, 150)
-                //.KalmanFilter(0.0003, 0.1,0.0003,0.1)
-                .AverageFilter(10, 10)
-                .RollingBuffer(TimeSpan.FromSeconds(10))
                 .Subscribe(_ =>
                 {
-                    var ddm = _.Select(x=>x.Item2 - x.Item1).Average();
-                    var sdm = _.Select(x=>x.Item2 + x.Item1).Average();
-                    var ddmDev = Math.Sqrt(_.Select(x=>x.Item2 - x.Item1).Select(x=>(x-ddm)*(x-ddm)).Sum() / (_.Length -1));
-                    var sdmDev = Math.Sqrt(_.Select(x=>x.Item2 + x.Item1).Select(x=>(x-sdm)*(x-sdm)).Sum() / (_.Length -1));
-                    var ddmAbsErr = Math.Abs(_.Select(x => x.Item2 - x.Item1).Min() - _.Select(x => x.Item2 - x.Item1).Max())/2.0;
-                    var sdmAbsErr = Math.Abs(_.Select(x => x.Item2 + x.Item1).Min() - _.Select(x => x.Item2 + x.Item1).Max())/2.0;
-                    for (var index = 0; index < _.Length; index++)
+                    for (var index = 0; index < 1000; index+=2)
                     {
-                        var item = _[index];
-                        _signal002.Update(index, (item.Item2 - item.Item1)*100);
+                        _signal001.Update(index/2, _.Span[index]);
                     }
-                    RxApp.MainThreadScheduler.Schedule(() =>
-                    {
-                        CustomText2 = $"DDM[{_.Length}]: {ddm:P2} (dev:{ddmDev:P2}, err:{ddmAbsErr:P2}) \n" +
-                                      $"SDM: {sdm:P2} (dev:{sdmDev:P2}, err:{sdmAbsErr:P2})";
-                        //_plot.Refresh();
-                    });
                 });
 
-            var highPassFilter = source
-                .AddIqFilter(new IlsHighPass(), new IlsHighPass()).Parallel(); 
-            
-            highPassFilter
-                .Magnitude()
-                .Fft1d()
-                .GetAm(_sampleRate, 90, 150)
-                .AverageFilter(10, 10)
-                .RollingBuffer(TimeSpan.FromSeconds(10))
-                .Subscribe(_ =>
-                {
-                    var ddm = _.Select(x=>x.Item2 - x.Item1).Average();
-                    var sdm = _.Select(x=>x.Item2 + x.Item1).Average();
-                    var ddmDev = Math.Sqrt(_.Select(x=>x.Item2 - x.Item1).Select(x=>(x-ddm)*(x-ddm)).Sum() / (_.Length -1));
-                    var sdmDev = Math.Sqrt(_.Select(x=>x.Item2 + x.Item1).Select(x=>(x-sdm)*(x-sdm)).Sum() / (_.Length -1));
-                    var ddmAbsErr = Math.Abs(_.Select(x => x.Item2 - x.Item1).Min() - _.Select(x => x.Item2 - x.Item1).Max())/2.0;
-                    var sdmAbsErr = Math.Abs(_.Select(x => x.Item2 + x.Item1).Min() - _.Select(x => x.Item2 + x.Item1).Max())/2.0;
-                    for (var index = 0; index < _.Length; index++)
-                    {
-                        var item = _[index];
-                        _signal003.Update(index, (item.Item2 - item.Item1)*100);
-                    }
-                    RxApp.MainThreadScheduler.Schedule(() =>
-                    {
-                        CustomText3 = $"DDM[{_.Length}]: {ddm:P2} (dev:{ddmDev:P2}, err:{ddmAbsErr:P2}) \n" +
-                                      $"SDM: {sdm:P2} (dev:{sdmDev:P2}, err:{sdmAbsErr:P2}) \n" +
-                                      $"CodeID: {_codeId}";
-                        //_plot.Refresh();
-                    });
-                });
-            
-            
-            
-            
-            var readSamplesStep = (int)(_sampleRate / 30.0); // 90 Hz and 150 Hz => НОД 30  -  samples per 1/30 sec
-            var sampleRateCount = _sampleRate * (30.0 / 1000.0); // 30 ms
-            var rate = (int)Math.Floor(sampleRateCount / readSamplesStep) + 1;
-            var samplesCnt = rate * readSamplesStep * 2; // I + Q
-            
-            source
-                .SplitSample(samplesCnt)
-                .Magnitude()
-                .Fft1d()
-                .GetAm(_sampleRate, 1020)
-                .CodeId(0.05, 0.20, rate * readSamplesStep, _sampleRate)
-                .Subscribe(_ =>
-                {
-                    _codeId = _;
-                });
-
-            source
-                .FrequencyOffset(16_000)
-                .RollingBuffer(TimeSpan.FromSeconds(10))
-                .Subscribe(_ =>
-            {
-                var freqOffset = _.Average();
-                var freqOffsetDev = Math.Sqrt(_.Select(x=>(x-freqOffset)*(x-freqOffset)).Sum() / (_.Length - 1));
-                var freqOffsetAbsErr = Math.Abs(_.Min() - _.Max()) / 2.0;
-                
-                RxApp.MainThreadScheduler.Schedule(() =>
-                {
-                    CustomText4 = $"FreqOffset: {freqOffset:F2} (dev:{freqOffsetDev:F2}, err:{freqOffsetAbsErr:F2})";
-                    //_plot.Refresh();
-                });
-            });
             lowPassFilter
-                .FrequencyOffset(16_000)
-                .RollingBuffer(TimeSpan.FromSeconds(10))
+                .Magnitude()
+                // .AddIFilter(new BandpassFilter(_sampleRate, 90))
+                .AddIFilter(new BandPass90Hz())
                 .Subscribe(_ =>
                 {
-                    var freqOffset = _.Average();
-                    var freqOffsetDev = Math.Sqrt(_.Select(x=>(x-freqOffset)*(x-freqOffset)).Sum() / (_.Length - 1));
-                    var freqOffsetAbsErr = Math.Abs(_.Min() - _.Max()) / 2.0;
-                
+                    for (var index = 0; index < _.Length; index+=2)
+                    {
+                        _signal002.Update(index/2, _.Span[index]);
+                    }
+                });
+            
+            lowPassFilter
+                .Magnitude()
+                // .AddIFilter(new BandpassFilter(_sampleRate, 90))
+                .AddIFilter(new BandPass90Hz())
+                .CopyIToQ()
+                .FrequencyShift(_sampleRate, 90)
+                .Magnitude()
+                .Subscribe(_ =>
+                {
+                    for (var index = 0; index < _.Length; index+=2)
+                    {
+                        _signal003.Update(index/2, _.Span[index]);
+                    }
+                });
+            
+            lowPassFilter
+                .Magnitude()
+                // .AddIFilter(new BandpassFilter(_sampleRate, 90))
+                .AddIFilter(new BandPass90Hz())
+                .CopyIToQ()
+                .FrequencyShift(_sampleRate, 90)
+                .AddIqFilter(new LowpassFilter(_sampleRate, 30), new LowpassFilter(_sampleRate, 30))
+                .Magnitude()
+                .Subscribe(_ =>
+                {
+                    for (var index = 0; index < _.Length; index+=2)
+                    {
+                        _signal004.Update(index/2, _.Span[index]);
+                    }
+                });
+
+            lowPassFilter
+                .Magnitude()
+                // .AddIFilter(new BandpassFilter(_sampleRate, 90))
+                .AddIFilter(new BandPass90Hz())
+                .CopyIToQ()
+                .FrequencyShift(_sampleRate, 90)
+                .AddIqFilter(new LowpassFilter(_sampleRate, 50), new LowpassFilter(_sampleRate, 50))
+                .FrequencyOffset(0)
+                .AverageFilter(10)
+                .Subscribe(_ =>
+                {
                     RxApp.MainThreadScheduler.Schedule(() =>
                     {
-                        CustomText5 = $"FreqOffset CRS: {freqOffset:F2} (dev:{freqOffsetDev:F2}, err:{freqOffsetAbsErr:F2})";
-                        //_plot.Refresh();
+                        CustomText2 = $"FREQ90 = {Math.Round(_):F0}";
+                        _plot00.Refresh();
+                        _plot01.Refresh();
+                        _plot10.Refresh();
+                        _plot11.Refresh();
                     });
                 });
             
-            highPassFilter
-                .FrequencyOffset(16_000)
-                .RollingBuffer(TimeSpan.FromSeconds(10))
-                .Subscribe(_ =>
-                {
-                    var freqOffset = _.Average();
-                    var freqOffsetDev = Math.Sqrt(_.Select(x=>(x-freqOffset)*(x-freqOffset)).Sum() / (_.Length - 1));
-                    var freqOffsetAbsErr = Math.Abs(_.Min() - _.Max()) / 2.0;
-                
-                    RxApp.MainThreadScheduler.Schedule(() =>
-                    {
-                        CustomText6 = $"FreqOffset CLR: {freqOffset:F2} (dev:{freqOffsetDev:F2}, err:{freqOffsetAbsErr:F2})";
-                    });
-                });
+            // lowPassFilter
+            //     .Magnitude()
+            //     // .HalfOverlap()
+            //     //.WindowFilter(WindowFilterEnum.Cosine)
+            //     // .AddIqFilter(new LowpassFilter(_sampleRate, 1050),new LowpassFilter(_sampleRate, 1050))
+            //     .Fft1d()
+            //     .GetAm(_sampleRate, 90, 150)
+            //     //.KalmanFilter(0.0003, 0.1,0.0003,0.1)
+            //     .AverageFilter(10, 10)
+            //     .RollingBuffer(TimeSpan.FromSeconds(10))
+            //     .Subscribe(_ =>
+            //     {
+            //         var ddm = _.Select(x=>x.Item2 - x.Item1).Average();
+            //         var sdm = _.Select(x=>x.Item2 + x.Item1).Average();
+            //         var ddmDev = Math.Sqrt(_.Select(x=>x.Item2 - x.Item1).Select(x=>(x-ddm)*(x-ddm)).Sum() / (_.Length -1));
+            //         var sdmDev = Math.Sqrt(_.Select(x=>x.Item2 + x.Item1).Select(x=>(x-sdm)*(x-sdm)).Sum() / (_.Length -1));
+            //         var ddmAbsErr = Math.Abs(_.Select(x => x.Item2 - x.Item1).Min() - _.Select(x => x.Item2 - x.Item1).Max())/2.0;
+            //         var sdmAbsErr = Math.Abs(_.Select(x => x.Item2 + x.Item1).Min() - _.Select(x => x.Item2 + x.Item1).Max())/2.0;
+            //         for (var index = 0; index < _.Length; index++)
+            //         {
+            //             var item = _[index];
+            //             _signal002.Update(index, (item.Item2 - item.Item1)*100);
+            //         }
+            //         RxApp.MainThreadScheduler.Schedule(() =>
+            //         {
+            //             CustomText2 = $"DDM[{_.Length}]: {ddm:P2} (dev:{ddmDev:P2}, err:{ddmAbsErr:P2}) \n" +
+            //                           $"SDM: {sdm:P2} (dev:{sdmDev:P2}, err:{sdmAbsErr:P2})";
+            //             //_plot.Refresh();
+            //         });
+            //     });
+            //
+            // var highPassFilter = source
+            //     .AddIqFilter(new IlsHighPass(), new IlsHighPass()).Parallel(); 
+            //
+            // highPassFilter
+            //     .Magnitude()
+            //     .Fft1d()
+            //     .GetAm(_sampleRate, 90, 150)
+            //     .AverageFilter(10, 10)
+            //     .RollingBuffer(TimeSpan.FromSeconds(10))
+            //     .Subscribe(_ =>
+            //     {
+            //         var ddm = _.Select(x=>x.Item2 - x.Item1).Average();
+            //         var sdm = _.Select(x=>x.Item2 + x.Item1).Average();
+            //         var ddmDev = Math.Sqrt(_.Select(x=>x.Item2 - x.Item1).Select(x=>(x-ddm)*(x-ddm)).Sum() / (_.Length -1));
+            //         var sdmDev = Math.Sqrt(_.Select(x=>x.Item2 + x.Item1).Select(x=>(x-sdm)*(x-sdm)).Sum() / (_.Length -1));
+            //         var ddmAbsErr = Math.Abs(_.Select(x => x.Item2 - x.Item1).Min() - _.Select(x => x.Item2 - x.Item1).Max())/2.0;
+            //         var sdmAbsErr = Math.Abs(_.Select(x => x.Item2 + x.Item1).Min() - _.Select(x => x.Item2 + x.Item1).Max())/2.0;
+            //         for (var index = 0; index < _.Length; index++)
+            //         {
+            //             var item = _[index];
+            //             _signal003.Update(index, (item.Item2 - item.Item1)*100);
+            //         }
+            //         RxApp.MainThreadScheduler.Schedule(() =>
+            //         {
+            //             CustomText3 = $"DDM[{_.Length}]: {ddm:P2} (dev:{ddmDev:P2}, err:{ddmAbsErr:P2}) \n" +
+            //                           $"SDM: {sdm:P2} (dev:{sdmDev:P2}, err:{sdmAbsErr:P2}) \n" +
+            //                           $"CodeID: {_codeId}";
+            //             //_plot.Refresh();
+            //         });
+            //     });
+            //
+            //
+            //
+            //
+            // var readSamplesStep = (int)(_sampleRate / 30.0); // 90 Hz and 150 Hz => НОД 30  -  samples per 1/30 sec
+            // var sampleRateCount = _sampleRate * (30.0 / 1000.0); // 30 ms
+            // var rate = (int)Math.Floor(sampleRateCount / readSamplesStep) + 1;
+            // var samplesCnt = rate * readSamplesStep * 2; // I + Q
+            //
+            // source
+            //     .SplitSample(samplesCnt)
+            //     .Magnitude()
+            //     .Fft1d()
+            //     .GetAm(_sampleRate, 1020)
+            //     .CodeId(0.05, 0.20, rate * readSamplesStep, _sampleRate)
+            //     .Subscribe(_ =>
+            //     {
+            //         _codeId = _;
+            //     });
+            //
+            // source
+            //     .FrequencyOffset(16_000)
+            //     .RollingBuffer(TimeSpan.FromSeconds(10))
+            //     .Subscribe(_ =>
+            // {
+            //     var freqOffset = _.Average();
+            //     var freqOffsetDev = Math.Sqrt(_.Select(x=>(x-freqOffset)*(x-freqOffset)).Sum() / (_.Length - 1));
+            //     var freqOffsetAbsErr = Math.Abs(_.Min() - _.Max()) / 2.0;
+            //     
+            //     RxApp.MainThreadScheduler.Schedule(() =>
+            //     {
+            //         CustomText4 = $"FreqOffset: {freqOffset:F2} (dev:{freqOffsetDev:F2}, err:{freqOffsetAbsErr:F2})";
+            //         //_plot.Refresh();
+            //     });
+            // });
+            // lowPassFilter
+            //     .FrequencyOffset(16_000)
+            //     .RollingBuffer(TimeSpan.FromSeconds(10))
+            //     .Subscribe(_ =>
+            //     {
+            //         var freqOffset = _.Average();
+            //         var freqOffsetDev = Math.Sqrt(_.Select(x=>(x-freqOffset)*(x-freqOffset)).Sum() / (_.Length - 1));
+            //         var freqOffsetAbsErr = Math.Abs(_.Min() - _.Max()) / 2.0;
+            //     
+            //         RxApp.MainThreadScheduler.Schedule(() =>
+            //         {
+            //             CustomText5 = $"FreqOffset CRS: {freqOffset:F2} (dev:{freqOffsetDev:F2}, err:{freqOffsetAbsErr:F2})";
+            //             //_plot.Refresh();
+            //         });
+            //     });
+            //
+            // highPassFilter
+            //     .FrequencyOffset(16_000)
+            //     .RollingBuffer(TimeSpan.FromSeconds(10))
+            //     .Subscribe(_ =>
+            //     {
+            //         var freqOffset = _.Average();
+            //         var freqOffsetDev = Math.Sqrt(_.Select(x=>(x-freqOffset)*(x-freqOffset)).Sum() / (_.Length - 1));
+            //         var freqOffsetAbsErr = Math.Abs(_.Min() - _.Max()) / 2.0;
+            //     
+            //         RxApp.MainThreadScheduler.Schedule(() =>
+            //         {
+            //             CustomText6 = $"FreqOffset CLR: {freqOffset:F2} (dev:{freqOffsetDev:F2}, err:{freqOffsetAbsErr:F2})";
+            //         });
+            //     });
+            //
+            // var clrPhases = lowPassFilter
+            //     .Magnitude()
+            //     .Fft1d()
+            //     .GetPhase(_sampleRate, 90, 150);
+            // var crsPhases = highPassFilter
+            //     .Magnitude()
+            //     .Fft1d()
+            //     .GetPhase(_sampleRate, 90, 150);
+            //
+            //
+            // clrPhases
+            //     .ParallelJoin(crsPhases, (clr,crs) => (MathEx.GetDistanceAngleRad(clr.Item1, crs.Item1),
+            //     MathEx.GetDistanceAngleRad(clr.Item2, crs.Item2)))
+            //     .RollingBuffer(TimeSpan.FromSeconds(10))
+            //     .Subscribe(_ =>
+            //     {
+            //         var diff90 = _.Select(__ => __.Item1).ToArray();
+            //         var diff150 = _.Select(__ => __.Item2).ToArray();
+            //         var phi90CrsVsClr = diff90.Average();
+            //         var phi90CrsVsClrDev =
+            //             Math.Sqrt(diff90.Select(x => (x - phi90CrsVsClr) * (x - phi90CrsVsClr)).Sum() / (diff90.Length - 1));
+            //         var phi90CrsVsClrErr = Math.Abs(diff90.Min() - diff90.Max()) / 2.0;
+            //         
+            //         var phi150CrsVsClr = diff150.Average();
+            //         var phi150CrsVsClrDev =
+            //             Math.Sqrt(diff150.Select(x => (x - phi150CrsVsClr) * (x - phi150CrsVsClr)).Sum() / (diff150.Length - 1));
+            //         var phi150CrsVsClrErr = Math.Abs(diff150.Min() - diff150.Max()) / 2.0;
+            //         
+            //     
+            //     RxApp.MainThreadScheduler.Schedule(() =>
+            //     {
+            //         CustomText7 =
+            //             $"Phi90CrsVsClr: {phi90CrsVsClr*180/Math.PI:F2} (dev:{phi90CrsVsClrDev*180/Math.PI:F2}, err:{phi90CrsVsClrErr*180/Math.PI:F2}) | Phi150CrsVsClr: {phi150CrsVsClr*180/Math.PI:F2} (dev:{phi150CrsVsClrDev*180/Math.PI:F2}, err:{phi150CrsVsClrErr*180/Math.PI:F2})";
+            //         //_plot.Refresh();
+            //     });
+            // });
+            
+            #region LOC
 
-            var clrPhases = lowPassFilter
-                .Magnitude()
-                .Fft1d()
-                .GetPhase(_sampleRate, 90, 150);
-            var crsPhases = highPassFilter
-                .Magnitude()
-                .Fft1d()
-                .GetPhase(_sampleRate, 90, 150);
+            // source
+            //     .Magnitude()
+            //     .Fft1d()
+            //     .GetAm(_sampleRate, 90, 150)
+            //     .AverageFilter(10, 10)
+            //     .RollingBuffer(TimeSpan.FromSeconds(10))
+            //     .Subscribe(_ =>
+            //     {
+            //         var ddm = _.Select(x=>x.Item2 - x.Item1).Average();
+            //         var sdm = _.Select(x=>x.Item2 + x.Item1).Average();
+            //         var ddmDev = Math.Sqrt(_.Select(x=>x.Item2 - x.Item1).Select(x=>(x-ddm)*(x-ddm)).Sum() / (_.Length -1));
+            //         var sdmDev = Math.Sqrt(_.Select(x=>x.Item2 + x.Item1).Select(x=>(x-sdm)*(x-sdm)).Sum() / (_.Length -1));
+            //         var ddmAbsErr = Math.Abs(_.Select(x => x.Item2 - x.Item1).Min() - _.Select(x => x.Item2 - x.Item1).Max())/2.0;
+            //         var sdmAbsErr = Math.Abs(_.Select(x => x.Item2 + x.Item1).Min() - _.Select(x => x.Item2 + x.Item1).Max())/2.0;
+            //         for (var index = 0; index < _.Length; index++)
+            //         {
+            //             var item = _[index];
+            //             _signal001.Update(index, (item.Item2 - item.Item1)*100);
+            //         }
+            //         RxApp.MainThreadScheduler.Schedule(() =>
+            //         {
+            //             CustomText = $"DDM[{_.Length}]: {ddm:P2} (dev:{ddmDev:P2}, err:{ddmAbsErr:P2}) \n" +
+            //                          $"SDM: {sdm:P2} (dev:{sdmDev:P2}, err:{sdmAbsErr:P2})  \nP:{_rssi}";
+            //                          _plot00.Refresh();
+            //         });
+            //     });
+            // Observable.Timer(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1)).Subscribe(_ =>
+            // {
+            //     _rssi = lime.GetLevel(CancellationToken.None).Result.ToString("F2");
+            // });
+            //
+            //
+            // var lowPassFilter = source
+            //     //.AddIqFilter(new LowpassFilter(_sampleRate,16000),new LowpassFilter(_sampleRate,16000))
+            //     //.AddIqFilter(new CustomLowPassElliptic8kHzFilter(),new CustomLowPassElliptic8kHzFilter())
+            //     .AddIqFilter(new IlsLowPass(), new IlsLowPass()).Parallel();
+            // lowPassFilter
+            //     .Magnitude()
+            //     // .HalfOverlap()
+            //     //.WindowFilter(WindowFilterEnum.Cosine)
+            //     // .AddIqFilter(new LowpassFilter(_sampleRate, 1050),new LowpassFilter(_sampleRate, 1050))
+            //     .Fft1d()
+            //     .GetAm(_sampleRate, 90, 150)
+            //     //.KalmanFilter(0.0003, 0.1,0.0003,0.1)
+            //     .AverageFilter(10, 10)
+            //     .RollingBuffer(TimeSpan.FromSeconds(10))
+            //     .Subscribe(_ =>
+            //     {
+            //         var ddm = _.Select(x=>x.Item2 - x.Item1).Average();
+            //         var sdm = _.Select(x=>x.Item2 + x.Item1).Average();
+            //         var ddmDev = Math.Sqrt(_.Select(x=>x.Item2 - x.Item1).Select(x=>(x-ddm)*(x-ddm)).Sum() / (_.Length -1));
+            //         var sdmDev = Math.Sqrt(_.Select(x=>x.Item2 + x.Item1).Select(x=>(x-sdm)*(x-sdm)).Sum() / (_.Length -1));
+            //         var ddmAbsErr = Math.Abs(_.Select(x => x.Item2 - x.Item1).Min() - _.Select(x => x.Item2 - x.Item1).Max())/2.0;
+            //         var sdmAbsErr = Math.Abs(_.Select(x => x.Item2 + x.Item1).Min() - _.Select(x => x.Item2 + x.Item1).Max())/2.0;
+            //         for (var index = 0; index < _.Length; index++)
+            //         {
+            //             var item = _[index];
+            //             _signal002.Update(index, (item.Item2 - item.Item1)*100);
+            //         }
+            //         RxApp.MainThreadScheduler.Schedule(() =>
+            //         {
+            //             CustomText2 = $"DDM[{_.Length}]: {ddm:P2} (dev:{ddmDev:P2}, err:{ddmAbsErr:P2}) \n" +
+            //                           $"SDM: {sdm:P2} (dev:{sdmDev:P2}, err:{sdmAbsErr:P2})";
+            //             //_plot.Refresh();
+            //         });
+            //     });
+            //
+            // var highPassFilter = source
+            //     .AddIqFilter(new IlsHighPass(), new IlsHighPass()).Parallel(); 
+            //
+            // highPassFilter
+            //     .Magnitude()
+            //     .Fft1d()
+            //     .GetAm(_sampleRate, 90, 150)
+            //     .AverageFilter(10, 10)
+            //     .RollingBuffer(TimeSpan.FromSeconds(10))
+            //     .Subscribe(_ =>
+            //     {
+            //         var ddm = _.Select(x=>x.Item2 - x.Item1).Average();
+            //         var sdm = _.Select(x=>x.Item2 + x.Item1).Average();
+            //         var ddmDev = Math.Sqrt(_.Select(x=>x.Item2 - x.Item1).Select(x=>(x-ddm)*(x-ddm)).Sum() / (_.Length -1));
+            //         var sdmDev = Math.Sqrt(_.Select(x=>x.Item2 + x.Item1).Select(x=>(x-sdm)*(x-sdm)).Sum() / (_.Length -1));
+            //         var ddmAbsErr = Math.Abs(_.Select(x => x.Item2 - x.Item1).Min() - _.Select(x => x.Item2 - x.Item1).Max())/2.0;
+            //         var sdmAbsErr = Math.Abs(_.Select(x => x.Item2 + x.Item1).Min() - _.Select(x => x.Item2 + x.Item1).Max())/2.0;
+            //         for (var index = 0; index < _.Length; index++)
+            //         {
+            //             var item = _[index];
+            //             _signal003.Update(index, (item.Item2 - item.Item1)*100);
+            //         }
+            //         RxApp.MainThreadScheduler.Schedule(() =>
+            //         {
+            //             CustomText3 = $"DDM[{_.Length}]: {ddm:P2} (dev:{ddmDev:P2}, err:{ddmAbsErr:P2}) \n" +
+            //                           $"SDM: {sdm:P2} (dev:{sdmDev:P2}, err:{sdmAbsErr:P2}) \n" +
+            //                           $"CodeID: {_codeId}";
+            //             //_plot.Refresh();
+            //         });
+            //     });
+            //
+            //
+            //
+            //
+            // var readSamplesStep = (int)(_sampleRate / 30.0); // 90 Hz and 150 Hz => НОД 30  -  samples per 1/30 sec
+            // var sampleRateCount = _sampleRate * (30.0 / 1000.0); // 30 ms
+            // var rate = (int)Math.Floor(sampleRateCount / readSamplesStep) + 1;
+            // var samplesCnt = rate * readSamplesStep * 2; // I + Q
+            //
+            // source
+            //     .SplitSample(samplesCnt)
+            //     .Magnitude()
+            //     .Fft1d()
+            //     .GetAm(_sampleRate, 1020)
+            //     .CodeId(0.05, 0.20, rate * readSamplesStep, _sampleRate)
+            //     .Subscribe(_ =>
+            //     {
+            //         _codeId = _;
+            //     });
+            //
+            // source
+            //     .FrequencyOffset(16_000)
+            //     .RollingBuffer(TimeSpan.FromSeconds(10))
+            //     .Subscribe(_ =>
+            // {
+            //     var freqOffset = _.Average();
+            //     var freqOffsetDev = Math.Sqrt(_.Select(x=>(x-freqOffset)*(x-freqOffset)).Sum() / (_.Length - 1));
+            //     var freqOffsetAbsErr = Math.Abs(_.Min() - _.Max()) / 2.0;
+            //     
+            //     RxApp.MainThreadScheduler.Schedule(() =>
+            //     {
+            //         CustomText4 = $"FreqOffset: {freqOffset:F2} (dev:{freqOffsetDev:F2}, err:{freqOffsetAbsErr:F2})";
+            //         //_plot.Refresh();
+            //     });
+            // });
+            // lowPassFilter
+            //     .FrequencyOffset(16_000)
+            //     .RollingBuffer(TimeSpan.FromSeconds(10))
+            //     .Subscribe(_ =>
+            //     {
+            //         var freqOffset = _.Average();
+            //         var freqOffsetDev = Math.Sqrt(_.Select(x=>(x-freqOffset)*(x-freqOffset)).Sum() / (_.Length - 1));
+            //         var freqOffsetAbsErr = Math.Abs(_.Min() - _.Max()) / 2.0;
+            //     
+            //         RxApp.MainThreadScheduler.Schedule(() =>
+            //         {
+            //             CustomText5 = $"FreqOffset CRS: {freqOffset:F2} (dev:{freqOffsetDev:F2}, err:{freqOffsetAbsErr:F2})";
+            //             //_plot.Refresh();
+            //         });
+            //     });
+            //
+            // highPassFilter
+            //     .FrequencyOffset(16_000)
+            //     .RollingBuffer(TimeSpan.FromSeconds(10))
+            //     .Subscribe(_ =>
+            //     {
+            //         var freqOffset = _.Average();
+            //         var freqOffsetDev = Math.Sqrt(_.Select(x=>(x-freqOffset)*(x-freqOffset)).Sum() / (_.Length - 1));
+            //         var freqOffsetAbsErr = Math.Abs(_.Min() - _.Max()) / 2.0;
+            //     
+            //         RxApp.MainThreadScheduler.Schedule(() =>
+            //         {
+            //             CustomText6 = $"FreqOffset CLR: {freqOffset:F2} (dev:{freqOffsetDev:F2}, err:{freqOffsetAbsErr:F2})";
+            //         });
+            //     });
+            //
+            // var clrPhases = lowPassFilter
+            //     .Magnitude()
+            //     .Fft1d()
+            //     .GetPhase(_sampleRate, 90, 150);
+            // var crsPhases = highPassFilter
+            //     .Magnitude()
+            //     .Fft1d()
+            //     .GetPhase(_sampleRate, 90, 150);
+            //
+            //
+            // clrPhases
+            //     .ParallelJoin(crsPhases, (clr,crs) => (MathEx.GetDistanceAngleRad(clr.Item1, crs.Item1),
+            //     MathEx.GetDistanceAngleRad(clr.Item2, crs.Item2)))
+            //     .RollingBuffer(TimeSpan.FromSeconds(10))
+            //     .Subscribe(_ =>
+            //     {
+            //         var diff90 = _.Select(__ => __.Item1).ToArray();
+            //         var diff150 = _.Select(__ => __.Item2).ToArray();
+            //         var phi90CrsVsClr = diff90.Average();
+            //         var phi90CrsVsClrDev =
+            //             Math.Sqrt(diff90.Select(x => (x - phi90CrsVsClr) * (x - phi90CrsVsClr)).Sum() / (diff90.Length - 1));
+            //         var phi90CrsVsClrErr = Math.Abs(diff90.Min() - diff90.Max()) / 2.0;
+            //         
+            //         var phi150CrsVsClr = diff150.Average();
+            //         var phi150CrsVsClrDev =
+            //             Math.Sqrt(diff150.Select(x => (x - phi150CrsVsClr) * (x - phi150CrsVsClr)).Sum() / (diff150.Length - 1));
+            //         var phi150CrsVsClrErr = Math.Abs(diff150.Min() - diff150.Max()) / 2.0;
+            //         
+            //     
+            //     RxApp.MainThreadScheduler.Schedule(() =>
+            //     {
+            //         CustomText7 =
+            //             $"Phi90CrsVsClr: {phi90CrsVsClr*180/Math.PI:F2} (dev:{phi90CrsVsClrDev*180/Math.PI:F2}, err:{phi90CrsVsClrErr*180/Math.PI:F2}) | Phi150CrsVsClr: {phi150CrsVsClr*180/Math.PI:F2} (dev:{phi150CrsVsClrDev*180/Math.PI:F2}, err:{phi150CrsVsClrErr*180/Math.PI:F2})";
+            //         //_plot.Refresh();
+            //     });
+            // });
+
+            #endregion
             
 
-            clrPhases
-                .ParallelJoin(crsPhases, (clr,crs) => (MathEx.GetDistanceAngleRad(clr.Item1, crs.Item1),
-                MathEx.GetDistanceAngleRad(clr.Item2, crs.Item2)))
-                .RollingBuffer(TimeSpan.FromSeconds(10))
-                .Subscribe(_ =>
-                {
-                    var diff90 = _.Select(__ => __.Item1).ToArray();
-                    var diff150 = _.Select(__ => __.Item2).ToArray();
-                    var phi90CrsVsClr = diff90.Average();
-                    var phi90CrsVsClrDev =
-                        Math.Sqrt(diff90.Select(x => (x - phi90CrsVsClr) * (x - phi90CrsVsClr)).Sum() / (diff90.Length - 1));
-                    var phi90CrsVsClrErr = Math.Abs(diff90.Min() - diff90.Max()) / 2.0;
-                    
-                    var phi150CrsVsClr = diff150.Average();
-                    var phi150CrsVsClrDev =
-                        Math.Sqrt(diff150.Select(x => (x - phi150CrsVsClr) * (x - phi150CrsVsClr)).Sum() / (diff150.Length - 1));
-                    var phi150CrsVsClrErr = Math.Abs(diff150.Min() - diff150.Max()) / 2.0;
-                    
-                
-                RxApp.MainThreadScheduler.Schedule(() =>
-                {
-                    CustomText7 =
-                        $"Phi90CrsVsClr: {phi90CrsVsClr*180/Math.PI:F2} (dev:{phi90CrsVsClrDev*180/Math.PI:F2}, err:{phi90CrsVsClrErr*180/Math.PI:F2}) | Phi150CrsVsClr: {phi150CrsVsClr*180/Math.PI:F2} (dev:{phi150CrsVsClrDev*180/Math.PI:F2}, err:{phi150CrsVsClrErr*180/Math.PI:F2})";
-                    //_plot.Refresh();
-                });
-            });
-                
-            
+            #region VOR
+
             //
             // _azimuthIndex = 0;
             //     source
@@ -373,6 +629,9 @@ namespace Asv.Sdr.Viewer
                 //         });
                 //         
                 //     });
+
+            #endregion
+            
             
 
             start();
@@ -644,4 +903,12 @@ namespace Asv.Sdr.Viewer
         }
     }
     
+    public class BandPass90Hz : EllipticFilterBase
+    {
+        public BandPass90Hz() : base(
+            new []{ 1.202087324e-13, 0.0, -4.808349296e-13, 0.0, 7.212523944e-13}, 
+            new []{ 0.9969262176, -7.978340376, 27.93459137, -55.89026882, 69.88955148, -55.93330016, 27.97762303, -7.996782747 })
+        {
+        }
+    }
 }

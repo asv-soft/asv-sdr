@@ -44,7 +44,6 @@ namespace Asv.Sdr
             
             while (inputIndex < _sourceSize)
             {
-                var i = new Index(inputIndex);
                 if (_freeSpace <= (input.Length - inputIndex))
                 {
                     var spanIn = input[new Range(new Index(inputIndex), new Index(inputIndex + _freeSpace))];

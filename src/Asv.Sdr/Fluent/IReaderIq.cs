@@ -281,13 +281,13 @@ namespace Asv.Sdr
 
         #region Frequency offset
 
-        public static IObservable<double> FrequencyOffset(this IReaderIqSubject<float> src, short fOffset)
+        public static IObservable<double> FrequencyOffset(this IReaderIqSubject<float> src, short freqOffset, Func<double, double> freqAdjustment = default)
         {
-            return new ReaderIqFrequencyOffsetFloatSubject(src, fOffset);
+            return new ReaderIqFrequencyOffsetFloatSubject(src, freqOffset, freqAdjustment);
         }
-        public static IObservable<double> FrequencyOffset(this IReaderIqSubject<double> src, short fOffset)
+        public static IObservable<double> FrequencyOffset(this IReaderIqSubject<double> src, short freqOffset, Func<double, double> freqAdjustment = default)
         {
-            return new ReaderIqFrequencyOffsetDoubleSubject(src, fOffset);
+            return new ReaderIqFrequencyOffsetDoubleSubject(src, freqOffset, freqAdjustment);
         }
 
         #endregion

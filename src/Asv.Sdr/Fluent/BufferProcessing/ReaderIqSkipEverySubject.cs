@@ -10,12 +10,12 @@ namespace Asv.Sdr
         private readonly int _skipEveryTime;
         private readonly Subject<Memory<TOut>> _subject = new();
         private readonly IDisposable _subscribe;
-        private int _value;
+        private uint _value;
 
         public ReaderIqSkipEverySubject(IReaderIqSubject<TOut> source, int skipEveryTime)
         {
             OutputBufferSize = source.OutputBufferSize;
-            _skipEveryTime = skipEveryTime;
+            _skipEveryTime = skipEveryTime <= 0 ? 1 : skipEveryTime + 1;
             _subscribe = source.Subscribe(OnNext);
         }
 
