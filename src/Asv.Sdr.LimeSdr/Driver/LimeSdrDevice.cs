@@ -121,19 +121,19 @@ namespace Asv.Sdr.LimeSdr
             switch (level)
             {
                 case LogLevel.LOG_LEVEL_CRITICAL:
-                    _logger.Fatal("LMS: {1}", level, msg);
+                    _logger.Fatal("LMS=> {0}", msg);
                     break;
                 case LogLevel.LOG_LEVEL_ERROR:
-                    _logger.Error("LMS: {1}", level, msg);
+                    _logger.Error("LMS=> {0}", msg);
                     break;
                 case LogLevel.LOG_LEVEL_WARNING:
-                    _logger.Warn("LMS: {1}", level, msg);
+                    _logger.Warn("LMS=> {0}", msg);
                     break;
                 case LogLevel.LOG_LEVEL_INFO:
-                    _logger.Info("LMS: {1}", level, msg);
+                    _logger.Info("LMS=> {0}", msg);
                     break;
                 case LogLevel.LOG_LEVEL_DEBUG:
-                    _logger.Debug("LMS: {1}", level, msg);
+                    _logger.Debug("LMS=> {0}", msg);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(level), level, null);
