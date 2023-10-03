@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,19 +54,23 @@ namespace Asv.Sdr.LimeSdr
         
 
         #endregion
-
         
         private readonly IntPtr _device;
         private readonly TaskFactory _taskFactory;
         private readonly List<ILmsStream> _streamList = new(4);
         private readonly bool _isThreadSafe;
+        private HashSet<string> _ignoreLogLmsParams;
         
-
         public LimeSdrDevice(string deviceId, bool isThreadSave = false)
+            :this(deviceId,isThreadSave,LimeSdrParams.LMS7_CAPSEL,LimeSdrParams.LMS7_CAPTURE)
+        {
+            
+        }
+        public LimeSdrDevice(string deviceId, bool isThreadSave, params LMS7Parameter[] ignoreLogLmsParams)
         {
             DeviceId = deviceId;
             _isThreadSafe = isThreadSave;
-
+            _ignoreLogLmsParams = new HashSet<string>(ignoreLogLmsParams.Select(x=>x.name),StringComparer.InvariantCultureIgnoreCase);
             
             _logger.Debug("Try to open LimeSDR device {0}",deviceId);
             LibHelper.CheckLibraryFiles();
@@ -113,7 +118,26 @@ namespace Asv.Sdr.LimeSdr
 
         private static void OnLmsLog(LogLevel level, string msg)
         {
-            _logger.Info($"LMS[type:{level}]: {msg}");
+            switch (level)
+            {
+                case LogLevel.LOG_LEVEL_CRITICAL:
+                    _logger.Fatal("LMS: {1}", level, msg);
+                    break;
+                case LogLevel.LOG_LEVEL_ERROR:
+                    _logger.Error("LMS: {1}", level, msg);
+                    break;
+                case LogLevel.LOG_LEVEL_WARNING:
+                    _logger.Warn("LMS: {1}", level, msg);
+                    break;
+                case LogLevel.LOG_LEVEL_INFO:
+                    _logger.Info("LMS: {1}", level, msg);
+                    break;
+                case LogLevel.LOG_LEVEL_DEBUG:
+                    _logger.Debug("LMS: {1}", level, msg);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(level), level, null);
+            }
         }
 
 
@@ -411,7 +435,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info("Set LMS register {0:X2}={1:X2}", address, value);
+                _logger.Trace("Set LMS register {0:X2}={1:X2}", address, value);
                 Check(LMS_WriteLMSReg(_device, address, value),nameof(LMS_WriteLMSReg));
             }, cancel);
         }
@@ -421,12 +445,15 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info("Set LMS param {0}={1:X2}", (object)param.name, (object)value);
+                if (_ignoreLogLmsParams.Contains(param.name) == false)
+                {
+                    _logger.Trace("Set LMS param {0}={1:X2}", (object)param.name, (object)value);    
+                }
                 Check(LMS_WriteParam(_device, param, value),nameof(LMS_WriteParam));
             }, cancel);
         }
 
-        public  Task<ushort> ReadLMSParam(LMS7Parameter param, CancellationToken cancel)
+        public Task<ushort> ReadLMSParam(LMS7Parameter param, CancellationToken cancel)
         {
             return _taskFactory.StartNew(() =>
             {
