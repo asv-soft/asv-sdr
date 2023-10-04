@@ -281,13 +281,13 @@ namespace Asv.Sdr
 
         #region Frequency offset
 
-        public static IObservable<double> FrequencyOffset(this IReaderIqSubject<float> src, short freqOffset, Func<double, double> freqAdjustment = default)
+        public static IObservable<double> FrequencyOffset(this IReaderIqSubject<float> src)
         {
-            return new ReaderIqFrequencyOffsetFloatSubject(src, freqOffset, freqAdjustment);
+            return new ReaderIqFrequencyOffsetFloatSubject(src);
         }
-        public static IObservable<double> FrequencyOffset(this IReaderIqSubject<double> src, short freqOffset, Func<double, double> freqAdjustment = default)
+        public static IObservable<double> FrequencyOffset(this IReaderIqSubject<double> src)
         {
-            return new ReaderIqFrequencyOffsetDoubleSubject(src, freqOffset, freqAdjustment);
+            return new ReaderIqFrequencyOffsetDoubleSubject(src);
         }
 
         #endregion
@@ -383,9 +383,9 @@ namespace Asv.Sdr
 
         #endregion
 
-        public static IReaderIqSubject<TOut> SkipEvery<TOut>(this IReaderIqSubject<TOut> src, int skipEveryTime)
+        public static IReaderIqSubject<TOut> SkipEvery<TOut>(this IReaderIqSubject<TOut> src, int skipEveryTime, int startOffset)
         {
-            return new ReaderIqSkipEverySubject<TOut>(src, skipEveryTime);
+            return new ReaderIqSkipEverySubject<TOut>(src, skipEveryTime, startOffset);
         }
 
         public static IObservable<(TOut[] i,TOut[] q)> CopyToArray<TOut>(this IReaderIqSubject<TOut> src)

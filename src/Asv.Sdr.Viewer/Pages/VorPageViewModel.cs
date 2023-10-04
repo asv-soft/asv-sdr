@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Concurrency;
-using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using Asv.Common;
 using Asv.Sdr.LimeSdr;
 using Asv.Tools;
-using DynamicData;
-using JetBrains.Annotations;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using ScottPlot.Avalonia;
@@ -194,7 +187,7 @@ namespace Asv.Sdr.Viewer
                 .CopyIToQ()
                 .FrequencyShift(_sampleRate, 90)
                 .AddIqFilter(new LowpassFilter(_sampleRate, 50), new LowpassFilter(_sampleRate, 50))
-                .FrequencyOffset(0)
+                .FrequencyOffset()
                 .AverageFilter(10)
                 .Subscribe(_ =>
                 {

@@ -18,7 +18,7 @@ namespace Asv.Sdr.LimeSdr
         public double GfirBandWidth { get; set; } = 66_000;
         public bool LmsSelfCalibrate { get; set; } = true;
         public uint Channel { get; set; } = 0;
-        public ushort AmountDataRssi { get; set; } = 7;
+        public byte AmountDataRssi { get; set; } = 7;
     }
 
     public class LimeReaderIq: DisposableOnceWithCancel, IReaderIq<float>
@@ -47,7 +47,7 @@ namespace Asv.Sdr.LimeSdr
             await _device.SetAntenna(LmsChannel.Rx, config.Channel, (uint)config.Path, DisposeCancel);
             await _device.SetBandWidth(LmsChannel.Rx, config.Channel, config.BandWidth, DisposeCancel);
             await _device.SetNormalizedGain(LmsChannel.Rx, config.Channel, config.Gain, DisposeCancel);
-            await _device.EnableRSSIMeasure(1);
+            await _device.EnableRSSIMeasure(config.AmountDataRssi);
             
             // await _device.WriteLMSParam(LimeSdrParams.LMS7_G_PGA_RBB_R3, 24, DisposeCancel);
             if (config.LmsLpfEnable == true)
@@ -76,7 +76,6 @@ namespace Asv.Sdr.LimeSdr
         
             
             _rxStream = await _device.CreateStream(LmsChannel.Rx, config.Channel, (uint)config.SampleRate);
-            await _device.WriteLMSParam(LimeSdrParams.LMS7_AGC_AVG_RXTSP, (ushort)config.AmountDataRssi, DisposeCancel);
             await _rxStream.Start(DisposeCancel);
             
         }
