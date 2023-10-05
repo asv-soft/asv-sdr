@@ -10,6 +10,7 @@ namespace Asv.Sdr
         public ReaderIqFrequencyOffsetFloatSubject(IReaderIqSubject<float> input) : base(input)
         {
             _readSamples = input.OutputBufferSize / 2;
+            if (_readSamples == 1) throw new ArgumentException("Input buffer size must be greater than 2");
         }
 
         protected override double Process(ReadOnlySpan<float> input, out bool selfPublish)
@@ -28,7 +29,7 @@ namespace Asv.Sdr
             }
             sumX /= (_readSamples - 1);
             sumY /= (_readSamples - 1);
-            var offset = Math.Atan2(sumY, sumX) * _readSamples;
+            var offset = -Math.Atan2(sumY, sumX) * _readSamples;
             return offset;
         }
     }
@@ -40,6 +41,7 @@ namespace Asv.Sdr
         public ReaderIqFrequencyOffsetDoubleSubject(IReaderIqSubject<double> input) : base(input)
         {
             _readSamples = input.OutputBufferSize / 2;
+            if (_readSamples == 1) throw new ArgumentException("Input buffer size must be greater than 2");
         }
 
         protected override double Process(ReadOnlySpan<double> input, out bool selfPublish)
@@ -58,7 +60,7 @@ namespace Asv.Sdr
             }
             sumX /= (_readSamples - 1);
             sumY /= (_readSamples - 1);
-            var offset = Math.Atan2(sumY, sumX) * _readSamples;
+            var offset = -Math.Atan2(sumY, sumX) * _readSamples;
             return offset;
         }
     }
