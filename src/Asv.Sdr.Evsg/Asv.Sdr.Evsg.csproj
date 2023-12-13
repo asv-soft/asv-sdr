@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+        <Version>1.0.1</Version>
+        <LangVersion>9.0</LangVersion>
+        <Authors>https://github.com/asvol</Authors>
+        <Company>https://github.com/asvol</Company>
+        <Copyright>https://github.com/asvol</Copyright>
+        <PackageProjectUrl>https://github.com/asvol/asv-sdr</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/asvol/asv-sdr</RepositoryUrl>
+        <PackageTags />
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Asv.Sdr\Asv.Sdr.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Asv.IO" Version="1.13.1" />
+    </ItemGroup>
+
+</Project>

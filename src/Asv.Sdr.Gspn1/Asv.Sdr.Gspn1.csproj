@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+        <Version>1.0.1</Version>
+        <LangVersion>latest</LangVersion>
+        <Authors>https://github.com/asvol</Authors>
+        <Company>https://github.com/asvol</Company>
+        <Copyright>https://github.com/asvol</Copyright>
+        <PackageProjectUrl>https://github.com/asvol/asv-sdr</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/asvol/asv-sdr</RepositoryUrl>
+        <PackageTags />
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="NLog" Version="5.2.6" />
+      <PackageReference Include="System.IO.Ports" Version="6.0.0" />
+    </ItemGroup>
+
+</Project>

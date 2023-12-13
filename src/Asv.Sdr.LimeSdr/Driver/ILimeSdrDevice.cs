@@ -60,6 +60,7 @@ namespace Asv.Sdr.LimeSdr
         Task Stop(CancellationToken cancel);
         Task<LmsStreamStatus> GetStatus(CancellationToken cancel);
         Task<int> Read(Memory<float> iqBuffer, uint timeoutMs = 1000, CancellationToken cancel = default);
+        Task<int> Write(ReadOnlyMemory<float> iqBuffer, uint timeoutMs = 1000, CancellationToken cancel = default);
 
     }
 

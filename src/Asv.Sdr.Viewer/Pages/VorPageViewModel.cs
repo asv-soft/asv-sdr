@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Concurrency;
+using System.Threading;
 using System.Threading.Tasks;
 using Asv.Sdr.LimeSdr;
 using Asv.Tools;
@@ -79,7 +80,8 @@ namespace Asv.Sdr.Viewer
             _sampleRate = 96_000;
             _readSamples = (int)(_sampleRate / 30.0 * 5);
             _bufferSize = _readSamples * 2; // I + Q buffer
-            
+
+            var a = device.GetChipTemperature(CancellationToken.None).Result;
             
             var lime = new LimeReaderIq(device, new LimeSourceIqConfig
             {

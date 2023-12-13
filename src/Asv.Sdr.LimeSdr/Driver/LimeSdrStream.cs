@@ -83,7 +83,14 @@ namespace Asv.Sdr.LimeSdr
             }, cancel);
         }
       
-        
+        public unsafe Task<int> Write(ReadOnlyMemory<float> iqBuffer, uint timeoutMs = 1000, CancellationToken cancel = default)
+        {
+            return _factory.StartNew(() =>
+            {
+                using var pin = iqBuffer.Pin();
+                return LMS_SendStream(_stream, pin.Pointer, (uint)(iqBuffer.Length / 2), ref _meta, timeoutMs);
+            }, cancel);
+        }
 
         
     }
