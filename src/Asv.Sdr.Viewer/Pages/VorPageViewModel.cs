@@ -85,7 +85,7 @@ namespace Asv.Sdr.Viewer
             
             var lime = new LimeReaderIq(device, new LimeSourceIqConfig
             {
-                Frequency = 110_000_000-16_000,
+                Frequency = 122_000_000,
                 BandWidth = 64_000,
                 Gain = 1,
                 SampleRate = _sampleRate,
@@ -180,6 +180,8 @@ namespace Asv.Sdr.Viewer
                     {
                         _signal004.Update(index/2, _.Span[index]);
                     }
+
+                    RxApp.MainThreadScheduler.Schedule(() => _plot00.Refresh());
                 });
 
             lowPassFilter
@@ -193,14 +195,14 @@ namespace Asv.Sdr.Viewer
                 .AverageFilter(10)
                 .Subscribe(_ =>
                 {
-                    RxApp.MainThreadScheduler.Schedule(() =>
+                    /*RxApp.MainThreadScheduler.Schedule(() =>
                     {
                         CustomText2 = $"FREQ90 = {Math.Round(_):F0}";
                         _plot00.Refresh();
                         _plot01.Refresh();
                         _plot10.Refresh();
                         _plot11.Refresh();
-                    });
+                    });*/
                 });
             
             // lowPassFilter

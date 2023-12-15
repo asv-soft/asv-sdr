@@ -19,8 +19,7 @@ namespace Asv.Sdr.LimeSdr
 
         static LimeSdrDevice()
         {
-            LibHelper.CheckLibraryFiles();
-            _callback = new LogCallBack(OnLmsLog);
+            _callback = OnLmsLog;
             GC.KeepAlive(_callback);
             LMS_RegisterLogHandler(_callback);
         }
@@ -73,7 +72,6 @@ namespace Asv.Sdr.LimeSdr
             _ignoreLogLmsParams = new HashSet<string>(ignoreLogLmsParams.Select(x=>x.name),StringComparer.InvariantCultureIgnoreCase);
             
             _logger.Debug("Try to open LimeSDR device {0}",deviceId);
-            LibHelper.CheckLibraryFiles();
 
             Disposable.AddAction(() =>
             {

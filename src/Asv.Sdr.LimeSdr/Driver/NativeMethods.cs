@@ -1,8 +1,21 @@
 using System;
+using System.ComponentModel;
+using System.IO;
 using System.Runtime.InteropServices;
+using NLog;
 
 namespace Asv.Sdr.LimeSdr
 {
+    public static class LmsNativeDllUsage
+    {
+#if X64
+        public static bool Is64BitOperatingSystem = true;
+#else
+        public static bool Is64BitOperatingSystem = false;
+#endif
+    }
+    
+    
     //Enumeration of LMS7 TEST signal types
     public enum lms_testsig_t
     {
@@ -146,9 +159,101 @@ namespace Asv.Sdr.LimeSdr
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void LogCallBack(LogLevel level, string msg);
 
+    /// <summary>
+    /// DLl from here https://downloads.myriadrf.org/project/limesuite/20.10/
+    /// </summary>
     class NativeMethods
     {
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        
+        static NativeMethods()
+        {
+            var os = DetectPlatform();
+            switch (os)
+            {
+                case OperatingSystem.Undefined:
+                    break;
+                case OperatingSystem.Windows:
+                    if (LmsNativeDllUsage.Is64BitOperatingSystem == true)
+                    {
+                        var dllDir64 = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "lib","x64");
+                        if (!Directory.Exists(dllDir64))
+                        {
+                            _logger.Info("Create native library directory {0}", dllDir64);
+                            Directory.CreateDirectory(dllDir64);
+                        }
+                        CheckFile(Path.Combine(dllDir64, "LimeSuite.dll"), Libs.LimeSuiteX64);
+                        if (!SetDllDirectory(dllDir64))
+                            throw new Win32Exception($"Error to execute kernel32.dll:SetDllDirectory({dllDir64})");
+                        _logger.Info("Set native library directory {0}", dllDir64);
+                        Is64BitOperatingSystem = true;
+                    }
+                    else
+                    {
+                        var dllDir32 = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "lib","x86");
+                        if (!Directory.Exists(dllDir32))
+                        {
+                            _logger.Info("Create native library directory {0}", dllDir32);
+                            Directory.CreateDirectory(dllDir32);
+                        }
+                        CheckFile(Path.Combine(dllDir32, "LimeSuite.dll"), Libs.LimeSuiteX32);
+                        if (!SetDllDirectory(dllDir32))
+                            throw new Win32Exception($"Error to execute kernel32.dll:SetDllDirectory({dllDir32})");
+                        _logger.Info("Set native library directory {0}", dllDir32);
+                        Is64BitOperatingSystem = false;
+                    }
+                    break;
+                case OperatingSystem.Linux:
+                    break;
+                case OperatingSystem.MacOsX:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("Can't detect OS");
+            }
+        }
 
+        public static bool Is64BitOperatingSystem = false;
+
+
+        public enum OperatingSystem
+        {
+            Undefined,
+            Windows,
+            Linux,
+            MacOsX
+        }
+
+        
+
+        private static void CheckFile(string path, byte[] data)
+        {
+            if (!File.Exists(path)) File.WriteAllBytes(path, data);
+        }
+
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern bool SetDllDirectory(string path);
+
+        private static OperatingSystem DetectPlatform()
+        {
+            var windir = Environment.GetEnvironmentVariable("windir");
+            if (!string.IsNullOrEmpty(windir) && windir.Contains(@"\") && Directory.Exists(windir)) return OperatingSystem.Windows;
+
+            if (File.Exists(@"/proc/sys/kernel/ostype"))
+            {
+                var osType = File.ReadAllText(@"/proc/sys/kernel/ostype");
+                return osType.StartsWith("Linux", StringComparison.OrdinalIgnoreCase)
+                    ? OperatingSystem.Linux
+                    : OperatingSystem.Undefined;
+            }
+
+            return File.Exists(@"/System/Library/CoreServices/SystemVersion.plist")
+                ? OperatingSystem.MacOsX
+                : OperatingSystem.Undefined;
+        }
+        
+        
+        
         [DllImport("LimeSuite", EntryPoint = "LMS_ReadLMSReg", CallingConvention = CallingConvention.Cdecl)]
         public static unsafe extern int LMS_ReadLMSReg(IntPtr device, UInt32 address, UInt16* val);
 
@@ -183,20 +288,20 @@ namespace Asv.Sdr.LimeSdr
         // --------------------------------------- BEGIN X86 / X64 platform ------------------------------------------------
 
         public static int LMS_EnableChannel(IntPtr device, bool dir_tx, uint chan, bool enabled) =>
-            Environment.Is64BitOperatingSystem
+            Is64BitOperatingSystem
                 ? LMS_EnableChannel_X64(device, dir_tx, chan, enabled)
                 : LMS_EnableChannel_X32(device, dir_tx, chan, enabled);
 
         public static int LMS_SetLOFrequency(IntPtr device, bool dir_tx, uint chan, double frequency)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_SetLOFrequency_X64(device, dir_tx, chan, frequency)
                 : LMS_SetLOFrequency_X32(device, dir_tx, chan, frequency);
         }
 
         public static int LMS_GetLOFrequency(IntPtr device, bool dir_tx, uint chan, ref double frequency)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_GetLOFrequency_X64(device, dir_tx, chan, ref frequency)
                 : LMS_GetLOFrequency_X32(device, dir_tx, chan, ref frequency);
         }
@@ -204,7 +309,7 @@ namespace Asv.Sdr.LimeSdr
         public static unsafe int LMS_SetNCOFrequency(IntPtr device, bool dir_tx, uint chan, double* frequency,
             double pho)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_SetNCOFrequency_X64(device, dir_tx, chan, frequency, pho)
                 : LMS_SetNCOFrequency_X32(device, dir_tx, chan, frequency, pho);
         }
@@ -212,49 +317,49 @@ namespace Asv.Sdr.LimeSdr
         public static unsafe int LMS_GetNCOFrequency(IntPtr device, bool dir_tx, uint chan, double* frequency,
             double* pho)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_GetNCOFrequency_X64(device, dir_tx, chan, frequency, pho)
                 : LMS_GetNCOFrequency_X32(device, dir_tx, chan, frequency, pho);
         }
 
         public static int LMS_SetNCOIndex(IntPtr device, bool dir_tx, uint chan, int index, bool downconv)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_SetNCOIndex_X64(device, dir_tx, chan, index, downconv)
                 : LMS_SetNCOIndex_X32(device, dir_tx, chan, index, downconv);
         }
 
         public static int LMS_GetNCOIndex(IntPtr device, bool dir_tx, uint chan)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_GetNCOIndex_X64(device, dir_tx, chan)
                 : LMS_GetNCOIndex_X32(device, dir_tx, chan);
         }
 
         public static int LMS_SetNCOPhase(IntPtr device, bool dir_tx, uint chan, double phase, double fcw)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_SetNCOPhase_X64(device, dir_tx, chan, phase, fcw)
                 : LMS_SetNCOPhase_X32(device, dir_tx, chan, phase, fcw);
         }
 
         public static int LMS_GetNCOPhase(IntPtr device, bool dir_tx, uint chan, ref double phase, ref double fcw)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_GetNCOPhase_X64(device, dir_tx, chan, ref phase, ref fcw)
                 : LMS_GetNCOPhase_X32(device, dir_tx, chan, ref phase, ref fcw);
         }
 
         public static int LMS_SetSampleRateDir(IntPtr device, bool dir_tx, double rate, uint oversample)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_SetSampleRateDir_X64(device, dir_tx, rate, oversample)
                 : LMS_SetSampleRateDir_X32(device, dir_tx, rate, oversample);
         }
 
         public static int LMS_SetSampleRate(IntPtr device, double rate, uint oversample)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_SetSampleRate_X64(device, rate, oversample)
                 : LMS_SetSampleRate_X32(device, rate, oversample);
         }
@@ -262,7 +367,7 @@ namespace Asv.Sdr.LimeSdr
         public static int LMS_GetSampleRate(IntPtr device, bool dir_tx, uint chan, ref double host_Hz,
             ref double rf_Hz)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_GetSampleRate_X64(device, dir_tx, chan, ref host_Hz, ref rf_Hz)
                 : LMS_GetSampleRate_X32(device, dir_tx, chan, ref host_Hz, ref rf_Hz);
         }
@@ -270,7 +375,7 @@ namespace Asv.Sdr.LimeSdr
         public static unsafe int LMS_RecvStream(IntPtr stream, void* samples, uint sample_count,
             ref lms_stream_meta_t meta, uint timeout_ms)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_RecvStream_X64(stream, samples, sample_count, ref meta, timeout_ms)
                 : LMS_RecvStream_X32(stream, samples, sample_count, ref meta, timeout_ms);
         }
@@ -278,14 +383,14 @@ namespace Asv.Sdr.LimeSdr
         public static unsafe int LMS_SendStream(IntPtr stream, void* samples, uint sample_count,
             ref lms_stream_meta_t meta, uint timeout_ms)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_SendStream_X64(stream, samples, sample_count, ref meta, timeout_ms)
                 : LMS_SendStream_X32(stream, samples, sample_count, ref meta, timeout_ms);
         }
 
         public static unsafe int LMS_SetAntenna(IntPtr device, bool dir_tx, uint chan, uint index)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_SetAntenna_X64(device, dir_tx, chan, index)
                 : LMS_SetAntenna_X32(device, dir_tx, chan, index);
         }
@@ -293,42 +398,42 @@ namespace Asv.Sdr.LimeSdr
         public static unsafe int LMS_SetTestSignal(IntPtr device, bool dir_tx, uint chan, lms_testsig_t sig,
             Int16 dc_i, Int16 dc_q)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_SetTestSignal_X64(device, dir_tx, chan, sig, dc_i, dc_q)
                 : LMS_SetTestSignal_X32(device, dir_tx, chan, sig, dc_i, dc_q);
         }
 
         public unsafe static int LMS_GPIOWrite(IntPtr device, char* buffer, uint length)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_GPIOWrite_X64(device, buffer, length)
                 : LMS_GPIOWrite_X32(device, buffer, length);
         }
 
         public unsafe static int LMS_GPIODirWrite(IntPtr device, char* buffer, uint length)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_GPIODirWrite_X64(device, buffer, length)
                 : LMS_GPIODirWrite_X32(device, buffer, length);
         }
 
         public unsafe static int LMS_GPIORead(IntPtr device, char* buffer, uint length)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_GPIORead_X64(device, buffer, length)
                 : LMS_GPIORead_X32(device, buffer, length);
         }
 
         public unsafe static int LMS_GPIODirRead(IntPtr device, char* buffer, uint length)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_GPIODirRead_X64(device, buffer, length)
                 : LMS_GPIODirRead_X32(device, buffer, length);
         }
 
         public static int LMS_SetGaindB(IntPtr device, bool dir_tx, uint chan, uint gain)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_SetGaindB_X64(device, dir_tx, chan, gain)
                 : LMS_SetGaindB_X32(device, dir_tx, chan, gain);
         }
@@ -336,7 +441,7 @@ namespace Asv.Sdr.LimeSdr
         public unsafe static int LMS_GetGaindB(IntPtr device, bool dir_tx, uint chan, ref uint gain)
         {
             int res;
-            if (Environment.Is64BitOperatingSystem)
+            if (Is64BitOperatingSystem)
             {
                 var buffer = new ulong[1];
 
@@ -363,98 +468,98 @@ namespace Asv.Sdr.LimeSdr
 
         public static int LMS_SetNormalizedGain(IntPtr device, bool dir_tx, uint chan, double gain)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_SetNormalizedGain_X64(device, dir_tx, chan, gain)
                 : LMS_SetNormalizedGain_X32(device, dir_tx, chan, gain);
         }
 
         public unsafe static int LMS_GetNormalizedGain(IntPtr device, bool dir_tx, uint chan, double* gain)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_GetNormalizedGain_X64(device, dir_tx, chan, gain)
                 : LMS_GetNormalizedGain_X32(device, dir_tx, chan, gain);
         }
 
         public unsafe static int LMS_GetChipTemperature(IntPtr dev, uint ind, double* temp)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_GetChipTemperature_X64(dev, ind, temp)
                 : LMS_GetChipTemperature_X32(dev, ind, temp);
         }
 
         public unsafe static int LMS_SetLPFBW(IntPtr device, bool dir_tx, uint chan, double bandwidth)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_SetLPFBW_X64(device, dir_tx, chan, bandwidth)
                 : LMS_SetLPFBW_X32(device, dir_tx, chan, bandwidth);
         }
 
         public unsafe static int LMS_GetLPFBW(IntPtr device, bool dir_tx, uint chan, double* bandwidth)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_GetLPFBW_X64(device, dir_tx, chan, bandwidth)
                 : LMS_GetLPFBW_X32(device, dir_tx, chan, bandwidth);
         }
 
         public unsafe static int LMS_GetLPFBWRange(IntPtr device, bool dir_tx, uint chan, lms_range_t* range)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_GetLPFBWRange_X64(device, dir_tx, chan, range)
                 : LMS_GetLPFBWRange_X32(device, dir_tx, chan, range);
         }
 
         public unsafe static int LMS_SetLPF(IntPtr device, bool dir_tx, uint chan, bool enable)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_SetLPF_X64(device, dir_tx, chan, enable)
                 : LMS_SetLPF_X32(device, dir_tx, chan, enable);
         }
 
         public unsafe static int LMS_SetGFIRLPF(IntPtr device, bool dir_tx, uint chan, bool enable, double bandwidth)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_SetGFIRLPF_X64(device, dir_tx, chan, enable, bandwidth)
                 : LMS_SetGFIRLPF_X32(device, dir_tx, chan, enable, bandwidth);
         }
 
         public unsafe static int LMS_SetGFIRCoeff(IntPtr device, bool dir_tx, uint chan, IntPtr filt, double* coef, uint count)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_SetGFIRCoeff_X64(device, dir_tx, chan, filt, coef, count)
                 : LMS_SetGFIRCoeff_X32(device, dir_tx, chan, filt, coef, count);
         }
 
         public unsafe static int LMS_GetGFIRCoeff(IntPtr device, bool dir_tx, uint chan, IntPtr filt, double* coef)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_GetGFIRCoeff_X64(device, dir_tx, chan, filt, coef)
                 : LMS_GetGFIRCoeff_X32(device, dir_tx, chan, filt, coef);
         }
 
         public unsafe static int LMS_GetAntennaBW(IntPtr device, bool dir_tx, uint chan, uint path, lms_range_t* range)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_GetAntennaBW_X64(device, dir_tx, chan, path, range)
                 : LMS_GetAntennaBW_X32(device, dir_tx, chan, path, range);
         }
 
         public unsafe static int LMS_GetClockFreq(IntPtr device, uint clk_id, double* freq)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_GetClockFreq_X64(device, clk_id, freq)
                 : LMS_GetClockFreq_X32(device, clk_id, freq);
         }
 
         public unsafe static int LMS_SetClockFreq(IntPtr device, uint clk_id, double freq)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_SetClockFreq_X64(device, clk_id, freq)
                 : LMS_SetClockFreq_X32(device, clk_id, freq);
         }
 
         public unsafe static int LMS_Calibrate(IntPtr device, bool dir_tx, uint chan, double bw, uint flags)
         {
-            return Environment.Is64BitOperatingSystem
+            return Is64BitOperatingSystem
                 ? LMS_Calibrate_X64(device, dir_tx, chan, bw, flags)
                 : LMS_Calibrate_X32(device, dir_tx, chan, bw, flags);
         }
@@ -609,7 +714,7 @@ namespace Asv.Sdr.LimeSdr
 
         public static int LMS_SetupStream(IntPtr device, bool dir_tx, DataFormat dataFmt, ref IntPtr stream, uint chan, uint fifoSize, float throughputVsLatency)
         {
-            if (Environment.Is64BitOperatingSystem)
+            if (Is64BitOperatingSystem)
             {
                 var streamId = new lms_stream_t_X64
                 {
