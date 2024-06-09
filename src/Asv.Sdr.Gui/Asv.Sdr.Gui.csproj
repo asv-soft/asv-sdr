@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <AssemblyVersion>$(ProductVersion)</AssemblyVersion>
+        <FileVersion>$(ProductVersion)</FileVersion>
+        <Version>$(ProductVersion)</Version>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Asv.Avalonia.Toolkit" Version="$(AsvAvaloniaToolkitVersion)" />
+        <PackageReference Include="Asv.Common" Version="$(AsvCommonVersion)" />
+        <PackageReference Include="Asv.Cfg" Version="$(AsvCommonVersion)" />
+        
+        <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="ScottPlot.Avalonia" Version="5.0.34" />
+
+        <PackageReference Include="System.Composition" Version="$(CompositionVersion)"/>
+        <PackageReference Include="FluentAvaloniaUI" Version="$(FluentAvaloniaUIVersion)"/>
+        <PackageReference Include="Material.Icons.Avalonia" Version="$(MaterialIconsAvaloniaVersion)"/>
+
+        <PackageReference Include="ReactiveUI" Version="$(ReactiveUIVersion)"/>
+        <PackageReference Include="ReactiveUI.Fody" Version="$(ReactiveUIVersion)"/>
+        <PackageReference Include="ReactiveUI.Validation" Version="$(ReactiveUIValidationVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <UpToDateCheckInput Remove="Views\MainView.axaml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Asv.Sdr.SignalHound\Asv.Sdr.SignalHound.csproj" />
+    </ItemGroup>
+</Project>

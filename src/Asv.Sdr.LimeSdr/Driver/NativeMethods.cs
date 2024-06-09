@@ -162,7 +162,7 @@ namespace Asv.Sdr.LimeSdr
     /// <summary>
     /// DLl from here https://downloads.myriadrf.org/project/limesuite/20.10/
     /// </summary>
-    class NativeMethods
+    public class NativeMethods
     {
         private static Logger _logger = LogManager.GetCurrentClassLogger();
         

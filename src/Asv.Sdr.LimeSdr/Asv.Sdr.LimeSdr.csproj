@@ -1,8 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-    <Version>1.0.1</Version>
-    <LangVersion>9.0</LangVersion>
+    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    <AssemblyVersion>$(ProductVersion)</AssemblyVersion>
+    <FileVersion>$(ProductVersion)</FileVersion>
+    <Version>$(ProductVersion)</Version>
     <Authors>https://github.com/asvol</Authors>
     <Company>https://github.com/asvol</Company>
     <Copyright>https://github.com/asvol</Copyright>
@@ -29,22 +30,16 @@
     <Prefer32bit>false</Prefer32bit>
     <DefineConstants>TRACE;</DefineConstants>
   </PropertyGroup>
-
-
   <PropertyGroup Condition="'$(PlatformTarget)'=='x64'">
     <DefineConstants>$(DefineConstants);X64</DefineConstants>
   </PropertyGroup>
-  
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Asv.Common" Version="1.13.1" />
-    <PackageReference Include="NLog" Version="5.2.6" />
-    <PackageReference Include="System.Memory" Version="4.5.5" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Asv.Sdr\Asv.Sdr.csproj" />
+    <PackageReference Include="Asv.Common" Version="$(AsvCommonVersion)" />
+    <PackageReference Include="System.Reactive" Version="$(SystemReactiveVersion)" />
+    <PackageReference Include="NLog" Version="$(NLogVersion)" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Libs.Designer.cs">
@@ -58,5 +53,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Libs.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Asv.Sdr\Asv.Sdr.csproj" />
   </ItemGroup>
 </Project>

@@ -140,6 +140,7 @@ namespace Asv.Sdr.LimeSdr
 
 
         public string DeviceId { get; }
+        public IntPtr DeviceHandle => _device;
 
         public Task<int> GetChannelNumbers(LmsChannel channel, CancellationToken cancel)
         {

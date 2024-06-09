@@ -59,6 +59,8 @@ namespace Asv.Sdr.LimeSdr
         Task Start(CancellationToken cancel);
         Task Stop(CancellationToken cancel);
         Task<LmsStreamStatus> GetStatus(CancellationToken cancel);
+        lms_stream_meta_t Metadata { get; }
+        void EditMetadata(Func<lms_stream_meta_t, lms_stream_meta_t> edit);
         Task<int> Read(Memory<float> iqBuffer, uint timeoutMs = 1000, CancellationToken cancel = default);
         Task<int> Write(ReadOnlyMemory<float> iqBuffer, uint timeoutMs = 1000, CancellationToken cancel = default);
 

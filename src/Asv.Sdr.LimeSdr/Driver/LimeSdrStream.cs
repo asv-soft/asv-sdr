@@ -74,6 +74,13 @@ namespace Asv.Sdr.LimeSdr
             }, cancel);
         }
 
+        public lms_stream_meta_t Metadata => _meta;
+
+        public void EditMetadata(Func<lms_stream_meta_t, lms_stream_meta_t> edit)
+        {
+            _meta = edit(_meta);
+        }
+        
         public unsafe Task<int> Read(Memory<float> iqBuffer, uint timeoutMs = 1000, CancellationToken cancel = default)
         {
             return _factory.StartNew(() =>

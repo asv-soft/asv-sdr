@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ProductVersion>1.1.6</ProductVersion>
+    <AvaloniaVersion>11.0.10</AvaloniaVersion>
+    <AsvCommonVersion>2.0.0</AsvCommonVersion>
+    <AsvAvaloniaToolkitVersion>0.1.7</AsvAvaloniaToolkitVersion>
+    <FluentAvaloniaUIVersion>2.0.5</FluentAvaloniaUIVersion>
+    <ReactiveUIVersion>19.5.41</ReactiveUIVersion>
+    <SystemReactiveVersion>6.0.0</SystemReactiveVersion>
+    <MaterialIconsAvaloniaVersion>2.0.1</MaterialIconsAvaloniaVersion>
+    <ReactiveUIValidationVersion>3.1.6</ReactiveUIValidationVersion>
+    <CompositionVersion>8.0.0</CompositionVersion>
+    <NLogVersion>5.2.8</NLogVersion>
+  </PropertyGroup>
+</Project>

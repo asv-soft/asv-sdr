@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFrameworks>net5.0;net6.0;net7.0</TargetFrameworks>
-	  <Version>1.0.0</Version>
-	  <LangVersion>9.0</LangVersion>
+	  <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+      <AssemblyVersion>$(ProductVersion)</AssemblyVersion>
+      <FileVersion>$(ProductVersion)</FileVersion>
+      <Version>$(ProductVersion)</Version>
 	  <Authors>https://github.com/asvol</Authors>
 	  <Company>https://github.com/asvol</Company>
 	  <Copyright>https://github.com/asvol</Copyright>
@@ -11,15 +12,10 @@
 	  <RepositoryUrl>https://github.com/asvol/asv-sdr</RepositoryUrl>
 	  <PackageTags />
 	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Folder Include="BB\" />
-  </ItemGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' " />
 
   <ItemGroup>
     <Compile Update="Libs.Designer.cs">
@@ -28,6 +24,10 @@
       <DependentUpon>Libs.resx</DependentUpon>
     </Compile>
   </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="NLog" Version="$(NLogVersion)" />
+        <PackageReference Include="Asv.Common" Version="$(AsvCommonVersion)" />
+    </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Update="Libs.resx">
