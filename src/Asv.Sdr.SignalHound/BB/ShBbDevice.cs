@@ -88,6 +88,25 @@ namespace Asv.Sdr.SignalHound
         string SerialNumber { get;  }
         Task Init(BBMode mode = BBMode.Streaming, BBSubMode subMode = BBSubMode.StreamIq,
             CancellationToken cancel = default);
+        /// <summary>
+        /// See bbConfigureIQCenter for configuring I/Q streaming center frequency.
+        /// 
+        /// This function configures the sweep frequency range. Start and stop frequencies can be determined from the center and span.
+        /// 
+        /// start = center – (span / 2)
+        /// stop = center + (span / 2)
+        /// During initialization a more precise start frequency and span is determined and returned in the bbQueryTraceInfo function.
+        /// 
+        /// The start/stop frequencies cannot exceed [9kHz, 6.4GHz].
+        /// 
+        /// There is an absolute minimum operating span of 20 Hz, but 200kHz is a suggested minimum.
+        /// 
+        /// Certain modes of operation have specific frequency range limits. Those mode dependent limits are tested against during bbInitiate.
+        /// </summary>
+        /// <param name="center">Center frequency in Hz.</param>
+        /// <param name="span">Span in Hz.</param>
+        /// <param name="cancel"></param>
+        /// <returns></returns>
         Task ConfigureCenterSpan(double center, double span,CancellationToken cancel = default);
         Task ConfigureGain(int? gain = null, CancellationToken cancel = default);
         Task ConfigureLevel(double refLevel, double? attenuation = null ,CancellationToken cancel = default);

@@ -7,7 +7,7 @@
         <entry key="Asv.Sdr.Gui/Asv.Sdr.Gui/Shell/ShellView.axaml" value="Asv.Sdr.Gui/Asv.Sdr.Gui.Browser/Asv.Sdr.Gui.Browser.csproj" />
         <entry key="Asv.Sdr.Gui/Asv.Sdr.Gui/Tools/MainWindow.axaml" value="Asv.Sdr.Gui/Asv.Sdr.Gui.Browser/Asv.Sdr.Gui.Browser.csproj" />
         <entry key="Asv.Sdr.Gui/Asv.Sdr.Gui/Views/MainWindow.axaml" value="Asv.Sdr.Gui/Asv.Sdr.Gui.Browser/Asv.Sdr.Gui.Browser.csproj" />
-        <entry key="Asv.Sdr.Gui/Shell/Pages/SignalHound/SignalHoundView.axaml" value="Asv.Sdr.Gui.Browser/Asv.Sdr.Gui.Browser.csproj" />
+        <entry key="Asv.Sdr.Gui/Shell/Pages/SignalHound/SignalHoundView.axaml" value="Asv.Sdr.Gui.Desktop/Asv.Sdr.Gui.Desktop.csproj" />
         <entry key="Asv.Sdr.Gui/Shell/ShellView.axaml" value="Asv.Sdr.Gui.Desktop/Asv.Sdr.Gui.Desktop.csproj" />
         <entry key="Asv.Sdr.Gui/Tools/MainWindow.axaml" value="Asv.Sdr.Gui.Browser/Asv.Sdr.Gui.Browser.csproj" />
         <entry key="Asv.Sdr.Viewer/MainShell.axaml" value="Asv.Sdr.Viewer/Asv.Sdr.Viewer.csproj" />

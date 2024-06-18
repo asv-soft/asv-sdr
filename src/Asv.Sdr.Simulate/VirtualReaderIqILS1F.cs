@@ -32,7 +32,7 @@ namespace Asv.Sdr.Simulate
                     break;
                 case DdmSdmType.AM150_90:
                     _kam150 = (sdm - ddm) / 2.0;
-                    _kam90 = (sdm + ddm) / 2.0;
+                                                                   _kam90 = (sdm + ddm) / 2.0;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);

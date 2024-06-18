@@ -56,7 +56,7 @@ public class SignalHoundViewModel:ShellPage
             await _device.ConfigureCenterSpan( 915_000_000, 20.0e6);
             await _device.ConfigureSweepCoupling( 10e3, 10.0e3, 0.001, BBRbwShape.Nuttall, BbRejection.NoSpurReject);
             await _device.ConfigureAcquisition(BbDetector.MinAndMax, BbScale.LogScale);
-            await _device.ConfigureRealTime(100.0, 30);
+            await _device.ConfigureRealTime(200.0, 4);
             await _device.Init(BBMode.RealTime, 0, CancellationToken.None);
             var traceInfo = await _device.QueryTraceInfo();
             var realTimeInfo = await _device.QueryRealTimeInfo();
@@ -75,10 +75,10 @@ public class SignalHoundViewModel:ShellPage
                     RxApp.MainThreadScheduler.Schedule(() =>
                     {
                         _plot?.Plot.Clear();
-                        /*_plot?.Plot.Add.Signal(sweepMin);
-                        _plot?.Plot.Add.Signal(sweepMax);*/
-                        _plot?.Plot.Add.Heatmap(ConvertTo2DArray(alphaFrame, realTimeInfo.FrameHeight,
-                            realTimeInfo.FrameWidth));
+                        _plot?.Plot.Add.Signal(sweepMin);
+                        _plot?.Plot.Add.Signal(sweepMax);
+                        /*_plot?.Plot.Add.Heatmap(ConvertTo2DArray(alphaFrame, realTimeInfo.FrameHeight,
+                            realTimeInfo.FrameWidth));*/
                         
                         _plot?.Plot.Axes.AutoScale();
                         _plot?.Refresh();

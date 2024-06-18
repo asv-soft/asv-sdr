@@ -1,7 +1,7 @@
 @echo off
 rem ====== projects ======
 
-set projects=Asv.Sdr Asv.Sdr.LimeSdr Asv.Sdr.Simulate
+set projects=Asv.Sdr Asv.Sdr.LimeSdr Asv.Sdr.Simulate Asv.Sdr.SignalHound
 
 rem ====== projects ======
 

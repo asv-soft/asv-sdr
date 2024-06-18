@@ -1,22 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-	  <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
-      <AssemblyVersion>$(ProductVersion)</AssemblyVersion>
-      <FileVersion>$(ProductVersion)</FileVersion>
-      <Version>$(ProductVersion)</Version>
-	  <Authors>https://github.com/asvol</Authors>
-	  <Company>https://github.com/asvol</Company>
-	  <Copyright>https://github.com/asvol</Copyright>
-	  <PackageProjectUrl>https://github.com/asvol/asv-sdr</PackageProjectUrl>
-	  <RepositoryUrl>https://github.com/asvol/asv-sdr</RepositoryUrl>
-	  <PackageTags />
-	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    <AssemblyVersion>$(ProductVersion)</AssemblyVersion>
+    <FileVersion>$(ProductVersion)</FileVersion>
+    <Version>1.2.0</Version>
+    <Authors>https://github.com/asvol</Authors>
+    <Company>https://github.com/asvol</Company>
+    <Copyright>https://github.com/asvol</Copyright>
+    <PackageProjectUrl>https://github.com/asvol/asv-sdr</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/asvol/asv-sdr</RepositoryUrl>
+    <PackageTags />
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' " />
-
   <ItemGroup>
     <Compile Update="Libs.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -24,16 +21,14 @@
       <DependentUpon>Libs.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="NLog" Version="$(NLogVersion)" />
-        <PackageReference Include="Asv.Common" Version="$(AsvCommonVersion)" />
-    </ItemGroup>
-
+  <ItemGroup>
+    <PackageReference Include="NLog" Version="$(NLogVersion)" />
+    <PackageReference Include="Asv.Common" Version="$(AsvCommonVersion)" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Libs.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Libs.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
 </Project>
