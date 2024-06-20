@@ -334,16 +334,24 @@ namespace Asv.Sdr.SignalHound
 
         protected override void InternalDisposeOnce()
         {
+            base.InternalDisposeOnce();
             try
             {
                 InternalCheckStatus(BbApi.bbAbort(_deviceHandle));
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e,$"Error to bbAbort device:{e.Message}");
+            }
+            try
+            {
                 InternalCheckStatus(BbApi.bbCloseDevice(_deviceHandle));
             }
             catch (Exception e)
             {
                 _logger.Error(e,$"Error to close device:{e.Message}");
             }
-            base.InternalDisposeOnce();
+            
         }
 
 
