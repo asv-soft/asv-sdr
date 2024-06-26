@@ -19,6 +19,9 @@ namespace Asv.Sdr.LimeSdr
         public bool LmsSelfCalibrate { get; set; } = true;
         public uint Channel { get; set; } = 0;
         public byte AmountDataRssi { get; set; } = 7;
+        public uint? RxBufferSize { get; set; }
+        public float ThroughputVsLatency { get; set; } = 0.5f;
+        public bool FlushPartialPacket { get; set; } = true;
     }
 
     public class LimeReaderIq: DisposableOnceWithCancel, IReaderIq<float>
@@ -75,7 +78,7 @@ namespace Asv.Sdr.LimeSdr
             }
         
             
-            _rxStream = await _device.CreateStream(LmsChannel.Rx, config.Channel, (uint)config.SampleRate);
+            _rxStream = await _device.CreateStream(LmsChannel.Rx, config.Channel, (uint)( config.RxBufferSize ?? config.SampleRate), throughputVsLatency: config.ThroughputVsLatency, flushPartialPacket:config.FlushPartialPacket);
             await _rxStream.Start(DisposeCancel);
             
         }

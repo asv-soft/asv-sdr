@@ -10,7 +10,7 @@
         <Version>$(ProductVersion)</Version>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <PlatformTarget>x64</PlatformTarget>
+      <PlatformTarget>AnyCPU</PlatformTarget>
     </PropertyGroup>
 
     <ItemGroup>
@@ -44,6 +44,13 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Asv.Sdr.LimeSdr\Asv.Sdr.LimeSdr.csproj" />
       <ProjectReference Include="..\Asv.Sdr.SignalHound\Asv.Sdr.SignalHound.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="NLog.config">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 </Project>
