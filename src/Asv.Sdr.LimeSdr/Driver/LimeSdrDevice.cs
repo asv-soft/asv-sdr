@@ -51,6 +51,12 @@ namespace Asv.Sdr.LimeSdr
             }
         }
         
+        public static unsafe string GetApiVersion()
+        {
+            var str = LMS_GetLibraryVersion();
+            return Encoding.ASCII.GetString((byte*)str, 50);
+        }
+        
 
         #endregion
         
@@ -142,6 +148,15 @@ namespace Asv.Sdr.LimeSdr
         public string DeviceId { get; }
         public IntPtr DeviceHandle => _device;
 
+        public Task Reset( CancellationToken cancel)
+        {
+            return _taskFactory.StartNew(() =>
+            {
+                if (IsDisposed) return -1;
+                return LMS_Reset(_device);
+            }, cancel);
+        }
+        
         public Task<int> GetChannelNumbers(LmsChannel channel, CancellationToken cancel)
         {
             return _taskFactory.StartNew(() =>
@@ -472,6 +487,51 @@ namespace Asv.Sdr.LimeSdr
 
         #endregion
 
+        #region GPIO
+
+        public unsafe Task WriteGpioDirection(ReadOnlyMemory<byte> val, CancellationToken cancel)
+        {
+            return _taskFactory.StartNew(() =>
+            {
+                if (IsDisposed) return;
+                using var handle = val.Pin();
+                Check(LMS_GPIODirWrite(_device, handle.Pointer, (uint)val.Length), nameof(LMS_GPIOWrite));
+            }, cancel);
+        }
+        
+        public unsafe Task WriteGpio(ReadOnlyMemory<byte> val, CancellationToken cancel)
+        {
+            return _taskFactory.StartNew(() =>
+            {
+                if (IsDisposed) return;
+                using var handle = val.Pin();
+                Check(LMS_GPIOWrite(_device, handle.Pointer, (uint)val.Length), nameof(LMS_GPIOWrite));
+            }, cancel);
+        }
+        
+        public unsafe Task ReadGpioDirection(Memory<byte> val, CancellationToken cancel)
+        {
+            return _taskFactory.StartNew(() =>
+            {
+                if (IsDisposed) return;
+                using var handle = val.Pin();
+                Check(LMS_GPIODirRead(_device, handle.Pointer, (uint)val.Length), nameof(LMS_GPIOWrite));
+            }, cancel);
+        }
+        
+        public unsafe Task ReadGpio(Memory<byte> val, CancellationToken cancel)
+        {
+            return _taskFactory.StartNew(() =>
+            {
+                if (IsDisposed) return;
+                using var handle = val.Pin();
+                Check(LMS_GPIORead(_device, handle.Pointer, (uint)val.Length), nameof(LMS_GPIOWrite));
+            }, cancel);
+        }
+        
+        #endregion
+        
+        
         #region CustomRegister
 
             public Task WriteCustomRegister(ushort addr, ushort val, CancellationToken cancel)

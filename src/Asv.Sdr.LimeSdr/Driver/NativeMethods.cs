@@ -255,15 +255,15 @@ namespace Asv.Sdr.LimeSdr
         
         
         [DllImport("LimeSuite", EntryPoint = "LMS_ReadLMSReg", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_ReadLMSReg(IntPtr device, UInt32 address, UInt16* val);
+        public static extern unsafe int LMS_ReadLMSReg(IntPtr device, UInt32 address, UInt16* val);
 
         [DllImport("LimeSuite", EntryPoint = "LMS_WriteLMSReg", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_WriteLMSReg(IntPtr device, UInt32 address, UInt16 val);
+        public static extern unsafe int LMS_WriteLMSReg(IntPtr device, UInt32 address, UInt16 val);
 
         #region Dll import
 
         [DllImport("LimeSuite", EntryPoint = "LMS_GetDeviceList", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_GetDeviceList(byte* dev_list);
+        public static extern unsafe int LMS_GetDeviceList(byte* dev_list);
 
         [DllImport("LimeSuite", EntryPoint = "LMS_Open", CallingConvention = CallingConvention.Cdecl)]
         public static extern int LMS_Open(out IntPtr device, string info, string args);
@@ -403,28 +403,28 @@ namespace Asv.Sdr.LimeSdr
                 : LMS_SetTestSignal_X32(device, dir_tx, chan, sig, dc_i, dc_q);
         }
 
-        public unsafe static int LMS_GPIOWrite(IntPtr device, char* buffer, uint length)
+        public static unsafe int LMS_GPIOWrite(IntPtr device, void* buffer, uint length)
         {
             return Is64BitOperatingSystem
                 ? LMS_GPIOWrite_X64(device, buffer, length)
                 : LMS_GPIOWrite_X32(device, buffer, length);
         }
 
-        public unsafe static int LMS_GPIODirWrite(IntPtr device, char* buffer, uint length)
+        public static unsafe int LMS_GPIODirWrite(IntPtr device, void* buffer, uint length)
         {
             return Is64BitOperatingSystem
                 ? LMS_GPIODirWrite_X64(device, buffer, length)
                 : LMS_GPIODirWrite_X32(device, buffer, length);
         }
 
-        public unsafe static int LMS_GPIORead(IntPtr device, char* buffer, uint length)
+        public static unsafe int LMS_GPIORead(IntPtr device, void* buffer, uint length)
         {
             return Is64BitOperatingSystem
                 ? LMS_GPIORead_X64(device, buffer, length)
                 : LMS_GPIORead_X32(device, buffer, length);
         }
 
-        public unsafe static int LMS_GPIODirRead(IntPtr device, char* buffer, uint length)
+        public static unsafe int LMS_GPIODirRead(IntPtr device, void* buffer, uint length)
         {
             return Is64BitOperatingSystem
                 ? LMS_GPIODirRead_X64(device, buffer, length)
@@ -438,7 +438,7 @@ namespace Asv.Sdr.LimeSdr
                 : LMS_SetGaindB_X32(device, dir_tx, chan, gain);
         }
 
-        public unsafe static int LMS_GetGaindB(IntPtr device, bool dir_tx, uint chan, ref uint gain)
+        public static unsafe int LMS_GetGaindB(IntPtr device, bool dir_tx, uint chan, ref uint gain)
         {
             int res;
             if (Is64BitOperatingSystem)
@@ -473,91 +473,91 @@ namespace Asv.Sdr.LimeSdr
                 : LMS_SetNormalizedGain_X32(device, dir_tx, chan, gain);
         }
 
-        public unsafe static int LMS_GetNormalizedGain(IntPtr device, bool dir_tx, uint chan, double* gain)
+        public static unsafe int LMS_GetNormalizedGain(IntPtr device, bool dir_tx, uint chan, double* gain)
         {
             return Is64BitOperatingSystem
                 ? LMS_GetNormalizedGain_X64(device, dir_tx, chan, gain)
                 : LMS_GetNormalizedGain_X32(device, dir_tx, chan, gain);
         }
 
-        public unsafe static int LMS_GetChipTemperature(IntPtr dev, uint ind, double* temp)
+        public static unsafe int LMS_GetChipTemperature(IntPtr dev, uint ind, double* temp)
         {
             return Is64BitOperatingSystem
                 ? LMS_GetChipTemperature_X64(dev, ind, temp)
                 : LMS_GetChipTemperature_X32(dev, ind, temp);
         }
 
-        public unsafe static int LMS_SetLPFBW(IntPtr device, bool dir_tx, uint chan, double bandwidth)
+        public static unsafe int LMS_SetLPFBW(IntPtr device, bool dir_tx, uint chan, double bandwidth)
         {
             return Is64BitOperatingSystem
                 ? LMS_SetLPFBW_X64(device, dir_tx, chan, bandwidth)
                 : LMS_SetLPFBW_X32(device, dir_tx, chan, bandwidth);
         }
 
-        public unsafe static int LMS_GetLPFBW(IntPtr device, bool dir_tx, uint chan, double* bandwidth)
+        public static unsafe int LMS_GetLPFBW(IntPtr device, bool dir_tx, uint chan, double* bandwidth)
         {
             return Is64BitOperatingSystem
                 ? LMS_GetLPFBW_X64(device, dir_tx, chan, bandwidth)
                 : LMS_GetLPFBW_X32(device, dir_tx, chan, bandwidth);
         }
 
-        public unsafe static int LMS_GetLPFBWRange(IntPtr device, bool dir_tx, uint chan, lms_range_t* range)
+        public static unsafe int LMS_GetLPFBWRange(IntPtr device, bool dir_tx, uint chan, lms_range_t* range)
         {
             return Is64BitOperatingSystem
                 ? LMS_GetLPFBWRange_X64(device, dir_tx, chan, range)
                 : LMS_GetLPFBWRange_X32(device, dir_tx, chan, range);
         }
 
-        public unsafe static int LMS_SetLPF(IntPtr device, bool dir_tx, uint chan, bool enable)
+        public static unsafe int LMS_SetLPF(IntPtr device, bool dir_tx, uint chan, bool enable)
         {
             return Is64BitOperatingSystem
                 ? LMS_SetLPF_X64(device, dir_tx, chan, enable)
                 : LMS_SetLPF_X32(device, dir_tx, chan, enable);
         }
 
-        public unsafe static int LMS_SetGFIRLPF(IntPtr device, bool dir_tx, uint chan, bool enable, double bandwidth)
+        public static unsafe int LMS_SetGFIRLPF(IntPtr device, bool dir_tx, uint chan, bool enable, double bandwidth)
         {
             return Is64BitOperatingSystem
                 ? LMS_SetGFIRLPF_X64(device, dir_tx, chan, enable, bandwidth)
                 : LMS_SetGFIRLPF_X32(device, dir_tx, chan, enable, bandwidth);
         }
 
-        public unsafe static int LMS_SetGFIRCoeff(IntPtr device, bool dir_tx, uint chan, IntPtr filt, double* coef, uint count)
+        public static unsafe int LMS_SetGFIRCoeff(IntPtr device, bool dir_tx, uint chan, IntPtr filt, double* coef, uint count)
         {
             return Is64BitOperatingSystem
                 ? LMS_SetGFIRCoeff_X64(device, dir_tx, chan, filt, coef, count)
                 : LMS_SetGFIRCoeff_X32(device, dir_tx, chan, filt, coef, count);
         }
 
-        public unsafe static int LMS_GetGFIRCoeff(IntPtr device, bool dir_tx, uint chan, IntPtr filt, double* coef)
+        public static unsafe int LMS_GetGFIRCoeff(IntPtr device, bool dir_tx, uint chan, IntPtr filt, double* coef)
         {
             return Is64BitOperatingSystem
                 ? LMS_GetGFIRCoeff_X64(device, dir_tx, chan, filt, coef)
                 : LMS_GetGFIRCoeff_X32(device, dir_tx, chan, filt, coef);
         }
 
-        public unsafe static int LMS_GetAntennaBW(IntPtr device, bool dir_tx, uint chan, uint path, lms_range_t* range)
+        public static unsafe int LMS_GetAntennaBW(IntPtr device, bool dir_tx, uint chan, uint path, lms_range_t* range)
         {
             return Is64BitOperatingSystem
                 ? LMS_GetAntennaBW_X64(device, dir_tx, chan, path, range)
                 : LMS_GetAntennaBW_X32(device, dir_tx, chan, path, range);
         }
 
-        public unsafe static int LMS_GetClockFreq(IntPtr device, uint clk_id, double* freq)
+        public static unsafe int LMS_GetClockFreq(IntPtr device, uint clk_id, double* freq)
         {
             return Is64BitOperatingSystem
                 ? LMS_GetClockFreq_X64(device, clk_id, freq)
                 : LMS_GetClockFreq_X32(device, clk_id, freq);
         }
 
-        public unsafe static int LMS_SetClockFreq(IntPtr device, uint clk_id, double freq)
+        public static unsafe int LMS_SetClockFreq(IntPtr device, uint clk_id, double freq)
         {
             return Is64BitOperatingSystem
                 ? LMS_SetClockFreq_X64(device, clk_id, freq)
                 : LMS_SetClockFreq_X32(device, clk_id, freq);
         }
 
-        public unsafe static int LMS_Calibrate(IntPtr device, bool dir_tx, uint chan, double bw, uint flags)
+        public static unsafe int LMS_Calibrate(IntPtr device, bool dir_tx, uint chan, double bw, uint flags)
         {
             return Is64BitOperatingSystem
                 ? LMS_Calibrate_X64(device, dir_tx, chan, bw, flags)
@@ -572,9 +572,9 @@ namespace Asv.Sdr.LimeSdr
         [DllImport("LimeSuite", EntryPoint = "LMS_GetLOFrequency", CallingConvention = CallingConvention.Cdecl)]
         public static extern int LMS_GetLOFrequency_X64(IntPtr device, bool dir_tx, UInt64 chan, ref double frequency);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetNCOFrequency", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_SetNCOFrequency_X64(IntPtr device, bool dir_tx, UInt64 chan, double* frequency, double pho);
+        public static extern unsafe int LMS_SetNCOFrequency_X64(IntPtr device, bool dir_tx, UInt64 chan, double* frequency, double pho);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetNCOFrequency", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_GetNCOFrequency_X64(IntPtr device, bool dir_tx, UInt64 chan, double* frequency, double* pho);
+        public static extern unsafe int LMS_GetNCOFrequency_X64(IntPtr device, bool dir_tx, UInt64 chan, double* frequency, double* pho);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetNCOIndex", CallingConvention = CallingConvention.Cdecl)]
         public static extern int LMS_SetNCOIndex_X64(IntPtr device, bool dir_tx, UInt64 chan, int index, bool downconv);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetNCOIndex", CallingConvention = CallingConvention.Cdecl)]
@@ -590,53 +590,53 @@ namespace Asv.Sdr.LimeSdr
         [DllImport("LimeSuite", EntryPoint = "LMS_GetSampleRate", CallingConvention = CallingConvention.Cdecl)]
         public static extern int LMS_GetSampleRate_X64(IntPtr device, bool dir_tx, UInt64 chan, ref double host_Hz, ref double rf_Hz);
         [DllImport("LimeSuite", EntryPoint = "LMS_RecvStream", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_RecvStream_X64(IntPtr stream, void* samples, UInt64 sample_count, ref lms_stream_meta_t meta, UInt64 timeout_ms);
+        public static extern unsafe int LMS_RecvStream_X64(IntPtr stream, void* samples, UInt64 sample_count, ref lms_stream_meta_t meta, UInt64 timeout_ms);
         [DllImport("LimeSuite", EntryPoint = "LMS_SendStream", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_SendStream_X64(IntPtr stream, void* samples, UInt64 sample_count, ref lms_stream_meta_t meta, UInt64 timeout_ms);
+        public static extern unsafe int LMS_SendStream_X64(IntPtr stream, void* samples, UInt64 sample_count, ref lms_stream_meta_t meta, UInt64 timeout_ms);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetAntenna", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_SetAntenna_X64(IntPtr device, bool dir_tx, UInt64 chan, UInt64 index);
+        public static extern unsafe int LMS_SetAntenna_X64(IntPtr device, bool dir_tx, UInt64 chan, UInt64 index);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetTestSignal", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_SetTestSignal_X64(IntPtr device, bool dir_tx, UInt64 chan, lms_testsig_t sig, Int16 dc_i, Int16 dc_q);
+        public static extern unsafe int LMS_SetTestSignal_X64(IntPtr device, bool dir_tx, UInt64 chan, lms_testsig_t sig, Int16 dc_i, Int16 dc_q);
         [DllImport("LimeSuite", EntryPoint = "LMS_GPIOWrite", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GPIOWrite_X64(IntPtr device, char* buffer, UInt64 length);
+        public static extern unsafe int LMS_GPIOWrite_X64(IntPtr device, void* buffer, UInt64 length);
         [DllImport("LimeSuite", EntryPoint = "LMS_GPIODirWrite", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GPIODirWrite_X64(IntPtr device, char* buffer, UInt64 length);
+        public static extern unsafe int LMS_GPIODirWrite_X64(IntPtr device, void* buffer, UInt64 length);
         [DllImport("LimeSuite", EntryPoint = "LMS_GPIORead", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GPIORead_X64(IntPtr device, char* buffer, UInt64 length);
+        public static extern unsafe int LMS_GPIORead_X64(IntPtr device, void* buffer, UInt64 length);
         [DllImport("LimeSuite", EntryPoint = "LMS_GPIODirRead", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GPIODirRead_X64(IntPtr device, char* buffer, UInt64 length);
+        public static extern unsafe int LMS_GPIODirRead_X64(IntPtr device, void* buffer, UInt64 length);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetGaindB", CallingConvention = CallingConvention.Cdecl)]
         public static extern int LMS_SetGaindB_X64(IntPtr device, bool dir_tx, UInt64 chan, UInt64 gain);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetGaindB", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetGaindB_X64(IntPtr device, bool dir_tx, UInt64 chan, UInt64* gain);
+        public static extern unsafe int LMS_GetGaindB_X64(IntPtr device, bool dir_tx, UInt64 chan, UInt64* gain);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetNormalizedGain", CallingConvention = CallingConvention.Cdecl)]
         public static extern int LMS_SetNormalizedGain_X64(IntPtr device, bool dir_tx, UInt64 chan, double gain);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetNormalizedGain", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetNormalizedGain_X64(IntPtr device, bool dir_tx, UInt64 chan, double* gain);
+        public static extern unsafe int LMS_GetNormalizedGain_X64(IntPtr device, bool dir_tx, UInt64 chan, double* gain);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetChipTemperature", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetChipTemperature_X64(IntPtr dev, UInt64 ind, double* temp);
+        public static extern unsafe int LMS_GetChipTemperature_X64(IntPtr dev, UInt64 ind, double* temp);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetLPFBW", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_SetLPFBW_X64(IntPtr device, bool dir_tx, UInt64 chan, double bandwidth);
+        public static extern unsafe int LMS_SetLPFBW_X64(IntPtr device, bool dir_tx, UInt64 chan, double bandwidth);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetLPFBW", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetLPFBW_X64(IntPtr device, bool dir_tx, UInt64 chan, double* bandwidth);
+        public static extern unsafe int LMS_GetLPFBW_X64(IntPtr device, bool dir_tx, UInt64 chan, double* bandwidth);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetLPFBWRange", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetLPFBWRange_X64(IntPtr device, bool dir_tx, UInt64 chan, lms_range_t* range);
+        public static extern unsafe int LMS_GetLPFBWRange_X64(IntPtr device, bool dir_tx, UInt64 chan, lms_range_t* range);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetLPF", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_SetLPF_X64(IntPtr device, bool dir_tx, UInt64 chan, bool enable);
+        public static extern unsafe int LMS_SetLPF_X64(IntPtr device, bool dir_tx, UInt64 chan, bool enable);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetGFIRLPF", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_SetGFIRLPF_X64(IntPtr device, bool dir_tx, UInt64 chan, bool enable, double bandwidth);
+        public static extern unsafe int LMS_SetGFIRLPF_X64(IntPtr device, bool dir_tx, UInt64 chan, bool enable, double bandwidth);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetGFIRCoeff", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_SetGFIRCoeff_X64(IntPtr device, bool dir_tx, UInt64 chan, IntPtr filt, double* coef, UInt64 count);
+        public static extern unsafe int LMS_SetGFIRCoeff_X64(IntPtr device, bool dir_tx, UInt64 chan, IntPtr filt, double* coef, UInt64 count);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetGFIRCoeff", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetGFIRCoeff_X64(IntPtr device, bool dir_tx, UInt64 chan, IntPtr filt, double* coef);
+        public static extern unsafe int LMS_GetGFIRCoeff_X64(IntPtr device, bool dir_tx, UInt64 chan, IntPtr filt, double* coef);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetAntennaBW", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetAntennaBW_X64(IntPtr device, bool dir_tx, UInt64 chan, UInt64 path, lms_range_t* range);
+        public static extern unsafe int LMS_GetAntennaBW_X64(IntPtr device, bool dir_tx, UInt64 chan, UInt64 path, lms_range_t* range);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetClockFreq", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetClockFreq_X64(IntPtr device, UInt64 clk_id, double* freq);
+        public static extern unsafe int LMS_GetClockFreq_X64(IntPtr device, UInt64 clk_id, double* freq);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetClockFreq", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_SetClockFreq_X64(IntPtr device, UInt64 clk_id, double freq);
+        public static extern unsafe int LMS_SetClockFreq_X64(IntPtr device, UInt64 clk_id, double freq);
         [DllImport("LimeSuite", EntryPoint = "LMS_Calibrate", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_Calibrate_X64(IntPtr device, bool dir_tx, UInt64 chan, double bw, UInt64 flags);
+        public static extern unsafe int LMS_Calibrate_X64(IntPtr device, bool dir_tx, UInt64 chan, double bw, UInt64 flags);
 
 
         [DllImport("LimeSuite", EntryPoint = "LMS_SetLOFrequency", CallingConvention = CallingConvention.Cdecl)]
@@ -644,11 +644,11 @@ namespace Asv.Sdr.LimeSdr
         [DllImport("LimeSuite", EntryPoint = "LMS_GetLOFrequency", CallingConvention = CallingConvention.Cdecl)]
         public static extern int LMS_GetLOFrequency_X32(IntPtr device, bool dir_tx, UInt32 chan, ref double frequency);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetNCOFrequency", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_SetNCOFrequency_X32(IntPtr device, bool dir_tx, UInt32 chan, double* frequency, double pho);
+        public static extern unsafe int LMS_SetNCOFrequency_X32(IntPtr device, bool dir_tx, UInt32 chan, double* frequency, double pho);
         [DllImport("LimeSuite", EntryPoint = "LMS_EnableChannel", CallingConvention = CallingConvention.Cdecl)]
         public static extern int LMS_EnableChannel_X32(IntPtr device, bool dir_tx, UInt32 chan, bool enabled);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetNCOFrequency", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_GetNCOFrequency_X32(IntPtr device, bool dir_tx, UInt32 chan, double* frequency, double* pho);
+        public static extern unsafe int LMS_GetNCOFrequency_X32(IntPtr device, bool dir_tx, UInt32 chan, double* frequency, double* pho);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetNCOIndex", CallingConvention = CallingConvention.Cdecl)]
         public static extern int LMS_SetNCOIndex_X32(IntPtr device, bool dir_tx, UInt32 chan, int index, bool downconv);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetNCOIndex", CallingConvention = CallingConvention.Cdecl)]
@@ -664,53 +664,53 @@ namespace Asv.Sdr.LimeSdr
         [DllImport("LimeSuite", EntryPoint = "LMS_GetSampleRate", CallingConvention = CallingConvention.Cdecl)]
         public static extern int LMS_GetSampleRate_X32(IntPtr device, bool dir_tx, UInt32 chan, ref double host_Hz, ref double rf_Hz);
         [DllImport("LimeSuite", EntryPoint = "LMS_RecvStream", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_RecvStream_X32(IntPtr stream, void* samples, UInt32 sample_count, ref lms_stream_meta_t meta, UInt32 timeout_ms);
+        public static extern unsafe int LMS_RecvStream_X32(IntPtr stream, void* samples, UInt32 sample_count, ref lms_stream_meta_t meta, UInt32 timeout_ms);
         [DllImport("LimeSuite", EntryPoint = "LMS_SendStream", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_SendStream_X32(IntPtr stream, void* samples, uint sample_count, ref lms_stream_meta_t meta, uint timeout_ms);
+        public static extern unsafe int LMS_SendStream_X32(IntPtr stream, void* samples, uint sample_count, ref lms_stream_meta_t meta, uint timeout_ms);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetAntenna", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_SetAntenna_X32(IntPtr device, bool dir_tx, UInt32 chan, UInt32 index);
+        public static extern unsafe int LMS_SetAntenna_X32(IntPtr device, bool dir_tx, UInt32 chan, UInt32 index);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetTestSignal", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_SetTestSignal_X32(IntPtr device, bool dir_tx, UInt32 chan, lms_testsig_t sig, Int16 dc_i, Int16 dc_q);
+        public static extern unsafe int LMS_SetTestSignal_X32(IntPtr device, bool dir_tx, UInt32 chan, lms_testsig_t sig, Int16 dc_i, Int16 dc_q);
         [DllImport("LimeSuite", EntryPoint = "LMS_GPIOWrite", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GPIOWrite_X32(IntPtr device, char* buffer, UInt32 length);
+        public static extern unsafe int LMS_GPIOWrite_X32(IntPtr device, void* buffer, UInt32 length);
         [DllImport("LimeSuite", EntryPoint = "LMS_GPIODirWrite", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GPIODirWrite_X32(IntPtr device, char* buffer, UInt32 length);
+        public static extern unsafe int LMS_GPIODirWrite_X32(IntPtr device, void* buffer, UInt32 length);
         [DllImport("LimeSuite", EntryPoint = "LMS_GPIORead", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GPIORead_X32(IntPtr device, char* buffer, UInt32 length);
+        public static extern unsafe int LMS_GPIORead_X32(IntPtr device, void* buffer, UInt32 length);
         [DllImport("LimeSuite", EntryPoint = "LMS_GPIODirRead", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GPIODirRead_X32(IntPtr device, char* buffer, UInt32 length);
+        public static extern unsafe int LMS_GPIODirRead_X32(IntPtr device, void* buffer, UInt32 length);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetGaindB", CallingConvention = CallingConvention.Cdecl)]
         public static extern int LMS_SetGaindB_X32(IntPtr device, bool dir_tx, UInt32 chan, UInt32 gain);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetGaindB", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetGaindB_X32(IntPtr device, bool dir_tx, UInt32 chan, UInt32* gain);
+        public static extern unsafe int LMS_GetGaindB_X32(IntPtr device, bool dir_tx, UInt32 chan, UInt32* gain);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetNormalizedGain", CallingConvention = CallingConvention.Cdecl)]
         public static extern int LMS_SetNormalizedGain_X32(IntPtr device, bool dir_tx, UInt32 chan, double gain);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetNormalizedGain", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetNormalizedGain_X32(IntPtr device, bool dir_tx, UInt32 chan, double* gain);
+        public static extern unsafe int LMS_GetNormalizedGain_X32(IntPtr device, bool dir_tx, UInt32 chan, double* gain);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetChipTemperature", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetChipTemperature_X32(IntPtr dev, UInt32 ind, double* temp);
+        public static extern unsafe int LMS_GetChipTemperature_X32(IntPtr dev, UInt32 ind, double* temp);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetLPFBW", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_SetLPFBW_X32(IntPtr device, bool dir_tx, UInt32 chan, double bandwidth);
+        public static extern unsafe int LMS_SetLPFBW_X32(IntPtr device, bool dir_tx, UInt32 chan, double bandwidth);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetLPFBW", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetLPFBW_X32(IntPtr device, bool dir_tx, UInt32 chan, double* bandwidth);
+        public static extern unsafe int LMS_GetLPFBW_X32(IntPtr device, bool dir_tx, UInt32 chan, double* bandwidth);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetLPFBWRange", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetLPFBWRange_X32(IntPtr device, bool dir_tx, UInt32 chan, lms_range_t* range);
+        public static extern unsafe int LMS_GetLPFBWRange_X32(IntPtr device, bool dir_tx, UInt32 chan, lms_range_t* range);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetLPF", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_SetLPF_X32(IntPtr device, bool dir_tx, UInt32 chan, bool enable);
+        public static extern unsafe int LMS_SetLPF_X32(IntPtr device, bool dir_tx, UInt32 chan, bool enable);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetGFIRLPF", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_SetGFIRLPF_X32(IntPtr device, bool dir_tx, UInt32 chan, bool enable, double bandwidth);
+        public static extern unsafe int LMS_SetGFIRLPF_X32(IntPtr device, bool dir_tx, UInt32 chan, bool enable, double bandwidth);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetGFIRCoeff", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_SetGFIRCoeff_X32(IntPtr device, bool dir_tx, UInt32 chan, IntPtr filt, double* coef, UInt32 count);
+        public static extern unsafe int LMS_SetGFIRCoeff_X32(IntPtr device, bool dir_tx, UInt32 chan, IntPtr filt, double* coef, UInt32 count);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetGFIRCoeff", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetGFIRCoeff_X32(IntPtr device, bool dir_tx, UInt32 chan, IntPtr filt, double* coef);
+        public static extern unsafe int LMS_GetGFIRCoeff_X32(IntPtr device, bool dir_tx, UInt32 chan, IntPtr filt, double* coef);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetAntennaBW", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetAntennaBW_X32(IntPtr device, bool dir_tx, UInt32 chan, UInt32 path, lms_range_t* range);
+        public static extern unsafe int LMS_GetAntennaBW_X32(IntPtr device, bool dir_tx, UInt32 chan, UInt32 path, lms_range_t* range);
         [DllImport("LimeSuite", EntryPoint = "LMS_GetClockFreq", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetClockFreq_X32(IntPtr device, UInt32 clk_id, double* freq);
+        public static extern unsafe int LMS_GetClockFreq_X32(IntPtr device, UInt32 clk_id, double* freq);
         [DllImport("LimeSuite", EntryPoint = "LMS_SetClockFreq", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_SetClockFreq_X32(IntPtr device, UInt32 clk_id, double freq);
+        public static extern unsafe int LMS_SetClockFreq_X32(IntPtr device, UInt32 clk_id, double freq);
         [DllImport("LimeSuite", EntryPoint = "LMS_Calibrate", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_Calibrate_X32(IntPtr device, bool dir_tx, UInt32 chan, double bw, UInt32 flags);
+        public static extern unsafe int LMS_Calibrate_X32(IntPtr device, bool dir_tx, UInt32 chan, double bw, UInt32 flags);
 
         public static int LMS_SetupStream(IntPtr device, bool dir_tx, DataFormat dataFmt, ref IntPtr stream, uint chan, uint fifoSize, float throughputVsLatency)
         {
@@ -751,16 +751,16 @@ namespace Asv.Sdr.LimeSdr
         // --------------------------------------- END X86 / X64 platform ------------------------------------------------
 
         [DllImport("LimeSuite", EntryPoint = "LMS_SetupStream", CallingConvention = CallingConvention.Cdecl)]
-        private static unsafe extern int LMS_SetupStream(IntPtr dev, IntPtr stream);
+        private static extern unsafe int LMS_SetupStream(IntPtr dev, IntPtr stream);
 
         [DllImport("LimeSuite", EntryPoint = "LMS_StartStream", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_StartStream(IntPtr stream);
+        public static extern unsafe int LMS_StartStream(IntPtr stream);
 
         [DllImport("LimeSuite", EntryPoint = "LMS_StopStream", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_StopStream(IntPtr stream);
+        public static extern unsafe int LMS_StopStream(IntPtr stream);
 
         [DllImport("LimeSuite", EntryPoint = "LMS_DestroyStream", CallingConvention = CallingConvention.Cdecl)]
-        public static unsafe extern int LMS_DestroyStream(IntPtr dev, IntPtr stream);
+        public static extern unsafe int LMS_DestroyStream(IntPtr dev, IntPtr stream);
 
         [DllImport("LimeSuite", EntryPoint = "LMS_GetLastErrorMessage", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr LMS_GetLastErrorMessage();
@@ -777,37 +777,37 @@ namespace Asv.Sdr.LimeSdr
         public static extern int LMS_WriteParam(IntPtr device, LMS7Parameter param, UInt16 val);
 
         [DllImport("LimeSuite", EntryPoint = "LMS_ReadParam", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_ReadParam(IntPtr device, LMS7Parameter param, ushort* val);
+        public static extern unsafe int LMS_ReadParam(IntPtr device, LMS7Parameter param, ushort* val);
 
         [DllImport("LimeSuite", EntryPoint = "LMS_Reset", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_Reset(IntPtr device);
+        public static extern unsafe int LMS_Reset(IntPtr device);
 
         [DllImport("LimeSuite", EntryPoint = "LMS_GetStreamStatus", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_GetStreamStatus(IntPtr stream, ref LmsStreamStatus status);
+        public static extern unsafe int LMS_GetStreamStatus(IntPtr stream, ref LmsStreamStatus status);
 
         [DllImport("LimeSuite", EntryPoint = "LMS_GetLibraryVersion", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern char* LMS_GetLibraryVersion();
+        public static extern unsafe char* LMS_GetLibraryVersion();
 
         [DllImport("LimeSuite", EntryPoint = "LMS_GetDeviceInfo", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern void* LMS_GetDeviceInfo(IntPtr device);
+        public static extern unsafe void* LMS_GetDeviceInfo(IntPtr device);
 
         [DllImport("LimeSuite", EntryPoint = "LMS_SaveConfig", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_SaveConfig(IntPtr device, string fileName);
+        public static extern unsafe int LMS_SaveConfig(IntPtr device, string fileName);
 
         [DllImport("LimeSuite", EntryPoint = "LMS_LoadConfig", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_LoadConfig(IntPtr device, string fileName);
+        public static extern unsafe int LMS_LoadConfig(IntPtr device, string fileName);
 
         [DllImport("LimeSuite", EntryPoint = "LMS_VCTCXOWrite", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_VCTCXOWrite(IntPtr device, ushort val);
+        public static extern unsafe int LMS_VCTCXOWrite(IntPtr device, ushort val);
 
         [DllImport("LimeSuite", EntryPoint = "LMS_VCTCXORead", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_VCTCXORead(IntPtr device, ushort* val);
+        public static extern unsafe int LMS_VCTCXORead(IntPtr device, ushort* val);
 
         [DllImport("LimeSuite", EntryPoint = "LMS_WriteFPGAReg", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_WriteFPGAReg(IntPtr device, UInt32 address, UInt16 val);
+        public static extern unsafe int LMS_WriteFPGAReg(IntPtr device, UInt32 address, UInt16 val);
 
         [DllImport("LimeSuite", EntryPoint = "LMS_ReadFPGAReg", CallingConvention = CallingConvention.Cdecl)]
-        public unsafe static extern int LMS_ReadFPGAReg(IntPtr device, UInt32 address, UInt16* val);
+        public static extern unsafe int LMS_ReadFPGAReg(IntPtr device, UInt32 address, UInt16* val);
 
         #endregion
     }

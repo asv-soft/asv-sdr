@@ -75,7 +75,7 @@ namespace Asv.Sdr.LimeSdr
         Task Calibrate(LmsChannel type, uint channel, double bandwidth, uint flags, CancellationToken cancel);
         Task SaveConfig(string path, CancellationToken cancel);
         Task LoadConfig(string path, CancellationToken cancel);
-
+        Task Reset(CancellationToken cancel);
         Task SetSampleRate(double rate, uint oversample, CancellationToken cancel);
         Task SetSampleRateDir(LmsChannel type, double rate, uint oversample, CancellationToken cancel);
         Task SetFrequency(LmsChannel type, uint channel, double freq, CancellationToken cancel);
@@ -105,6 +105,33 @@ namespace Asv.Sdr.LimeSdr
 
         Task WriteCustomRegister(ushort addr, ushort val, CancellationToken cancel);
         Task<ushort> ReadCustomRegister(ushort addr, CancellationToken cancel);
+
+        
+        Task WriteGpioDirection(ReadOnlyMemory<byte> val, CancellationToken cancel);
+        public Task WriteGpio8Direction(byte val, CancellationToken cancel)
+        {
+            return WriteGpioDirection(new ReadOnlyMemory<byte>(new[] { val }), cancel);
+        }
+        Task WriteGpio(ReadOnlyMemory<byte> val, CancellationToken cancel);
+        public Task WriteGpio8(byte val, CancellationToken cancel)
+        {
+            return WriteGpio(new ReadOnlyMemory<byte>(new[] { val }), cancel);
+        }
+        Task ReadGpioDirection(Memory<byte> val, CancellationToken cancel);
+        public async Task<byte> ReadGpio8Direction(CancellationToken cancel)
+        {
+            var arr = new byte[1] ;
+            await ReadGpioDirection(arr, cancel);
+            return arr[0];
+        }
+        Task ReadGpio(Memory<byte> val, CancellationToken cancel);
+        public async Task<byte> ReadGpio8( CancellationToken cancel)
+        {
+            var arr = new byte[1];
+            await ReadGpio(arr, cancel);
+            return arr[0];
+        }
+
     }
 
     public static class LimeSdrDeviceHelper
