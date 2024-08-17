@@ -140,7 +140,9 @@ namespace Asv.Sdr.LimeSdr
                     _logger.Debug("LMS=> {0}", msg);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(level), level, null);
+                    _logger.Debug("LMS=> {0}", msg);
+                    break;
+                    //throw new ArgumentOutOfRangeException(nameof(level), level, null);
             }
         }
 
