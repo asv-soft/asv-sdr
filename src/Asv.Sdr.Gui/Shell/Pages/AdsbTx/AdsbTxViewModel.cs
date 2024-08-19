@@ -12,6 +12,7 @@ using Asv.Common;
 using Asv.IO;
 using Asv.Sdr.LimeSdr;
 using Material.Icons;
+using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using ScottPlot.Avalonia;
 
@@ -20,12 +21,14 @@ namespace Asv.Sdr.Gui;
 [Export(typeof(IShellPage))]
 public class AdsbTxViewModel:ShellPage
 {
+    private readonly ILoggerFactory _loggerFactory;
     private AvaPlot _avaPlotLms;
     private AvaPlot _avaPlotSh;
     private readonly CancellationTokenSource _cancelStream;
     private LimeSdrDevice _device;
     private ILmsStream _txStream;
 
+    
     public AdsbTxViewModel() : base(WellKnownUri.Shell + ".adsbtx")
     {
         Title = "ADSB Tx";
@@ -33,6 +36,12 @@ public class AdsbTxViewModel:ShellPage
         ConnectLms = ReactiveCommand.CreateRunInBackground(ConnectLmsImpl);
     }
 
+    [ImportingConstructor]
+    public AdsbTxViewModel(ILoggerFactory loggerFactory):this()
+    {
+        _loggerFactory = loggerFactory;
+    }
+    
     private async void ConnectLmsImpl()
     {
         LmsNativeDllUsage.Is64BitOperatingSystem = true;

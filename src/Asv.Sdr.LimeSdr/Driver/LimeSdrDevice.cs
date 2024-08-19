@@ -17,13 +17,12 @@ namespace Asv.Sdr.LimeSdr
     {
         #region Static
 
-        private static readonly ILogger<LimeSdrDevice> StaticLogger = LogManager.GetLogger<LimeSdrDevice>();
-
+        private static readonly LogCallBack _callback;
         static LimeSdrDevice()
         {
-            LogCallBack callback = OnLmsLog;
-            GC.KeepAlive(callback);
-            LMS_RegisterLogHandler(callback);
+            _callback = OnLmsLog;
+            GC.KeepAlive(_callback);
+            LMS_RegisterLogHandler(_callback);
         }
 
         private static readonly object Sync = new();
@@ -71,7 +70,7 @@ namespace Asv.Sdr.LimeSdr
         
 
         public LimeSdrDevice(string deviceId, bool isThreadSave = false, ILogger<LimeSdrDevice>? logger = null)
-            :this(deviceId,isThreadSave,logger ?? NullLogger<LimeSdrDevice>.Instance,LimeSdrParams.LMS7_CAPSEL,LimeSdrParams.LMS7_CAPTURE)
+            :this(deviceId,isThreadSave,logger ?? LmsLogManager.GetLogger<LimeSdrDevice>(),LimeSdrParams.LMS7_CAPSEL,LimeSdrParams.LMS7_CAPTURE)
         {
             
         }
@@ -131,19 +130,19 @@ namespace Asv.Sdr.LimeSdr
             switch (level)
             {
                 case LogLevel.LOG_LEVEL_CRITICAL:
-                    StaticLogger.ZLogCritical($"LMS=> {msg}");
+                    LmsLogManager.Logger.ZLogCritical($"{msg}");
                     break;
                 case LogLevel.LOG_LEVEL_ERROR:
-                    StaticLogger.ZLogError($"LMS=> {msg}", msg);
+                    LmsLogManager.Logger.ZLogError($"{msg}");
                     break;
                 case LogLevel.LOG_LEVEL_WARNING:
-                    StaticLogger.ZLogWarning($"LMS=> {msg}");
+                    LmsLogManager.Logger.ZLogWarning($"{msg}");
                     break;
                 case LogLevel.LOG_LEVEL_INFO:
-                    StaticLogger.ZLogInformation($"LMS=> {msg}");
+                    LmsLogManager.Logger.ZLogInformation($"{msg}");
                     break;
                 case LogLevel.LOG_LEVEL_DEBUG:
-                    StaticLogger.ZLogDebug($"LMS=> {msg}");
+                    LmsLogManager.Logger.ZLogDebug($"{msg}");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(level), level, null);

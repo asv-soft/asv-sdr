@@ -3,15 +3,15 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Asv.Sdr.LimeSdr;
 
-public static class LogManager
+public static class LmsLogManager
 {
     private static ILogger _globalLogger = NullLogger.Instance;
     private static ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
 
-    public static void SetLoggerFactory(ILoggerFactory loggerFactory, string categoryName)
+    public static void SetLoggerFactory(ILoggerFactory loggerFactory)
     {
         _loggerFactory = loggerFactory;
-        _globalLogger = loggerFactory.CreateLogger(categoryName);
+        _globalLogger = loggerFactory.CreateLogger("Asv.Sdr.LimeSdr");
     }
 
     public static ILogger Logger => _globalLogger;

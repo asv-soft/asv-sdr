@@ -166,7 +166,7 @@ namespace Asv.Sdr.LimeSdr
     /// </summary>
     public class NativeMethods
     {
-        private static readonly ILogger<NativeMethods> Logger = LogManager.GetLogger<NativeMethods>();
+        private static readonly ILogger<NativeMethods> Logger = LmsLogManager.GetLogger<NativeMethods>();
         
         static NativeMethods()
         {
