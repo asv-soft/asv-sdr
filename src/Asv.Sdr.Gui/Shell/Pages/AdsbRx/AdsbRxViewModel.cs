@@ -8,6 +8,7 @@ using System.Reactive.Concurrency;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Asv.Common;
 using Asv.IO;
 using Asv.Sdr.LimeSdr;
 using DynamicData.Binding;
@@ -28,7 +29,9 @@ public class AdsbRxViewModel:ShellPage
     private AvaPlot _plotRight;
     private Signal _signal;
     private bool _nextTrigger;
-    private readonly AdsbBitDecoder _decoder;
+    // private readonly AdsbBitDecoder _decoder;
+    
+    private readonly AdsbMessageParser _decoder;
     private int _cnt;
 
     public AdsbRxViewModel() : base(WellKnownUri.Shell + ".adsbrx")
@@ -36,11 +39,15 @@ public class AdsbRxViewModel:ShellPage
         Title = "ADSB RX";
         Icon = MaterialIconKind.ChartFinance;
         ConnectLms = ReactiveCommand.CreateRunInBackground(ConnectLmsImpl);
-        _decoder = new AdsbBitDecoder();
-        _decoder.FrameReceived += (frame, length) =>
-        {
-            Icao = AdsbBitDecoder.GetICAOAddress(frame).ToString("X") + "   " + length + " " + _cnt++;
-        };
+        // _decoder = new AdsbBitDecoder();
+        _decoder = new AdsbMessageParser();
+        // _decoder.FrameReceived += (frame, length) =>
+        // {
+        //     Icao = AdsbBitDecoder.GetICAOAddress(frame).ToString("X") + "   " + length + " " + _cnt++;
+        // };
+        _decoder.OnMessageRecev
+            .Subscribe(_ => Icao = _)
+            .DisposeItWith(Disposable);
         NextTrigger = ReactiveCommand.Create(() =>
         {
             _nextTrigger = true;
@@ -145,10 +152,10 @@ public class AdsbRxViewModel:ShellPage
 
                         var value = cnt >= (bitLength / 2);
                         str.Append(value?"1":"0");
-                        _decoder.ProcessSample(value ? 1:0);
+                        _decoder.ProcessSample(value ? (byte)1 : (byte)0);
                     }
 
-                    DecodedBits = str.ToString();
+                    // DecodedBits = str.ToString();
                     RxApp.MainThreadScheduler.Schedule(() =>
                     {
                         _plotLeft.Plot.Clear();
@@ -163,8 +170,6 @@ public class AdsbRxViewModel:ShellPage
                     tcs.Task.Wait();
                     stopwach.Restart();
                     _nextTrigger = false;
-                    
-                    
                 });
             start();
         }
