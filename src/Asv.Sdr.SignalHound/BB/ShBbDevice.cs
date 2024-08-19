@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Reactive;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Asv.Common;
-using NLog;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using ZLogger;
 
 namespace Asv.Sdr.SignalHound
 {
@@ -189,7 +188,7 @@ namespace Asv.Sdr.SignalHound
     {
         #region Static
 
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        
         
         public static string ApiVersion => BbApi.bbGetAPIString();
         
@@ -197,19 +196,19 @@ namespace Asv.Sdr.SignalHound
         {
             var devices = new int[BbApi.BB_MAX_DEVICES];
             var deviceCount = 0;
-            InternalCheckStatus(BbApi.bbGetSerialNumberList(devices, ref deviceCount));
+            BbApi.bbGetSerialNumberList(devices, ref deviceCount);
             for (var i = 0; i < deviceCount; i++)
             {
                 yield return devices[i];
             }
         }
         
-        private static void InternalCheckStatus(bbStatus status, bool throwIfWarning = false)
+        private void InternalCheckStatus(bbStatus status, bool throwIfWarning = false)
         {
             if (status == bbStatus.bbNoError) return;
             if (status > 0 && throwIfWarning == false ) return;
             var err = BbApi.bbGetStatusString(status);
-            _logger.Error($"SignalHound device error: {err}");
+            _logger.ZLogError($"SignalHound device error: {err}");
             throw new SignalHoundException(err,status);
         }
 
@@ -217,9 +216,10 @@ namespace Asv.Sdr.SignalHound
         
         private readonly int _deviceHandle;
         private readonly TaskFactory _taskFactory;
-    
-        public ShBbDevice(int serial,TaskFactory? taskFactory = null)
+        private readonly ILogger<ShBbDevice> _logger;
+        public ShBbDevice(int serial,TaskFactory? taskFactory = null, ILogger<ShBbDevice>? logger = null)
         {
+            _logger = logger ?? NullLogger<ShBbDevice>.Instance;
             InternalCheckStatus(BbApi.bbOpenDeviceBySerialNumber(ref _deviceHandle, serial));
             Name = BbApi.bbGetDeviceName(_deviceHandle);
             SerialNumber = BbApi.bbGetSerialString(_deviceHandle);
@@ -341,7 +341,7 @@ namespace Asv.Sdr.SignalHound
             }
             catch (Exception e)
             {
-                _logger.Error(e,$"Error to bbAbort device:{e.Message}");
+                _logger.ZLogError(e,$"Error to bbAbort device:{e.Message}");
             }
             try
             {
@@ -349,7 +349,7 @@ namespace Asv.Sdr.SignalHound
             }
             catch (Exception e)
             {
-                _logger.Error(e,$"Error to close device:{e.Message}");
+                _logger.ZLogError(e,$"Error to close device:{e.Message}");
             }
             
         }

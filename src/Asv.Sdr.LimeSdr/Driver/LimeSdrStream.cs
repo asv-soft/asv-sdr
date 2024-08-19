@@ -2,18 +2,19 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Asv.Common;
-using NLog;
+using Microsoft.Extensions.Logging;
+using ZLogger;
 using static Asv.Sdr.LimeSdr.NativeMethods;
 
 namespace Asv.Sdr.LimeSdr
 {
     public class LmsStream : DisposableOnceWithCancel, ILmsStream
     {
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private readonly TaskFactory _deviceFactory;
 
         private bool _started;
         private lms_stream_meta_t _meta;
+        private readonly ILogger _logger;
         private readonly TaskFactory _factory;
         private readonly IntPtr _stream;
         private readonly string _name;
@@ -21,8 +22,9 @@ namespace Asv.Sdr.LimeSdr
 
         public LmsStream(TaskFactory deviceFactory, LmsChannel type, uint channel, IntPtr device, string id,
             uint bufferLength, float throughputVsLatency, lms_stream_meta_t meta, bool isThreadSafe,
-            Func<ILmsStream,Task> destroyStream)
+            Func<ILmsStream,Task> destroyStream, ILogger logger)
         {
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
             _deviceFactory = deviceFactory;
             Type = type;
             Channel = channel;
@@ -31,6 +33,7 @@ namespace Asv.Sdr.LimeSdr
                     : Task.Factory;
             LimeSdrDevice.Check(LMS_SetupStream(device, type == LmsChannel.Tx, DataFormat.LMS_FMT_F32, ref _stream, channel, bufferLength, throughputVsLatency),nameof(LMS_SetupStream));
             _meta = meta;
+            _logger = logger;
             Disposable.AddAction(() =>
             {
                 if (_started) LimeSdrDevice.Check(LMS_StopStream(_stream), nameof(LMS_StopStream));
@@ -47,7 +50,7 @@ namespace Asv.Sdr.LimeSdr
         {
             return _deviceFactory.StartNew(() =>
             {
-                _logger.Info($"Start {_name}");
+                _logger.ZLogInformation($"Start {_name}");
                 LimeSdrDevice.Check(LMS_StartStream(_stream),nameof(LMS_StartStream));
                 _started = true;
             }, cancel);
@@ -58,7 +61,7 @@ namespace Asv.Sdr.LimeSdr
             return _deviceFactory.StartNew(() =>
             {
                 if (!_started) return;
-                _logger.Info($"Stop {_name}");
+                _logger.ZLogInformation($"Stop {_name}");
                 LimeSdrDevice.Check(LMS_StopStream(_stream),nameof(LMS_StopStream));
                 _started = false;
             }, cancel);

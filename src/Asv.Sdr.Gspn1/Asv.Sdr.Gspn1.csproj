@@ -16,8 +16,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="NLog" Version="5.2.6" />
       <PackageReference Include="System.IO.Ports" Version="6.0.0" />
+        <PackageReference Include="ZLogger" Version="$(ZLoggerVersion)" />
     </ItemGroup>
 
 </Project>

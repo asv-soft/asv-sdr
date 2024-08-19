@@ -48,10 +48,4 @@
       <ProjectReference Include="..\Asv.Sdr.LimeSdr\Asv.Sdr.LimeSdr.csproj" />
       <ProjectReference Include="..\Asv.Sdr.SignalHound\Asv.Sdr.SignalHound.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <None Update="NLog.config">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
 </Project>

@@ -5,7 +5,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Asv.Common;
-using NLog;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using ZLogger;
+
 using static Asv.Sdr.LimeSdr.NativeMethods;
 
 namespace Asv.Sdr.LimeSdr
@@ -14,21 +17,20 @@ namespace Asv.Sdr.LimeSdr
     {
         #region Static
 
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        private static readonly LogCallBack _callback;
+        private static readonly ILogger<LimeSdrDevice> StaticLogger = LogManager.GetLogger<LimeSdrDevice>();
 
         static LimeSdrDevice()
         {
-            _callback = OnLmsLog;
-            GC.KeepAlive(_callback);
-            LMS_RegisterLogHandler(_callback);
+            LogCallBack callback = OnLmsLog;
+            GC.KeepAlive(callback);
+            LMS_RegisterLogHandler(callback);
         }
 
-        private static readonly object _sync = new();
+        private static readonly object Sync = new();
 
         public static unsafe IReadOnlyList<string> GetAvailableDevices()
         {
-            lock (_sync)
+            lock (Sync)
             {
                 var buff = new byte[256 * 8];
                 var result = new List<string>();
@@ -64,20 +66,24 @@ namespace Asv.Sdr.LimeSdr
         private readonly TaskFactory _taskFactory;
         private readonly List<ILmsStream> _streamList = new(4);
         private readonly bool _isThreadSafe;
-        private HashSet<string> _ignoreLogLmsParams;
+        private readonly HashSet<string> _ignoreLogLmsParams;
+        private readonly ILogger<LimeSdrDevice> _logger;
         
-        public LimeSdrDevice(string deviceId, bool isThreadSave = false)
-            :this(deviceId,isThreadSave,LimeSdrParams.LMS7_CAPSEL,LimeSdrParams.LMS7_CAPTURE)
+
+        public LimeSdrDevice(string deviceId, bool isThreadSave = false, ILogger<LimeSdrDevice>? logger = null)
+            :this(deviceId,isThreadSave,logger ?? NullLogger<LimeSdrDevice>.Instance,LimeSdrParams.LMS7_CAPSEL,LimeSdrParams.LMS7_CAPTURE)
         {
             
         }
-        public LimeSdrDevice(string deviceId, bool isThreadSave, params LMS7Parameter[] ignoreLogLmsParams)
+        public LimeSdrDevice(string deviceId, bool isThreadSave,ILogger<LimeSdrDevice> logger, params LMS7Parameter[] ignoreLogLmsParams)
         {
+            ArgumentNullException.ThrowIfNull(logger);
+            _logger = logger;
             DeviceId = deviceId;
             _isThreadSafe = isThreadSave;
             _ignoreLogLmsParams = new HashSet<string>(ignoreLogLmsParams.Select(x=>x.name),StringComparer.InvariantCultureIgnoreCase);
             
-            _logger.Debug("Try to open LimeSDR device {0}",deviceId);
+            _logger.ZLogDebug($"Try to open LimeSDR device {deviceId}");
 
             Disposable.AddAction(() =>
             {
@@ -125,19 +131,19 @@ namespace Asv.Sdr.LimeSdr
             switch (level)
             {
                 case LogLevel.LOG_LEVEL_CRITICAL:
-                    _logger.Fatal("LMS=> {0}", msg);
+                    StaticLogger.ZLogCritical($"LMS=> {msg}");
                     break;
                 case LogLevel.LOG_LEVEL_ERROR:
-                    _logger.Error("LMS=> {0}", msg);
+                    StaticLogger.ZLogError($"LMS=> {msg}", msg);
                     break;
                 case LogLevel.LOG_LEVEL_WARNING:
-                    _logger.Warn("LMS=> {0}", msg);
+                    StaticLogger.ZLogWarning($"LMS=> {msg}");
                     break;
                 case LogLevel.LOG_LEVEL_INFO:
-                    _logger.Info("LMS=> {0}", msg);
+                    StaticLogger.ZLogInformation($"LMS=> {msg}");
                     break;
                 case LogLevel.LOG_LEVEL_DEBUG:
-                    _logger.Debug("LMS=> {0}", msg);
+                    StaticLogger.ZLogDebug($"LMS=> {msg}");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(level), level, null);
@@ -188,7 +194,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info("Set LMS {0:G}{1} GFIR LPF:{2} = {3}", type, channel, bandwidth, enable);
+                _logger.ZLogInformation($"Set LMS {type:G}{channel} GFIR LPF:{bandwidth} = {enable}");
                 Check(LMS_SetGFIRLPF(_device, type == LmsChannel.Tx, channel, enable, bandwidth),nameof(LMS_SetGFIRLPF));
             }, cancel);
         }
@@ -198,7 +204,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info("Do LMS {0:G}{1} calibration with bandwidth:{2} and flags {3}", type,channel,bandwidth,flags);
+                _logger.ZLogInformation($"Do LMS {type:G}{channel} calibration with bandwidth:{bandwidth} and flags {flags}");
                 Check(LMS_Calibrate(_device, type == LmsChannel.Tx, channel, bandwidth, flags),nameof(LMS_Calibrate));
             }, cancel);
         }
@@ -210,7 +216,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info($"Save LMS config to file {path}");
+                _logger.ZLogInformation($"Save LMS config to file {path}");
                 Check(LMS_SaveConfig(_device, path), nameof(LMS_SaveConfig));
             }, cancel);
         }
@@ -220,7 +226,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info($"Load LMS config from file {path}");
+                _logger.ZLogInformation($"Load LMS config from file {path}");
                 Check(LMS_LoadConfig(_device, path),nameof(LMS_LoadConfig));
             }, cancel);
         }
@@ -234,7 +240,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info("Set sample rate {0} with oversample {1}",rate,oversample);
+                _logger.ZLogInformation($"Set sample rate {rate} with oversample {oversample}");
                 Check(LMS_SetSampleRate(_device, rate, oversample),nameof(LMS_SetSampleRate));
             }, cancel);
         }
@@ -244,7 +250,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info("Set sample rate for {0:G} {1} with oversample {2}", type, rate, oversample);
+                _logger.ZLogInformation($"Set sample rate for {type:G} {rate} with oversample {oversample}");
                 Check(LMS_SetSampleRateDir(_device, type == LmsChannel.Tx, rate, oversample), nameof(LMS_SetSampleRateDir));
             }, cancel);
         }
@@ -256,7 +262,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info("Set {0:G}{1} LO frequency {2} ", type, channel, freq);
+                _logger.ZLogInformation($"Set {type:G}{channel} LO frequency {freq} ");
                 Check(LMS_SetLOFrequency(_device, type == LmsChannel.Tx, channel, freq),nameof(LMS_SetLOFrequency));
             }, cancel);
         }
@@ -266,7 +272,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info("Set {0:G}{1} antenna {2:G}", type, channel, type == LmsChannel.Rx ? (LmsPathRx)index : (LmsPathTx)index);
+                _logger.ZLogInformation($"Set {type:G}{channel} antenna {index}");
                 Check(LMS_SetAntenna(_device, type == LmsChannel.Tx, channel, index),nameof(LMS_SetAntenna));
             }, cancel);
         }
@@ -296,7 +302,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info("Set {0:G}{1} normalized gain  {2:G}", type, channel, normalizedGain);
+                _logger.ZLogInformation($"Set {type:G}{channel} normalized gain  {normalizedGain}");
                 Check(LMS_SetNormalizedGain(_device, type == LmsChannel.Tx, channel, normalizedGain),nameof(LMS_SetNormalizedGain));
             }, cancel);
         }
@@ -306,7 +312,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info("Set {0:G}{1} gain  {2:G} dBm", type, channel, gainDbm);
+                _logger.ZLogInformation($"Set {type:G}{channel} gain  {gainDbm} dBm");
                 Check(LMS_SetGaindB(_device, type == LmsChannel.Tx, channel, gainDbm),nameof(LMS_SetGaindB));
             }, cancel);
         }
@@ -339,15 +345,15 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return null;
-                _logger.Info("Create new stream {0:G}{1} buff:{2}, throughputVsLatency:{3}", type, channel, bufferLength, throughputVsLatency);
+                _logger.ZLogInformation($"Create new stream {type:G}{channel} buff:{bufferLength}, throughputVsLatency:{throughputVsLatency}");
                 var strm = new LmsStream(_taskFactory,  type, channel, _device, DeviceId, bufferLength, throughputVsLatency, new lms_stream_meta_t
                 {
                     flushPartialPacket = flushPartialPacket,
                     waitForTimestamp = waitForTimestamp,
-                },_isThreadSafe, DestroyStream);
+                },_isThreadSafe, DestroyStream, _logger);
                 _streamList.Add(strm);
                 return (ILmsStream)strm;
-            }, cancel);
+            }, cancel)!;
         }
 
         public Task EnableChannel(LmsChannel type, uint channel, bool isEnable, CancellationToken cancel)
@@ -355,7 +361,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info("Enable channel {0:G}{1} ={2}", type, channel, isEnable);
+                _logger.ZLogInformation($"Enable channel {type:G}{channel} ={isEnable}");
                 Check(LMS_EnableChannel(_device, type == LmsChannel.Tx, channel, isEnable),nameof(LMS_EnableChannel));
             }, cancel);
         }
@@ -365,7 +371,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info("Set {0:G}{1} BW={2}", type, channel, bandwidth);
+                _logger.ZLogInformation($"Set {type:G}{channel} BW={bandwidth}");
                 Check(LMS_SetLPFBW(_device, type == LmsChannel.Tx, channel, bandwidth),nameof(LMS_SetLPFBW));
             }, cancel);
         }
@@ -377,7 +383,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info("Enable  {0:G}{1} LPF={2}", type, channel, enable);
+                _logger.ZLogInformation($"Enable  {type:G}{channel} LPF={enable}");
                 Check(LMS_SetLPF(_device, type == LmsChannel.Tx, channel, enable),nameof(LMS_SetLPF));
             }, cancel);
         }
@@ -387,7 +393,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info("Set  {0:G}{1} LPF BW={2}", type, channel, bandwidth);
+                _logger.ZLogInformation($"Set  {type:G}{channel} LPF BW={bandwidth}");
                 Check(LMS_SetLPFBW(_device, type == LmsChannel.Tx, channel, bandwidth),nameof(LMS_SetLPFBW));
             }, cancel);
         }
@@ -418,7 +424,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Info("Set FPGA register [{0:X2}]={1}", address, value);
+                _logger.ZLogInformation($"Set FPGA register [{address:X2}]={value}");
                 Check(LMS_WriteFPGAReg(_device, address, value),nameof(LMS_WriteFPGAReg));
             }, cancel);
         }
@@ -449,7 +455,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.Trace("Set LMS register {0:X2}={1:X2}", address, value);
+                _logger.ZLogInformation($"Set LMS register {address:X2}={value:X2}");
                 Check(LMS_WriteLMSReg(_device, address, value),nameof(LMS_WriteLMSReg));
             }, cancel);
         }
@@ -461,7 +467,7 @@ namespace Asv.Sdr.LimeSdr
                 if (IsDisposed) return;
                 if (_ignoreLogLmsParams.Contains(param.name) == false)
                 {
-                    _logger.Trace("Set LMS param {0}={1:X2}", (object)param.name, (object)value);    
+                    _logger.ZLogTrace($"Set LMS param {param.name}={value:X2}");
                 }
                 Check(LMS_WriteParam(_device, param, value),nameof(LMS_WriteParam));
             }, cancel);

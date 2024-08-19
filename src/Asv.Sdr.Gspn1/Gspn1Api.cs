@@ -3,14 +3,17 @@ using System.Globalization;
 using System.IO.Ports;
 using System.Linq;
 using System.Threading;
-using NLog;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using ZLogger;
+
 
 namespace Asv.Sdr.Gspn1;
 
 public class Gspn1Api 
 {
     public const string ApiName = "gspn1";
-    private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+    private readonly ILogger<Gspn1Api> _logger;
 
 
     public GspnModeInfo[] modes { get; } = {
@@ -22,6 +25,10 @@ public class Gspn1Api
         new GspnModeInfo(6, "Glide-SP50", "Глиссадный радиомаяк СП-50"),
     };
 
+    public Gspn1Api(ILogger<Gspn1Api>? logger)
+    {
+        _logger = logger ?? NullLogger<Gspn1Api>.Instance;
+    }
 
     public string[] set_mode(string serialPort, int mode)
     {
@@ -324,7 +331,7 @@ public class Gspn1Api
                 catch (Exception e)
                 {
                     attempt++;
-                    _logger.Warn(e, "Couldn't open serial port. Attempt {0}",attempt);
+                    _logger.ZLogWarning(e, $"Couldn't open serial port. Attempt {attempt}");
                     if (attempt>= 5) throw;
                 }
                 Thread.Sleep(500);
