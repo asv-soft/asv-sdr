@@ -54,8 +54,4 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Shell\Pages\AdsbRx\Parser\Messages\" />
-    </ItemGroup>
 </Project>

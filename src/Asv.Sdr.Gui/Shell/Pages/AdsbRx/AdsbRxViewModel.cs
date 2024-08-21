@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Composition;
 using System.Diagnostics;
 using System.Linq;
@@ -9,9 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Asv.Common;
-using Asv.IO;
 using Asv.Sdr.LimeSdr;
-using DynamicData.Binding;
 using Material.Icons;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -34,13 +31,88 @@ public class AdsbRxViewModel:ShellPage
     private readonly AdsbMessageParser _decoder;
     private int _cnt;
 
+    private byte[] GetMags(byte[] frame)
+    {
+        var result = new byte[frame.Length * 8 + 16];
+
+        byte shift = 0x80; 
+        for (var i = 0; i < 8; i++)
+        {
+            result[i] = (byte)((AdsbHelper.Preamble[0] & shift) != 0 ? 1 : 0);
+            result[i + 8] = (byte)((AdsbHelper.Preamble[1] & shift) != 0 ? 1 : 0);
+            shift >>= 1;
+        }
+        
+        for (var i = 0; i < frame.Length; i++)
+        {
+            shift = 0x80;
+            for (var j = 0; j < 8; j++)
+            {
+                result[16 + i * 8 + j] = (byte)((frame[i] & shift) != 0 ? 1 : 0);
+                shift >>= 1;
+            }
+        }
+
+        return result;
+    }
+    
     public AdsbRxViewModel() : base(WellKnownUri.Shell + ".adsbrx")
     {
         Title = "ADSB RX";
         Icon = MaterialIconKind.ChartFinance;
-        ConnectLms = ReactiveCommand.CreateRunInBackground(ConnectLmsImpl);
         // _decoder = new AdsbBitDecoder();
         _decoder = new AdsbMessageParser();
+
+       
+        // (byte)0x5d, (byte)0x40, (byte)0x74, (byte)0x35, (byte)0x8a, (byte)0xd0, (byte)0x0c
+
+
+        byte[] buffRx = [0xA1, 0x40, 0x8D, 0x48, 0x40, 0xD6, 0x20, 0x2C, 0xC3, 0x71, 0xC3, 0x2C, 0xE0, 0x57, 0x60, 0x98];
+        var spanRx = new ReadOnlySpan<byte>(buffRx);
+        var df = AdsbHelper.GetDownlinkFormat(spanRx);
+        if (df is 17 or 18)
+        {
+            var id = new AdsbAircraftIdentification();
+            id.Deserialize(ref spanRx);
+
+            var buffTx = new byte[buffRx.Length];
+            var spanTx = new Span<byte>(buffTx);
+            id.Serialize(ref spanTx);
+
+            var eq = true;
+            for (var i = 0; i < buffRx.Length; i++)
+            {
+                if (buffTx[i] == buffRx[i]) continue;
+                eq = false;
+                break;
+            }
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        var mags = GetMags([0x8D, 0x48, 0x40, 0xD6, 0x20, 0x2C, 0xC3, 0x71, 0xC3, 0x2C, 0xE0, 0x57, 0x60, 0x98]);
+        foreach (var mag in mags)
+        {
+            _decoder.ProcessSample(mag);
+        }
+        
+        ConnectLms = ReactiveCommand.CreateRunInBackground(ConnectLmsImpl);
         // _decoder.FrameReceived += (frame, length) =>
         // {
         //     Icao = AdsbBitDecoder.GetICAOAddress(frame).ToString("X") + "   " + length + " " + _cnt++;
@@ -66,7 +138,6 @@ public class AdsbRxViewModel:ShellPage
     private void ConnectLmsImpl()
     {
         LmsNativeDllUsage.Is64BitOperatingSystem = true;
-        
         try
         {
             _cancelShStream = new CancellationTokenSource();
