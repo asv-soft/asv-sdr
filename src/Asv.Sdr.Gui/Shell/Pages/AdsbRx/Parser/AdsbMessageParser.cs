@@ -12,9 +12,9 @@ public class AdsbMessageParser : DisposableOnce
     private readonly Subject<string> _onMessageRecev = new();
     public IObservable<string> OnMessageRecev => _onMessageRecev;
     private readonly Subject<AdsbParserException> _onErrorSubject = new();
-    private readonly Subject<AdsbDFMessageBase> _onMessageSubject = new();
+    private readonly Subject<AdsbDfMessageBase> _onMessageSubject = new();
 
-    private readonly Dictionary<int, Func<AdsbDFMessageBase>> _factory = new();
+    private readonly Dictionary<int, Func<AdsbDfMessageBase>> _factory = new();
     private int _readBytes;
     
     /// <summary>
@@ -74,7 +74,7 @@ public class AdsbMessageParser : DisposableOnce
     /// Registers a factory.
     /// </summary>
     /// <param name="factory">The factory to register.</param>
-    public void Register(Func<AdsbDFMessageBase> factory)
+    public void Register(Func<AdsbDfMessageBase> factory)
     {
         var pkt = factory();
         _factory.Add(pkt.DownlinkFormat, factory);
@@ -89,7 +89,7 @@ public class AdsbMessageParser : DisposableOnce
     /// Notifies when a message is received.
     /// </summary>
     /// <param name="message">The received message.</param>
-    protected void InternalOnMessage(AdsbDFMessageBase message)
+    protected void InternalOnMessage(AdsbDfMessageBase message)
     {
         _onMessageSubject.OnNext(message);
     }
@@ -322,7 +322,7 @@ public class AdsbMessageParser : DisposableOnce
     /// <summary>
     /// Gets an observable of the message subject.
     /// </summary>
-    public IObservable<AdsbDFMessageBase> OnMessage => _onMessageSubject;
+    public IObservable<AdsbDfMessageBase> OnMessage => _onMessageSubject;
 
     protected override void InternalDisposeOnce()
     {
