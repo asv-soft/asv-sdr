@@ -61,28 +61,39 @@ public class AdsbRxViewModel:ShellPage
         Title = "ADSB RX";
         Icon = MaterialIconKind.ChartFinance;
         // _decoder = new AdsbBitDecoder();
-        _decoder = new AdsbMessageParser();
 
        
+        
+        _decoder = new AdsbMessageParser();
         // (byte)0x5d, (byte)0x40, (byte)0x74, (byte)0x35, (byte)0x8a, (byte)0xd0, (byte)0x0c
 
-
-        byte[] buffRx = [0xA1, 0x40, 0x8D, 0x48, 0x40, 0xD6, 0x20, 0x2C, 0xC3, 0x71, 0xC3, 0x2C, 0xE0, 0x57, 0x60, 0x98];
-        var spanRx = new ReadOnlySpan<byte>(buffRx);
-        var df = AdsbHelper.GetDownlinkFormat(spanRx);
+        byte[] buffRx1 = [0xA1, 0x40, 0x8D, 0x40, 0x62, 0x1D, 0x58, 0xC3, 0x82, 0xD6, 0x90, 0xC8, 0xAC, 0x28, 0x63, 0xA7];
+        byte[] buffRx2 = [0xA1, 0x40, 0x8D, 0x40, 0x62, 0x1D, 0x58, 0xC3, 0x86, 0x43, 0x5C, 0xC4, 0x12, 0x69, 0x2A, 0xD6];
+        var spanRx1 = new ReadOnlySpan<byte>(buffRx1);
+        var spanRx2 = new ReadOnlySpan<byte>(buffRx2);
+        var df = AdsbHelper.GetDownlinkFormat(spanRx1);
         if (df is 17 or 18)
         {
-            var id = new AdsbAircraftIdentification();
-            id.Deserialize(ref spanRx);
+            var msg1 = new AdsbAirbornePosition(); 
+            var msg2 = new AdsbAirbornePosition();
+            msg1.Deserialize(ref spanRx1);
+            msg2.Deserialize(ref spanRx2);
 
-            var buffTx = new byte[buffRx.Length];
-            var spanTx = new Span<byte>(buffTx);
-            id.Serialize(ref spanTx);
+            // типо msg1 более свежее
+            msg1.CalculatePosition(msg2);
+            
+            var buffTx1 = new byte[buffRx1.Length];
+            var buffTx2 = new byte[buffRx2.Length];
+            var spanTx1 = new Span<byte>(buffTx1);
+            var spanTx2 = new Span<byte>(buffTx2);
+            
+            msg1.Serialize(ref spanTx1);
+            msg2.Serialize(ref spanTx2);
 
             var eq = true;
-            for (var i = 0; i < buffRx.Length; i++)
+            for (var i = 0; i < buffTx1.Length; i++)
             {
-                if (buffTx[i] == buffRx[i]) continue;
+                if (buffRx1[i] == buffTx1[i] && buffRx2[i] == buffTx2[i]) continue;
                 eq = false;
                 break;
             }

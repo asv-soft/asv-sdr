@@ -29,6 +29,62 @@ public enum TypeCodeEnum
     AircraftOperationStatus
 }
 
+public enum AirbornePositionTypeCode
+{
+    /// <summary>
+    /// Базовое позиционирование с низкой точностью
+    /// </summary>
+    BasicPositionLowPrecision = 9,
+    /// <summary>
+    /// Базовое позиционирование с низкой частотой обновления
+    /// </summary>
+    BasicPositionLowUpdateRate = 10,
+    /// <summary>
+    /// Базовое позиционирование с высокой частотой обновления
+    /// </summary>
+    BasicPositionHighUpdateRate = 11,
+    /// <summary>
+    /// Базовое позиционирование с высокой точностью
+    /// </summary>
+    BasicPositionHighPrecision = 12,
+    /// <summary>
+    /// Улучшенное позиционирование с индикацией NIC
+    /// </summary>
+    EnhancedPositionWithNic = 13,
+    /// <summary>
+    /// Улучшенное позиционирование с индикацией NACp
+    /// </summary>
+    EnhancedPositionWithNacP = 14,
+    /// <summary>
+    /// Улучшенное позиционирование с данными вертикальной скорости
+    /// </summary>
+    EnhancedPositionWithVerticalRate = 15,
+    /// <summary>
+    /// Высокоточное позиционирование с индикацией NIC
+    /// </summary>
+    HighPrecisionPositionWithNic = 16,
+    /// <summary>
+    /// Высокоточное позиционирование с индикацией NACp
+    /// </summary>
+    HighPrecisionPositionWithNacP = 17,
+    /// <summary>
+    /// Высокоточное позиционирование с вертикальной скоростью и данными целостности
+    /// </summary>
+    HighPrecisionPositionWithVerticalRateAndIntegrity = 18,
+    /// <summary>
+    /// Базовая информация о GNSS местоположении
+    /// </summary>
+    BasicGnssPosition = 20,
+    /// <summary>
+    /// Улучшенная информация о GNSS местоположении с дополнительными данными о целостности
+    /// </summary>
+    EnhancedGnssPositionWithIntegrity = 21,
+    /// <summary>
+    /// Высокоточная информация о GNSS местоположении с расширенными функциями навигации
+    /// </summary>
+    HighPrecisionGnssPositionWithAdvNavFeatures = 22
+}
+
 public enum AircraftCategoryEnum
 {
     Reserved,
@@ -49,6 +105,26 @@ public enum AircraftCategoryEnum
     Heavy,
     HighPerformanceAndHighSpeed,
     Rotorcraft
+}
+
+public enum AltitudeTypeEnum
+{
+    Barometric,
+    Gnss
+}
+
+public enum CprFormatEnum
+{
+    Even,
+    Odd
+}
+
+public enum SurveillanceStatusEnum
+{
+    NoCondition = 0,
+    PermanentAlert = 1,
+    TemporaryAlert = 2,
+    SpecialPositionIdentification = 3
 }
 
 public static class AdsbHelper
@@ -367,6 +443,110 @@ public static class AdsbHelper
         }
 
         return Encoding.ASCII.GetString(src);
+    }
+
+    private static double Mod(double x, double y)
+    {
+        return x - y * Math.Floor(x / y);
+    }
+
+    /// <summary>
+    /// Number of latitude zones between the equator and a pole
+    /// </summary>
+    private const int Nz = 15;
+    
+    /// <summary>
+    /// Longitude zone number (1 .. 59)
+    /// </summary>
+    /// <param name="lat">Latitude [°]</param>
+    /// <returns></returns>
+    private static int Nl(double lat)
+    {
+        if (lat is < -87.0 or > 87.0) return 1;
+        var latRad = Math.PI * lat / 180.0;
+        var x = 1.0 - Math.Cos(Math.PI / (2.0 * Nz));
+        var y = Math.Pow(Math.Cos(latRad), 2);
+        var arcArg = 1.0 - x / y;
+        if (arcArg > 1.0) arcArg = 1.0;
+        if (arcArg < -1.0) arcArg = -1.0;
+        var z = Math.Acos(arcArg);
+        return (int)Math.Floor(2.0 * Math.PI / z);
+    }
+
+    public static (double Lat, double Lon) GloballyUnambiguousPositionDecoding(uint nCprLatEven, uint nCprLonEven,
+        uint nCprLatOdd, uint nCprLonOdd, DateTime tEven, DateTime tOdd)
+    {
+        const double dLatEven = 360.0 / (4.0 * Nz);
+        const double dLatOdd = 360.0 / (4.0 * Nz - 1.0);
+        const double part = 1 << 17;
+        
+        var latCprEven = nCprLatEven / part;
+        var lonCprEven = nCprLonEven / part;
+        var latCprOdd = nCprLatOdd / part;
+        var lonCprOdd = nCprLonOdd / part;
+       
+        var j = (int)Math.Floor(59.0 * latCprEven - 60.0 * latCprOdd + 0.5);
+
+        var latEven = dLatEven * (Mod(j, 60) + latCprEven);
+        var latOdd = dLatOdd * (Mod(j, 59) + latCprOdd);
+
+        if (latEven >= 270.0) latEven -= 390.0;
+        if (latOdd >= 270.0) latOdd -= 360;
+
+        var nlEven = Nl(latEven);
+        var nlOdd = Nl(latOdd);
+
+        if (nlEven != nlOdd) return (Lat: double.NaN, Lon: double.NaN);
+
+        var lat = tEven >= tOdd ? latEven : latOdd;
+
+        var m = Math.Floor(lonCprEven * (nlEven - 1) - lonCprOdd * nlEven + 0.5);
+
+        var nEven = Math.Max(nlEven, 1);
+        var nOdd = Math.Max(nlEven - 1, 1);
+
+        var dLonEven = 360.0 / nEven;
+        var dLonOdd = 360.0 / nOdd;
+
+        var lonEven = dLonEven * (Mod(m, nEven) + lonCprEven);
+        var lonOdd = dLonOdd * (Mod(m, nOdd) + lonCprOdd);
+        
+        var lon = tEven >= tOdd ? lonEven : lonOdd;
+        if (lon >= 180.0) lon -= 360.0;
+
+        return (Lat: lat, Lon: lon);
+    }
+
+    public static (double Lat, double Lon) LocallyUnambiguousPositionDecoding(uint nCprLat, uint nCprLon, double latRef,
+        double lonRef, CprFormatEnum format)
+    {
+        const double part = 1 << 17;
+        var latCpr = nCprLat / part;
+        var lonCpr = nCprLon / part;
+        
+        var i = format == CprFormatEnum.Even ? 0 : 1;
+        var dLat = 360.0 / (4.0 * Nz - i);
+        var j = (int)Math.Floor(latRef / dLat) + (int)Math.Floor(Mod(latRef, dLat) / dLat - latCpr + 0.5);
+        var lat = dLat * (j + latCpr);
+
+        var nl = Nl(lat);
+        var dLon = 360.0 / Math.Max(nl - i, 1);
+        var m = (int)Math.Floor(lonRef / dLon) + (int)Math.Floor(Mod(lonRef, dLon) / dLon - lonCpr + 0.5);
+        var lon = dLon * (m + lonCpr);
+        
+        return (Lat: lat, Lon: lon);
+    }
+
+    public static (uint Lat, uint Lon) UnambiguousPositionEncoding(double lat, double lon, CprFormatEnum format)
+    {
+        var nl = Nl(lat) - (format == CprFormatEnum.Even ? 0 : 1);
+        var dLon = 360.0 / Math.Max(nl, 1);  // Prevent division by zero
+        var nLon = (uint)Math.Floor((1 << 17) * (lon % dLon) / dLon);
+        
+        var dLat = format == CprFormatEnum.Even ? 360.0 / 60 : 360.0 / 59;
+        var nLat = (uint)Math.Floor((1 << 17) * (lat % dLat) / dLat);
+
+        return (Lat: nLat, Lon: nLon);
     }
     
 }
