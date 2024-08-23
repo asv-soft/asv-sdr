@@ -149,6 +149,7 @@ public class AdsbRxViewModel:ShellPage
     private void ConnectLmsImpl()
     {
         LmsNativeDllUsage.Is64BitOperatingSystem = true;
+        NativeMethods.Is64BitOperatingSystem = true;
         try
         {
             _cancelShStream = new CancellationTokenSource();

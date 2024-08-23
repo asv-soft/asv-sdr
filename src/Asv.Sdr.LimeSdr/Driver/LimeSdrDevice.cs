@@ -145,7 +145,7 @@ namespace Asv.Sdr.LimeSdr
                     LmsLogManager.Logger.ZLogDebug($"{msg}");
                     break;
                 default:
-                    _logger.Debug("LMS=> {0}", msg);
+                    LmsLogManager.Logger.ZLogDebug($"{level} {msg}");
                     break;
                     //throw new ArgumentOutOfRangeException(nameof(level), level, null);
             }
