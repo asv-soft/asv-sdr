@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,14 +23,16 @@ public class AdsbRxViewModel:ShellPage
 {
     private CancellationTokenSource _cancelShStream;
     private LimeSdrDevice _device;
-    private AvaPlot _plotLeft;
-    private AvaPlot _plotRight;
+    private AvaPlot _plot1;
+    private AvaPlot _plot2;
+    private AvaPlot _plot3;
     private Signal _signal;
     private bool _nextTrigger;
     // private readonly AdsbBitDecoder _decoder;
     
     private readonly AdsbMessageParser _decoder;
     private int _cnt;
+    
 
     private byte[] GetMags(byte[] frame)
     {
@@ -133,14 +136,21 @@ public class AdsbRxViewModel:ShellPage
             .DisposeItWith(Disposable);
         NextTrigger = ReactiveCommand.Create(() =>
         {
+            _plot2?.Plot.Clear();
             _nextTrigger = true;
         });
         this.WhenAnyValue(x => x.Threshold).Subscribe(x =>
         {
-            _plotLeft?.Plot.Remove<HorizontalLine>();
-            _plotLeft?.Plot.Add.HorizontalLine(x);
-            _plotLeft?.Refresh();
+            _plot1?.Plot.Remove<HorizontalLine>();
+            _plot1?.Plot.Add.HorizontalLine(x);
+            _plot1?.Refresh();
         });
+        this.WhenAnyValue(x => x.Gain)
+            .Throttle(TimeSpan.FromMilliseconds(500))
+            .Subscribe(x =>
+            {
+                _device?.SetNormalizedGain(LmsChannel.Tx, 0, x, default).Wait();
+            }).DisposeItWith(Disposable);
     }
 
     [Reactive]
@@ -171,33 +181,53 @@ public class AdsbRxViewModel:ShellPage
                 LmsLpfBandWidth = 4e6,
                 Channel = 0,
                 AmountDataRssi = 1,
-                //LmsSelfCalibrate = true,
+                LmsSelfCalibrate = false,
                 Path = LmsPathRx.LMS_PATH_LNAH,
             };
             var lime = new LimeReaderIq(_device,cfg );
-            var bufferSize = 4_000;
+            var bufferSize = 40_000;
             var stopwach = new Stopwatch();
             var fill = new double[bufferSize / 2];
             var stepLine = new double[bufferSize];
             
             var found = false;
             
-            
+            var template = new byte[] {1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0};
+            var correlation = new PulseCrossCorrelation(sampleRate, 2_000_000, template);
+
+            var proc = new AdsbSignalProcessor(sampleRate, x =>
+            {
+                _nextTrigger = false;
+                RxApp.MainThreadScheduler.Schedule(() =>
+                {
+                    _plot2.Plot.Add.Signal(x);
+                    _plot2.Refresh();
+                });
+                
+               
+            });
             var source = lime
                 .Sample(bufferSize, out var start)
                 .Magnitude().Subscribe(data =>
                 {
                     if (_nextTrigger == false) return;
+                    
                     found = false;
                     var firstItem = 0;
                     var tcs = new TaskCompletionSource();
                     var plotData = data.Span;
                     var bitSequence = new double[bufferSize/2];
+                    var buffer = data.Span;
+                    var corrPlot = new double[buffer.Length / 2];
+                    
                     for (int i = 0; i < fill.Length; i++)
                     {
                         var val = plotData[i * 2];
+                        proc.Process(val);
                         fill[i] = val;
-                        if (val > Threshold)
+                        var corr = correlation.Process(buffer[i*2]);
+                        corrPlot[i] = corr;
+                        if (corr > 0)
                         {
                             stepLine[i*2] = 1;
                             stepLine[i*2+1] = 1;
@@ -218,9 +248,11 @@ public class AdsbRxViewModel:ShellPage
                             }
                         }
                     }
+                    
+                   
+                    
                     if (found == false) return;
                     var str = new StringBuilder();
-                    
                     
                     for (int i = 0; i < bitSequence.Length; i+=bitLength)
                     {
@@ -238,16 +270,25 @@ public class AdsbRxViewModel:ShellPage
                         _decoder.ProcessSample(value ? (byte)1 : (byte)0);
                     }
 
+                    
+                    
                     // DecodedBits = str.ToString();
                     RxApp.MainThreadScheduler.Schedule(() =>
                     {
-                        _plotLeft.Plot.Clear();
-                        _plotRight.Plot.Clear();
-                        _plotLeft.Plot.Add.HorizontalLine(Threshold);
-                        _plotLeft.Plot.Add.Signal(fill);
-                        _plotRight.Plot.Add.Signal(stepLine);
-                        _plotLeft.Refresh();
-                        _plotRight.Refresh();
+                        _plot1.Plot.Clear();
+                        
+                        _plot1.Plot.Add.HorizontalLine(Threshold);
+                        _plot1.Plot.Add.Signal(fill);
+                        _plot1.Refresh();
+                        
+                        /*_plot2.Plot.Clear();
+                        _plot2.Plot.Add.Signal(stepLine);
+                        _plot2.Refresh();*/
+                        
+                       
+                        _plot3.Plot.Clear();
+                        _plot3.Plot.Add.Signal(corrPlot);
+                        _plot3.Refresh();    
                         tcs.SetResult();
                     });
                     tcs.Task.Wait();
@@ -267,11 +308,15 @@ public class AdsbRxViewModel:ShellPage
 
     public ReactiveCommand<Unit,Unit> ConnectLms { get; set; }
     [Reactive] public double Threshold { get; set; } = 0.3;
+    
+    [Reactive] public double Gain { get; set; } = 0.69;
     public ReactiveCommand<Unit,Unit> NextTrigger { get; }
 
-    public void InitCharts(AvaPlot plotLeft, AvaPlot plotRight)
+    public void InitCharts(AvaPlot plot1, AvaPlot plot2, AvaPlot plot3)
     {
-        _plotLeft = plotLeft;
-        _plotRight = plotRight;
+        _plot1 = plot1;
+        _plot2 = plot2;
+        _plot3 = plot3;
     }
 }
+
