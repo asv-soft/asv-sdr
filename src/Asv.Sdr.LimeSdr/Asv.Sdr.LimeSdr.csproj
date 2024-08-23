@@ -39,7 +39,7 @@
   <ItemGroup>
     <PackageReference Include="Asv.Common" Version="$(AsvCommonVersion)" />
     <PackageReference Include="System.Reactive" Version="$(SystemReactiveVersion)" />
-    <PackageReference Include="NLog" Version="$(NLogVersion)" />
+    <PackageReference Include="ZLogger" Version="$(ZLoggerVersion)" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Libs.Designer.cs">

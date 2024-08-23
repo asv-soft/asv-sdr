@@ -21,7 +21,7 @@
         <PackageReference Include="Asv.Avalonia.Toolkit" Version="$(AsvAvaloniaToolkitVersion)" />
         <PackageReference Include="Asv.Common" Version="$(AsvCommonVersion)" />
         <PackageReference Include="Asv.Cfg" Version="$(AsvCommonVersion)" />
-        <PackageReference Include="Asv.Io" Version="$(AsvCommonVersion)" />
+        <PackageReference Include="Asv.IO" Version="$(AsvCommonVersion)" />
         
         <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
@@ -47,11 +47,5 @@
     <ItemGroup>
       <ProjectReference Include="..\Asv.Sdr.LimeSdr\Asv.Sdr.LimeSdr.csproj" />
       <ProjectReference Include="..\Asv.Sdr.SignalHound\Asv.Sdr.SignalHound.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Update="NLog.config">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
 </Project>
