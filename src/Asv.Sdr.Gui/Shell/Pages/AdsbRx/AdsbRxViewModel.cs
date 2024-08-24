@@ -11,8 +11,10 @@ using System.Threading.Tasks;
 using Asv.Common;
 using Asv.Sdr.LimeSdr;
 using Material.Icons;
+using Newtonsoft.Json;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using ScottPlot;
 using ScottPlot.Avalonia;
 using ScottPlot.Plottables;
 
@@ -26,13 +28,15 @@ public class AdsbRxViewModel:ShellPage
     private AvaPlot _plot1;
     private AvaPlot _plot2;
     private AvaPlot _plot3;
-    private Signal _signal;
+    private AvaPlot _plot4;
+    
     private bool _nextTrigger;
     // private readonly AdsbBitDecoder _decoder;
     
     private readonly AdsbMessageParser _decoder;
     private int _cnt;
     
+
 
     private byte[] GetMags(byte[] frame)
     {
@@ -137,19 +141,15 @@ public class AdsbRxViewModel:ShellPage
         NextTrigger = ReactiveCommand.Create(() =>
         {
             _plot2?.Plot.Clear();
+            _plot4?.Plot.Clear();
             _nextTrigger = true;
         });
-        this.WhenAnyValue(x => x.Threshold).Subscribe(x =>
-        {
-            _plot1?.Plot.Remove<HorizontalLine>();
-            _plot1?.Plot.Add.HorizontalLine(x);
-            _plot1?.Refresh();
-        });
+       
         this.WhenAnyValue(x => x.Gain)
             .Throttle(TimeSpan.FromMilliseconds(500))
             .Subscribe(x =>
             {
-                _device?.SetNormalizedGain(LmsChannel.Tx, 0, x, default).Wait();
+                _device?.SetNormalizedGain(LmsChannel.Rx, 0, x, default).Wait();
             }).DisposeItWith(Disposable);
     }
 
@@ -172,45 +172,90 @@ public class AdsbRxViewModel:ShellPage
             var cfg = new LimeSourceIqConfig
             {
                 Frequency = frequencyHz,
-                BandWidth = 4e6,
+                BandWidth = 2.5e6,
                 Gain = 0.69,
                 SampleRate = sampleRate,
                 GfirEnable = true,
-                GfirBandWidth = 4e6,
+                GfirBandWidth = 2.8e6,
                 LmsLpfEnable = true,
-                LmsLpfBandWidth = 4e6,
+                LmsLpfBandWidth = 2400000.0,
                 Channel = 0,
                 AmountDataRssi = 1,
-                LmsSelfCalibrate = false,
+                LmsSelfCalibrate = true,
                 Path = LmsPathRx.LMS_PATH_LNAH,
+                ThroughputVsLatency = 1,
             };
             var lime = new LimeReaderIq(_device,cfg );
-            var bufferSize = 40_000;
+            var bufferSize = 1024*1024;
             var stopwach = new Stopwatch();
             var fill = new double[bufferSize / 2];
             var stepLine = new double[bufferSize];
             
             var found = false;
             
-            var template = new byte[] {1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0};
-            var correlation = new PulseCrossCorrelation(sampleRate, 2_000_000, template);
+            
 
-            var proc = new AdsbSignalProcessor(sampleRate, x =>
+            var proc = new AdsbSignalProcessor(sampleRate, (string name, double[] data, DataType type, PlotNumber num) =>
             {
                 _nextTrigger = false;
+                var plot = num switch
+                {
+                    PlotNumber.Plot1 => _plot2,
+                    PlotNumber.Plot2 => _plot4,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
                 RxApp.MainThreadScheduler.Schedule(() =>
                 {
-                    _plot2.Plot.Add.Signal(x);
-                    _plot2.Refresh();
+                    switch (type)
+                    {
+                        case DataType.Bar:
+                            var a = plot.Plot.Add.Scatter(Enumerable.Range(0, data.Length).ToArray(),data);
+                            a.LegendText = name;
+                            a.ConnectStyle = ConnectStyle.StepHorizontal;
+                            break;
+                        case DataType.Signal:
+                            var b = plot.Plot.Add.Signal(data);
+                            b.LegendText = name;
+                            break;
+                        case DataType.HorizontalLine:
+                            plot.Plot.Add.HorizontalLine(data[0]).LegendText = name;
+                            break;
+                        case DataType.VertivalLine:
+                            plot.Plot.Add.VerticalLine(data[0]).LegendText = name;
+                            break;
+                        case DataType.Clear:
+                            plot.Plot.Clear();
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                    }
+                    plot.Plot.Axes.AutoScale();
+                    plot.Refresh();
                 });
+
+               
                 
                
             });
+
+            proc.OnMessage.Subscribe(x =>
+            {
+                DecodedBits = JsonConvert.SerializeObject(x, Formatting.Indented);
+            });
+            proc.OnMessageText.Subscribe(x =>
+            {
+                
+            });
+            
             var source = lime
-                .Sample(bufferSize, out var start)
+                .Sample(sampleRate/10, out var start)
                 .Magnitude().Subscribe(data =>
                 {
-                    if (_nextTrigger == false) return;
+                    for (int i = 0; i < data.Length; i+=2)
+                    {
+                        proc.Process(data.Span[i]);
+                    }
+                    /*if (_nextTrigger == false) return;
                     
                     found = false;
                     var firstItem = 0;
@@ -270,30 +315,40 @@ public class AdsbRxViewModel:ShellPage
                         _decoder.ProcessSample(value ? (byte)1 : (byte)0);
                     }
 
-                    
-                    
+
+                    Task.Factory.StartNew(() =>
+                    {
+                        var level = lime.GetLevel(default).Result.ToString("F0") + " dBm";
+                        RxApp.MainThreadScheduler.Schedule(() =>
+                        {
+                            _plot3.Plot.Add.Annotation(level);
+                        });
+                        
+                    });
                     // DecodedBits = str.ToString();
                     RxApp.MainThreadScheduler.Schedule(() =>
                     {
                         _plot1.Plot.Clear();
                         
-                        _plot1.Plot.Add.HorizontalLine(Threshold);
-                        _plot1.Plot.Add.Signal(fill);
+                        /*_plot1.Plot.Add.HorizontalLine(Threshold);#1#
+                        _plot1.Plot.Add.Signal(fill).LegendText = "RAW signal";
+                        _plot1.Plot.Axes.AutoScale();
                         _plot1.Refresh();
                         
-                        /*_plot2.Plot.Clear();
-                        _plot2.Plot.Add.Signal(stepLine);
-                        _plot2.Refresh();*/
+                        
+                        
                         
                        
                         _plot3.Plot.Clear();
-                        _plot3.Plot.Add.Signal(corrPlot);
+                        _plot3.Plot.Add.Signal(corrPlot).LegendText = "Correlation function";
+                        
+                        _plot3.Plot.Axes.AutoScale();
                         _plot3.Refresh();    
                         tcs.SetResult();
                     });
                     tcs.Task.Wait();
                     stopwach.Restart();
-                    _nextTrigger = false;
+                    _nextTrigger = false;*/
                 });
             start();
         }
@@ -304,6 +359,9 @@ public class AdsbRxViewModel:ShellPage
     }
 
     [Reactive]
+    public string Level { get; set; }
+
+    [Reactive]
     public string DecodedBits { get; set; }
 
     public ReactiveCommand<Unit,Unit> ConnectLms { get; set; }
@@ -312,11 +370,12 @@ public class AdsbRxViewModel:ShellPage
     [Reactive] public double Gain { get; set; } = 0.69;
     public ReactiveCommand<Unit,Unit> NextTrigger { get; }
 
-    public void InitCharts(AvaPlot plot1, AvaPlot plot2, AvaPlot plot3)
+    public void InitCharts(AvaPlot plot1, AvaPlot plot2, AvaPlot plot3, AvaPlot plot4)
     {
         _plot1 = plot1;
         _plot2 = plot2;
         _plot3 = plot3;
+        _plot4 = plot4;
     }
 }
 

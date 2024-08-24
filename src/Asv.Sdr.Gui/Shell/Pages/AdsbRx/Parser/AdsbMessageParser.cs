@@ -69,6 +69,8 @@ public class AdsbMessageParser : DisposableOnce
     
     private readonly byte[] _frame = new byte[AdsbHelper.LongFrameLengthBytes];
     private int _msgLen;
+    private bool _first;
+    private int _firstValue;
 
     /// <summary>
     /// Registers a factory.
@@ -177,8 +179,16 @@ public class AdsbMessageParser : DisposableOnce
                 }
                 break;
             case State.DFAndAC:
+                if (_first)
+                {
+                    _firstValue = mag;
+                    _first = false;
+                    return false;
+                }
+                _first = true;
+                var val = _firstValue == 1 && mag == 0 ? 1 : 0;
                 _currentByte <<= 1;
-                _currentByte |= (byte)(mag & 0x1);
+                _currentByte |= (byte)(val & 0x1);
                 _readedBits++;
                 if (_readedBits == 8)
                 {
@@ -193,8 +203,16 @@ public class AdsbMessageParser : DisposableOnce
                 }
                 break;
             case State.Payload:
+                if (_first)
+                {
+                    _firstValue = mag;
+                    _first = false;
+                    return false;
+                }
+                _first = true;
+                var val2 = _firstValue == 1 && mag == 0 ? 1 : 0;
                 _currentByte <<= 1;
-                _currentByte |= (byte)(mag & 0x1);
+                _currentByte |= (byte)(val2 & 0x1);
                 _readedBits++;
                 if (_readedBits == 8)
                 {
@@ -209,8 +227,16 @@ public class AdsbMessageParser : DisposableOnce
                 }
                 break;
             case State.Crc1:
+                if (_first)
+                {
+                    _firstValue = mag;
+                    _first = false;
+                    return false;
+                }
+                _first = true;
+                var val3 = _firstValue == 1 && mag == 0 ? 1 : 0;
                 _currentByte <<= 1;
-                _currentByte |= (byte)(mag & 0x1);
+                _currentByte |= (byte)(val3 & 0x1);
                 _readedBits++;
                 if (_readedBits == 8)
                 {
@@ -225,8 +251,16 @@ public class AdsbMessageParser : DisposableOnce
                 }
                 break;
             case State.Crc2:
+                if (_first)
+                {
+                    _firstValue = mag;
+                    _first = false;
+                    return false;
+                }
+                _first = true;
+                var val4 = _firstValue == 1 && mag == 0 ? 1 : 0;
                 _currentByte <<= 1;
-                _currentByte |= (byte)(mag & 0x1);
+                _currentByte |= (byte)(val4 & 0x1);
                 _readedBits++;
                 if (_readedBits == 8)
                 {
@@ -241,8 +275,16 @@ public class AdsbMessageParser : DisposableOnce
                 }
                 break;
             case State.Crc3:
+                if (_first)
+                {
+                    _firstValue = mag;
+                    _first = false;
+                    return false;
+                }
+                _first = true;
+                var val5 = _firstValue == 1 && mag == 0 ? 1 : 0;
                 _currentByte <<= 1;
-                _currentByte |= (byte)(mag & 0x1);
+                _currentByte |= (byte)(val5 & 0x1);
                 _readedBits++;
                 if (_readedBits == 8)
                 {
