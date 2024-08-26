@@ -178,7 +178,7 @@ public class AdsbRxViewModel:ShellPage
                 GfirEnable = true,
                 GfirBandWidth = 2.8e6,
                 LmsLpfEnable = true,
-                LmsLpfBandWidth = 2400000.0,
+                LmsLpfBandWidth = 1.4e6,
                 Channel = 0,
                 AmountDataRssi = 1,
                 LmsSelfCalibrate = true,
@@ -220,7 +220,7 @@ public class AdsbRxViewModel:ShellPage
                         case DataType.HorizontalLine:
                             plot.Plot.Add.HorizontalLine(data[0]).LegendText = name;
                             break;
-                        case DataType.VertivalLine:
+                        case DataType.VerticalLine:
                             plot.Plot.Add.VerticalLine(data[0]).LegendText = name;
                             break;
                         case DataType.Clear:
@@ -249,7 +249,8 @@ public class AdsbRxViewModel:ShellPage
             
             var source = lime
                 .Sample(sampleRate/10, out var start)
-                .Magnitude().Subscribe(data =>
+                .Magnitude()
+                .Subscribe(data =>
                 {
                     for (int i = 0; i < data.Length; i+=2)
                     {
