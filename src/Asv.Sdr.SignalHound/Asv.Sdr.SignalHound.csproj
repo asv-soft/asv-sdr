@@ -22,8 +22,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NLog" Version="$(NLogVersion)" />
     <PackageReference Include="Asv.Common" Version="$(AsvCommonVersion)" />
+    <PackageReference Include="ZLogger" Version="$(ZLoggerVersion)" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Libs.resx">
