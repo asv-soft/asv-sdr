@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reactive.Subjects;
 using System.Threading;
 using Asv.Common;
-using Asv.IO;
 
 namespace Asv.Sdr.Gui;
 
@@ -29,6 +28,7 @@ public class AdsbMessageParser : DisposableOnce
 
     private byte _syncByte;
     private byte _currentByte;
+    private byte _stateByte;
 
     private State _state = State.Preamb1;
     
@@ -177,10 +177,20 @@ public class AdsbMessageParser : DisposableOnce
                 }
                 break;
             case State.DFAndAC:
-                _currentByte <<= 1;
-                _currentByte |= (byte)(mag & 0x1);
                 _readedBits++;
-                if (_readedBits == 8)
+                _stateByte |= (byte)(mag << (_readedBits % 2));
+                if (_readedBits % 2 == 0)
+                {
+                    if (_stateByte is 0b00 or 0b11)
+                    {
+                        Reset();
+                        break;
+                    }
+                    _currentByte <<= 1;
+                    _currentByte |= (byte)((_stateByte & 0b11) == 0b01 ? 0 : 1);
+                    _stateByte = 0;
+                }
+                if (_readedBits == 16)
                 {
                     _frame[_readedBytes] = _currentByte;
                     _readedBytes++;
@@ -193,10 +203,20 @@ public class AdsbMessageParser : DisposableOnce
                 }
                 break;
             case State.Payload:
-                _currentByte <<= 1;
-                _currentByte |= (byte)(mag & 0x1);
                 _readedBits++;
-                if (_readedBits == 8)
+                _stateByte |= (byte)(mag << (_readedBits % 2));
+                if (_readedBits % 2 == 0)
+                {
+                    if (_stateByte is 0b00 or 0b11)
+                    {
+                        Reset();
+                        break;
+                    }
+                    _currentByte <<= 1;
+                    _currentByte |= (byte)((_stateByte & 0b11) == 0b01 ? 0 : 1);
+                    _stateByte = 0;
+                }
+                if (_readedBits == 16)
                 {
                     _frame[_readedBytes] = _currentByte;
                     _readedBytes++;
@@ -209,10 +229,20 @@ public class AdsbMessageParser : DisposableOnce
                 }
                 break;
             case State.Crc1:
-                _currentByte <<= 1;
-                _currentByte |= (byte)(mag & 0x1);
                 _readedBits++;
-                if (_readedBits == 8)
+                _stateByte |= (byte)(mag << (_readedBits % 2));
+                if (_readedBits % 2 == 0)
+                {
+                    if (_stateByte is 0b00 or 0b11)
+                    {
+                        Reset();
+                        break;
+                    }
+                    _currentByte <<= 1;
+                    _currentByte |= (byte)((_stateByte & 0b11) == 0b01 ? 0 : 1);
+                    _stateByte = 0;
+                }
+                if (_readedBits == 16)
                 {
                     _frame[_readedBytes] = _currentByte;
                     _readedBytes++;
@@ -225,10 +255,20 @@ public class AdsbMessageParser : DisposableOnce
                 }
                 break;
             case State.Crc2:
-                _currentByte <<= 1;
-                _currentByte |= (byte)(mag & 0x1);
                 _readedBits++;
-                if (_readedBits == 8)
+                _stateByte |= (byte)(mag << (_readedBits % 2));
+                if (_readedBits % 2 == 0)
+                {
+                    if (_stateByte is 0b00 or 0b11)
+                    {
+                        Reset();
+                        break;
+                    }
+                    _currentByte <<= 1;
+                    _currentByte |= (byte)((_stateByte & 0b11) == 0b01 ? 0 : 1);
+                    _stateByte = 0;
+                }
+                if (_readedBits == 16)
                 {
                     _frame[_readedBytes] = _currentByte;
                     _readedBytes++;
@@ -241,10 +281,20 @@ public class AdsbMessageParser : DisposableOnce
                 }
                 break;
             case State.Crc3:
-                _currentByte <<= 1;
-                _currentByte |= (byte)(mag & 0x1);
                 _readedBits++;
-                if (_readedBits == 8)
+                _stateByte |= (byte)(mag << (_readedBits % 2));
+                if (_readedBits % 2 == 0)
+                {
+                    if (_stateByte is 0b00 or 0b11)
+                    {
+                        Reset();
+                        break;
+                    }
+                    _currentByte <<= 1;
+                    _currentByte |= (byte)((_stateByte & 0b11) == 0b01 ? 0 : 1);
+                    _stateByte = 0;
+                }
+                if (_readedBits == 16)
                 {
                     _frame[_readedBytes] = _currentByte;
                     _readedBytes++;
@@ -285,6 +335,7 @@ public class AdsbMessageParser : DisposableOnce
         _readedBytes = 0;
         _syncByte = 0;
         _currentByte = 0;
+        _stateByte = 0;
         _msgLen = 0;
     }
 

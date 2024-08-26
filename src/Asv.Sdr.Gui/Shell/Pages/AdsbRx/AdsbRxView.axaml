@@ -19,6 +19,10 @@
         </StackPanel>
         <TextBlock DockPanel.Dock="Top" Text="{Binding DecodedBits}" FontSize="20"/>
         <TextBlock DockPanel.Dock="Top" Text="{Binding Icao}" FontSize="20"/>
+        <TextBlock DockPanel.Dock="Top" Text="{Binding Identific}" FontSize="20"/>
+        <TextBlock DockPanel.Dock="Top" Text="{Binding Lat}" FontSize="20"/>
+        <TextBlock DockPanel.Dock="Top" Text="{Binding Lon}" FontSize="20"/>
+        <TextBlock DockPanel.Dock="Top" Text="{Binding Alt}" FontSize="20"/>
         <Grid RowDefinitions="5*,*">
             <avalonia:AvaPlot Grid.Row="0" Name="PlotLeft"/>
             <avalonia:AvaPlot Grid.Row="1" Name="PlotRight"/>

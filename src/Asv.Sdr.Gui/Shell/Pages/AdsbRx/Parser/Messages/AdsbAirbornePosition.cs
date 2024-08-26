@@ -6,8 +6,8 @@ namespace Asv.Sdr.Gui;
 public class AdsbAirbornePosition : AdsbExtendedSquitterBase
 {
 
-    public uint NCprLat { get; set; }
-    public uint NCprLon { get; set; }
+    public uint NCprLat { get; private set; }
+    public uint NCprLon { get; private set; }
 
     public AltitudeTypeEnum AltitudeType => (int)AirbornePositionType is >= 9 and <= 18 ? AltitudeTypeEnum.Barometric : AltitudeTypeEnum.Gnss;
 

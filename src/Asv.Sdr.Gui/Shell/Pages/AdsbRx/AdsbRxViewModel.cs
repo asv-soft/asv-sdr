@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,13 +28,14 @@ public class AdsbRxViewModel:ShellPage
     private Signal _signal;
     private bool _nextTrigger;
     // private readonly AdsbBitDecoder _decoder;
+    private AdsbAirbornePosition _prev = null;
     
     private readonly AdsbMessageParser _decoder;
     private int _cnt;
 
     private byte[] GetMags(byte[] frame)
     {
-        var result = new byte[frame.Length * 8 + 16];
+        var result = new byte[frame.Length * 8 * 2 + 16];
 
         byte shift = 0x80; 
         for (var i = 0; i < 8; i++)
@@ -48,7 +50,16 @@ public class AdsbRxViewModel:ShellPage
             shift = 0x80;
             for (var j = 0; j < 8; j++)
             {
-                result[16 + i * 8 + j] = (byte)((frame[i] & shift) != 0 ? 1 : 0);
+                if ((frame[i] & shift) != 0)
+                {
+                    result[16 + i * 16 + 2 * j] = 1;
+                    result[16 + i * 16 + 2 * j + 1] = 0;
+                }
+                else
+                {
+                    result[16 + i * 16 + 2 * j] = 0;
+                    result[16 + i * 16 + 2 * j + 1] = 1;
+                }
                 shift >>= 1;
             }
         }
@@ -65,64 +76,6 @@ public class AdsbRxViewModel:ShellPage
        
         
         _decoder = new AdsbMessageParser();
-        // (byte)0x5d, (byte)0x40, (byte)0x74, (byte)0x35, (byte)0x8a, (byte)0xd0, (byte)0x0c
-
-        byte[] buffRx1 = [0xA1, 0x40, 0x8D, 0x40, 0x62, 0x1D, 0x58, 0xC3, 0x82, 0xD6, 0x90, 0xC8, 0xAC, 0x28, 0x63, 0xA7];
-        byte[] buffRx2 = [0xA1, 0x40, 0x8D, 0x40, 0x62, 0x1D, 0x58, 0xC3, 0x86, 0x43, 0x5C, 0xC4, 0x12, 0x69, 0x2A, 0xD6];
-        var spanRx1 = new ReadOnlySpan<byte>(buffRx1);
-        var spanRx2 = new ReadOnlySpan<byte>(buffRx2);
-        var df = AdsbHelper.GetDownlinkFormat(spanRx1);
-        if (df is 17 or 18)
-        {
-            var msg1 = new AdsbAirbornePosition(); 
-            var msg2 = new AdsbAirbornePosition();
-            msg1.Deserialize(ref spanRx1);
-            msg2.Deserialize(ref spanRx2);
-
-            // типо msg1 более свежее
-            msg1.CalculatePosition(msg2);
-            
-            var buffTx1 = new byte[buffRx1.Length];
-            var buffTx2 = new byte[buffRx2.Length];
-            var spanTx1 = new Span<byte>(buffTx1);
-            var spanTx2 = new Span<byte>(buffTx2);
-            
-            msg1.Serialize(ref spanTx1);
-            msg2.Serialize(ref spanTx2);
-
-            var eq = true;
-            for (var i = 0; i < buffTx1.Length; i++)
-            {
-                if (buffRx1[i] == buffTx1[i] && buffRx2[i] == buffTx2[i]) continue;
-                eq = false;
-                break;
-            }
-        }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        var mags = GetMags([0x8D, 0x48, 0x40, 0xD6, 0x20, 0x2C, 0xC3, 0x71, 0xC3, 0x2C, 0xE0, 0x57, 0x60, 0x98]);
-        foreach (var mag in mags)
-        {
-            _decoder.ProcessSample(mag);
-        }
-        
         ConnectLms = ReactiveCommand.CreateRunInBackground(ConnectLmsImpl);
         // _decoder.FrameReceived += (frame, length) =>
         // {
@@ -145,6 +98,14 @@ public class AdsbRxViewModel:ShellPage
 
     [Reactive]
     public string Icao { get; set; }
+    [Reactive]
+    public string Identific { get; set; }
+    [Reactive]
+    public string Lat { get; set; }
+    [Reactive]
+    public string Lon { get; set; }
+    [Reactive]
+    public string Alt { get; set; }
 
     private void ConnectLmsImpl()
     {
