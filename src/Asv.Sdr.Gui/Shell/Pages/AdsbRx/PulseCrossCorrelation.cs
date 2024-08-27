@@ -16,7 +16,7 @@ public enum DataType
     Bar,
     Signal,
     HorizontalLine,
-    VertivalLine
+    VerticalLine
 }
 
 public enum PlotNumber
@@ -46,16 +46,23 @@ public class AdsbSignalProcessor
     private readonly AdsbBitDecoder _parser2;
     private readonly object _sync = new();
     private readonly int _bitPulseMinimumLevel;
+    private readonly int _pulseLength;
 
     public AdsbSignalProcessor(int sampleRate, DebugPlotDelegate? debugCallback)
     {
         _debugCallback = debugCallback;
-        _correlation = new PulseCrossCorrelation(sampleRate, AdsbHalfBitRate, Preamble);
-        _correlationBuffer = new CircularBuffer2<double>(Preamble.Length * _correlation.PulseLength);
-        _rawBuffer = new CircularBuffer2<double>( (Preamble.Length + MaxAdsbMessageSize * 2  /*cause 1 bit is 2 pulse*/ + PrefixPostfixSize*2) * _correlation.PulseLength);
-        _prefixPulseSize = PrefixPostfixSize * _correlation.PulseLength;
-        _avgSize = (Preamble.Length + MinAdsbMessageSize * 2  /*cause 1 bit is 2 pulse*/) * _correlation.PulseLength;
-        _bitPulseMinimumLevel = _correlation.PulseLength / 2;
+        _pulseLength = sampleRate / AdsbHalfBitRate;
+        if (sampleRate % AdsbHalfBitRate != 0)
+        {
+            throw new ArgumentException($"Sample rate must be multiple of {AdsbHalfBitRate}");
+        }
+        _correlation = new PulseCrossCorrelation(_pulseLength, Preamble);
+        
+        _correlationBuffer = new CircularBuffer2<double>(Preamble.Length * _pulseLength);
+        _rawBuffer = new CircularBuffer2<double>( (Preamble.Length + MaxAdsbMessageSize * 2  /*cause 1 bit is 2 pulse*/ + PrefixPostfixSize*2) * _pulseLength);
+        _prefixPulseSize = PrefixPostfixSize * _pulseLength;
+        _avgSize = (Preamble.Length + MinAdsbMessageSize * 2  /*cause 1 bit is 2 pulse*/) * _pulseLength;
+        _bitPulseMinimumLevel = _pulseLength / 2;
         
         
         _parser = new AdsbMessageParser();
@@ -186,11 +193,11 @@ public class AdsbSignalProcessor
         }
         
 
-        while (_rawBuffer.IsEmpty == false && _rawBuffer.Size > _correlation.PulseLength)
+        while (_rawBuffer.IsEmpty == false && _rawBuffer.Size > _pulseLength)
         {
             var value = 0;
             var cnt = 0;
-            for (var j = 0; j < _correlation.PulseLength; j++)
+            for (var j = 0; j < _pulseLength; j++)
             {
                 if (_rawBuffer[j] > avg)
                 {
@@ -206,7 +213,7 @@ public class AdsbSignalProcessor
             {
                 
             }
-            for (var i = 0; i < _correlation.PulseLength; i++)
+            for (var i = 0; i < _pulseLength; i++)
             {
                 _rawBuffer.PopFront();
             }
@@ -217,61 +224,4 @@ public class AdsbSignalProcessor
 
     public IObservable<AdsbDfMessageBase> OnMessage => _parser.OnMessage;
     public IObservable<string> OnMessageText => _parser.OnMessageRecev;
-}
-
-public class PulseCrossCorrelation:IDspFilter
-{
-    private readonly int _pulseLength;
-    private readonly ImmutableArray<double> _template;
-    private readonly CircularBuffer2<double> _buffer;
-    private readonly int _sampleRate;
-
-    public PulseCrossCorrelation(int sampleRate, int bitRate,byte[] puleTemplate)
-    {
-        if (_pulseLength % bitRate != 0) throw new Exception("Invalid bit rate. Must be a multiple of sample rate");
-        _sampleRate = sampleRate;
-        _pulseLength = sampleRate / bitRate;
-        _buffer = new CircularBuffer2<double>(puleTemplate.Length * _pulseLength);
-        var builder = ImmutableArray.CreateBuilder<double>(puleTemplate.Length * _pulseLength);
-        foreach (var val in puleTemplate)
-        {
-            if (val is not (0 or 1))
-                throw new Exception("Invalid template value: must be 0 or 1");
-            if (val == 0)
-            {
-                for (int j = 0; j < _pulseLength; j++)
-                {
-                    builder.Add(-1);
-                }
-            }
-            else
-            {
-                for (var j = 0; j < _pulseLength; j++)
-                {
-                    builder.Add(1);
-                }
-            }
-        }
-        _template = builder.ToImmutable();
-    }
-
-    public int PulseLength => _pulseLength;
-    public int SampleRate => _sampleRate;
-
-    public double Process(double input)
-    {
-        _buffer.PushFront(input);
-        if (_buffer.IsFull == false) return 0;
-        var summ = 0.0;
-        for (var i = 0; i < _template.Length; i++)
-        {
-            summ+=_template[i] * _buffer[i];
-        }
-        return summ;
-    }
-    
-    public void Reset()
-    {
-        _buffer.Clear();
-    }
 }
