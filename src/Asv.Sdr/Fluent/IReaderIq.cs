@@ -22,12 +22,32 @@ namespace Asv.Sdr
 
     public static class FluentDspHelper
     {
+        
+        
         public static IReaderIqSubject<T> Sample<T>(this IReaderIq<T> src, int readSize,out Action start, bool useArrayPool = false,
             ThreadPriority priority = ThreadPriority.Highest)
         {
             return new ReaderIqSampler<T>(src, readSize,out start, useArrayPool, priority);
         }
 
+        public static IReaderIqSubject<T> Preview<T>(this IReaderIqSubject<T> src,ProcessDelegate<T> previewCallback)
+        {
+            return new ReaderIqCallbackSubject<T>(src, previewCallback);
+        }
+        public static IReaderIqSubject<T> Preview<T>(this IReaderIqSubject<T> src,ProcessDelegate<T> previewCallback, bool previewEnabled)
+        {
+            return previewEnabled == false ? src : new ReaderIqCallbackSubject<T>(src, previewCallback);
+        }
+        
+        public static IReaderIqSubject<T> PreviewOnDebug<T>(this IReaderIqSubject<T> src,ProcessDelegate<T> previewCallback, bool previewEnabled)
+        {
+#if DEBUG
+            return new ReaderIqCallbackSubject<T>(src, previewCallback);
+#else
+            return src;
+#endif
+        }
+        
         public static IReaderIqSubject<T> Parallel<T>(this IReaderIqSubject<T> src)
         {
             return new ReaderIqParallelSubject<T>(src);
@@ -396,13 +416,13 @@ namespace Asv.Sdr
         #region Pulse coding modulaition
 
         public static IReaderIqSubject<double> PulseDetector(this IReaderIqSubject<double> src,
-            int pulseSize, byte[] template, double correlationThreshold, int maxPulseCount, int prefixPulseCount, bool useArrayPool = false)
+            int pulseSize, byte[] template, double correlationThreshold, int maxPulseCount, int prefixPulseCount, bool useArrayPool = true)
          {
             return new ReaderIqPcmDetector(src, pulseSize,template,correlationThreshold,maxPulseCount,prefixPulseCount,useArrayPool);
         }
         
         public static IReaderIqSubject<double> PulseAvgNormalize(this IReaderIqSubject<double> src, int skip, int count,
-            double lowValue, double highValue, bool useArrayPool = false)
+            double lowValue, double highValue, bool useArrayPool = true)
         {
             return new ReaderIqPcmAvgNormalizer(src, skip, count, lowValue, highValue, useArrayPool);
         }

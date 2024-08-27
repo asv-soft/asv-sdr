@@ -63,7 +63,35 @@ namespace Asv.Sdr
     }
 
     public delegate void ProcessDelegate<TIn, TOut>(ReadOnlySpan<TIn> input, Span<TOut> output);
+    
+    public delegate void ProcessDelegate<T>(ReadOnlySpan<T> input);
 
+    public class ReaderIqCallbackSubject<T> : DisposableOnceWithCancel, IReaderIqSubject<T>
+    {
+        private readonly ProcessDelegate<T> _processCallback;
+        private readonly Subject<Memory<T>> _output;
+
+        public ReaderIqCallbackSubject(IReaderIqSubject<T> input, ProcessDelegate<T> processCallback)
+        {
+            _processCallback = processCallback ?? throw new ArgumentNullException(nameof(processCallback));
+            OutputBufferSize = input.OutputBufferSize;
+            _output = new Subject<Memory<T>>().DisposeItWith(Disposable);
+            input.Subscribe(OnData).DisposeItWith(Disposable);
+        }
+
+        private void OnData(Memory<T> memory)
+        {
+            _processCallback(memory.Span);
+            _output.OnNext(memory);
+        }
+
+        public IDisposable Subscribe(IObserver<Memory<T>> observer)
+        {
+            return _output.Subscribe(observer);
+        }
+        public int OutputBufferSize { get; }
+    }
+    
     public class ReaderIqCallbackSubject<TIn, TOut> : ReaderIqSubject<TIn, TOut>
     {
         private readonly ProcessDelegate<TIn, TOut> _processCallback;

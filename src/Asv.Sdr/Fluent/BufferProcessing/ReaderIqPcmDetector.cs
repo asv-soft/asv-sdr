@@ -31,7 +31,7 @@ namespace Asv.Sdr
                 _correlationBuffer = new CircularBuffer2<double>(buff, correlationBufferLength);
                 var rawBuff = ArrayPool<double>.Shared.Rent(rawBufferLength);
                 _rawBuffer = new CircularBuffer2<double>(rawBuff, rawBufferLength);
-                _outputBuffer = ArrayPool<double>.Shared.Rent(_correlationBuffer.Capacity);
+                _outputBuffer = ArrayPool<double>.Shared.Rent(rawBufferLength);
                 Disposable.AddAction(()=>
                 {
                     ArrayPool<double>.Shared.Return(buff);
@@ -43,9 +43,9 @@ namespace Asv.Sdr
             {
                 _correlationBuffer = new CircularBuffer2<double>(correlationBufferLength);
                 _rawBuffer = new CircularBuffer2<double>(rawBufferLength);
-                _outputBuffer = new double[_correlationBuffer.Capacity];
+                _outputBuffer = new double[rawBufferLength];
             }
-            _outputMemory = new Memory<double>(_outputBuffer, 0, _outputBuffer.Length);
+            _outputMemory = new Memory<double>(_outputBuffer, 0, _rawBuffer.Capacity);
             OutputBufferSize = _rawBuffer.Capacity;
             _prefixPulseSize = prefixPulseCount * pulseSize;
             input.Subscribe(OnNext).DisposeItWith(Disposable);
@@ -109,7 +109,7 @@ namespace Asv.Sdr
                             if (_rawBuffer.IsFull)
                             {
                                 _state = State.Rise;
-                                _rawBuffer.CopyTo(new Span<double>(_outputBuffer,0,_correlationBuffer.Capacity));
+                                _rawBuffer.CopyTo(new Span<double>(_outputBuffer,0,_rawBuffer.Size));
                                 _output.OnNext(_outputMemory);
                             }
                             break;

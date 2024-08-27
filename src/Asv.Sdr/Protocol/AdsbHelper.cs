@@ -13,7 +13,7 @@ public static class AdsbHelper
     private const int MinAdsbPulseCount = 56;
     private const double AdsbCorrelationThreshold = 0.0;
     
-    public static IReaderIqSubject<double> AdsbPulseDetector<T>(this IReaderIqSubject<double> src, int sampleRate)
+    public static IReaderIqSubject<double> AdsbPulseDetector(this IReaderIqSubject<double> src, int sampleRate)
     {
         return src.PulseDetector(sampleRate/AdsbHalfBitRate,Preamble,AdsbCorrelationThreshold,MaxAdsbPulseCount,AdsbPrefixPostfixCount);
     }

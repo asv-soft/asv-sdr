@@ -15,18 +15,15 @@
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8">
             <Button Command="{Binding NextTrigger}">Next</Button>
             <Button Command="{Binding ConnectLms}">Connect Lms</Button>
-            <Slider Minimum="0" Width="500" Maximum="0.3" Value="{Binding Threshold}"/>
             <Slider Minimum="0" Width="500" Maximum="1" Value="{Binding Gain}"/>
             
         </StackPanel>
         <TextBlock DockPanel.Dock="Top" Text="{Binding DecodedBits}" FontSize="20"/>
-        <TextBlock DockPanel.Dock="Top" Text="{Binding Icao}" FontSize="20"/>
-
         
         <Grid RowDefinitions="*,3*,2*" ColumnDefinitions="*,*">
             <avalonia:AvaPlot Grid.Row="0" Grid.Column="0" Name="Plot1"/>
-            <avalonia:AvaPlot Grid.Row="0" Grid.Column="1" Name="Plot3"/>
-            <avalonia:AvaPlot Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="1" Name="Plot2"/>
+            <avalonia:AvaPlot Grid.Row="0" Grid.Column="1" Name="Plot2"/>
+            <avalonia:AvaPlot Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="1" Name="Plot3"/>
             <avalonia:AvaPlot Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="2" Name="Plot4"/>
             
         </Grid>
