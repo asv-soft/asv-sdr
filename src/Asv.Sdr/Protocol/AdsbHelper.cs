@@ -9,9 +9,9 @@ public static class AdsbHelper
     private static readonly byte[] Preamble = [1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0];
     private const int AdsbHalfBitRate = 2_000_000;
     private const int AdsbPrefixPostfixCount = 10;
-    private const int MaxAdsbPulseCount = 112;
-    private const int MinAdsbPulseCount = 56;
-    private const double AdsbCorrelationThreshold = 0.0;
+    private const int MaxAdsbPulseCount = 112 * 2 /*cause 1 bit is two pulse*/;
+    private const int MinAdsbPulseCount = 56 * 2 /*cause 1 bit is two pulse*/;
+    private const double AdsbCorrelationThreshold = 0.01;
     
     public static IReaderIqSubject<double> AdsbPulseDetector(this IReaderIqSubject<double> src, int sampleRate)
     {
@@ -23,7 +23,7 @@ public static class AdsbHelper
         return src.PulseAvgNormalize(0,MinAdsbPulseCount*sampleRate/AdsbHalfBitRate,0,1);
     }
     
-    public static IObservable<byte> AdsbPulseTruncate(this IReaderIqSubject<double> src, int sampleRate, bool useArrayPool = false)
+    public static IObservable<byte> AdsbPulseTruncate(this IReaderIqSubject<double> src, int sampleRate)
     {
         return new ReaderIqAdsbPulseTruncate(src, 0.5,sampleRate/AdsbHalfBitRate);
     }

@@ -16,7 +16,7 @@
             <Button Command="{Binding NextTrigger}">Next</Button>
             <Button Command="{Binding ConnectLms}">Connect Lms</Button>
             <Slider Minimum="0" Width="500" Maximum="1" Value="{Binding Gain}"/>
-            
+            <Button Command="{Binding StartTxLms}">Enable TX Lms</Button>
         </StackPanel>
         <TextBlock DockPanel.Dock="Top" Text="{Binding DecodedBits}" FontSize="20"/>
         
