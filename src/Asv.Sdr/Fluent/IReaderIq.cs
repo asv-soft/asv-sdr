@@ -393,6 +393,23 @@ namespace Asv.Sdr
             return new ReaderIqCopyToArray<TOut>(src);
         }
 
+        #region Pulse coding modulaition
+
+        public static IReaderIqSubject<double> PulseDetector(this IReaderIqSubject<double> src,
+            int pulseSize, byte[] template, double correlationThreshold, int maxPulseCount, int prefixPulseCount, bool useArrayPool = false)
+         {
+            return new ReaderIqPcmDetector(src, pulseSize,template,correlationThreshold,maxPulseCount,prefixPulseCount,useArrayPool);
+        }
+        
+        public static IReaderIqSubject<double> PulseAvgNormalize(this IReaderIqSubject<double> src, int skip, int count,
+            double lowValue, double highValue, bool useArrayPool = false)
+        {
+            return new ReaderIqPcmAvgNormalizer(src, skip, count, lowValue, highValue, useArrayPool);
+        }
+        
+        
+        #endregion
+
     }
 
 }

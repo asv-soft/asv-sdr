@@ -5,38 +5,6 @@ using Asv.Common;
 
 namespace Asv.Sdr
 {
-    public class ReaderIqAvgNormalizer:ReaderIqSubject<double,double>
-    {
-        private readonly int _skip;
-        private readonly int _count;
-        private readonly double _min;
-        private readonly double _max;
-
-        public ReaderIqAvgNormalizer(IReaderIqSubject<double> input, int skip, int count, double min, double max, bool useArrayPool) 
-            : base(input, input.OutputBufferSize, useArrayPool)
-        {
-            _skip = skip;
-            _count = count;
-            _min = min;
-            _max = max;
-        }
-
-
-        protected override void Process(ReadOnlySpan<double> input, Span<double> output)
-        {
-            var sum = 0.0;
-            for (var i = 0; i < _count; i++)
-            {
-                sum += input[_skip + i];
-            }
-            var avg = sum / _count;
-            for (var i = 0; i < input.Length; i++)
-            {
-                output[i] = input[i] > avg ? _max : _min;
-            } 
-        }
-    }
-    
     public class ReaderIqPcmDetector: DisposableOnceWithCancel, IReaderIqSubject<double>
     {
         private readonly PulseCrossCorrelation _correlation;
@@ -50,12 +18,12 @@ namespace Asv.Sdr
         private readonly double _correlationThreshold;
 
         public ReaderIqPcmDetector(IReaderIqSubject<double> input, int pulseSize,
-            byte[] template, double correlationThreshold, int maxMessageSize,  int prefixSize, bool useArrayPool)
+            byte[] template, double correlationThreshold, int maxPulseCount, int prefixPulseCount, bool useArrayPool)
         {
             _correlation = new PulseCrossCorrelation(pulseSize, template);
             _correlationThreshold = correlationThreshold;
             var correlationBufferLength = template.Length * pulseSize;
-            var rawBufferLength = (template.Length + maxMessageSize + prefixSize * 2) * pulseSize;
+            var rawBufferLength = (template.Length + maxPulseCount + prefixPulseCount * 2) * pulseSize;
             
             if (useArrayPool)
             {
@@ -79,7 +47,7 @@ namespace Asv.Sdr
             }
             _outputMemory = new Memory<double>(_outputBuffer, 0, _outputBuffer.Length);
             OutputBufferSize = _rawBuffer.Capacity;
-            _prefixPulseSize = prefixSize * pulseSize;
+            _prefixPulseSize = prefixPulseCount * pulseSize;
             input.Subscribe(OnNext).DisposeItWith(Disposable);
             _output = new Subject<Memory<double>>().DisposeItWith(Disposable);
         }
