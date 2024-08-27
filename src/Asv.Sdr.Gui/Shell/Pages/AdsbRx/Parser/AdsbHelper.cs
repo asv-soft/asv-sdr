@@ -29,6 +29,29 @@ public enum TypeCodeEnum
     AircraftOperationStatus
 }
 
+public enum SurfacePositionTypeCodes
+{
+    /// <summary>
+    /// Воздушное судно на земле, передает скорость и направление.
+    /// </summary>
+    GroundVehicle = 5,
+
+    /// <summary>
+    /// Воздушное судно на земле с GNSS данными для точного положения.
+    /// </summary>
+    GroundVehicleWithGNSS = 6,
+
+    /// <summary>
+    /// Воздушное судно на земле, передает скорость, направление и изменение высоты.
+    /// </summary>
+    GroundVehicleWithVerticalRate = 7,
+
+    /// <summary>
+    /// Статус и индикаторы режима для воздушных судов на земле.
+    /// </summary>
+    GroundStatusAndMode = 8
+}
+
 public enum AirbornePositionTypeCode
 {
     /// <summary>
@@ -119,6 +142,11 @@ public enum CprFormatEnum
     Odd
 }
 
+public enum GroundTrackStatusEnum
+{
+    Invalid = 0,
+    Valid = 1
+}
 public enum SurveillanceStatusEnum
 {
     NoCondition = 0,
@@ -473,11 +501,24 @@ public static class AdsbHelper
         return (int)Math.Floor(2.0 * Math.PI / z);
     }
 
+    /// <summary>
+    /// Decoding aircraft position (globally method)
+    /// </summary>
+    /// <param name="nCprLatEven">17 bits of latitude from even message</param>
+    /// <param name="nCprLonEven">17 bits of longitude from even message</param>
+    /// <param name="nCprLatOdd">17 bits of latitude from odd message</param>
+    /// <param name="nCprLonOdd">17 bits of longitude from odd message</param>
+    /// <param name="tEven">Even message reception timestamp</param>
+    /// <param name="tOdd">Odd message reception timestamp</param>
+    /// <param name="zoneSize">
+    /// For Airborne Position = 360.0.
+    /// For Surface position = 90.0.</param>
+    /// <returns>Latitude/Longitude</returns>
     public static (double Lat, double Lon) GloballyUnambiguousPositionDecoding(uint nCprLatEven, uint nCprLonEven,
-        uint nCprLatOdd, uint nCprLonOdd, DateTime tEven, DateTime tOdd)
+        uint nCprLatOdd, uint nCprLonOdd, DateTime tEven, DateTime tOdd, double zoneSize = 360.0)
     {
-        const double dLatEven = 360.0 / (4.0 * Nz);
-        const double dLatOdd = 360.0 / (4.0 * Nz - 1.0);
+        var dLatEven = zoneSize / (4.0 * Nz);
+        var dLatOdd = zoneSize / (4.0 * Nz - 1.0);
         const double part = 1 << 17;
         
         var latCprEven = nCprLatEven / part;
@@ -490,7 +531,7 @@ public static class AdsbHelper
         var latEven = dLatEven * (Mod(j, 60) + latCprEven);
         var latOdd = dLatOdd * (Mod(j, 59) + latCprOdd);
 
-        if (latEven >= 270.0) latEven -= 390.0;
+        if (latEven >= 270.0) latEven -= 360.0;
         if (latOdd >= 270.0) latOdd -= 360;
 
         var nlEven = Nl(latEven);
@@ -505,8 +546,8 @@ public static class AdsbHelper
         var nEven = Math.Max(nlEven, 1);
         var nOdd = Math.Max(nlEven - 1, 1);
 
-        var dLonEven = 360.0 / nEven;
-        var dLonOdd = 360.0 / nOdd;
+        var dLonEven = zoneSize / nEven;
+        var dLonOdd = zoneSize / nOdd;
 
         var lonEven = dLonEven * (Mod(m, nEven) + lonCprEven);
         var lonOdd = dLonOdd * (Mod(m, nOdd) + lonCprOdd);
@@ -517,36 +558,63 @@ public static class AdsbHelper
         return (Lat: lat, Lon: lon);
     }
 
+    /// <summary>
+    /// Decoding aircraft position (locally method)
+    /// </summary>
+    /// <param name="nCprLat">17 bits of latitude from message</param>
+    /// <param name="nCprLon">17 bits of longitude from message</param>
+    /// <param name="latRef">Latitude of the nearest reference position [-90.0; 90.0]</param>
+    /// <param name="lonRef">Longitude of the nearest reference position [-180.0; 180.0]</param>
+    /// <param name="format">Even/Odd</param>
+    /// <param name="zoneSize">
+    /// For Airborne Position = 360.0.
+    /// For Surface position = 90.0.</param>
+    /// <returns>Latitude/Longitude</returns>
     public static (double Lat, double Lon) LocallyUnambiguousPositionDecoding(uint nCprLat, uint nCprLon, double latRef,
-        double lonRef, CprFormatEnum format)
+        double lonRef, CprFormatEnum format, double zoneSize = 360.0)
     {
         const double part = 1 << 17;
         var latCpr = nCprLat / part;
         var lonCpr = nCprLon / part;
         
         var i = format == CprFormatEnum.Even ? 0 : 1;
-        var dLat = 360.0 / (4.0 * Nz - i);
+        var dLat = zoneSize / (4.0 * Nz - i);
         var j = (int)Math.Floor(latRef / dLat) + (int)Math.Floor(Mod(latRef, dLat) / dLat - latCpr + 0.5);
         var lat = dLat * (j + latCpr);
-
+        if (lat >= 270.0) lat -= 360.0;
+        
         var nl = Nl(lat);
-        var dLon = 360.0 / Math.Max(nl - i, 1);
+        var dLon = zoneSize / Math.Max(nl - i, 1);
         var m = (int)Math.Floor(lonRef / dLon) + (int)Math.Floor(Mod(lonRef, dLon) / dLon - lonCpr + 0.5);
         var lon = dLon * (m + lonCpr);
+        if (lon >= 180.0) lon -= 360.0;
         
         return (Lat: lat, Lon: lon);
     }
 
-    public static (uint Lat, uint Lon) UnambiguousPositionEncoding(double lat, double lon, CprFormatEnum format)
+    /// <summary>
+    /// Encoding aircraft position
+    /// </summary>
+    /// <param name="lat">Latitude [-90.0; 90.0]</param>
+    /// <param name="lon">Longitude [-180.0; 180.0]</param>
+    /// <param name="format">Even/Odd</param>
+    /// <param name="zoneSize">
+    /// For Airborne Position = 360.0.
+    /// For Surface position = 90.0.</param>
+    /// <returns></returns>
+    public static (uint Lat, uint Lon) UnambiguousPositionEncoding(double lat, double lon, CprFormatEnum format,
+        double zoneSize = 360.0)
     {
+        if (lat < 0) lat += zoneSize;
+        if (lon < 0) lon += 180.0;
+        lon %= zoneSize;
         var nl = Nl(lat) - (format == CprFormatEnum.Even ? 0 : 1);
-        var dLon = 360.0 / Math.Max(nl, 1);  // Prevent division by zero
+        var dLon = zoneSize / Math.Max(nl, 1); // Prevent division by zero
         var nLon = (uint)Math.Floor((1 << 17) * (lon % dLon) / dLon);
-        
-        var dLat = format == CprFormatEnum.Even ? 360.0 / 60 : 360.0 / 59;
+
+        var dLat = format == CprFormatEnum.Even ? zoneSize / 60 : zoneSize / 59;
         var nLat = (uint)Math.Floor((1 << 17) * (lat % dLat) / dLat);
 
         return (Lat: nLat, Lon: nLon);
     }
-    
 }
