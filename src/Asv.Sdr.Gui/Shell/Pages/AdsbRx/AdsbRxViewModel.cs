@@ -1,23 +1,16 @@
 using System;
 using System.Composition;
-using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Asv.Common;
 using Asv.IO;
 using Asv.Sdr.LimeSdr;
 using Material.Icons;
-using Newtonsoft.Json;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using ScottPlot;
 using ScottPlot.Avalonia;
-using ScottPlot.Plottables;
 
 namespace Asv.Sdr.Gui;
 
@@ -29,9 +22,19 @@ public class AdsbRxViewModel:ShellPage
     private AvaPlot _plot2;
     private AvaPlot _plot3;
     private AvaPlot _plot4;
-    private bool _nextTrigger;
+    private AvaPlot _plot5;
+    private AvaPlot _plot6;
     private CancellationTokenSource _cancelShStream;
     private ILmsStream _txStream;
+    private ScottDebugTriggerPlot _iDebug;
+    private ScottDebugTriggerPlot _qDebug;
+    private ScottDebugTriggerPlot _magDebug;
+    private ScottDebugPlot _dataDebug;
+    private ScottDebugPlot _avgDebug;
+    private ScottDebugPlot _corrDebug;
+    private bool _isPause;
+
+
 
     public AdsbRxViewModel() : base(WellKnownUri.Shell + ".adsbrx")
     {
@@ -41,7 +44,13 @@ public class AdsbRxViewModel:ShellPage
         StartTxLms = ReactiveCommand.CreateRunInBackground(StartTxLmsImpl);
         NextTrigger = ReactiveCommand.Create(() =>
         {
-            _nextTrigger = true;
+            _isPause = !_isPause;
+            if (_corrDebug!= null) _corrDebug.IsPlotEnabled = _isPause;
+            if (_avgDebug!= null) _avgDebug.IsPlotEnabled = _isPause;
+            if (_iDebug!= null) _iDebug.IsPlotEnabled = _isPause;
+            if (_qDebug!= null) _qDebug.IsPlotEnabled = _isPause;
+            if (_magDebug!= null) _magDebug.IsPlotEnabled = _isPause;
+            if (_dataDebug!= null) _dataDebug.IsPlotEnabled = _isPause;
         });
        
         this.WhenAnyValue(x => x.Gain)
@@ -137,74 +146,100 @@ public class AdsbRxViewModel:ShellPage
         var cfg = new LimeSourceIqConfig
         {
             Frequency = 1090_000_000,
-            BandWidth = 2.5e6,
-            Gain = 0.69,
+            BandWidth = 3e6,
+            Gain = 0.0,
             SampleRate = sampleRate,
-            GfirEnable = true,
+            GfirEnable = false,
             GfirBandWidth = 2.8e6,
             LmsLpfEnable = true,
-            LmsLpfBandWidth = 1.4e6,
+            LmsLpfBandWidth = 3e6,
             Channel = 0,
             AmountDataRssi = 1,
             LmsSelfCalibrate = true,
             Path = LmsPathRx.LMS_PATH_LNAH,
-            ThroughputVsLatency = 0,
+            ThroughputVsLatency = 1,
         };
         var decoder = new AdsbMessageParser();
+        decoder.Register(()=>new AdsbAirbornePosition());
+        //decoder.Register(()=>new AdsbAircraftIdentification());
+        /*decoder.Register(()=>new AdsbSurfacePosition());*/
+        var counter = 0;
+        var err = 0;
+        var lastOdd = null as AdsbAirbornePosition;
+        var lastEven = null as AdsbAirbornePosition;
+        decoder.OnMessage.Subscribe(x =>
+        {
+            var curr = (AdsbAirbornePosition)x;
+            if (curr.CprFormat == CprFormatEnum.Even)
+            {
+                lastEven = curr;
+            }
+
+            if (curr.CprFormat == CprFormatEnum.Odd)
+            {
+                lastOdd = curr;
+            }
+            if (lastEven != null && lastOdd!= null)
+            {
+                lastEven.CalculatePosition(lastOdd);
+                Console.WriteLine($"{DateTime.Now:O} {counter} => {lastEven.Latitude} {lastEven.Longitude} {lastEven.Altitude}");
+            }
+        });
         decoder.OnMessageRecev.Subscribe(x =>
         {
-            Console.WriteLine(x);
+            Console.WriteLine($"{DateTime.Now:O} {counter++} => {x}");
+            
+        });
+        decoder.OnError.Subscribe(x =>
+        {
+            Console.WriteLine($"{DateTime.Now:O} {err++} => {x}");
         });
 
+        _corrDebug = new ScottDebugPlot(_plot4);
+        _avgDebug = new ScottDebugPlot(_plot5);
+        _dataDebug = new ScottDebugPlot(_plot6);
+        /*_iDebug = new ScottDebugTriggerPlot(_plot1,_corrDebug.OnTrigger);
+        _qDebug = new ScottDebugTriggerPlot(_plot2,_corrDebug.OnTrigger);*/
+        _magDebug = new ScottDebugTriggerPlot(_plot3,_corrDebug.OnTrigger);
+        var show = false;
         var lime = new LimeReaderIq(_device, cfg)
-            .Sample(sampleRate / 10, out var start)
+            .Sample(sampleRate / 5, out var start)
+            //.PreviewPlotI("I",_iDebug)
+            //.PreviewPlotQ("Q",_qDebug)
             .Magnitude()
-            .AdsbPulseDetector(sampleRate)
-            .Preview(PlotRawSignal)
-            .AdsbNormalize(sampleRate)
-            .Preview(PlotNormalizedSignal)
-            .AdsbPulseTruncate(sampleRate)
-            .Subscribe(data => decoder.ProcessSample(data));
+            .PreviewPlotI("Magnitude",_magDebug)
+            .AdsbPulseDetector(sampleRate,_corrDebug)
+            .AdsbNormalize(sampleRate,_avgDebug)
+            .AdsbPulseTruncate(sampleRate, _dataDebug )
+            .Subscribe(data =>
+            {
+                foreach (var d in data.Span)
+                {
+                    decoder.ProcessSample(d);
+                }
+                decoder.Reset();
+            });
             
                  
         start();
     }
-    private void PlotRawSignal(ReadOnlySpan<double> input)
-    {
-        var inputArr = input.ToArray();
-        RxApp.MainThreadScheduler.Schedule(() =>
-        {
-            _plot3.Plot.Clear();
-            _plot3.Plot.Add.Signal(inputArr);
-        });
-    }
-    private void PlotNormalizedSignal(ReadOnlySpan<double> input)
-    {
-        var inputArr = input.ToArray();
-        RxApp.MainThreadScheduler.Schedule(() =>
-        {
-            _plot3.Plot.Add.Signal(inputArr);
-            _plot3.Refresh();
-        });
-    }
-
-   
-
 
     [Reactive]
     public string DecodedBits { get; set; }
     public ReactiveCommand<Unit,Unit> ConnectLms { get; set; }
    
-    [Reactive] public double Gain { get; set; } = 0.69;
+    [Reactive] public double Gain { get; set; } = 0.0;
     public ReactiveCommand<Unit,Unit> NextTrigger { get; }
     public ReactiveCommand<Unit,Unit> StartTxLms { get; }
 
-    public void InitCharts(AvaPlot plot1, AvaPlot plot2, AvaPlot plot3, AvaPlot plot4)
+    public void InitCharts(AvaPlot plot1, AvaPlot plot2, AvaPlot plot3, AvaPlot plot4,AvaPlot plot5,AvaPlot plot6)
     {
         _plot1 = plot1;
         _plot2 = plot2;
         _plot3 = plot3;
         _plot4 = plot4;
+        _plot5 = plot5;
+        _plot6 = plot6;
     }
 }
 

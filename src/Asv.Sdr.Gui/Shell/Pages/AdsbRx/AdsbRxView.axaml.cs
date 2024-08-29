@@ -18,7 +18,7 @@ public partial class AdsbRxView : ReactiveUserControl<AdsbRxViewModel>
         {
             this.WhenAnyValue(x => x.ViewModel)
                 .WhereNotNull()
-                .Subscribe(x => x.InitCharts(Plot1,Plot2,Plot3,Plot4))
+                .Subscribe(x => x.InitCharts(Plot1,Plot2,Plot3,Plot4, Plot5, Plot6))
                 .DisposeItWith(disp);
 
         });

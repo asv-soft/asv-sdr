@@ -20,12 +20,13 @@
         </StackPanel>
         <TextBlock DockPanel.Dock="Top" Text="{Binding DecodedBits}" FontSize="20"/>
         
-        <Grid RowDefinitions="*,3*,2*" ColumnDefinitions="*,*">
-            <avalonia:AvaPlot Grid.Row="0" Grid.Column="0" Name="Plot1"/>
-            <avalonia:AvaPlot Grid.Row="0" Grid.Column="1" Name="Plot2"/>
-            <avalonia:AvaPlot Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="1" Name="Plot3"/>
-            <avalonia:AvaPlot Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="2" Name="Plot4"/>
-            
+        <Grid RowDefinitions="*,*,*,*,*,*">
+            <avalonia:AvaPlot Grid.Row="0" Name="Plot1"/>
+            <avalonia:AvaPlot Grid.Row="1" Name="Plot2"/>
+            <avalonia:AvaPlot Grid.Row="2" Name="Plot3"/>
+            <avalonia:AvaPlot Grid.Row="3" Name="Plot4"/>
+            <avalonia:AvaPlot Grid.Row="4" Name="Plot5"/>
+            <avalonia:AvaPlot Grid.Row="5" Name="Plot6"/>
         </Grid>
     </DockPanel>
 </UserControl>

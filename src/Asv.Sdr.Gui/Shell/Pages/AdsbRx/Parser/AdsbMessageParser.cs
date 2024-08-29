@@ -320,7 +320,7 @@ public class AdsbMessageParser : DisposableOnce
     /// <summary>
     /// Resets the parser.
     /// </summary>
-    private void Reset()
+    public void Reset()
     {
         _state = State.Preamb1;
         _readedBits = 0;

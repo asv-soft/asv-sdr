@@ -2,6 +2,7 @@ using System;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Asv.Sdr.DebugPlot;
 using Asv.Sdr.V2;
 
 namespace Asv.Sdr
@@ -30,16 +31,81 @@ namespace Asv.Sdr
             return new ReaderIqSampler<T>(src, readSize,out start, useArrayPool, priority);
         }
 
+        #region Preview
         public static IReaderIqSubject<T> Preview<T>(this IReaderIqSubject<T> src,ProcessDelegate<T> previewCallback)
         {
             return new ReaderIqCallbackSubject<T>(src, previewCallback);
+        }
+        public static IReaderIqSubject<double> PreviewPlotI(this IReaderIqSubject<double> src,string name, IDebugPlot plot)
+        {
+            var counter = 0;
+            return new ReaderIqCallbackSubject<double>(src, x =>
+            {
+                plot.Begin();
+                var arr = new double[x.Length/2];
+                for (var i = 0; i < arr.Length; i++)
+                {
+                    arr[i] = x[i*2];
+                }
+                plot.AddSignal(name,arr);
+                plot.AddAnnotation("Index", $"Index: {Interlocked.Increment(ref counter)}");
+                plot.End();
+            });
+        }
+        public static IReaderIqSubject<float> PreviewPlotI(this IReaderIqSubject<float> src,string name, IDebugPlot plot)
+        {
+            var counter = 0;
+            return new ReaderIqCallbackSubject<float>(src, x =>
+            {
+                plot.Begin();
+                var arr = new double[x.Length/2];
+                for (var i = 0; i < arr.Length; i++)
+                {
+                    arr[i] = x[i*2];
+                }
+                plot.AddSignal(name,arr);
+                plot.AddAnnotation("Index", $"Index: {Interlocked.Increment(ref counter)}");
+                plot.End();
+            });
+        }
+        public static IReaderIqSubject<double> PreviewPlotQ(this IReaderIqSubject<double> src,string name, IDebugPlot plot)
+        {
+            var counter = 0;
+            return new ReaderIqCallbackSubject<double>(src, x =>
+            {
+                plot.Begin();
+                var arr = new double[x.Length/2];
+                for (var i = 0; i < arr.Length; i++)
+                {
+                    arr[i] = x[i*2 + 1];
+                }
+                plot.AddSignal(name,arr);
+                plot.AddAnnotation("Index", $"Index: {Interlocked.Increment(ref counter)}");
+                plot.End();
+            });
+        }
+        public static IReaderIqSubject<float> PreviewPlotQ(this IReaderIqSubject<float> src,string name, IDebugPlot plot)
+        {
+            var counter = 0;
+            return new ReaderIqCallbackSubject<float>(src, x =>
+            {
+                plot.Begin();
+                var arr = new double[x.Length/2];
+                for (var i = 0; i < arr.Length; i++)
+                {
+                    arr[i] = x[i*2 + 1];
+                }
+                plot.AddSignal(name,arr);
+                plot.AddAnnotation("Index", $"Index: {Interlocked.Increment(ref counter)}");
+                plot.End();
+            });
         }
         public static IReaderIqSubject<T> Preview<T>(this IReaderIqSubject<T> src,ProcessDelegate<T> previewCallback, bool previewEnabled)
         {
             return previewEnabled == false ? src : new ReaderIqCallbackSubject<T>(src, previewCallback);
         }
         
-        public static IReaderIqSubject<T> PreviewOnDebug<T>(this IReaderIqSubject<T> src,ProcessDelegate<T> previewCallback, bool previewEnabled)
+        public static IReaderIqSubject<T> PreviewOnDebug<T>(this IReaderIqSubject<T> src,ProcessDelegate<T> previewCallback)
         {
 #if DEBUG
             return new ReaderIqCallbackSubject<T>(src, previewCallback);
@@ -47,6 +113,7 @@ namespace Asv.Sdr
             return src;
 #endif
         }
+        #endregion
         
         public static IReaderIqSubject<T> Parallel<T>(this IReaderIqSubject<T> src)
         {
@@ -416,15 +483,16 @@ namespace Asv.Sdr
         #region Pulse coding modulaition
 
         public static IReaderIqSubject<double> PulseDetector(this IReaderIqSubject<double> src,
-            int pulseSize, byte[] template, double correlationThreshold, int maxPulseCount, int prefixPulseCount, bool useArrayPool = true)
+            int pulseSize, byte[] template, double correlationThreshold, int maxPulseCount, int prefixPulseCount,
+            IDebugPlot? plot = null, bool useArrayPool = true)
          {
-            return new ReaderIqPcmDetector(src, pulseSize,template,correlationThreshold,maxPulseCount,prefixPulseCount,useArrayPool);
+            return new ReaderIqPcmDetector(src, pulseSize,template,correlationThreshold,maxPulseCount,prefixPulseCount,plot,useArrayPool);
         }
         
         public static IReaderIqSubject<double> PulseAvgNormalize(this IReaderIqSubject<double> src, int skip, int count,
-            double lowValue, double highValue, bool useArrayPool = true)
+            double lowValue, double highValue, IDebugPlot? plot, bool useArrayPool = true)
         {
-            return new ReaderIqPcmAvgNormalizer(src, skip, count, lowValue, highValue, useArrayPool);
+            return new ReaderIqPcmAvgNormalizer(src, skip, count, lowValue, highValue,plot, useArrayPool);
         }
         
         
