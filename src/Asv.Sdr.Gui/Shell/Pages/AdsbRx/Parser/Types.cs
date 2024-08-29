@@ -10,17 +10,17 @@ public enum CapabilityEnum
     DLRequest0OrFlightStatus2345OnGroundOrAirborne
 }
 
-public enum TypeCodeEnum
+public enum AdsbMessageTypeEnum
 {
-    AircraftIdentification,
-    SurfacePosition,
-    AirborneBarometricPosition,
-    AirborneVelocities,
-    AirborneGnssPosition,
-    Reserved,
-    AircraftStatus,
-    TargetStateAndStatusInformation,
-    AircraftOperationStatus
+    AircraftIdentification = 1,
+    SurfacePosition = 5,
+    AirborneBarometricPosition = 9,
+    AirborneVelocities = 19,
+    AirborneGnssPosition = 20,
+    Reserved = 23,
+    AircraftStatus = 28,
+    TargetStateAndStatusInformation = 29,
+    AircraftOperationStatus = 31
 }
 
 public enum SurfacePositionTypeCodes
@@ -126,10 +126,10 @@ public enum AircraftCategoryEnum
 
 public enum VelocitySubTypeEnum
 {
-    SubType1 = 0,
-    SubType2 = 1,
-    SubType3 = 2,
-    SubType4 = 3
+    SubType1 = 1,
+    SubType2 = 2,
+    SubType3 = 3,
+    SubType4 = 4
 }
 
 public enum NavigationUncertaintyCategoryEnum
@@ -209,4 +209,17 @@ public enum AirspeedTypeEnum
     /// True airspeed
     /// </summary>
     TAS = 1
+}
+
+public enum OperationStatusTypeEnum
+{
+    Airborne = 0,
+    Surface = 1
+}
+
+public enum AdsbVersionNumberEnum
+{
+    AppendixA = 0,
+    AppendixB = 1,
+    AppendixC = 2
 }

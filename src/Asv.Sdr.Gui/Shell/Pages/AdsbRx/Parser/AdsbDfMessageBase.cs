@@ -11,6 +11,12 @@ public abstract class AdsbDfMessageBase : ISizedSpanSerializable
     /// </summary>
     private int _rawCa = 5;
 
+    
+    /// <summary>
+    /// Id: [...DF (5 bit)... | ...TC (5 bit)... | SubType (3 bit) ]
+    /// </summary>
+    public abstract ushort Id { get; }
+    
     public abstract int DownlinkFormat { get; }
 
     public CapabilityEnum Capability

@@ -39,7 +39,7 @@ public class AdsbSurfacePosition : AdsbExtendedSquitterBase
         buffer = buffer[(bitIndex / 8)..];
     }
 
-    public void CalculatePosition(AdsbAirbornePosition prevPosition)
+    public void CalculatePosition(AdsbSurfacePosition prevPosition)
     {
         if (CprFormat == prevPosition.CprFormat) return;
 
@@ -61,7 +61,7 @@ public class AdsbSurfacePosition : AdsbExtendedSquitterBase
     
     public uint NCprLat { get; set; }
     public uint NCprLon { get; set; }
-    public override TypeCodeEnum TypeCode => TypeCodeEnum.SurfacePosition;
+    public override AdsbMessageTypeEnum MessageType => AdsbMessageTypeEnum.SurfacePosition;
 
     public SurfacePositionTypeCodes SurfacePositionType { get; set; } =
         SurfacePositionTypeCodes.GroundVehicleWithVerticalRate;
