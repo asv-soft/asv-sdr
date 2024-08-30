@@ -13,10 +13,11 @@
     </Design.DataContext>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8">
-            <Button Command="{Binding NextTrigger}">Next</Button>
+            <Button Command="{Binding NextTrigger}">Enable plot</Button>
             <Button Command="{Binding ConnectLms}">Connect Lms</Button>
             <Slider Minimum="0" Width="500" Maximum="1" Value="{Binding Gain}"/>
             <Button Command="{Binding StartTxLms}">Enable TX Lms</Button>
+            <Button Command="{Binding StartStopTx}">Start\Stop Tx stream</Button>
         </StackPanel>
         <TextBlock DockPanel.Dock="Top" Text="{Binding DecodedBits}" FontSize="20"/>
         

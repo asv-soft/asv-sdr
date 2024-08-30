@@ -8,6 +8,7 @@ using Asv.Common;
 using Asv.IO;
 using Asv.Sdr.LimeSdr;
 using Material.Icons;
+using Newtonsoft.Json;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using ScottPlot.Avalonia;
@@ -42,6 +43,7 @@ public class AdsbRxViewModel:ShellPage
         Icon = MaterialIconKind.ChartFinance;
         ConnectLms = ReactiveCommand.CreateRunInBackground(ConnectLmsImpl);
         StartTxLms = ReactiveCommand.CreateRunInBackground(StartTxLmsImpl);
+        StartStopTx = ReactiveCommand.CreateRunInBackground(StartStopTxImpl);
         NextTrigger = ReactiveCommand.Create(() =>
         {
             _isPause = !_isPause;
@@ -61,14 +63,29 @@ public class AdsbRxViewModel:ShellPage
             }).DisposeItWith(Disposable);
     }
 
+    private void StartStopTxImpl()
+    {
+        EanbleTx = !EanbleTx;
+    }
+
     private async void StartTxLmsImpl()
     {
         var _sampleRate = 8e6;
-        var _bandWidth = 4e6;
+        var _bandWidth = 8e6;
         var _freq = 1090_000_000;
-        var _gain = 0.5;
+        var _gain = 0.69;
+        if (_device == null)
+        {
+            var dev = LimeSdrDevice.GetAvailableDevices().FirstOrDefault();
+            if (dev == null) throw new Exception("LMS device not found");
+            _device = new LimeSdrDevice(dev, true);    
+        }
+        
+        NativeMethods.Is64BitOperatingSystem = true;
+        LmsNativeDllUsage.Is64BitOperatingSystem = true;
+        
         await _device.EnableChannel(LmsChannel.Tx, 0, true,default);
-        await _device.SetSampleRate(_sampleRate, 0U,default);
+        await _device.SetSampleRate(_sampleRate, 1U,default);
         await _device.SetAntenna(LmsChannel.Tx, 0, (uint) LmsPathTx.LMS_PATH_TX1 , default);
         await _device.SetBandWidth(LmsChannel.Tx, 0, _bandWidth, default);
             
@@ -113,26 +130,38 @@ public class AdsbRxViewModel:ShellPage
             
             _txStream = await _device.CreateStream(LmsChannel.Tx, 0, (uint)_sampleRate, throughputVsLatency:1, cancel: default).DisposeItWith(Disposable);
             await _txStream.Start(default);
-            Observable.Timer(TimeSpan.FromSeconds(1),TimeSpan.FromSeconds(0.1))
-                .Subscribe(x =>
-                {
-                    var bitLength = (int)(_sampleRate / 2e6);
-                    var bufferSize = bit.Length * bitLength*2;
-                    var buffer = new float[bufferSize];
-                    var bufferMemory = new ReadOnlyMemory<float>(buffer, 0, bufferSize);
+            new Thread(() =>
+            {
+                var bitLength = (int)(_sampleRate / 2e6);
+                var bufferSize = bit.Length * bitLength*2;
+                var buffer = new float[bufferSize];
+                var bufferMemory = new ReadOnlyMemory<float>(buffer, 0, bufferSize);
                     
-                    for (var i = 0; i < bit.Length; i++)
+                for (var i = 0; i < bit.Length; i++)
+                {
+                    for (int j = 0; j < bitLength; j++)
                     {
-                        for (int j = 0; j < bitLength; j++)
-                        {
-                            buffer[i*2 * bitLength + j] = (float)bit[i];
-                            buffer[i*2 * bitLength + j + 1] = (float)bit[i];
-                        }
+                        buffer[i*2 * bitLength + j] = (float)bit[i];
+                        buffer[i*2 * bitLength + j + 1] = (float)bit[i];
                     }
+                }
+
+                var zero = new ReadOnlyMemory<float>(new float[(int)_sampleRate / 100]); 
+                while (true)
+                {
+                    _txStream.Write(zero, 10_000, default).Wait();
                     _txStream.Write(bufferMemory, 10_000, default).Wait();
-                });
+                    _txStream.Write(zero, 10_000, default).Wait();
+                    
+                }
+                
+                
+            }).Start();
+           
         
     }
+
+    public bool EanbleTx { get; set; }
 
     private void ConnectLmsImpl()
     {
@@ -160,14 +189,14 @@ public class AdsbRxViewModel:ShellPage
             ThroughputVsLatency = 1,
         };
         var decoder = new AdsbMessageParser();
-        decoder.Register(()=>new AdsbAirbornePosition());
-        //decoder.Register(()=>new AdsbAircraftIdentification());
+        //decoder.Register(()=>new AdsbAirbornePosition());
+        decoder.Register(()=>new AdsbAircraftIdentification());
         /*decoder.Register(()=>new AdsbSurfacePosition());*/
         var counter = 0;
         var err = 0;
         var lastOdd = null as AdsbAirbornePosition;
         var lastEven = null as AdsbAirbornePosition;
-        decoder.OnMessage.Subscribe(x =>
+        /*decoder.OnMessage.Subscribe(x =>
         {
             var curr = (AdsbAirbornePosition)x;
             if (curr.CprFormat == CprFormatEnum.Even)
@@ -184,6 +213,10 @@ public class AdsbRxViewModel:ShellPage
                 lastEven.CalculatePosition(lastOdd);
                 Console.WriteLine($"{DateTime.Now:O} {counter} => {lastEven.Latitude} {lastEven.Longitude} {lastEven.Altitude}");
             }
+        });*/
+        decoder.OnMessage.Subscribe(x =>
+        {
+            Console.WriteLine($"{DateTime.Now:O} {counter} => {JsonConvert.SerializeObject(x)}");
         });
         decoder.OnMessageRecev.Subscribe(x =>
         {
@@ -198,14 +231,14 @@ public class AdsbRxViewModel:ShellPage
         _corrDebug = new ScottDebugPlot(_plot4);
         _avgDebug = new ScottDebugPlot(_plot5);
         _dataDebug = new ScottDebugPlot(_plot6);
-        /*_iDebug = new ScottDebugTriggerPlot(_plot1,_corrDebug.OnTrigger);
-        _qDebug = new ScottDebugTriggerPlot(_plot2,_corrDebug.OnTrigger);*/
+        _iDebug = new ScottDebugTriggerPlot(_plot1,_corrDebug.OnTrigger);
+        _qDebug = new ScottDebugTriggerPlot(_plot2,_corrDebug.OnTrigger);
         _magDebug = new ScottDebugTriggerPlot(_plot3,_corrDebug.OnTrigger);
         var show = false;
         var lime = new LimeReaderIq(_device, cfg)
             .Sample(sampleRate / 5, out var start)
-            //.PreviewPlotI("I",_iDebug)
-            //.PreviewPlotQ("Q",_qDebug)
+            .PreviewPlotI("I",_iDebug)
+            .PreviewPlotQ("Q",_qDebug)
             .Magnitude()
             .PreviewPlotI("Magnitude",_magDebug)
             .AdsbPulseDetector(sampleRate,_corrDebug)
@@ -231,6 +264,7 @@ public class AdsbRxViewModel:ShellPage
     [Reactive] public double Gain { get; set; } = 0.0;
     public ReactiveCommand<Unit,Unit> NextTrigger { get; }
     public ReactiveCommand<Unit,Unit> StartTxLms { get; }
+    public ReactiveCommand<Unit,Unit> StartStopTx { get; }
 
     public void InitCharts(AvaPlot plot1, AvaPlot plot2, AvaPlot plot3, AvaPlot plot4,AvaPlot plot5,AvaPlot plot6)
     {
