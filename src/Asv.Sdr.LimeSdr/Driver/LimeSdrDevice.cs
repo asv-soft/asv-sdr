@@ -143,7 +143,7 @@ namespace Asv.Sdr.LimeSdr
                     break;
                 case LogLevel.LOG_LEVEL_DEBUG:
                 default:
-                    LmsLogManager.Logger.ZLogTrace($"{level} {msg}");
+                    LmsLogManager.Logger.ZLogTrace($"{msg}");
                     break;
                     //throw new ArgumentOutOfRangeException(nameof(level), level, null);
             }
