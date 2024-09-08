@@ -36,6 +36,7 @@ namespace Asv.Sdr.LimeSdr
             _logger = logger;
             Disposable.AddAction(() =>
             {
+                _logger.ZLogInformation($"Destroy stream {type}[{channel}] {_name}");
                 if (_started) LimeSdrDevice.Check(LMS_StopStream(_stream), nameof(LMS_StopStream));
                 LimeSdrDevice.Check(LMS_DestroyStream(device, _stream),nameof(LMS_DestroyStream));
                 destroyStream(this).Wait();

@@ -3,7 +3,7 @@
     <Nullable>enable</Nullable>
     <ProductVersion>1.1.6</ProductVersion>
     <AvaloniaVersion>11.0.10</AvaloniaVersion>
-    <AsvCommonVersion>2.0.4</AsvCommonVersion>
+    <AsvCommonVersion>3.0.0-dev.1</AsvCommonVersion>
     <AsvAvaloniaToolkitVersion>0.1.7</AsvAvaloniaToolkitVersion>
     <FluentAvaloniaUIVersion>2.0.5</FluentAvaloniaUIVersion>
     <ReactiveUIVersion>19.5.41</ReactiveUIVersion>
