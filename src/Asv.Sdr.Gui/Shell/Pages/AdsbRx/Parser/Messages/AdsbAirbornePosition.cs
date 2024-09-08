@@ -5,7 +5,7 @@ namespace Asv.Sdr.Gui;
 
 public class AdsbAirbornePosition : AdsbExtendedSquitterBase
 {
-
+    
     public uint NCprLat { get; set; }
     public uint NCprLon { get; set; }
 
@@ -28,6 +28,8 @@ public class AdsbAirbornePosition : AdsbExtendedSquitterBase
     private SurveillanceStatusEnum SurveillanceStatus { get; set; }
     public bool IsSingleAntenna { get; set; } = false;
     private uint Time { get; set; }
+
+    public override ushort Id => (17 << 8) | ((ushort)AdsbMessageTypeEnum.AirborneBarometricPosition << 3);
 
     protected override void InternalDeserialize(ref ReadOnlySpan<byte> buffer)
     {
@@ -65,11 +67,11 @@ public class AdsbAirbornePosition : AdsbExtendedSquitterBase
         buffer = buffer[(bitIndex / 8)..];
     }
 
-    public override TypeCodeEnum TypeCode => (int)AirbornePositionType switch
+    public override AdsbMessageTypeEnum MessageType => (int)AirbornePositionType switch
     {
-        >= 9 and <= 18 => TypeCodeEnum.AirborneBarometricPosition,
-        >= 20 and <= 22 => TypeCodeEnum.AirborneGnssPosition,
-        _ => TypeCodeEnum.Reserved
+        >= 9 and <= 18 => AdsbMessageTypeEnum.AirborneBarometricPosition,
+        >= 20 and <= 22 => AdsbMessageTypeEnum.AirborneGnssPosition,
+        _ => AdsbMessageTypeEnum.Reserved
     };
 
     public void CalculatePosition(AdsbAirbornePosition prevPosition)

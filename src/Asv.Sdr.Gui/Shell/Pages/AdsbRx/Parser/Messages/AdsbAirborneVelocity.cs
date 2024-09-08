@@ -4,7 +4,7 @@ using Asv.IO;
 namespace Asv.Sdr.Gui;
 
 
-public abstract class AdsbAirborneVelocity : AdsbExtendedSquitterBase
+public abstract class AdsbAirborneVelocityBase : AdsbExtendedSquitterBase
 {
     public VelocitySubTypeEnum SubType { get; set; }
     public bool IntentChangeFlag { get; set; }
@@ -19,8 +19,7 @@ public abstract class AdsbAirborneVelocity : AdsbExtendedSquitterBase
     
     protected override void InternalDeserialize(ref ReadOnlySpan<byte> buffer)
     {
-        var bitIndex = 0;
-        var typeCode = SpanBitHelper.GetBitU(buffer, ref bitIndex, 5);
+        var bitIndex = 5;
         SubType = (VelocitySubTypeEnum)SpanBitHelper.GetBitU(buffer, ref bitIndex, 3);
         IntentChangeFlag = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) == 1;
         IFRCapabilityFlag = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) == 1;
@@ -40,7 +39,7 @@ public abstract class AdsbAirborneVelocity : AdsbExtendedSquitterBase
     protected override void InternalSerialize(ref Span<byte> buffer)
     {
         var bitIndex = 0;
-        SpanBitHelper.SetBitU(buffer, ref bitIndex, 5, 19);
+        SpanBitHelper.SetBitU(buffer, ref bitIndex, 5, (uint)MessageType);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 3, (uint)SubType);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, IntentChangeFlag ? 1 : 0);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, IFRCapabilityFlag ? 1 : 0);
@@ -59,7 +58,7 @@ public abstract class AdsbAirborneVelocity : AdsbExtendedSquitterBase
     protected abstract void SpeedDecode(VelocitySubTypeEnum subType, uint speed);
     protected abstract uint SpeedEncode();
 
-    public override TypeCodeEnum TypeCode => TypeCodeEnum.AirborneVelocities;
+    public override AdsbMessageTypeEnum MessageType => AdsbMessageTypeEnum.AirborneVelocities;
 
     #region Common
 
@@ -67,8 +66,12 @@ public abstract class AdsbAirborneVelocity : AdsbExtendedSquitterBase
         EastWestVelocityDirectionEnum ewDirection, uint ewSpeedBits, NorthSouthVelocityDirectionEnum nsDirection,
         int nsSpeedBits)
     {
-        double ewVelocity = ewSpeedBits == 0 ? 0 : (ewSpeedBits - 1) * (subtype == VelocitySubTypeEnum.SubType1 ? 1 : 4);
-        double nsVelocity = nsSpeedBits == 0 ? 0 : (nsSpeedBits - 1) * (subtype == VelocitySubTypeEnum.SubType1 ? 1 : 4);
+        var ewVelocity = ewSpeedBits == 0
+            ? 0
+            : (ewSpeedBits - 1.0) * (subtype == VelocitySubTypeEnum.SubType1 ? 1.0 : 4.0);
+        var nsVelocity = nsSpeedBits == 0
+            ? 0
+            : (nsSpeedBits - 1.0) * (subtype == VelocitySubTypeEnum.SubType1 ? 1.0 : 4.0);
 
         if (ewDirection == EastWestVelocityDirectionEnum.FromEastToWest)
             ewVelocity = -ewVelocity;
@@ -104,8 +107,10 @@ public abstract class AdsbAirborneVelocity : AdsbExtendedSquitterBase
 
         return (ewDirection, ewSpeedBits, nsDirectionBit, nsSpeedBits);
     }
-    
-    private static (MagneticHeadingStatusEnum headingAvailable, double magneticHeading, AirspeedTypeEnum AirspeedType, double airspeed) AirspeedDecoding(VelocitySubTypeEnum subtype, MagneticHeadingStatusEnum status, uint headingBits, AirspeedTypeEnum speedType, int speedBits)
+
+    private static (MagneticHeadingStatusEnum headingAvailable, double magneticHeading, AirspeedTypeEnum AirspeedType,
+        double airspeed) AirspeedDecoding(VelocitySubTypeEnum subtype, MagneticHeadingStatusEnum status,
+            uint headingBits, AirspeedTypeEnum speedType, int speedBits)
     {
         var magneticHeading = status == MagneticHeadingStatusEnum.Available ? headingBits * (360.0 / 1024.0) : 0;
 
@@ -170,4 +175,34 @@ public abstract class AdsbAirborneVelocity : AdsbExtendedSquitterBase
     #endregion
     
     
+}
+
+public class AdsbGroundSpeed : AdsbAirborneVelocityBase
+{
+    protected override void SpeedDecode(VelocitySubTypeEnum subType, uint speed)
+    {
+        
+    }
+
+    protected override uint SpeedEncode()
+    {
+        return 0;
+    }
+
+    public override ushort Id => (ushort)(base.Id | (ushort)VelocitySubTypeEnum.SubType1);
+}
+
+public class AdsbAirspeed : AdsbAirborneVelocityBase
+{
+    protected override void SpeedDecode(VelocitySubTypeEnum subType, uint speed)
+    {
+        
+    }
+
+    protected override uint SpeedEncode()
+    {
+        return 0;
+    }
+
+    public override ushort Id => (ushort)(base.Id | (ushort)VelocitySubTypeEnum.SubType3);
 }

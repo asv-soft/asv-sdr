@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
 using System.Reactive;
@@ -25,6 +26,9 @@ public class AdsbRxViewModel:ShellPage
     private AvaPlot _plot4;
     private AvaPlot _plot5;
     private AvaPlot _plot6;
+    
+    private int _cnt;
+    
     private CancellationTokenSource _cancelShStream;
     private ILmsStream _txStream;
     private ScottDebugTriggerPlot _iDebug;
@@ -35,12 +39,128 @@ public class AdsbRxViewModel:ShellPage
     private ScottDebugPlot _corrDebug;
     private bool _isPause;
 
+    private byte[] GetMags(byte[] frame)
+    {
+        var result = new byte[frame.Length * 8 * 2 + 16];
 
+        byte shift = 0x80; 
+        for (var i = 0; i < 8; i++)
+        {
+            result[i] = (byte)((AdsbHelper.Preamble[0] & shift) != 0 ? 1 : 0);
+            result[i + 8] = (byte)((AdsbHelper.Preamble[1] & shift) != 0 ? 1 : 0);
+            shift >>= 1;
+        }
+        
+        for (var i = 0; i < frame.Length; i++)
+        {
+            shift = 0x80;
+            for (var j = 0; j < 8; j++)
+            {
+                var mag = frame[i] & shift;
+                if (mag != 0)
+                {
+                    result[16 + i * 16 + j * 2] = 1;
+                    result[16 + i * 16 + j * 2 + 1] = 0;
+                }
+                else
+                {
+                    result[16 + i * 16 + j * 2] = 0;
+                    result[16 + i * 16 + j * 2 + 1] = 1;
+                }
+                
+                shift >>= 1;
+            }
+        }
 
+        return result;
+    }
+
+    private void AdsbDecoderTest(AdsbMessageParser decoder)
+    {
+        var bufferRx = new List<byte[]>
+        {
+            GetMags([0x8D, 0x40, 0x62, 0x1D, 0x58, 0xC3, 0x82, 0xD6, 0x90, 0xC8, 0xAC, 0x28, 0x63, 0xA7]),
+            GetMags([0x8D, 0x40, 0x62, 0x1D, 0x58, 0xC3, 0x86, 0x43, 0x5C, 0xC4, 0x12, 0x69, 0x2A, 0xD6]),
+            GetMags([0x8D, 0x48, 0x40, 0xD6, 0x20, 0x2C, 0xC3, 0x71, 0xC3, 0x2C, 0xE0, 0x57, 0x60, 0x98]),
+            GetMags([0x8C, 0x48, 0x41, 0x75, 0x3A, 0xAB, 0x23, 0x87, 0x33, 0xC8, 0xCD, 0x40, 0x20, 0xB1]),
+            GetMags([0x8C, 0x48, 0x41, 0x75, 0x3A, 0x8A, 0x35, 0x32, 0x3F, 0xAE, 0xBD, 0xAC, 0x70, 0x2D]),
+            GetMags([0x8D, 0x48, 0x50, 0x20, 0x99, 0x44, 0x09, 0x94, 0x08, 0x38, 0x17, 0x5B, 0x28, 0x4F]),
+            GetMags([0x8D, 0xA0, 0x5F, 0x21, 0x9B, 0x06, 0xB6, 0xAF, 0x18, 0x94, 0x00, 0xCB, 0xC3, 0x3F])
+        };
+        
+        foreach (var buffer in bufferRx)
+        {
+            foreach (var b in buffer)
+            {
+                decoder.ProcessSample(b);
+            }
+        }
+    }
+    private void AdsbDecoderSubscribe(AdsbMessageParser decoder)
+    {
+        var lastAirbornePositions = new List<AdsbAirbornePosition>();
+        decoder.Filter<AdsbAirbornePosition>().Subscribe(_ =>
+        {
+            var last = lastAirbornePositions.FirstOrDefault(p => p.AircraftAddress == _.AircraftAddress);
+            if (last == null)
+            {
+                lastAirbornePositions.Add(_);
+                return;
+            }
+
+            if (last.CprFormat != _.CprFormat)
+            {
+                _.CalculatePosition(last);
+                Console.WriteLine($"=========  AirbornePosition ICAO: {_.AircraftAddress} =========");
+                Console.WriteLine($"Latitude: {_.Latitude:F6} Longitude: {_.Longitude:F6} Altitude: {_.Altitude:F2} ({_.AltitudeType:G})");
+            }
+            lastAirbornePositions.Remove(last);
+            lastAirbornePositions.Add(_);
+            
+        }).DisposeItWith(Disposable);
+        
+        var lastSurfacePositions = new List<AdsbSurfacePosition>();
+        decoder.Filter<AdsbSurfacePosition>().Subscribe(_ =>
+        {
+            var last = lastSurfacePositions.FirstOrDefault(p => p.AircraftAddress == _.AircraftAddress);
+            if (last == null)
+            {
+                lastSurfacePositions.Add(_);
+                return;
+            }
+
+            if (last.CprFormat != _.CprFormat)
+            {
+                _.CalculatePosition(last);
+                Console.WriteLine($"=========  SurfacePosition ICAO: {_.AircraftAddress} =========");
+                Console.WriteLine($"Latitude: {_.Latitude:F6} Longitude: {_.Longitude:F6} Movement: {_.Movement:F2} GroundTrack: {_.GroundTrack:F2}");
+            }
+            lastSurfacePositions.Remove(last);
+            lastSurfacePositions.Add(_);
+            
+        }).DisposeItWith(Disposable);
+
+        decoder.Filter<AdsbAircraftIdentification>().Subscribe(_ =>
+        {
+            Console.WriteLine($"ID ICAO: {_.AircraftAddress} Identification: {_.AircraftIdentification}");
+        }).DisposeItWith(Disposable);
+
+        decoder.Filter<AdsbGroundSpeed>().Subscribe(_ =>
+        {
+
+        }).DisposeItWith(Disposable);
+        
+        decoder.Filter<AdsbAirspeed>().Subscribe(_ =>
+        {
+
+        }).DisposeItWith(Disposable);
+    }
+    
     public AdsbRxViewModel() : base(WellKnownUri.Shell + ".adsbrx")
     {
         Title = "ADSB RX";
         Icon = MaterialIconKind.ChartFinance;
+     
         ConnectLms = ReactiveCommand.CreateRunInBackground(ConnectLmsImpl);
         StartTxLms = ReactiveCommand.CreateRunInBackground(StartTxLmsImpl);
         StartStopTx = ReactiveCommand.CreateRunInBackground(StartStopTxImpl);
@@ -188,45 +308,26 @@ public class AdsbRxViewModel:ShellPage
             Path = LmsPathRx.LMS_PATH_LNAH,
             ThroughputVsLatency = 1,
         };
-        var decoder = new AdsbMessageParser();
-        //decoder.Register(()=>new AdsbAirbornePosition());
-        decoder.Register(()=>new AdsbAircraftIdentification());
-        /*decoder.Register(()=>new AdsbSurfacePosition());*/
+        var decoder = new AdsbMessageParser()
+            .RegisterDefaultMessages()
+            .DisposeItWith(Disposable);
+        AdsbDecoderSubscribe(decoder);
         var counter = 0;
         var err = 0;
-        var lastOdd = null as AdsbAirbornePosition;
-        var lastEven = null as AdsbAirbornePosition;
-        /*decoder.OnMessage.Subscribe(x =>
-        {
-            var curr = (AdsbAirbornePosition)x;
-            if (curr.CprFormat == CprFormatEnum.Even)
-            {
-                lastEven = curr;
-            }
-
-            if (curr.CprFormat == CprFormatEnum.Odd)
-            {
-                lastOdd = curr;
-            }
-            if (lastEven != null && lastOdd!= null)
-            {
-                lastEven.CalculatePosition(lastOdd);
-                Console.WriteLine($"{DateTime.Now:O} {counter} => {lastEven.Latitude} {lastEven.Longitude} {lastEven.Altitude}");
-            }
-        });*/
-        decoder.OnMessage.Subscribe(x =>
-        {
-            Console.WriteLine($"{DateTime.Now:O} {counter} => {JsonConvert.SerializeObject(x)}");
-        });
-        decoder.OnMessageRecev.Subscribe(x =>
-        {
-            Console.WriteLine($"{DateTime.Now:O} {counter++} => {x}");
-            
-        });
-        decoder.OnError.Subscribe(x =>
-        {
-            Console.WriteLine($"{DateTime.Now:O} {err++} => {x}");
-        });
+        
+        // decoder.OnMessage.Subscribe(x =>
+        // {
+        //     Console.WriteLine($"{DateTime.Now:O} {counter} => {JsonConvert.SerializeObject(x)}");
+        // });
+        // decoder.OnMessageRecev.Subscribe(x =>
+        // {
+        //     Console.WriteLine($"{DateTime.Now:O} {counter++} => {x}");
+        //     
+        // });
+        // decoder.OnError.Subscribe(x =>
+        // {
+        //     Console.WriteLine($"{DateTime.Now:O} {err++} => {x}");
+        // });
 
         _corrDebug = new ScottDebugPlot(_plot4);
         _avgDebug = new ScottDebugPlot(_plot5);

@@ -131,22 +131,74 @@ public static class AdsbHelper
             _ => throw new ArgumentOutOfRangeException(nameof(ca), ca, null)
         };
     }
-    public static TypeCodeEnum GetTypeCode(ReadOnlySpan<byte> frame)
+    public static AdsbMessageTypeEnum GetMessageType(ReadOnlySpan<byte> frame)
     {
-        var tc = (frame[7] >> 3) & 0x1F;
+        var tc = (frame[6] >> 3) & 0x1F;
         return tc switch
         {
-            >= 1 and <= 4 => TypeCodeEnum.AircraftIdentification,
-            <= 8 => TypeCodeEnum.SurfacePosition,
-            <= 18 => TypeCodeEnum.AirborneBarometricPosition,
-            19 => TypeCodeEnum.AirborneVelocities,
-            <= 22 => TypeCodeEnum.AirborneGnssPosition,
-            <= 27 => TypeCodeEnum.Reserved,
-            28 => TypeCodeEnum.AircraftStatus,
-            29 => TypeCodeEnum.TargetStateAndStatusInformation,
-            31 => TypeCodeEnum.AircraftOperationStatus,
-            _ => TypeCodeEnum.Reserved
+            >= 1 and <= 4 => AdsbMessageTypeEnum.AircraftIdentification,
+            <= 8 => AdsbMessageTypeEnum.SurfacePosition,
+            <= 18 => AdsbMessageTypeEnum.AirborneBarometricPosition,
+            19 => AdsbMessageTypeEnum.AirborneVelocities,
+            <= 22 => AdsbMessageTypeEnum.AirborneGnssPosition,
+            <= 27 => AdsbMessageTypeEnum.Reserved,
+            28 => AdsbMessageTypeEnum.AircraftStatus,
+            29 => AdsbMessageTypeEnum.TargetStateAndStatusInformation,
+            31 => AdsbMessageTypeEnum.AircraftOperationStatus,
+            _ => AdsbMessageTypeEnum.Reserved
         };
+    }
+
+    private static byte GetExtendedSquitterSybType(ReadOnlySpan<byte> frame)
+    {
+        return (byte)(frame[6] & 0x07);
+    }
+
+    public static ushort GetMessageId(ReadOnlySpan<byte> buffer)
+    {
+        var df = GetDownlinkFormat(buffer);
+        if (GetMessageLength(df) == ShortFrameLengthBytes)
+        {
+            return (ushort)(df << 8);
+        }
+
+        if (df is not (17 or 18))
+        {
+            return (ushort)(df << 8);
+        }
+
+        var tc = GetMessageType(buffer);
+        switch (tc)
+        {
+            case AdsbMessageTypeEnum.AircraftIdentification:
+            case AdsbMessageTypeEnum.SurfacePosition:
+            case AdsbMessageTypeEnum.AirborneBarometricPosition:
+            case AdsbMessageTypeEnum.AircraftStatus:
+            case AdsbMessageTypeEnum.TargetStateAndStatusInformation:
+                return (ushort)((17 << 8) | ((ushort)tc << 3));
+            case AdsbMessageTypeEnum.AirborneVelocities:
+                var st = (VelocitySubTypeEnum)GetExtendedSquitterSybType(buffer);
+                return st switch
+                {
+                    VelocitySubTypeEnum.SubType1 => (ushort)((17 << 8) | ((ushort)tc << 3) |
+                                                             (ushort)VelocitySubTypeEnum.SubType1),
+                    VelocitySubTypeEnum.SubType2 => (ushort)((17 << 8) | ((ushort)tc << 3) |
+                                                             (ushort)VelocitySubTypeEnum.SubType1),
+                    VelocitySubTypeEnum.SubType3 => (ushort)((17 << 8) | ((ushort)tc << 3) |
+                                                             (ushort)VelocitySubTypeEnum.SubType3),
+                    VelocitySubTypeEnum.SubType4 => (ushort)((17 << 8) | ((ushort)tc << 3) |
+                                                             (ushort)VelocitySubTypeEnum.SubType3),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+            case AdsbMessageTypeEnum.AirborneGnssPosition:
+                return (17 << 8) | ((ushort)AdsbMessageTypeEnum.AirborneBarometricPosition << 3);
+            case AdsbMessageTypeEnum.AircraftOperationStatus:
+                return (ushort)((17 << 8) | ((ushort)tc << 3) | (ushort)AdsbVersionNumberEnum.AppendixC);
+            case AdsbMessageTypeEnum.Reserved:
+                return 0;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     public static AircraftCategoryEnum GetAircraftCategory(int tc, int ca)
