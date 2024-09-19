@@ -33,11 +33,17 @@ jobs:
         run: dotnet nuget add source ${{ env.GITHUB_PACKAGES_URL }} \--username '${{secrets.USER_NAME}}' \--password '${{ secrets.GIHUB_NUGET_AUTH_TOKEN }}' \--store-password-in-clear-text
 
       - name: Install dependencies
-        run: dotnet restore ./src
+        run: |
+          dotnet restore ./src/${{env.PROJECT_NAME}}/${{env.PROJECT_NAME}}.csproj
+          dotnet restore ./src/${{env.PROJECT_NAME}}/${{env.PROJECT_NAME}}.Test.csproj
+          dotnet restore ./src/${{env.PROJECT_NAME}}/${{env.PROJECT_NAME}}.LimeSdr.csproj
 
-      - name: Building projects
-        run: dotnet build ./src -c Release --no-restore    
-
+      - name: Build
+        run: |
+          dotnet build ./src/${{env.PROJECT_NAME}}/${{env.PROJECT_NAME}}.csproj --configuration Release --no-restore
+          dotnet build ./src/${{env.PROJECT_NAME}}/${{env.PROJECT_NAME}}.Test.csproj --configuration Release --no-restore
+          dotnet build ./src/${{env.PROJECT_NAME}}/${{env.PROJECT_NAME}}.LimeSdr.csproj --configuration Release --no-restore
+      
       - name: Running all tests
         run: dotnet test ./src --no-restore --verbosity normal
 
