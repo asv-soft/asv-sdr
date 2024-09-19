@@ -23,10 +23,10 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: |
-            7.x.x   
-            6.x.x   
-            5.x.x   
-            3.x.x
+            7.0.x   
+            6.0.x   
+            5.0.x   
+            3.0.x
 
       - name: Add NuGet source
         run: dotnet nuget add source ${{ env.GITHUB_PACKAGES_URL }} \--username '${{secrets.USER_NAME}}' \--password '${{secrets.GIHUB_NUGET_AUTH_TOKEN}}' \--store-password-in-clear-text
