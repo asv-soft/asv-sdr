@@ -30,16 +30,16 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
 
       - name: Add NuGet source
-        run: dotnet nuget add source ${{ env.GITHUB_PACKAGES_URL }} \--username '${{secrets.USER_NAME}}' \--password '${{secrets.GIHUB_NUGET_AUTH_TOKEN}}' \--store-password-in-clear-text
+        run: dotnet nuget add source ${{ env.GITHUB_PACKAGES_URL }} \--username '${{secrets.USER_NAME}}' \--password '${{ secrets.GIHUB_NUGET_AUTH_TOKEN }}' \--store-password-in-clear-text
 
       - name: Install dependencies
-        run: dotnet restore
+        run: dotnet restore ./src
 
       - name: Building projects
-        run: dotnet build -c Release --no-restore    
+        run: dotnet build ./src -c Release --no-restore    
 
       - name: Running all tests
-        run: dotnet test --no-restore --verbosity normal
+        run: dotnet test ./src --no-restore --verbosity normal
 
       - name: Set version variable
         env:
@@ -60,7 +60,7 @@ jobs:
           fi
 
       - name: Packing projects to Nuget
-        run: dotnet pack -c Release --no-build --no-restore -p:PackageVersion=${{ env.VERSION }}
+        run: dotnet pack ./src -c Release --no-build --no-restore -p:PackageVersion=${{ env.VERSION }}
 
       - name: List output files
         run: ls -la
