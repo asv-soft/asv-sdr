@@ -25,7 +25,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Add NuGet source
-        run: dotnet nuget add source ${{ env.GITHUB_PACKAGES_URL }} --username '${{secrets.USER_NAME}}' --password '${{ secrets.GIHUB_NUGET_AUTH_TOKEN }}' --store-password-in-clear-text
+        run: dotnet nuget add source ${{ env.GITHUB_PACKAGES_URL }} --username '${{ github.actor }}' --password '${{ secrets.GITHUB_TOKEN }}' --store-password-in-clear-text
 
       - name: Install dependencies
         run: |
