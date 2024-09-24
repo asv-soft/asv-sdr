@@ -66,15 +66,15 @@ namespace Asv.Sdr.LimeSdr
         private readonly List<ILmsStream> _streamList = new(4);
         private readonly bool _isThreadSafe;
         private readonly HashSet<string> _ignoreLogLmsParams;
-        private readonly ILogger<LimeSdrDevice> _logger;
+        private readonly ILogger? _logger;
         
 
-        public LimeSdrDevice(string deviceId, bool isThreadSave = false, ILogger<LimeSdrDevice>? logger = null)
-            :this(deviceId,isThreadSave,logger ?? LmsLogManager.GetLogger<LimeSdrDevice>(),LimeSdrParams.LMS7_CAPSEL,LimeSdrParams.LMS7_CAPTURE)
+        public LimeSdrDevice(string deviceId, bool isThreadSave = false, ILogger? logger = null)
+            :this(deviceId,isThreadSave,logger ?? LmsLogManager.GetLogger(nameof(LimeSdrDevice)),LimeSdrParams.LMS7_CAPSEL,LimeSdrParams.LMS7_CAPTURE)
         {
             
         }
-        public LimeSdrDevice(string deviceId, bool isThreadSave,ILogger<LimeSdrDevice> logger, params LMS7Parameter[] ignoreLogLmsParams)
+        public LimeSdrDevice(string deviceId, bool isThreadSave,ILogger logger, params LMS7Parameter[] ignoreLogLmsParams)
         {
             ArgumentNullException.ThrowIfNull(logger);
             _logger = logger;
@@ -142,10 +142,8 @@ namespace Asv.Sdr.LimeSdr
                     LmsLogManager.Logger.ZLogInformation($"{msg}");
                     break;
                 case LogLevel.LOG_LEVEL_DEBUG:
-                    LmsLogManager.Logger.ZLogDebug($"{msg}");
-                    break;
                 default:
-                    LmsLogManager.Logger.ZLogDebug($"{level} {msg}");
+                    LmsLogManager.Logger.ZLogTrace($"{msg}");
                     break;
                     //throw new ArgumentOutOfRangeException(nameof(level), level, null);
             }
