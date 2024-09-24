@@ -10,29 +10,26 @@ public abstract class AdsbAirborneVelocityBase : AdsbExtendedSquitterBase
     public bool IntentChangeFlag { get; set; }
     public bool IFRCapabilityFlag { get; set; }
     public NavigationUncertaintyCategoryEnum NavigationUncertaintyCategory { get; set; }
-    // private int SubTypeSpecificFields { get; set; }
-    public AltitudeTypeEnum VrSrc { get; set; }
-    public VerticalDirectionEnum VerticalDirection { get; set; }
+    public VerticalRateSourceEnum VrSrc { get; set; }
     public double VerticalRate { get; set; }
-    public GnssBaroAltDiffEnum GnssBaroAltDiffSign { get; set; }
     public double GnssBaroAltDiff { get; set; }
     
     protected override void InternalDeserialize(ref ReadOnlySpan<byte> buffer)
     {
+        base.InternalDeserialize(ref buffer);
         var bitIndex = 5;
         SubType = (VelocitySubTypeEnum)SpanBitHelper.GetBitU(buffer, ref bitIndex, 3);
         IntentChangeFlag = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) == 1;
         IFRCapabilityFlag = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) == 1;
         NavigationUncertaintyCategory =
             (NavigationUncertaintyCategoryEnum)SpanBitHelper.GetBitU(buffer, ref bitIndex, 3);
-        var speed = SpanBitHelper.GetBitU(buffer, ref bitIndex, 22);
-        SpeedDecode(SubType, speed);
-        VrSrc = (AltitudeTypeEnum)SpanBitHelper.GetBitU(buffer, ref bitIndex, 1);
-        VerticalDirection = (VerticalDirectionEnum)SpanBitHelper.GetBitU(buffer, ref bitIndex, 1);
-        VerticalRate = GetVerticalRate(SpanBitHelper.GetBitU(buffer, ref bitIndex, 9));
+        ReadVelocityData(buffer, ref bitIndex, SubType);
+        VrSrc = (VerticalRateSourceEnum)SpanBitHelper.GetBitU(buffer, ref bitIndex, 1);
+        var svt = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) == 0 ? 1 : -1;
+        VerticalRate = svt * GetVerticalRate(SpanBitHelper.GetBitU(buffer, ref bitIndex, 9)); 
         bitIndex += 2;
-        GnssBaroAltDiffSign = (GnssBaroAltDiffEnum)SpanBitHelper.GetBitU(buffer, ref bitIndex, 1);
-        GnssBaroAltDiff = GetGnssBaroAltDiff(SpanBitHelper.GetBitU(buffer, ref bitIndex, 7));
+        var sDiff = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) == 0 ? 1 : -1;
+        GnssBaroAltDiff = sDiff * GetGnssBaroAltDiff(SpanBitHelper.GetBitU(buffer, ref bitIndex, 7));
         buffer = buffer[(bitIndex / 8)..];
     }
 
@@ -44,132 +41,49 @@ public abstract class AdsbAirborneVelocityBase : AdsbExtendedSquitterBase
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, IntentChangeFlag ? 1 : 0);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, IFRCapabilityFlag ? 1 : 0);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 3, (uint)NavigationUncertaintyCategory);
-        var speed = SpeedEncode();
-        SpanBitHelper.SetBitU(buffer, ref bitIndex, 22, speed);
-        SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, VrSrc == AltitudeTypeEnum.Gnss ? 0 : 1);
-        SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, (uint)VerticalDirection);
+        WriteVelocityData(buffer, ref bitIndex, SubType);
+        SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, VrSrc == VerticalRateSourceEnum.Gnss ? 0 : 1);
+        SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, VerticalRate < 0 ? 1 : 0);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 9, SetVerticalRate(VerticalRate));
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 2, 0);
-        SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, (uint)GnssBaroAltDiffSign);
+        SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, GnssBaroAltDiff < 0 ? 1 : 0);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 7, SetGnssBaroAltDiff(GnssBaroAltDiff));
         buffer = buffer[(bitIndex / 8)..];
     }
 
-    protected abstract void SpeedDecode(VelocitySubTypeEnum subType, uint speed);
-    protected abstract uint SpeedEncode();
+    protected abstract void ReadVelocityData(ReadOnlySpan<byte> buffer, ref int pos, VelocitySubTypeEnum subType);
+    protected abstract void WriteVelocityData(Span<byte> buffer, ref int pos, VelocitySubTypeEnum subType);
 
     public override AdsbMessageTypeEnum MessageType => AdsbMessageTypeEnum.AirborneVelocities;
 
     #region Common
 
-    private static (double ewVelocity, double nsVelocity) GroundSpeedDecoding(VelocitySubTypeEnum subtype,
-        EastWestVelocityDirectionEnum ewDirection, uint ewSpeedBits, NorthSouthVelocityDirectionEnum nsDirection,
-        int nsSpeedBits)
-    {
-        var ewVelocity = ewSpeedBits == 0
-            ? 0
-            : (ewSpeedBits - 1.0) * (subtype == VelocitySubTypeEnum.SubType1 ? 1.0 : 4.0);
-        var nsVelocity = nsSpeedBits == 0
-            ? 0
-            : (nsSpeedBits - 1.0) * (subtype == VelocitySubTypeEnum.SubType1 ? 1.0 : 4.0);
-
-        if (ewDirection == EastWestVelocityDirectionEnum.FromEastToWest)
-            ewVelocity = -ewVelocity;
-
-        if (nsDirection == NorthSouthVelocityDirectionEnum.FromNorthToSouth)
-            nsVelocity = -nsVelocity;
-
-        return (ewVelocity, nsVelocity);
-    }
-
-    public static (EastWestVelocityDirectionEnum ewDirection, uint ewSpeedBits, NorthSouthVelocityDirectionEnum nsDirection,
-        uint nsSpeedBits) GroundSpeedEncoding(VelocitySubTypeEnum subtype, double ewVelocity, double nsVelocity)
-    {
-        var ewDirection = ewVelocity < 0
-            ? EastWestVelocityDirectionEnum.FromEastToWest
-            : EastWestVelocityDirectionEnum.FromWestToEast;
-        var nsDirectionBit = nsVelocity < 0
-            ? NorthSouthVelocityDirectionEnum.FromNorthToSouth
-            : NorthSouthVelocityDirectionEnum.FromSouthToNorth;
-
-        var ewSpeedBits = (uint)(Math.Abs(ewVelocity) + 1);
-        var nsSpeedBits = (uint)(Math.Abs(nsVelocity) + 1);
-
-        if (subtype == VelocitySubTypeEnum.SubType2)
-        {
-            ewSpeedBits = (uint)((Math.Abs(ewVelocity) + 1) / 4.0);
-            nsSpeedBits = (uint)((Math.Abs(nsVelocity) + 1) / 4.0);
-        }
-
-        // Ограничение на 10 бит
-        ewSpeedBits = Math.Min(ewSpeedBits, 1023);
-        nsSpeedBits = Math.Min(nsSpeedBits, 1023);
-
-        return (ewDirection, ewSpeedBits, nsDirectionBit, nsSpeedBits);
-    }
-
-    private static (MagneticHeadingStatusEnum headingAvailable, double magneticHeading, AirspeedTypeEnum AirspeedType,
-        double airspeed) AirspeedDecoding(VelocitySubTypeEnum subtype, MagneticHeadingStatusEnum status,
-            uint headingBits, AirspeedTypeEnum speedType, int speedBits)
-    {
-        var magneticHeading = status == MagneticHeadingStatusEnum.Available ? headingBits * (360.0 / 1024.0) : 0;
-
-        double airspeed = 0;
-        if (speedBits != 0)
-        {
-            airspeed = subtype == VelocitySubTypeEnum.SubType3 ? speedBits - 1 : 4.0 * (speedBits - 1);
-        }
-
-        return (status, magneticHeading, speedType, airspeed);
-    }
-
-    public static (MagneticHeadingStatusEnum status, uint headingBits, AirspeedTypeEnum speedType, uint speedBits)
-        AirspeedEncoding(VelocitySubTypeEnum subtype, MagneticHeadingStatusEnum headingStatus, double magneticHeading,
-            AirspeedTypeEnum airspeedType, double airspeed)
-    {
-
-        var headingBits = headingStatus == MagneticHeadingStatusEnum.Available
-            ? (uint)Math.Round(magneticHeading / 360.0 * 1024.0, 0) & 1023
-            : 0; // Маскируем, чтобы убедиться, что биты не превышают 10 бит
-
-        uint speedBits = 0;
-
-        if (airspeed > 0)
-        {
-            if (subtype == VelocitySubTypeEnum.SubType3)
-            {
-                speedBits = (uint)airspeed;
-            }
-            else if (subtype == VelocitySubTypeEnum.SubType4)
-            {
-                speedBits = (uint)Math.Round(airspeed / 4.0, 0);
-            }
-        }
-
-        // Убедимся, что скорость не превышает максимально допустимое 10-битное значение
-        speedBits = Math.Min(speedBits, 1023);
-
-        return (headingStatus, headingBits, airspeedType, speedBits);
-    }
-
     private static double GetVerticalRate(uint rateBits)
     {
-        return rateBits;
+        if (rateBits == 0) return double.NaN;
+        return (rateBits - 1) * 64 * 0.00508; // ft/min => m/s
     }
     
     private static uint SetVerticalRate(double rate)
     {
-        return (uint)Math.Round(rate, 0);
+        if (double.IsNaN(rate)) return 0;
+        rate = Math.Abs(rate);
+        var rateBits = (uint)Math.Round(rate / (64 * 0.00508) + 1, 0); // m/s => ft/min
+        return rateBits > 511 ? 511 : rateBits;
     }
 
     private static double GetGnssBaroAltDiff(uint diffBits)
     {
-        return diffBits;
+        if (diffBits == 0) return double.NaN;
+        return (diffBits - 1) * 25.0 * 0.3048; // ft => m
     }
     
     private static uint SetGnssBaroAltDiff(double diff)
     {
-        return (uint)Math.Round(diff, 0);
+        if (double.IsNaN(diff)) return 0;
+        diff = Math.Abs(diff);
+        var diffBits = (uint)Math.Round(diff / (25.0 * 0.3048) + 1, 0);
+        return diffBits > 127 ? 127 : diffBits;
     }
 
     #endregion
@@ -179,14 +93,50 @@ public abstract class AdsbAirborneVelocityBase : AdsbExtendedSquitterBase
 
 public class AdsbGroundSpeed : AdsbAirborneVelocityBase
 {
-    protected override void SpeedDecode(VelocitySubTypeEnum subType, uint speed)
+    public double GroundSpeed { get; set; }
+    
+    public double GroundTrackAngle { get; set; }
+    protected override void ReadVelocityData(ReadOnlySpan<byte> buffer, ref int pos, VelocitySubTypeEnum subType)
     {
+        var ewVelocityCoef = SpanBitHelper.GetBitU(buffer, ref pos, 1) == 0 ? 1.0 : -1.0;
+        var ewVelocityBits = SpanBitHelper.GetBitU(buffer, ref pos, 10);
+        ewVelocityCoef *= (subType == VelocitySubTypeEnum.SubType1 ? 1.0 : 4.0);
+        var vx = ewVelocityBits == 0 ? double.NaN : ewVelocityCoef * (ewVelocityBits - 1) * 0.51444; // knots => m/s
         
+        var nsVelocityCoef = SpanBitHelper.GetBitU(buffer, ref pos, 1) == 0 ? 1.0 : -1.0;
+        var nsVelocityBits = SpanBitHelper.GetBitU(buffer, ref pos, 10);
+        nsVelocityCoef *= (subType == VelocitySubTypeEnum.SubType1 ? 1.0 : 4.0);
+        var vy = nsVelocityBits == 0 ? double.NaN : nsVelocityCoef * (nsVelocityBits - 1) * 0.51444; // knots => m/s
+
+        GroundSpeed = Math.Sqrt(vx * vx + vy * vy);
+        GroundTrackAngle = (Math.Atan2(vx, vy) * 180.0 / Math.PI) % 360.0;
     }
 
-    protected override uint SpeedEncode()
+    protected override void WriteVelocityData(Span<byte> buffer, ref int pos, VelocitySubTypeEnum subType)
     {
-        return 0;
+        if (double.IsNaN(GroundSpeed) || double.IsNaN(GroundTrackAngle))
+        {
+            SpanBitHelper.SetBitU(buffer, ref pos, 22, 0);
+            return;
+        }
+
+        var angle = (GroundTrackAngle % 360.0) * Math.PI / 180.0;
+        var vx = GroundSpeed * Math.Sin(angle) / 0.51444;
+        var vy = GroundSpeed * Math.Cos(angle) / 0.51444;
+        
+        SpanBitHelper.SetBitU(buffer, ref pos, 1, vx < 0.0 ? 1 : 0);
+        vx = Math.Abs(vx);
+        if (subType == VelocitySubTypeEnum.SubType2) vx /= 4.0;
+        var ewVelocityBits = (uint)Math.Round(vx, 0) + 1;
+        ewVelocityBits = ewVelocityBits > 1023 ? 1023 : ewVelocityBits;
+        SpanBitHelper.SetBitU(buffer, ref pos, 10, ewVelocityBits);
+        
+        SpanBitHelper.SetBitU(buffer, ref pos, 1, vy < 0.0 ? 1 : 0);
+        vy = Math.Abs(vy);
+        if (subType == VelocitySubTypeEnum.SubType2) vy /= 4.0;
+        var nsVelocityBits = (uint)Math.Round(vy, 0) + 1;
+        nsVelocityBits = nsVelocityBits > 1023 ? 1023 : nsVelocityBits;
+        SpanBitHelper.SetBitU(buffer, ref pos, 10, nsVelocityBits);
     }
 
     public override ushort Id => (ushort)(base.Id | (ushort)VelocitySubTypeEnum.SubType1);
@@ -194,14 +144,50 @@ public class AdsbGroundSpeed : AdsbAirborneVelocityBase
 
 public class AdsbAirspeed : AdsbAirborneVelocityBase
 {
-    protected override void SpeedDecode(VelocitySubTypeEnum subType, uint speed)
+    public double MagneticHeading { get; set; }
+    public AirspeedTypeEnum AirspeedType { get; set; }
+    public double Airspeed { get; set; }
+    
+    
+    protected override void ReadVelocityData(ReadOnlySpan<byte> buffer, ref int pos, VelocitySubTypeEnum subType)
     {
-        
+        if (SpanBitHelper.GetBitU(buffer, ref pos, 1) == 0)
+        {
+            MagneticHeading = double.NaN;
+            pos += 10;
+        }
+        else
+        {
+            MagneticHeading = (SpanBitHelper.GetBitU(buffer, ref pos, 10) * 360.0 / 1024.0) % 360.0;
+        }
+
+        AirspeedType = SpanBitHelper.GetBitU(buffer, ref pos, 1) == 0 ? AirspeedTypeEnum.IAS : AirspeedTypeEnum.TAS;
+        var coef = subType == VelocitySubTypeEnum.SubType3 ? 1.0 : 4.0;
+
+        Airspeed = coef * (SpanBitHelper.GetBitU(buffer, ref pos, 1) - 1) * 0.51444; // knots => m/s
+
     }
 
-    protected override uint SpeedEncode()
+    protected override void WriteVelocityData(Span<byte> buffer, ref int pos, VelocitySubTypeEnum subType)
     {
-        return 0;
+        if (double.IsNaN(MagneticHeading))
+        {
+            SpanBitHelper.SetBitU(buffer, ref pos, 11, 0);
+        }
+        else
+        {
+            SpanBitHelper.SetBitU(buffer, ref pos, 1, 1);
+            var mhBits = (uint)Math.Abs(Math.Round((MagneticHeading % 360.0) * 1024.0 / 360.0, 0));
+            mhBits = mhBits > 1023 ? 1023 : mhBits;
+            SpanBitHelper.SetBitU(buffer, ref pos, 10, mhBits);
+        }
+        
+        SpanBitHelper.SetBitU(buffer, ref pos, 1, AirspeedType == AirspeedTypeEnum.IAS ? 0 : 1);
+        var coef = subType == VelocitySubTypeEnum.SubType3 ? 1.0 : 4.0;
+
+        var asBits = Math.Round(Airspeed / (0.51444 * coef) + 1, 0);
+        asBits = asBits > 1023 ? 1023 : asBits;
+        SpanBitHelper.SetBitU(buffer, ref pos, 10, asBits);
     }
 
     public override ushort Id => (ushort)(base.Id | (ushort)VelocitySubTypeEnum.SubType3);

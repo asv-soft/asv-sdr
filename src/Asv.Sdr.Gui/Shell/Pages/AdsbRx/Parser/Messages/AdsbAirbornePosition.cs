@@ -3,13 +3,11 @@ using Asv.IO;
 
 namespace Asv.Sdr.Gui;
 
-public class AdsbAirbornePosition : AdsbExtendedSquitterBase
+public abstract class AdsbAirbornePosition : AdsbExtendedSquitterBase
 {
-    
+    public override ushort Id  => (ushort)((17 << 8) | ((ushort)MessageType << 3));
     public uint NCprLat { get; set; }
     public uint NCprLon { get; set; }
-
-    public AltitudeTypeEnum AltitudeType => (int)AirbornePositionType is >= 9 and <= 18 ? AltitudeTypeEnum.Barometric : AltitudeTypeEnum.Gnss;
 
     public double Latitude { get; set; } = double.NaN;
 
@@ -19,26 +17,19 @@ public class AdsbAirbornePosition : AdsbExtendedSquitterBase
 
     public CprFormatEnum CprFormat { get; set; }
 
-    /// <summary>
-    /// When Type Code is from 9 to 18, the encoded altitude represents the barometric altitude of the aircraft.
-    /// When the Type Code is from 20 to 22, the encoded altitude contains the GNSS altitude of the aircraft.
-    /// </summary>
-    public AirbornePositionTypeCode AirbornePositionType { get; set; } = AirbornePositionTypeCode.BasicGnssPosition;
-
     private SurveillanceStatusEnum SurveillanceStatus { get; set; }
     public bool IsSingleAntenna { get; set; } = false;
     private uint Time { get; set; }
 
-    public override ushort Id => (17 << 8) | ((ushort)AdsbMessageTypeEnum.AirborneBarometricPosition << 3);
-
     protected override void InternalDeserialize(ref ReadOnlySpan<byte> buffer)
     {
+        base.InternalDeserialize(ref buffer);
         var bitIndex = 0;
-        AirbornePositionType = (AirbornePositionTypeCode)SpanBitHelper.GetBitU(buffer, ref bitIndex, 5);
+        SetAirbornePositionType(SpanBitHelper.GetBitU(buffer, ref bitIndex, 5));
         SurveillanceStatus = (SurveillanceStatusEnum)SpanBitHelper.GetBitU(buffer, ref bitIndex, 2);
         IsSingleAntenna = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) == 1;
         var alt = SpanBitHelper.GetBitU(buffer, ref bitIndex, 12);
-        Altitude = AltitudeType == AltitudeTypeEnum.Barometric ? GetBaroAltitude(alt) : GetGnssAltitude(alt);
+        Altitude = GetAltitude(alt);
         Time = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1);
         CprFormat = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) == 0 ? CprFormatEnum.Even : CprFormatEnum.Odd;
         NCprLat = SpanBitHelper.GetBitU(buffer, ref bitIndex, 17);
@@ -49,10 +40,10 @@ public class AdsbAirbornePosition : AdsbExtendedSquitterBase
     protected override void InternalSerialize(ref Span<byte> buffer)
     {
         var bitIndex = 0;
-        SpanBitHelper.SetBitU(buffer, ref bitIndex, 5, (uint)AirbornePositionType);
+        SpanBitHelper.SetBitU(buffer, ref bitIndex, 5, GetAirbornePositionType());
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 2, (uint)SurveillanceStatus);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, IsSingleAntenna ? 1 : 0);
-        var nAlt = AltitudeType == AltitudeTypeEnum.Barometric ? SetBaroAltitude(Altitude) : SetGnssAltitude(Altitude);
+        var nAlt = SetAltitude(Altitude);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 12, nAlt);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, Time);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, (uint)CprFormat);
@@ -66,13 +57,6 @@ public class AdsbAirbornePosition : AdsbExtendedSquitterBase
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 17, NCprLon);
         buffer = buffer[(bitIndex / 8)..];
     }
-
-    public override AdsbMessageTypeEnum MessageType => (int)AirbornePositionType switch
-    {
-        >= 9 and <= 18 => AdsbMessageTypeEnum.AirborneBarometricPosition,
-        >= 20 and <= 22 => AdsbMessageTypeEnum.AirborneGnssPosition,
-        _ => AdsbMessageTypeEnum.Reserved
-    };
 
     public void CalculatePosition(AdsbAirbornePosition prevPosition)
     {
@@ -96,25 +80,37 @@ public class AdsbAirbornePosition : AdsbExtendedSquitterBase
 
     #region Common
 
-    // Функция для преобразования двоичного числа в код Грея
-    private static int BinaryToGray(int binary)
+    protected abstract double GetAltitude(uint nAlt);
+    protected abstract uint SetAltitude(double alt);
+    
+    protected abstract void SetAirbornePositionType(uint nMsgType);
+    protected abstract uint GetAirbornePositionType();
+    
+
+    #endregion
+    
+}
+
+public class AdsbAirbornePositionWithBaroAlt : AdsbAirbornePosition
+{
+    public override AdsbMessageTypeEnum MessageType => AdsbMessageTypeEnum.AirborneBarometricPosition;
+    
+    /// <summary>
+    /// When Type Code is from 9 to 18, the encoded altitude represents the barometric altitude of the aircraft.
+    /// </summary>
+    public AirbornePositionBaroAltTypeCode AirbornePositionType { get; set; } = AirbornePositionBaroAltTypeCode.BasicPositionHighUpdateRate;
+
+    protected override void SetAirbornePositionType(uint nMsgType)
     {
-        return binary ^ (binary >> 1);
+        AirbornePositionType = (AirbornePositionBaroAltTypeCode)nMsgType;
     }
 
-    // Функция для преобразования числа в коде Грея обратно в двоичный код
-    private static int GrayToBinary(int gray)
+    protected override uint GetAirbornePositionType()
     {
-        var binary = gray;
-        var shift = 1;
-        while ((gray >> shift) > 0)
-        {
-            binary ^= gray >> shift;
-            shift++;
-        }
-        return binary;
+        return (uint)AirbornePositionType;
     }
-    private static double GetBaroAltitude(uint nAlt)
+
+    protected override double GetAltitude(uint nAlt)
     {
         if (nAlt == 0) return double.NaN;
         var q = (nAlt & 0x10) != 0 ? 1 : 0;
@@ -126,7 +122,7 @@ public class AdsbAirbornePosition : AdsbExtendedSquitterBase
         return GrayToBinary((int)nAlt) * 100.0 / 3.28084;
     }
 
-    private static uint SetBaroAltitude(double alt)
+    protected override uint SetAltitude(double alt)
     {
         if (double.IsNaN(alt)) return 0;
 
@@ -148,20 +144,63 @@ public class AdsbAirbornePosition : AdsbExtendedSquitterBase
         altNorm = (altNorm + 1000) / 25;
         return (uint)(((altNorm & 0x7F0) << 1) | 0x10 | (altNorm & 0xF));
     }
+
+    #region MyRegion
+
+    // Функция для преобразования двоичного числа в код Грея
+    private static int BinaryToGray(int binary)
+    {
+        return binary ^ (binary >> 1);
+    }
+
+    // Функция для преобразования числа в коде Грея обратно в двоичный код
+    private static int GrayToBinary(int gray)
+    {
+        var binary = gray;
+        var shift = 1;
+        while ((gray >> shift) > 0)
+        {
+            binary ^= gray >> shift;
+            shift++;
+        }
+        return binary;
+    }
     
-    private static double GetGnssAltitude(uint nAlt)
+
+    #endregion
+}
+
+public class AdsbAirbornePositionWithGnssAlt : AdsbAirbornePosition
+{
+    public override AdsbMessageTypeEnum MessageType => AdsbMessageTypeEnum.AirborneGnssPosition;
+    
+    /// <summary>
+    /// When the Type Code is from 20 to 22, the encoded altitude contains the GNSS altitude of the aircraft.
+    /// </summary>
+    public AirbornePositionGnssAltTypeCode AirbornePositionType { get; set; } = AirbornePositionGnssAltTypeCode.BasicGnssPosition;
+    
+    protected override void SetAirbornePositionType(uint nMsgType)
+    {
+        AirbornePositionType = (AirbornePositionGnssAltTypeCode)nMsgType;
+    }
+
+    protected override uint GetAirbornePositionType()
+    {
+        return (uint)AirbornePositionType;
+    }
+
+    protected override double GetAltitude(uint nAlt)
     {
         return nAlt * 6.25 - 1000.0;
     }
-    
-    private static uint SetGnssAltitude(double alt)
+
+    protected override uint SetAltitude(double alt)
     {
         if (alt > 24593.75) alt = 24593.75;
         if (alt < -1000.0) alt = -1000.0;
 
         return (uint)Math.Round((alt + 1000.0) / 6.25, 0);
     }
-
-    #endregion
-    
 }
+
+

@@ -159,7 +159,7 @@ public static class AdsbHelper
         var df = GetDownlinkFormat(buffer);
         if (GetMessageLength(df) == ShortFrameLengthBytes)
         {
-            return (ushort)(df << 8);
+            return (ushort)df;
         }
 
         if (df is not (17 or 18))
@@ -173,25 +173,17 @@ public static class AdsbHelper
             case AdsbMessageTypeEnum.AircraftIdentification:
             case AdsbMessageTypeEnum.SurfacePosition:
             case AdsbMessageTypeEnum.AirborneBarometricPosition:
+            case AdsbMessageTypeEnum.AirborneGnssPosition:
             case AdsbMessageTypeEnum.AircraftStatus:
             case AdsbMessageTypeEnum.TargetStateAndStatusInformation:
                 return (ushort)((17 << 8) | ((ushort)tc << 3));
             case AdsbMessageTypeEnum.AirborneVelocities:
                 var st = (VelocitySubTypeEnum)GetExtendedSquitterSybType(buffer);
-                return st switch
-                {
-                    VelocitySubTypeEnum.SubType1 => (ushort)((17 << 8) | ((ushort)tc << 3) |
-                                                             (ushort)VelocitySubTypeEnum.SubType1),
-                    VelocitySubTypeEnum.SubType2 => (ushort)((17 << 8) | ((ushort)tc << 3) |
-                                                             (ushort)VelocitySubTypeEnum.SubType1),
-                    VelocitySubTypeEnum.SubType3 => (ushort)((17 << 8) | ((ushort)tc << 3) |
-                                                             (ushort)VelocitySubTypeEnum.SubType3),
-                    VelocitySubTypeEnum.SubType4 => (ushort)((17 << 8) | ((ushort)tc << 3) |
-                                                             (ushort)VelocitySubTypeEnum.SubType3),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-            case AdsbMessageTypeEnum.AirborneGnssPosition:
-                return (17 << 8) | ((ushort)AdsbMessageTypeEnum.AirborneBarometricPosition << 3);
+                if (st is VelocitySubTypeEnum.SubType1 or VelocitySubTypeEnum.SubType2)
+                    return (ushort)((17 << 8) | ((ushort)tc << 3) | ((ushort)VelocitySubTypeEnum.SubType1 & 0x7));
+                if (st is VelocitySubTypeEnum.SubType3 or VelocitySubTypeEnum.SubType4)
+                    return (ushort)((17 << 8) | ((ushort)tc << 3) | ((ushort)VelocitySubTypeEnum.SubType3 & 0x7));
+                throw new ArgumentOutOfRangeException();
             case AdsbMessageTypeEnum.AircraftOperationStatus:
                 return (ushort)((17 << 8) | ((ushort)tc << 3) | (ushort)AdsbVersionNumberEnum.AppendixC);
             case AdsbMessageTypeEnum.Reserved:

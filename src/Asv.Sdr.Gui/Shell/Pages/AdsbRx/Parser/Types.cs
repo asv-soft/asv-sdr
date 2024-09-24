@@ -46,7 +46,7 @@ public enum SurfacePositionTypeCodes
     GroundStatusAndMode = 8
 }
 
-public enum AirbornePositionTypeCode
+public enum AirbornePositionBaroAltTypeCode
 {
     /// <summary>
     /// Базовое позиционирование с низкой точностью
@@ -88,6 +88,10 @@ public enum AirbornePositionTypeCode
     /// Высокоточное позиционирование с вертикальной скоростью и данными целостности
     /// </summary>
     HighPrecisionPositionWithVerticalRateAndIntegrity = 18,
+}
+
+public enum AirbornePositionGnssAltTypeCode
+{
     /// <summary>
     /// Базовая информация о GNSS местоположении
     /// </summary>
@@ -144,7 +148,7 @@ public enum NavigationUncertaintyCategoryEnum
     NotAvailable
 }
 
-public enum AltitudeTypeEnum
+public enum VerticalRateSourceEnum
 {
     Barometric,
     Gnss
@@ -167,18 +171,6 @@ public enum SurveillanceStatusEnum
     PermanentAlert = 1,
     TemporaryAlert = 2,
     SpecialPositionIdentification = 3
-}
-
-public enum GnssBaroAltDiffEnum
-{
-    GnssAboveBaro = 0,
-    GnssBelowBaro = 1,
-}
-
-public enum VerticalDirectionEnum
-{
-    Up = 0,
-    Down = 1
 }
 
 public enum EastWestVelocityDirectionEnum

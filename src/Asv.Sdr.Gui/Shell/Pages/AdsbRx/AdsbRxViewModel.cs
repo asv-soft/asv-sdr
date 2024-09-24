@@ -98,13 +98,13 @@ public class AdsbRxViewModel:ShellPage
     }
     private void AdsbDecoderSubscribe(AdsbMessageParser decoder)
     {
-        var lastAirbornePositions = new List<AdsbAirbornePosition>();
-        decoder.Filter<AdsbAirbornePosition>().Subscribe(_ =>
+        var lastAirbornePositionsBaroAlt = new List<AdsbAirbornePositionWithBaroAlt>();
+        decoder.Filter<AdsbAirbornePositionWithBaroAlt>().Subscribe(_ =>
         {
-            var last = lastAirbornePositions.FirstOrDefault(p => p.AircraftAddress == _.AircraftAddress);
+            var last = lastAirbornePositionsBaroAlt.FirstOrDefault(p => p.AircraftAddress == _.AircraftAddress);
             if (last == null)
             {
-                lastAirbornePositions.Add(_);
+                lastAirbornePositionsBaroAlt.Add(_);
                 return;
             }
 
@@ -112,12 +112,34 @@ public class AdsbRxViewModel:ShellPage
             {
                 _.CalculatePosition(last);
                 Console.WriteLine($"=========  AirbornePosition ICAO: {_.AircraftAddress} =========");
-                Console.WriteLine($"Latitude: {_.Latitude:F6} Longitude: {_.Longitude:F6} Altitude: {_.Altitude:F2} ({_.AltitudeType:G})");
+                Console.WriteLine($"Latitude: {_.Latitude:F6} Longitude: {_.Longitude:F6} Altitude (Baro): {_.Altitude:F2}");
             }
-            lastAirbornePositions.Remove(last);
-            lastAirbornePositions.Add(_);
+            lastAirbornePositionsBaroAlt.Remove(last);
+            lastAirbornePositionsBaroAlt.Add(_);
             
         }).DisposeItWith(Disposable);
+        
+        var lastAirbornePositionsGnssAlt = new List<AdsbAirbornePositionWithGnssAlt>();
+        decoder.Filter<AdsbAirbornePositionWithGnssAlt>().Subscribe(_ =>
+        {
+            var last = lastAirbornePositionsGnssAlt.FirstOrDefault(p => p.AircraftAddress == _.AircraftAddress);
+            if (last == null)
+            {
+                lastAirbornePositionsGnssAlt.Add(_);
+                return;
+            }
+
+            if (last.CprFormat != _.CprFormat)
+            {
+                _.CalculatePosition(last);
+                Console.WriteLine($"=========  AirbornePosition ICAO: {_.AircraftAddress} =========");
+                Console.WriteLine($"Latitude: {_.Latitude:F6} Longitude: {_.Longitude:F6} Altitude (GNSS): {_.Altitude:F2}");
+            }
+            lastAirbornePositionsGnssAlt.Remove(last);
+            lastAirbornePositionsGnssAlt.Add(_);
+            
+        }).DisposeItWith(Disposable);
+        
         
         var lastSurfacePositions = new List<AdsbSurfacePosition>();
         decoder.Filter<AdsbSurfacePosition>().Subscribe(_ =>
@@ -142,7 +164,7 @@ public class AdsbRxViewModel:ShellPage
 
         decoder.Filter<AdsbAircraftIdentification>().Subscribe(_ =>
         {
-            Console.WriteLine($"ID ICAO: {_.AircraftAddress} Identification: {_.AircraftIdentification}");
+            Console.WriteLine($"ID ICAO: {_.AircraftAddress} Identification: {_.AircraftIdentification} ({_.AircraftCategory:G})");
         }).DisposeItWith(Disposable);
 
         decoder.Filter<AdsbGroundSpeed>().Subscribe(_ =>

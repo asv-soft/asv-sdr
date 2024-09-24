@@ -7,6 +7,7 @@ public class AdsbSurfacePosition : AdsbExtendedSquitterBase
 {
     protected override void InternalDeserialize(ref ReadOnlySpan<byte> buffer)
     {
+        base.InternalDeserialize(ref buffer);
         var bitIndex = 0;
         SurfacePositionType = (SurfacePositionTypeCodes)SpanBitHelper.GetBitU(buffer, ref bitIndex, 5);
         Movement = GetMovement(SpanBitHelper.GetBitU(buffer, ref bitIndex, 7));

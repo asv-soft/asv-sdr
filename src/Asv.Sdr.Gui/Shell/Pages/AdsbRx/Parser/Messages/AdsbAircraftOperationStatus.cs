@@ -7,6 +7,7 @@ public class AdsbAircraftOperationStatus : AdsbExtendedSquitterBase
 {
     protected override void InternalDeserialize(ref ReadOnlySpan<byte> buffer)
     {
+        base.InternalDeserialize(ref buffer);
         var bitIndex = 5;
         OperationStatusType = (OperationStatusTypeEnum)SpanBitHelper.GetBitU(buffer, ref bitIndex, 3);
         buffer = buffer[(bitIndex / 8)..];

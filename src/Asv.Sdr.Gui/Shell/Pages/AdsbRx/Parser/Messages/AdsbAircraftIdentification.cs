@@ -24,6 +24,7 @@ public class AdsbAircraftIdentification : AdsbExtendedSquitterBase
 
     protected override void InternalDeserialize(ref ReadOnlySpan<byte> buffer)
     {
+        base.InternalDeserialize(ref buffer);
         _rawMt = (buffer[0] >> 3) & 0x1F;
         _rawCa = buffer[0] & 0x7;
         AircraftIdentification = AdsbHelper.AircraftIdDecoding(buffer.Slice(1, 6));

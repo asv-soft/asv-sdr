@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 
 namespace Asv.Sdr.Gui;
@@ -15,7 +14,8 @@ public static class AdsbParserFactory
         get
         {
             yield return () => new AdsbAircraftIdentification();
-            yield return () => new AdsbAirbornePosition();
+            yield return () => new AdsbAirbornePositionWithBaroAlt();
+            yield return () => new AdsbAirbornePositionWithGnssAlt();
             yield return () => new AdsbSurfacePosition();
             yield return () => new AdsbGroundSpeed();
             yield return () => new AdsbAirspeed();
