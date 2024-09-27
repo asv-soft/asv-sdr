@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    
     <FileVersion>$(ProductVersion)</FileVersion>
     <Version>1.5.1-dev.1</Version>
     <Authors>https://github.com/asvol</Authors>
