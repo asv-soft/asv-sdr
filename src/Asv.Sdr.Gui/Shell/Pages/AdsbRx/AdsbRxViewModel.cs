@@ -216,6 +216,8 @@ public class AdsbRxViewModel:ShellPage
         var _bandWidth = 8e6;
         var _freq = 1090_000_000;
         var _gain = 0.69;
+        /*NativeMethods.Is64BitOperatingSystem = true;
+        LmsNativeDllUsage.Is64BitOperatingSystem = true;*/
         if (_device == null)
         {
             var dev = LimeSdrDevice.GetAvailableDevices().FirstOrDefault();
@@ -223,8 +225,7 @@ public class AdsbRxViewModel:ShellPage
             _device = new LimeSdrDevice(dev, true);    
         }
         
-        NativeMethods.Is64BitOperatingSystem = true;
-        LmsNativeDllUsage.Is64BitOperatingSystem = true;
+        
         
         await _device.EnableChannel(LmsChannel.Tx, 0, true,default);
         await _device.SetSampleRate(_sampleRate, 1U,default);
@@ -307,8 +308,8 @@ public class AdsbRxViewModel:ShellPage
 
     private void ConnectLmsImpl()
     {
-        LmsNativeDllUsage.Is64BitOperatingSystem = true;
-        NativeMethods.Is64BitOperatingSystem = true;
+        /*LmsNativeDllUsage.Is64BitOperatingSystem = true;
+        NativeMethods.Is64BitOperatingSystem = true;*/
         _cancelShStream = new CancellationTokenSource();
         var dev = LimeSdrDevice.GetAvailableDevices().FirstOrDefault();
         if (dev == null) throw new Exception("LMS device not found");
