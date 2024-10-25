@@ -69,8 +69,8 @@ namespace Asv.Sdr.LimeSdr
         private readonly ILogger? _logger;
         
 
-        public LimeSdrDevice(string deviceId, bool isThreadSave = false, ILogger? logger = null)
-            :this(deviceId,isThreadSave,logger ?? LmsLogManager.GetLogger(nameof(LimeSdrDevice)),LimeSdrParams.LMS7_CAPSEL,LimeSdrParams.LMS7_CAPTURE)
+        public LimeSdrDevice(string deviceId, bool isThreadSave = false, ILoggerFactory? logFactory = null)
+            :this(deviceId,isThreadSave,logFactory?.CreateLogger<LimeSdrDevice>() ?? LmsLogManager.GetLogger(nameof(LimeSdrDevice)),LimeSdrParams.LMS7_CAPSEL,LimeSdrParams.LMS7_CAPTURE)
         {
             
         }
