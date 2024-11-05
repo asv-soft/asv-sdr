@@ -90,6 +90,7 @@ namespace Asv.Sdr.LimeSdr
                 {
                     stream.Dispose();
                 }
+                Check(LMS_Reset(_device), nameof(LMS_Reset));
                 Check(LMS_Close(_device), nameof(LMS_Close));
             });
 
