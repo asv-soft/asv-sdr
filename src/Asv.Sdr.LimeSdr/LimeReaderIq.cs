@@ -91,9 +91,14 @@ namespace Asv.Sdr.LimeSdr
             return result;
         }
 
-        public Task<int> Read(Memory<float> iqBuffer, CancellationToken cancel = default)
+        public async Task<int> Read(Memory<float> iqBuffer, CancellationToken cancel = default)
         {
-            return _rxStream.Read(iqBuffer, 5000, DisposeCancel);
+            var result =  await _rxStream.Read(iqBuffer, 5000, DisposeCancel);
+            if (iqBuffer.Length / 2 != result)
+            {
+                Console.WriteLine("Read less than expected");
+            }
+            return result;
         }
     }
 }

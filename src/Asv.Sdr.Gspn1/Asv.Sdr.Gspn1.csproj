@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
-        <AssemblyVersion>$(ProductVersion)</AssemblyVersion>
+        
         <FileVersion>$(ProductVersion)</FileVersion>
         <Version>$(ProductVersion)</Version>
         <LangVersion>latest</LangVersion>

@@ -1,131 +1,8 @@
 using System;
-using System.Linq;
 using System.Text;
 using Asv.IO;
-using Avalonia.Controls.Documents;
 
 namespace Asv.Sdr.Gui;
-
-public enum CapabilityEnum
-{
-    Reserved,
-    Level1,
-    Level2OnGround,
-    Level2Airborne,
-    Level2OnGroundOrAirborne,
-    DLRequest0OrFlightStatus2345OnGroundOrAirborne
-}
-
-public enum TypeCodeEnum
-{
-    AircraftIdentification,
-    SurfacePosition,
-    AirborneBarometricPosition,
-    AirborneVelocities,
-    AirborneGnssPosition,
-    Reserved,
-    AircraftStatus,
-    TargetStateAndStatusInformation,
-    AircraftOperationStatus
-}
-
-public enum AirbornePositionTypeCode
-{
-    /// <summary>
-    /// Базовое позиционирование с низкой точностью
-    /// </summary>
-    BasicPositionLowPrecision = 9,
-    /// <summary>
-    /// Базовое позиционирование с низкой частотой обновления
-    /// </summary>
-    BasicPositionLowUpdateRate = 10,
-    /// <summary>
-    /// Базовое позиционирование с высокой частотой обновления
-    /// </summary>
-    BasicPositionHighUpdateRate = 11,
-    /// <summary>
-    /// Базовое позиционирование с высокой точностью
-    /// </summary>
-    BasicPositionHighPrecision = 12,
-    /// <summary>
-    /// Улучшенное позиционирование с индикацией NIC
-    /// </summary>
-    EnhancedPositionWithNic = 13,
-    /// <summary>
-    /// Улучшенное позиционирование с индикацией NACp
-    /// </summary>
-    EnhancedPositionWithNacP = 14,
-    /// <summary>
-    /// Улучшенное позиционирование с данными вертикальной скорости
-    /// </summary>
-    EnhancedPositionWithVerticalRate = 15,
-    /// <summary>
-    /// Высокоточное позиционирование с индикацией NIC
-    /// </summary>
-    HighPrecisionPositionWithNic = 16,
-    /// <summary>
-    /// Высокоточное позиционирование с индикацией NACp
-    /// </summary>
-    HighPrecisionPositionWithNacP = 17,
-    /// <summary>
-    /// Высокоточное позиционирование с вертикальной скоростью и данными целостности
-    /// </summary>
-    HighPrecisionPositionWithVerticalRateAndIntegrity = 18,
-    /// <summary>
-    /// Базовая информация о GNSS местоположении
-    /// </summary>
-    BasicGnssPosition = 20,
-    /// <summary>
-    /// Улучшенная информация о GNSS местоположении с дополнительными данными о целостности
-    /// </summary>
-    EnhancedGnssPositionWithIntegrity = 21,
-    /// <summary>
-    /// Высокоточная информация о GNSS местоположении с расширенными функциями навигации
-    /// </summary>
-    HighPrecisionGnssPositionWithAdvNavFeatures = 22
-}
-
-public enum AircraftCategoryEnum
-{
-    Reserved,
-    NoCategoryInformation,
-    SurfaceEmergencyVehicle,
-    SurfaceServiceVehicle,
-    GroundObstruction,
-    GliderOrSailplane,
-    LighterThanAir,
-    ParachutistOrSkydiver,
-    UltralightOrHangGliderOrParaGlider,
-    UnmannedAerialVehicle,
-    SpaceOrTransAtmosphericVehicle,
-    Light,
-    Medium1,
-    Medium2,
-    HighVortexAircraft,
-    Heavy,
-    HighPerformanceAndHighSpeed,
-    Rotorcraft
-}
-
-public enum AltitudeTypeEnum
-{
-    Barometric,
-    Gnss
-}
-
-public enum CprFormatEnum
-{
-    Even,
-    Odd
-}
-
-public enum SurveillanceStatusEnum
-{
-    NoCondition = 0,
-    PermanentAlert = 1,
-    TemporaryAlert = 2,
-    SpecialPositionIdentification = 3
-}
 
 public static class AdsbHelper
 {
@@ -254,22 +131,66 @@ public static class AdsbHelper
             _ => throw new ArgumentOutOfRangeException(nameof(ca), ca, null)
         };
     }
-    public static TypeCodeEnum GetTypeCode(ReadOnlySpan<byte> frame)
+    public static AdsbMessageTypeEnum GetMessageType(ReadOnlySpan<byte> frame)
     {
-        var tc = (frame[7] >> 3) & 0x1F;
+        var tc = (frame[6] >> 3) & 0x1F;
         return tc switch
         {
-            >= 1 and <= 4 => TypeCodeEnum.AircraftIdentification,
-            <= 8 => TypeCodeEnum.SurfacePosition,
-            <= 18 => TypeCodeEnum.AirborneBarometricPosition,
-            19 => TypeCodeEnum.AirborneVelocities,
-            <= 22 => TypeCodeEnum.AirborneGnssPosition,
-            <= 27 => TypeCodeEnum.Reserved,
-            28 => TypeCodeEnum.AircraftStatus,
-            29 => TypeCodeEnum.TargetStateAndStatusInformation,
-            31 => TypeCodeEnum.AircraftOperationStatus,
-            _ => TypeCodeEnum.Reserved
+            >= 1 and <= 4 => AdsbMessageTypeEnum.AircraftIdentification,
+            <= 8 => AdsbMessageTypeEnum.SurfacePosition,
+            <= 18 => AdsbMessageTypeEnum.AirborneBarometricPosition,
+            19 => AdsbMessageTypeEnum.AirborneVelocities,
+            <= 22 => AdsbMessageTypeEnum.AirborneGnssPosition,
+            <= 27 => AdsbMessageTypeEnum.Reserved,
+            28 => AdsbMessageTypeEnum.AircraftStatus,
+            29 => AdsbMessageTypeEnum.TargetStateAndStatusInformation,
+            31 => AdsbMessageTypeEnum.AircraftOperationStatus,
+            _ => AdsbMessageTypeEnum.Reserved
         };
+    }
+
+    private static byte GetExtendedSquitterSybType(ReadOnlySpan<byte> frame)
+    {
+        return (byte)(frame[6] & 0x07);
+    }
+
+    public static ushort GetMessageId(ReadOnlySpan<byte> buffer)
+    {
+        var df = GetDownlinkFormat(buffer);
+        if (GetMessageLength(df) == ShortFrameLengthBytes)
+        {
+            return (ushort)df;
+        }
+
+        if (df is not (17 or 18))
+        {
+            return (ushort)(df << 8);
+        }
+
+        var tc = GetMessageType(buffer);
+        switch (tc)
+        {
+            case AdsbMessageTypeEnum.AircraftIdentification:
+            case AdsbMessageTypeEnum.SurfacePosition:
+            case AdsbMessageTypeEnum.AirborneBarometricPosition:
+            case AdsbMessageTypeEnum.AirborneGnssPosition:
+            case AdsbMessageTypeEnum.AircraftStatus:
+            case AdsbMessageTypeEnum.TargetStateAndStatusInformation:
+                return (ushort)((17 << 8) | ((ushort)tc << 3));
+            case AdsbMessageTypeEnum.AirborneVelocities:
+                var st = (VelocitySubTypeEnum)GetExtendedSquitterSybType(buffer);
+                if (st is VelocitySubTypeEnum.SubType1 or VelocitySubTypeEnum.SubType2)
+                    return (ushort)((17 << 8) | ((ushort)tc << 3) | ((ushort)VelocitySubTypeEnum.SubType1 & 0x7));
+                if (st is VelocitySubTypeEnum.SubType3 or VelocitySubTypeEnum.SubType4)
+                    return (ushort)((17 << 8) | ((ushort)tc << 3) | ((ushort)VelocitySubTypeEnum.SubType3 & 0x7));
+                throw new ArgumentOutOfRangeException();
+            case AdsbMessageTypeEnum.AircraftOperationStatus:
+                return (ushort)((17 << 8) | ((ushort)tc << 3) | (ushort)AdsbVersionNumberEnum.AppendixC);
+            case AdsbMessageTypeEnum.Reserved:
+                return 0;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     public static AircraftCategoryEnum GetAircraftCategory(int tc, int ca)
@@ -473,11 +394,24 @@ public static class AdsbHelper
         return (int)Math.Floor(2.0 * Math.PI / z);
     }
 
+    /// <summary>
+    /// Decoding aircraft position (globally method)
+    /// </summary>
+    /// <param name="nCprLatEven">17 bits of latitude from even message</param>
+    /// <param name="nCprLonEven">17 bits of longitude from even message</param>
+    /// <param name="nCprLatOdd">17 bits of latitude from odd message</param>
+    /// <param name="nCprLonOdd">17 bits of longitude from odd message</param>
+    /// <param name="tEven">Even message reception timestamp</param>
+    /// <param name="tOdd">Odd message reception timestamp</param>
+    /// <param name="zoneSize">
+    /// For Airborne Position = 360.0.
+    /// For Surface position = 90.0.</param>
+    /// <returns>Latitude/Longitude</returns>
     public static (double Lat, double Lon) GloballyUnambiguousPositionDecoding(uint nCprLatEven, uint nCprLonEven,
-        uint nCprLatOdd, uint nCprLonOdd, DateTime tEven, DateTime tOdd)
+        uint nCprLatOdd, uint nCprLonOdd, DateTime tEven, DateTime tOdd, double zoneSize = 360.0)
     {
-        const double dLatEven = 360.0 / (4.0 * Nz);
-        const double dLatOdd = 360.0 / (4.0 * Nz - 1.0);
+        var dLatEven = zoneSize / (4.0 * Nz);
+        var dLatOdd = zoneSize / (4.0 * Nz - 1.0);
         const double part = 1 << 17;
         
         var latCprEven = nCprLatEven / part;
@@ -490,7 +424,7 @@ public static class AdsbHelper
         var latEven = dLatEven * (Mod(j, 60) + latCprEven);
         var latOdd = dLatOdd * (Mod(j, 59) + latCprOdd);
 
-        if (latEven >= 270.0) latEven -= 390.0;
+        if (latEven >= 270.0) latEven -= 360.0;
         if (latOdd >= 270.0) latOdd -= 360;
 
         var nlEven = Nl(latEven);
@@ -505,8 +439,8 @@ public static class AdsbHelper
         var nEven = Math.Max(nlEven, 1);
         var nOdd = Math.Max(nlEven - 1, 1);
 
-        var dLonEven = 360.0 / nEven;
-        var dLonOdd = 360.0 / nOdd;
+        var dLonEven = zoneSize / nEven;
+        var dLonOdd = zoneSize / nOdd;
 
         var lonEven = dLonEven * (Mod(m, nEven) + lonCprEven);
         var lonOdd = dLonOdd * (Mod(m, nOdd) + lonCprOdd);
@@ -517,36 +451,63 @@ public static class AdsbHelper
         return (Lat: lat, Lon: lon);
     }
 
+    /// <summary>
+    /// Decoding aircraft position (locally method)
+    /// </summary>
+    /// <param name="nCprLat">17 bits of latitude from message</param>
+    /// <param name="nCprLon">17 bits of longitude from message</param>
+    /// <param name="latRef">Latitude of the nearest reference position [-90.0; 90.0]</param>
+    /// <param name="lonRef">Longitude of the nearest reference position [-180.0; 180.0]</param>
+    /// <param name="format">Even/Odd</param>
+    /// <param name="zoneSize">
+    /// For Airborne Position = 360.0.
+    /// For Surface position = 90.0.</param>
+    /// <returns>Latitude/Longitude</returns>
     public static (double Lat, double Lon) LocallyUnambiguousPositionDecoding(uint nCprLat, uint nCprLon, double latRef,
-        double lonRef, CprFormatEnum format)
+        double lonRef, CprFormatEnum format, double zoneSize = 360.0)
     {
         const double part = 1 << 17;
         var latCpr = nCprLat / part;
         var lonCpr = nCprLon / part;
         
         var i = format == CprFormatEnum.Even ? 0 : 1;
-        var dLat = 360.0 / (4.0 * Nz - i);
+        var dLat = zoneSize / (4.0 * Nz - i);
         var j = (int)Math.Floor(latRef / dLat) + (int)Math.Floor(Mod(latRef, dLat) / dLat - latCpr + 0.5);
         var lat = dLat * (j + latCpr);
-
+        if (lat >= 270.0) lat -= 360.0;
+        
         var nl = Nl(lat);
-        var dLon = 360.0 / Math.Max(nl - i, 1);
+        var dLon = zoneSize / Math.Max(nl - i, 1);
         var m = (int)Math.Floor(lonRef / dLon) + (int)Math.Floor(Mod(lonRef, dLon) / dLon - lonCpr + 0.5);
         var lon = dLon * (m + lonCpr);
+        if (lon >= 180.0) lon -= 360.0;
         
         return (Lat: lat, Lon: lon);
     }
 
-    public static (uint Lat, uint Lon) UnambiguousPositionEncoding(double lat, double lon, CprFormatEnum format)
+    /// <summary>
+    /// Encoding aircraft position
+    /// </summary>
+    /// <param name="lat">Latitude [-90.0; 90.0]</param>
+    /// <param name="lon">Longitude [-180.0; 180.0]</param>
+    /// <param name="format">Even/Odd</param>
+    /// <param name="zoneSize">
+    /// For Airborne Position = 360.0.
+    /// For Surface position = 90.0.</param>
+    /// <returns></returns>
+    public static (uint Lat, uint Lon) UnambiguousPositionEncoding(double lat, double lon, CprFormatEnum format,
+        double zoneSize = 360.0)
     {
+        if (lat < 0) lat += zoneSize;
+        if (lon < 0) lon += 180.0;
+        lon %= zoneSize;
         var nl = Nl(lat) - (format == CprFormatEnum.Even ? 0 : 1);
-        var dLon = 360.0 / Math.Max(nl, 1);  // Prevent division by zero
+        var dLon = zoneSize / Math.Max(nl, 1); // Prevent division by zero
         var nLon = (uint)Math.Floor((1 << 17) * (lon % dLon) / dLon);
-        
-        var dLat = format == CprFormatEnum.Even ? 360.0 / 60 : 360.0 / 59;
+
+        var dLat = format == CprFormatEnum.Even ? zoneSize / 60 : zoneSize / 59;
         var nLat = (uint)Math.Floor((1 << 17) * (lat % dLat) / dLat);
 
         return (Lat: nLat, Lon: nLon);
     }
-    
 }

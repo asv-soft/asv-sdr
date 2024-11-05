@@ -168,51 +168,7 @@ namespace Asv.Sdr.LimeSdr
     {
         private static readonly ILogger<NativeMethods> Logger = LmsLogManager.GetLogger<NativeMethods>();
         
-        static NativeMethods()
-        {
-            var os = DetectPlatform();
-            switch (os)
-            {
-                case OperatingSystem.Undefined:
-                    break;
-                case OperatingSystem.Windows:
-                    if (LmsNativeDllUsage.Is64BitOperatingSystem == true)
-                    {
-                        var dllDir64 = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "lib","x64");
-                        if (!Directory.Exists(dllDir64))
-                        {
-                            Logger.ZLogInformation($"Create native library directory {dllDir64}");
-                            Directory.CreateDirectory(dllDir64);
-                        }
-                        CheckFile(Path.Combine(dllDir64, "LimeSuite.dll"), Libs.LimeSuiteX64);
-                        if (!SetDllDirectory(dllDir64))
-                            throw new Win32Exception($"Error to execute kernel32.dll:SetDllDirectory({dllDir64})");
-                        Logger.ZLogInformation($"Set native library directory {dllDir64}");
-                        Is64BitOperatingSystem = true;
-                    }
-                    else
-                    {
-                        var dllDir32 = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "lib","x86");
-                        if (!Directory.Exists(dllDir32))
-                        {
-                            Logger.ZLogInformation($"Create native library directory {dllDir32}");
-                            Directory.CreateDirectory(dllDir32);
-                        }
-                        CheckFile(Path.Combine(dllDir32, "LimeSuite.dll"), Libs.LimeSuiteX32);
-                        if (!SetDllDirectory(dllDir32))
-                            throw new Win32Exception($"Error to execute kernel32.dll:SetDllDirectory({dllDir32})");
-                        Logger.ZLogInformation($"Set native library directory {dllDir32}");
-                        Is64BitOperatingSystem = false;
-                    }
-                    break;
-                case OperatingSystem.Linux:
-                    break;
-                case OperatingSystem.MacOsX:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException("Can't detect OS");
-            }
-        }
+       
 
         public static bool Is64BitOperatingSystem = false;
 
@@ -233,26 +189,7 @@ namespace Asv.Sdr.LimeSdr
         }
 
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool SetDllDirectory(string path);
-
-        private static OperatingSystem DetectPlatform()
-        {
-            var windir = Environment.GetEnvironmentVariable("windir");
-            if (!string.IsNullOrEmpty(windir) && windir.Contains(@"\") && Directory.Exists(windir)) return OperatingSystem.Windows;
-
-            if (File.Exists(@"/proc/sys/kernel/ostype"))
-            {
-                var osType = File.ReadAllText(@"/proc/sys/kernel/ostype");
-                return osType.StartsWith("Linux", StringComparison.OrdinalIgnoreCase)
-                    ? OperatingSystem.Linux
-                    : OperatingSystem.Undefined;
-            }
-
-            return File.Exists(@"/System/Library/CoreServices/SystemVersion.plist")
-                ? OperatingSystem.MacOsX
-                : OperatingSystem.Undefined;
-        }
+       
         
         
         

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive.Subjects;
 using System.Threading;
 using Asv.Common;
+using Asv.IO;
 
 namespace Asv.Sdr.Gui;
 
@@ -13,7 +14,7 @@ public class AdsbMessageParser : DisposableOnce
     private readonly Subject<AdsbParserException> _onErrorSubject = new();
     private readonly Subject<AdsbDfMessageBase> _onMessageSubject = new();
 
-    private readonly Dictionary<int, Func<AdsbDfMessageBase>> _factory = new();
+    private readonly Dictionary<ushort, Func<AdsbDfMessageBase>> _factory = new();
     private int _readBytes;
     
     /// <summary>
@@ -69,6 +70,8 @@ public class AdsbMessageParser : DisposableOnce
     
     private readonly byte[] _frame = new byte[AdsbHelper.LongFrameLengthBytes];
     private int _msgLen;
+    private bool _first;
+    private int _firstValue;
 
     /// <summary>
     /// Registers a factory.
@@ -77,7 +80,7 @@ public class AdsbMessageParser : DisposableOnce
     public void Register(Func<AdsbDfMessageBase> factory)
     {
         var pkt = factory();
-        _factory.Add(pkt.DownlinkFormat, factory);
+        _factory.Add(pkt.Id, factory);
     }
 
     /// <summary>
@@ -89,7 +92,7 @@ public class AdsbMessageParser : DisposableOnce
     /// Notifies when a message is received.
     /// </summary>
     /// <param name="message">The received message.</param>
-    protected void InternalOnMessage(AdsbDfMessageBase message)
+    private void InternalOnMessage(AdsbDfMessageBase message)
     {
         _onMessageSubject.OnNext(message);
     }
@@ -100,7 +103,7 @@ public class AdsbMessageParser : DisposableOnce
     /// <param name="id">The ID of the packet.</param>
     /// <param name="data">The data of the packet.</param>
     /// <param name="ignoreReadNotAllData">Optional boolean that defaults to false. If true, does not check if all data was read.</param>
-    protected void ParsePacket(int id, ref ReadOnlySpan<byte> data, bool ignoreReadNotAllData = false)
+    private void ParsePacket(ushort id, ref ReadOnlySpan<byte> data, bool ignoreReadNotAllData = false)
     {
         if (!_factory.TryGetValue(id, out var factory))
         {
@@ -135,7 +138,35 @@ public class AdsbMessageParser : DisposableOnce
             PublishWhenReadNotAllDataWhenDeserializePacket(message.DownlinkFormat.ToString());
         }
     }
+    
+    private bool TryFormByte(byte mag, out byte result)
+    {
+        _readedBits++;
+        _stateByte |= (byte)(mag << (_readedBits % 2));
+        if (_readedBits % 2 == 0)
+        {
+            if ((_stateByte & 0b11) is 0b00 or 0b11)
+            {
+                Reset();
+                result = 0;
+                return false;
+            }
+            _currentByte <<= 1;
+            _currentByte |= (byte)((_stateByte & 0b11) == 0b01 ? 0 : 1);
+            _stateByte = 0;
+        }
 
+        if (_readedBits == 16)
+        {
+            result = _currentByte;
+            _readedBits = 0;
+            _currentByte = 0;
+            return true;
+        }
+
+        result = 0;
+        return false;
+    }
     /// <summary>
     /// Reads a bit of data.
     /// </summary>
@@ -177,51 +208,20 @@ public class AdsbMessageParser : DisposableOnce
                 }
                 break;
             case State.DFAndAC:
-                _readedBits++;
-                _stateByte |= (byte)(mag << (_readedBits % 2));
-                if (_readedBits % 2 == 0)
+                if (TryFormByte(mag, out var dfacByte))
                 {
-                    if (_stateByte is 0b00 or 0b11)
-                    {
-                        Reset();
-                        break;
-                    }
-                    _currentByte <<= 1;
-                    _currentByte |= (byte)((_stateByte & 0b11) == 0b01 ? 0 : 1);
-                    _stateByte = 0;
-                }
-                if (_readedBits == 16)
-                {
-                    _frame[_readedBytes] = _currentByte;
+                    _frame[_readedBytes] = dfacByte;
                     _readedBytes++;
-                    _readedBits = 0;
-                    _currentByte = 0;
-                    
                     var df = AdsbHelper.GetDownlinkFormat(new ReadOnlySpan<byte>(_frame)[.._readedBytes]);
                     _msgLen = AdsbHelper.GetMessageLength(df);
                     _state = State.Payload;
                 }
                 break;
             case State.Payload:
-                _readedBits++;
-                _stateByte |= (byte)(mag << (_readedBits % 2));
-                if (_readedBits % 2 == 0)
+                if (TryFormByte(mag, out var payloadByte))
                 {
-                    if (_stateByte is 0b00 or 0b11)
-                    {
-                        Reset();
-                        break;
-                    }
-                    _currentByte <<= 1;
-                    _currentByte |= (byte)((_stateByte & 0b11) == 0b01 ? 0 : 1);
-                    _stateByte = 0;
-                }
-                if (_readedBits == 16)
-                {
-                    _frame[_readedBytes] = _currentByte;
+                    _frame[_readedBytes] = payloadByte;
                     _readedBytes++;
-                    _readedBits = 0;
-                    _currentByte = 0;
                     if (_readedBytes == _msgLen - 3)
                     {
                         _state = State.Crc1;
@@ -229,25 +229,10 @@ public class AdsbMessageParser : DisposableOnce
                 }
                 break;
             case State.Crc1:
-                _readedBits++;
-                _stateByte |= (byte)(mag << (_readedBits % 2));
-                if (_readedBits % 2 == 0)
+                if (TryFormByte(mag, out var crc1Byte))
                 {
-                    if (_stateByte is 0b00 or 0b11)
-                    {
-                        Reset();
-                        break;
-                    }
-                    _currentByte <<= 1;
-                    _currentByte |= (byte)((_stateByte & 0b11) == 0b01 ? 0 : 1);
-                    _stateByte = 0;
-                }
-                if (_readedBits == 16)
-                {
-                    _frame[_readedBytes] = _currentByte;
+                    _frame[_readedBytes] = crc1Byte;
                     _readedBytes++;
-                    _readedBits = 0;
-                    _currentByte = 0;
                     if (_readedBytes == _msgLen - 2)
                     {
                         _state = State.Crc2;
@@ -255,25 +240,10 @@ public class AdsbMessageParser : DisposableOnce
                 }
                 break;
             case State.Crc2:
-                _readedBits++;
-                _stateByte |= (byte)(mag << (_readedBits % 2));
-                if (_readedBits % 2 == 0)
+                if (TryFormByte(mag, out var crc2Byte))
                 {
-                    if (_stateByte is 0b00 or 0b11)
-                    {
-                        Reset();
-                        break;
-                    }
-                    _currentByte <<= 1;
-                    _currentByte |= (byte)((_stateByte & 0b11) == 0b01 ? 0 : 1);
-                    _stateByte = 0;
-                }
-                if (_readedBits == 16)
-                {
-                    _frame[_readedBytes] = _currentByte;
+                    _frame[_readedBytes] = crc2Byte;
                     _readedBytes++;
-                    _readedBits = 0;
-                    _currentByte = 0;
                     if (_readedBytes == _msgLen - 1)
                     {
                         _state = State.Crc3;
@@ -281,35 +251,21 @@ public class AdsbMessageParser : DisposableOnce
                 }
                 break;
             case State.Crc3:
-                _readedBits++;
-                _stateByte |= (byte)(mag << (_readedBits % 2));
-                if (_readedBits % 2 == 0)
+                if (TryFormByte(mag, out var crc3Byte))
                 {
-                    if (_stateByte is 0b00 or 0b11)
-                    {
-                        Reset();
-                        break;
-                    }
-                    _currentByte <<= 1;
-                    _currentByte |= (byte)((_stateByte & 0b11) == 0b01 ? 0 : 1);
-                    _stateByte = 0;
-                }
-                if (_readedBits == 16)
-                {
-                    _frame[_readedBytes] = _currentByte;
+                    _frame[_readedBytes] = crc3Byte;
                     _readedBytes++;
-                    _readedBits = 0;
-                    _currentByte = 0;
                     if (_readedBytes == _msgLen)
                     {
                         var originalCrc = AdsbHelper.CalcCrc(_frame);
-                        var sourceCrc = (uint)(_frame[_msgLen - 3] << 16) | (uint)(_frame[_msgLen - 2] << 8) | _frame[_msgLen - 1];
+                        var sourceCrc = (uint)(_frame[_msgLen - 3] << 16) | (uint)(_frame[_msgLen - 2] << 8) |
+                                        _frame[_msgLen - 1];
                         if (originalCrc == sourceCrc)
                         {
-                            var df = AdsbHelper.GetDownlinkFormat(_frame);
-                            _onMessageRecev.OnNext($"Down link format: {df}");
+                            var id = AdsbHelper.GetMessageId(_frame);
+                            _onMessageRecev.OnNext($"Down link format: {(_frame[2] >> 3) & 0x1F}");
                             var span = new ReadOnlySpan<byte>(_frame, 0, _msgLen);
-                            ParsePacket(df, ref span, true);
+                            ParsePacket(id, ref span, true);
                             Reset();
                             return true;
                         }
@@ -328,7 +284,7 @@ public class AdsbMessageParser : DisposableOnce
     /// <summary>
     /// Resets the parser.
     /// </summary>
-    private void Reset()
+    public void Reset()
     {
         _state = State.Preamb1;
         _readedBits = 0;

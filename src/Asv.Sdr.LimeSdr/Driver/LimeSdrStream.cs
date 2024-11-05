@@ -29,13 +29,14 @@ namespace Asv.Sdr.LimeSdr
             Type = type;
             Channel = channel;
             _name = $"LMS stream {type:G}{channel}_{id}";
-            _factory = isThreadSafe ? new TaskFactory(new SingleThreadTaskScheduler(_name, priority: ThreadPriority.Highest).DisposeItWith(Disposable))
+            _factory = isThreadSafe ? new TaskFactory(new SingleThreadTaskScheduler(_name).DisposeItWith(Disposable))
                     : Task.Factory;
             LimeSdrDevice.Check(LMS_SetupStream(device, type == LmsChannel.Tx, DataFormat.LMS_FMT_F32, ref _stream, channel, bufferLength, throughputVsLatency),nameof(LMS_SetupStream));
             _meta = meta;
             _logger = logger;
             Disposable.AddAction(() =>
             {
+                _logger.ZLogInformation($"Destroy stream {type}[{channel}] {_name}");
                 if (_started) LimeSdrDevice.Check(LMS_StopStream(_stream), nameof(LMS_StopStream));
                 LimeSdrDevice.Check(LMS_DestroyStream(device, _stream),nameof(LMS_DestroyStream));
                 destroyStream(this).Wait();

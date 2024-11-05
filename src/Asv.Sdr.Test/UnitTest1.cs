@@ -2,8 +2,6 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using Asv.Sdr.Simulate;
-using Asv.Sdr.V2;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Xunit;
 using Xunit.Abstractions;
 
