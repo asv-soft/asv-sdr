@@ -187,9 +187,10 @@ namespace Asv.Sdr.LimeSdr
         {
             if (length is <= 0 or > 16) throw new Exception("Error length");
             var reg = await src.ReadFpgaRegister(address, cancel);
-            reg <<= sizeof(ushort) - length;
-            reg >>= index;
-            return reg;
+            var mask = ~(ushort)0u >> (sizeof(ushort) * 8 - length);
+            // reg <<= sizeof(ushort) - length;
+            // reg >>= index;
+            return (ushort)((reg >> index) & mask);
         }
     }
 }
