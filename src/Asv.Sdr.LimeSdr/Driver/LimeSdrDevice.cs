@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Asv.Common;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using ZLogger;
 
 using static Asv.Sdr.LimeSdr.NativeMethods;
@@ -66,10 +65,10 @@ namespace Asv.Sdr.LimeSdr
         private readonly List<ILmsStream> _streamList = new(4);
         private readonly bool _isThreadSafe;
         private readonly HashSet<string> _ignoreLogLmsParams;
-        private readonly ILogger? _logger;
+        private readonly ILogger _logger;
         
 
-        public LimeSdrDevice(string deviceId, bool isThreadSave = false, ILoggerFactory? logFactory = null)
+        public LimeSdrDevice(string deviceId, bool isThreadSave = true, ILoggerFactory? logFactory = null)
             :this(deviceId,isThreadSave,logFactory?.CreateLogger<LimeSdrDevice>() ?? LmsLogManager.GetLogger(nameof(LimeSdrDevice)),LimeSdrParams.LMS7_CAPSEL,LimeSdrParams.LMS7_CAPTURE)
         {
             
