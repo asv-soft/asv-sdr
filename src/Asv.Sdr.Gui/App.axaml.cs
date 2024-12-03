@@ -2,7 +2,6 @@ using System;
 using System.Composition.Convention;
 using System.Composition.Hosting;
 using Asv.Cfg;
-using Asv.Cfg.Json;
 using Asv.Sdr.LimeSdr;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
