@@ -1,4 +1,5 @@
 using System;
+using System.Reactive.Disposables;
 using Asv.Common;
 using Avalonia;
 using Avalonia.Controls;
@@ -19,7 +20,7 @@ public partial class AdsbTxView : ReactiveUserControl<AdsbTxViewModel>
             this.WhenAnyValue(x => x.ViewModel)
                 .WhereNotNull()
                 .Subscribe(x => x.InitCharts(AvaPlotLms,AvaPlotSh))
-                .DisposeItWith(disp);
+                .DisposeWith(disp);
 
         });
     }
