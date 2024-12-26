@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Asv.IO" Version="1.13.1" />
+      <PackageReference Include="Asv.IO" Version="$(AsvCommonVersion)" />
     </ItemGroup>
 
 </Project>

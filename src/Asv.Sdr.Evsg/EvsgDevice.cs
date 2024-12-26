@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Globalization;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Asv.Common;
 using Asv.IO;
+using R3;
 
 namespace Asv.Sdr.Evsg
 {
     public interface IEvsgDevice : IDisposable
     {
-        IRxValue<bool> IsConnected { get; }
+        ReadOnlyReactiveProperty<bool> IsConnected { get; }
         Task WaitConnected(CancellationToken cancel);
         Task<string> GetHostName(CancellationToken cancel);
         Task<double> GetDdm(CancellationToken cancel);
@@ -24,7 +23,7 @@ namespace Asv.Sdr.Evsg
     {
         private readonly TelnetStream _strm;
         private const int DefaultTimeoutMs = 3_000;
-        private readonly RxValue<bool> _isConnected = new();
+        private readonly ReactiveProperty<bool> _isConnected = new();
         private readonly IPort _port;
 
         public EvsgDevice(string connectionString)
@@ -33,10 +32,10 @@ namespace Asv.Sdr.Evsg
             _port.Enable();
             _strm = new TelnetStream(_port, Encoding.ASCII).DisposeItWith(Disposable);
             _isConnected.DisposeItWith(Disposable);
-            _port.State.Select(_ => _ == PortState.Connected).Subscribe(_isConnected).DisposeItWith(Disposable);
+            _port.State.Select(_ => _ == PortState.Connected).Subscribe(_isConnected.AsObserver()).DisposeItWith(Disposable);
         }
 
-        public IRxValue<bool> IsConnected => _isConnected;
+        public ReadOnlyReactiveProperty<bool> IsConnected => _isConnected;
 
         public async Task WaitConnected(CancellationToken cancel)
         {
@@ -79,9 +78,9 @@ namespace Asv.Sdr.Evsg
                 StopStream(CancellationToken.None).Wait(DefaultTimeoutMs);
                 StartIlsLocStream(CancellationToken.None).Wait(DefaultTimeoutMs);
                 return new CompositeDisposable(
-                    _strm.Select(_ => new EvsgIlsStreamData(_)).Subscribe(observer),
+                    _strm.OnReceive.Select(_ => new EvsgIlsStreamData(_)).Subscribe(observer),
                     System.Reactive.Disposables.Disposable.Create(() =>StopStream(CancellationToken.None).Wait(DefaultTimeoutMs)));
-            });
+            }).AsSystemObservable();
         }
     }
 

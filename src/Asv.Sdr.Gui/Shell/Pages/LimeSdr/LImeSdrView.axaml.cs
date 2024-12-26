@@ -1,4 +1,5 @@
 using System;
+using System.Reactive.Disposables;
 using Asv.Common;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
@@ -16,7 +17,7 @@ public partial class LimeSdrView : ReactiveUserControl<LimeSdrViewModel>
             this.WhenAnyValue(x => x.ViewModel)
                 .WhereNotNull()
                 .Subscribe(x => x.InitCharts(AvaPlotLms,AvaPlotSh))
-                .DisposeItWith(disp);
+                .DisposeWith(disp);
 
         });
     }

@@ -1,6 +1,6 @@
 using System;
-using System.Reactive.Disposables;
 using System.Threading;
+using R3;
 using ReactiveUI;
 
 namespace Asv.Sdr.Gui
