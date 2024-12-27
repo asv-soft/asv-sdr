@@ -6,7 +6,7 @@ using Asv.Common;
 
 namespace Asv.Sdr
 {
-    public abstract class ReaderIqZipSubject<TIn1, TIn2, TOut> : ReaderIqSubject<TOut>, IReaderIqSubject<TOut>
+    public abstract class ReaderIqZipSubject<TIn1, TIn2, TOut> : ReaderIqSubject<TOut>
     {
         private readonly AutoResetEvent _autoEvent = new(false);
         private int _flag1;
@@ -14,17 +14,25 @@ namespace Asv.Sdr
         private Memory<TIn1>? _memory1;
         private Memory<TIn2>? _memory2;
 
-        protected ReaderIqZipSubject(IReaderIqSubject<TIn1> input1, IReaderIqSubject<TIn2> input2, int size,
-            bool useArrayPool):base(size, useArrayPool)
+        protected ReaderIqZipSubject(
+            IReaderIqSubject<TIn1> input1,
+            IReaderIqSubject<TIn2> input2,
+            int size,
+            bool useArrayPool
+        )
+            : base(size, useArrayPool)
         {
             input1.Subscribe(OnData1).DisposeItWith(Disposable);
             input2.Subscribe(OnData2).DisposeItWith(Disposable);
-            
         }
 
         private void OnData1(Memory<TIn1> memory)
         {
-            if (Interlocked.CompareExchange(ref _flag1,1,0) !=0) return;
+            if (Interlocked.CompareExchange(ref _flag1, 1, 0) != 0)
+            {
+                return;
+            }
+
             _memory1 = memory;
             if (_memory2.HasValue == false)
             {
@@ -32,17 +40,22 @@ namespace Asv.Sdr
             }
             else
             {
-                Process(_memory1.Value.Span, _memory2.Value.Span,Memory.Span);
+                Process(_memory1.Value.Span, _memory2.Value.Span, Memory.Span);
                 _memory1 = null;
                 _memory2 = null;
                 _autoEvent.Set();
             }
+
             Interlocked.Exchange(ref _flag1, 0);
         }
 
         private void OnData2(Memory<TIn2> memory)
         {
-            if (Interlocked.CompareExchange(ref _flag2, 1, 0) != 0) return;
+            if (Interlocked.CompareExchange(ref _flag2, 1, 0) != 0)
+            {
+                return;
+            }
+
             _memory2 = memory;
             if (_memory1.HasValue == false)
             {
@@ -56,31 +69,51 @@ namespace Asv.Sdr
                 _memory2 = null;
                 _autoEvent.Set();
             }
+
             Interlocked.Exchange(ref _flag2, 0);
         }
 
-        protected abstract void Process(ReadOnlySpan<TIn1> input1, ReadOnlySpan<TIn2> input2, Span<TOut> output);
-
+        protected abstract void Process(
+            ReadOnlySpan<TIn1> input1,
+            ReadOnlySpan<TIn2> input2,
+            Span<TOut> output
+        );
     }
 
-    public delegate void ProcessDelegate<TIn1, TIn2, TOut>(ReadOnlySpan<TIn1> input1, ReadOnlySpan<TIn2> input2, Span<TOut> output);
+    public delegate void ProcessDelegate<TIn1, TIn2, TOut>(
+        ReadOnlySpan<TIn1> input1,
+        ReadOnlySpan<TIn2> input2,
+        Span<TOut> output
+    );
 
     public class ReaderIqZipSubjectCallback<TIn1, TIn2, TOut> : ReaderIqZipSubject<TIn1, TIn2, TOut>
     {
         private readonly ProcessDelegate<TIn1, TIn2, TOut> _processCallback;
 
-        public ReaderIqZipSubjectCallback(IReaderIqSubject<TIn1> input1, IReaderIqSubject<TIn2> input2, int outputSize, ProcessDelegate<TIn1, TIn2, TOut> processCallback, bool useArrayPool) : base(input1, input2, outputSize, useArrayPool)
+        public ReaderIqZipSubjectCallback(
+            IReaderIqSubject<TIn1> input1,
+            IReaderIqSubject<TIn2> input2,
+            int outputSize,
+            ProcessDelegate<TIn1, TIn2, TOut> processCallback,
+            bool useArrayPool
+        )
+            : base(input1, input2, outputSize, useArrayPool)
         {
-            _processCallback = processCallback ?? throw new ArgumentNullException(nameof(processCallback));
+            _processCallback =
+                processCallback ?? throw new ArgumentNullException(nameof(processCallback));
         }
 
-        protected override void Process(ReadOnlySpan<TIn1> input1, ReadOnlySpan<TIn2> input2, Span<TOut> output)
+        protected override void Process(
+            ReadOnlySpan<TIn1> input1,
+            ReadOnlySpan<TIn2> input2,
+            Span<TOut> output
+        )
         {
             _processCallback(input1, input2, output);
         }
     }
 
-    public class ReaderIqParallelSubject<T>:DisposableOnceWithCancel, IReaderIqSubject<T>
+    public class ReaderIqParallelSubject<T> : DisposableOnceWithCancel, IReaderIqSubject<T>
     {
         private readonly IReaderIqSubject<T> _source;
         private readonly ReaderWriterLockSlim _rwLock = new(LockRecursionPolicy.NoRecursion);
@@ -103,8 +136,14 @@ namespace Asv.Sdr
                 for (var i = 0; i < parallelTasks.Length; i++)
                 {
                     var i1 = i;
-                    parallelTasks[i] = Task.Factory.StartNew(() =>_subscribers[i1].OnNext(memory),DisposeCancel, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                    parallelTasks[i] = Task.Factory.StartNew(
+                        () => _subscribers[i1].OnNext(memory),
+                        DisposeCancel,
+                        TaskCreationOptions.LongRunning,
+                        TaskScheduler.Default
+                    );
                 }
+
                 Task.WaitAll(parallelTasks, DisposeCancel);
             }
             finally
@@ -124,6 +163,7 @@ namespace Asv.Sdr
             {
                 _rwLock.ExitWriteLock();
             }
+
             return System.Reactive.Disposables.Disposable.Create(() =>
             {
                 InternalUnsubscribe(observer);

@@ -17,9 +17,11 @@ namespace Asv.Sdr
         private void OnData(Memory<TIn> buffer)
         {
             var result = Process(buffer.Span, out var selfPublish);
-            if (selfPublish == false) Publish(result);
+            if (!selfPublish)
+            {
+                Publish(result);
+            }
         }
-
 
         protected override void InternalDisposeOnce()
         {

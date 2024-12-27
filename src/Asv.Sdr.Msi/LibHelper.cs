@@ -7,13 +7,12 @@ namespace Asv.Sdr.Msi
 {
     public static class LibHelper
     {
-
         public enum OperatingSystem
         {
             Undefined,
             Windows,
             Linux,
-            MacOsX
+            MacOsX,
         }
 
         public static void CheckLibraryFiles()
@@ -27,17 +26,24 @@ namespace Asv.Sdr.Msi
                     var dllDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "lib");
                     Console.WriteLine($"Dll directory: {dllDir}");
                     if (!SetDllDirectory(dllDir))
-                        throw new Win32Exception($"Error to execute kernel32.dll:SetDllDirectory({dllDir})");
-                    if (!Directory.Exists(dllDir)) Directory.CreateDirectory(dllDir);
+                    {
+                        throw new Win32Exception(
+                            $"Error to execute kernel32.dll:SetDllDirectory({dllDir})"
+                        );
+                    }
+
+                    if (!Directory.Exists(dllDir))
+                    {
+                        Directory.CreateDirectory(dllDir);
+                    }
+
                     if (Environment.Is64BitOperatingSystem)
                     {
                         CheckFile(Path.Combine(dllDir, "mirsdrapi-rsp.dll"), Libs.x64_mir_sdr_api);
                         return;
                     }
-                    else
-                    {
-                        CheckFile(Path.Combine(dllDir, "mirsdrapi-rsp.dll"), Libs.x86_mir_sdr_api);
-                    }
+
+                    CheckFile(Path.Combine(dllDir, "mirsdrapi-rsp.dll"), Libs.x86_mir_sdr_api);
                     break;
                 case OperatingSystem.Linux:
                     break;
@@ -50,9 +56,11 @@ namespace Asv.Sdr.Msi
 
         private static void CheckFile(string path, byte[] data)
         {
-            if (!File.Exists(path)) File.WriteAllBytes(path, data);
+            if (!File.Exists(path))
+            {
+                File.WriteAllBytes(path, data);
+            }
         }
-
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool SetDllDirectory(string path);
@@ -60,7 +68,10 @@ namespace Asv.Sdr.Msi
         private static OperatingSystem DetectPlatform()
         {
             var windir = Environment.GetEnvironmentVariable("windir");
-            if (!string.IsNullOrEmpty(windir) && windir.Contains(@"\") && Directory.Exists(windir)) return OperatingSystem.Windows;
+            if (!string.IsNullOrEmpty(windir) && windir.Contains(@"\") && Directory.Exists(windir))
+            {
+                return OperatingSystem.Windows;
+            }
 
             if (File.Exists(@"/proc/sys/kernel/ostype"))
             {
@@ -74,6 +85,5 @@ namespace Asv.Sdr.Msi
                 ? OperatingSystem.MacOsX
                 : OperatingSystem.Undefined;
         }
-
     }
 }

@@ -5,7 +5,7 @@ Copyright (c) Sergey Bochkanov (ALGLIB project).
 >>> SOURCE LICENSE >>>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation (www.fsf.org); either version 2 of the 
+the Free Software Foundation (www.fsf.org); either version 2 of the
 License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -17,15 +17,11 @@ A copy of the GNU General Public License is available at
 http://www.fsf.org/licensing/licenses
 >>> END OF LICENSE >>>
 *************************************************************************/
-#pragma warning disable 162
-#pragma warning disable 164
-#pragma warning disable 219
+#pragma warning disable
 using System;
 
-public partial class alglib
+public partial class Alglib
 {
-
-    
     /*************************************************************************
     Computation of nodes and weights for a Gauss quadrature formula
 
@@ -62,22 +58,39 @@ public partial class alglib
       -- ALGLIB --
          Copyright 2005-2009 by Bochkanov Sergey
     *************************************************************************/
-    public static void gqgeneraterec(double[] alpha, double[] beta, double mu0, int n, out int info, out double[] x, out double[] w)
+    public static void gqgeneraterec(
+        double[] alpha,
+        double[] beta,
+        double mu0,
+        int n,
+        out int info,
+        out double[] x,
+        out double[] w
+    )
     {
         info = 0;
         x = new double[0];
         w = new double[0];
         gq.gqgeneraterec(alpha, beta, mu0, n, ref info, ref x, ref w, null);
     }
-    
-    public static void gqgeneraterec(double[] alpha, double[] beta, double mu0, int n, out int info, out double[] x, out double[] w, alglib.xparams _params)
+
+    public static void gqgeneraterec(
+        double[] alpha,
+        double[] beta,
+        double mu0,
+        int n,
+        out int info,
+        out double[] x,
+        out double[] w,
+        Alglib.xparams _params
+    )
     {
         info = 0;
         x = new double[0];
         w = new double[0];
         gq.gqgeneraterec(alpha, beta, mu0, n, ref info, ref x, ref w, _params);
     }
-    
+
     /*************************************************************************
     Computation of nodes and weights for a Gauss-Lobatto quadrature formula
 
@@ -117,22 +130,43 @@ public partial class alglib
       -- ALGLIB --
          Copyright 2005-2009 by Bochkanov Sergey
     *************************************************************************/
-    public static void gqgenerategausslobattorec(double[] alpha, double[] beta, double mu0, double a, double b, int n, out int info, out double[] x, out double[] w)
+    public static void gqgenerategausslobattorec(
+        double[] alpha,
+        double[] beta,
+        double mu0,
+        double a,
+        double b,
+        int n,
+        out int info,
+        out double[] x,
+        out double[] w
+    )
     {
         info = 0;
         x = new double[0];
         w = new double[0];
         gq.gqgenerategausslobattorec(alpha, beta, mu0, a, b, n, ref info, ref x, ref w, null);
     }
-    
-    public static void gqgenerategausslobattorec(double[] alpha, double[] beta, double mu0, double a, double b, int n, out int info, out double[] x, out double[] w, alglib.xparams _params)
+
+    public static void gqgenerategausslobattorec(
+        double[] alpha,
+        double[] beta,
+        double mu0,
+        double a,
+        double b,
+        int n,
+        out int info,
+        out double[] x,
+        out double[] w,
+        Alglib.xparams _params
+    )
     {
         info = 0;
         x = new double[0];
         w = new double[0];
         gq.gqgenerategausslobattorec(alpha, beta, mu0, a, b, n, ref info, ref x, ref w, _params);
     }
-    
+
     /*************************************************************************
     Computation of nodes and weights for a Gauss-Radau quadrature formula
 
@@ -172,22 +206,41 @@ public partial class alglib
       -- ALGLIB --
          Copyright 2005-2009 by Bochkanov Sergey
     *************************************************************************/
-    public static void gqgenerategaussradaurec(double[] alpha, double[] beta, double mu0, double a, int n, out int info, out double[] x, out double[] w)
+    public static void gqgenerategaussradaurec(
+        double[] alpha,
+        double[] beta,
+        double mu0,
+        double a,
+        int n,
+        out int info,
+        out double[] x,
+        out double[] w
+    )
     {
         info = 0;
         x = new double[0];
         w = new double[0];
         gq.gqgenerategaussradaurec(alpha, beta, mu0, a, n, ref info, ref x, ref w, null);
     }
-    
-    public static void gqgenerategaussradaurec(double[] alpha, double[] beta, double mu0, double a, int n, out int info, out double[] x, out double[] w, alglib.xparams _params)
+
+    public static void gqgenerategaussradaurec(
+        double[] alpha,
+        double[] beta,
+        double mu0,
+        double a,
+        int n,
+        out int info,
+        out double[] x,
+        out double[] w,
+        Alglib.xparams _params
+    )
     {
         info = 0;
         x = new double[0];
         w = new double[0];
         gq.gqgenerategaussradaurec(alpha, beta, mu0, a, n, ref info, ref x, ref w, _params);
     }
-    
+
     /*************************************************************************
     Returns nodes/weights for Gauss-Legendre quadrature on [-1,1] with N
     nodes.
@@ -219,15 +272,21 @@ public partial class alglib
         w = new double[0];
         gq.gqgenerategausslegendre(n, ref info, ref x, ref w, null);
     }
-    
-    public static void gqgenerategausslegendre(int n, out int info, out double[] x, out double[] w, alglib.xparams _params)
+
+    public static void gqgenerategausslegendre(
+        int n,
+        out int info,
+        out double[] x,
+        out double[] w,
+        Alglib.xparams _params
+    )
     {
         info = 0;
         x = new double[0];
         w = new double[0];
         gq.gqgenerategausslegendre(n, ref info, ref x, ref w, _params);
     }
-    
+
     /*************************************************************************
     Returns  nodes/weights  for  Gauss-Jacobi quadrature on [-1,1] with weight
     function W(x)=Power(1-x,Alpha)*Power(1+x,Beta).
@@ -255,22 +314,37 @@ public partial class alglib
       -- ALGLIB --
          Copyright 12.05.2009 by Bochkanov Sergey
     *************************************************************************/
-    public static void gqgenerategaussjacobi(int n, double alpha, double beta, out int info, out double[] x, out double[] w)
+    public static void gqgenerategaussjacobi(
+        int n,
+        double alpha,
+        double beta,
+        out int info,
+        out double[] x,
+        out double[] w
+    )
     {
         info = 0;
         x = new double[0];
         w = new double[0];
         gq.gqgenerategaussjacobi(n, alpha, beta, ref info, ref x, ref w, null);
     }
-    
-    public static void gqgenerategaussjacobi(int n, double alpha, double beta, out int info, out double[] x, out double[] w, alglib.xparams _params)
+
+    public static void gqgenerategaussjacobi(
+        int n,
+        double alpha,
+        double beta,
+        out int info,
+        out double[] x,
+        out double[] w,
+        Alglib.xparams _params
+    )
     {
         info = 0;
         x = new double[0];
         w = new double[0];
         gq.gqgenerategaussjacobi(n, alpha, beta, ref info, ref x, ref w, _params);
     }
-    
+
     /*************************************************************************
     Returns  nodes/weights  for  Gauss-Laguerre  quadrature  on  [0,+inf) with
     weight function W(x)=Power(x,Alpha)*Exp(-x)
@@ -297,22 +371,35 @@ public partial class alglib
       -- ALGLIB --
          Copyright 12.05.2009 by Bochkanov Sergey
     *************************************************************************/
-    public static void gqgenerategausslaguerre(int n, double alpha, out int info, out double[] x, out double[] w)
+    public static void gqgenerategausslaguerre(
+        int n,
+        double alpha,
+        out int info,
+        out double[] x,
+        out double[] w
+    )
     {
         info = 0;
         x = new double[0];
         w = new double[0];
         gq.gqgenerategausslaguerre(n, alpha, ref info, ref x, ref w, null);
     }
-    
-    public static void gqgenerategausslaguerre(int n, double alpha, out int info, out double[] x, out double[] w, alglib.xparams _params)
+
+    public static void gqgenerategausslaguerre(
+        int n,
+        double alpha,
+        out int info,
+        out double[] x,
+        out double[] w,
+        Alglib.xparams _params
+    )
     {
         info = 0;
         x = new double[0];
         w = new double[0];
         gq.gqgenerategausslaguerre(n, alpha, ref info, ref x, ref w, _params);
     }
-    
+
     /*************************************************************************
     Returns  nodes/weights  for  Gauss-Hermite  quadrature on (-inf,+inf) with
     weight function W(x)=Exp(-x*x)
@@ -343,20 +430,24 @@ public partial class alglib
         w = new double[0];
         gq.gqgenerategausshermite(n, ref info, ref x, ref w, null);
     }
-    
-    public static void gqgenerategausshermite(int n, out int info, out double[] x, out double[] w, alglib.xparams _params)
+
+    public static void gqgenerategausshermite(
+        int n,
+        out int info,
+        out double[] x,
+        out double[] w,
+        Alglib.xparams _params
+    )
     {
         info = 0;
         x = new double[0];
         w = new double[0];
         gq.gqgenerategausshermite(n, ref info, ref x, ref w, _params);
     }
-
 }
-public partial class alglib
-{
 
-    
+public partial class Alglib
+{
     /*************************************************************************
     Computation of nodes and weights of a Gauss-Kronrod quadrature formula
 
@@ -403,7 +494,16 @@ public partial class alglib
       -- ALGLIB --
          Copyright 08.05.2009 by Bochkanov Sergey
     *************************************************************************/
-    public static void gkqgeneraterec(double[] alpha, double[] beta, double mu0, int n, out int info, out double[] x, out double[] wkronrod, out double[] wgauss)
+    public static void gkqgeneraterec(
+        double[] alpha,
+        double[] beta,
+        double mu0,
+        int n,
+        out int info,
+        out double[] x,
+        out double[] wkronrod,
+        out double[] wgauss
+    )
     {
         info = 0;
         x = new double[0];
@@ -411,8 +511,18 @@ public partial class alglib
         wgauss = new double[0];
         gkq.gkqgeneraterec(alpha, beta, mu0, n, ref info, ref x, ref wkronrod, ref wgauss, null);
     }
-    
-    public static void gkqgeneraterec(double[] alpha, double[] beta, double mu0, int n, out int info, out double[] x, out double[] wkronrod, out double[] wgauss, alglib.xparams _params)
+
+    public static void gkqgeneraterec(
+        double[] alpha,
+        double[] beta,
+        double mu0,
+        int n,
+        out int info,
+        out double[] x,
+        out double[] wkronrod,
+        out double[] wgauss,
+        Alglib.xparams _params
+    )
     {
         info = 0;
         x = new double[0];
@@ -420,7 +530,7 @@ public partial class alglib
         wgauss = new double[0];
         gkq.gkqgeneraterec(alpha, beta, mu0, n, ref info, ref x, ref wkronrod, ref wgauss, _params);
     }
-    
+
     /*************************************************************************
     Returns   Gauss   and   Gauss-Kronrod   nodes/weights  for  Gauss-Legendre
     quadrature with N points.
@@ -450,7 +560,13 @@ public partial class alglib
       -- ALGLIB --
          Copyright 12.05.2009 by Bochkanov Sergey
     *************************************************************************/
-    public static void gkqgenerategausslegendre(int n, out int info, out double[] x, out double[] wkronrod, out double[] wgauss)
+    public static void gkqgenerategausslegendre(
+        int n,
+        out int info,
+        out double[] x,
+        out double[] wkronrod,
+        out double[] wgauss
+    )
     {
         info = 0;
         x = new double[0];
@@ -458,8 +574,15 @@ public partial class alglib
         wgauss = new double[0];
         gkq.gkqgenerategausslegendre(n, ref info, ref x, ref wkronrod, ref wgauss, null);
     }
-    
-    public static void gkqgenerategausslegendre(int n, out int info, out double[] x, out double[] wkronrod, out double[] wgauss, alglib.xparams _params)
+
+    public static void gkqgenerategausslegendre(
+        int n,
+        out int info,
+        out double[] x,
+        out double[] wkronrod,
+        out double[] wgauss,
+        Alglib.xparams _params
+    )
     {
         info = 0;
         x = new double[0];
@@ -467,7 +590,7 @@ public partial class alglib
         wgauss = new double[0];
         gkq.gkqgenerategausslegendre(n, ref info, ref x, ref wkronrod, ref wgauss, _params);
     }
-    
+
     /*************************************************************************
     Returns   Gauss   and   Gauss-Kronrod   nodes/weights   for   Gauss-Jacobi
     quadrature on [-1,1] with weight function
@@ -504,7 +627,15 @@ public partial class alglib
       -- ALGLIB --
          Copyright 12.05.2009 by Bochkanov Sergey
     *************************************************************************/
-    public static void gkqgenerategaussjacobi(int n, double alpha, double beta, out int info, out double[] x, out double[] wkronrod, out double[] wgauss)
+    public static void gkqgenerategaussjacobi(
+        int n,
+        double alpha,
+        double beta,
+        out int info,
+        out double[] x,
+        out double[] wkronrod,
+        out double[] wgauss
+    )
     {
         info = 0;
         x = new double[0];
@@ -512,16 +643,34 @@ public partial class alglib
         wgauss = new double[0];
         gkq.gkqgenerategaussjacobi(n, alpha, beta, ref info, ref x, ref wkronrod, ref wgauss, null);
     }
-    
-    public static void gkqgenerategaussjacobi(int n, double alpha, double beta, out int info, out double[] x, out double[] wkronrod, out double[] wgauss, alglib.xparams _params)
+
+    public static void gkqgenerategaussjacobi(
+        int n,
+        double alpha,
+        double beta,
+        out int info,
+        out double[] x,
+        out double[] wkronrod,
+        out double[] wgauss,
+        Alglib.xparams _params
+    )
     {
         info = 0;
         x = new double[0];
         wkronrod = new double[0];
         wgauss = new double[0];
-        gkq.gkqgenerategaussjacobi(n, alpha, beta, ref info, ref x, ref wkronrod, ref wgauss, _params);
+        gkq.gkqgenerategaussjacobi(
+            n,
+            alpha,
+            beta,
+            ref info,
+            ref x,
+            ref wkronrod,
+            ref wgauss,
+            _params
+        );
     }
-    
+
     /*************************************************************************
     Returns Gauss and Gauss-Kronrod nodes for quadrature with N points.
 
@@ -548,7 +697,13 @@ public partial class alglib
       -- ALGLIB --
          Copyright 12.05.2009 by Bochkanov Sergey
     *************************************************************************/
-    public static void gkqlegendrecalc(int n, out int info, out double[] x, out double[] wkronrod, out double[] wgauss)
+    public static void gkqlegendrecalc(
+        int n,
+        out int info,
+        out double[] x,
+        out double[] wkronrod,
+        out double[] wgauss
+    )
     {
         info = 0;
         x = new double[0];
@@ -556,8 +711,15 @@ public partial class alglib
         wgauss = new double[0];
         gkq.gkqlegendrecalc(n, ref info, ref x, ref wkronrod, ref wgauss, null);
     }
-    
-    public static void gkqlegendrecalc(int n, out int info, out double[] x, out double[] wkronrod, out double[] wgauss, alglib.xparams _params)
+
+    public static void gkqlegendrecalc(
+        int n,
+        out int info,
+        out double[] x,
+        out double[] wkronrod,
+        out double[] wgauss,
+        Alglib.xparams _params
+    )
     {
         info = 0;
         x = new double[0];
@@ -565,7 +727,7 @@ public partial class alglib
         wgauss = new double[0];
         gkq.gkqlegendrecalc(n, ref info, ref x, ref wkronrod, ref wgauss, _params);
     }
-    
+
     /*************************************************************************
     Returns Gauss and Gauss-Kronrod nodes for quadrature with N  points  using
     pre-calculated table. Nodes/weights were  computed  with  accuracy  up  to
@@ -588,7 +750,13 @@ public partial class alglib
       -- ALGLIB --
          Copyright 12.05.2009 by Bochkanov Sergey
     *************************************************************************/
-    public static void gkqlegendretbl(int n, out double[] x, out double[] wkronrod, out double[] wgauss, out double eps)
+    public static void gkqlegendretbl(
+        int n,
+        out double[] x,
+        out double[] wkronrod,
+        out double[] wgauss,
+        out double eps
+    )
     {
         x = new double[0];
         wkronrod = new double[0];
@@ -596,8 +764,15 @@ public partial class alglib
         eps = 0;
         gkq.gkqlegendretbl(n, ref x, ref wkronrod, ref wgauss, ref eps, null);
     }
-    
-    public static void gkqlegendretbl(int n, out double[] x, out double[] wkronrod, out double[] wgauss, out double eps, alglib.xparams _params)
+
+    public static void gkqlegendretbl(
+        int n,
+        out double[] x,
+        out double[] wkronrod,
+        out double[] wgauss,
+        out double eps,
+        Alglib.xparams _params
+    )
     {
         x = new double[0];
         wkronrod = new double[0];
@@ -605,12 +780,10 @@ public partial class alglib
         eps = 0;
         gkq.gkqlegendretbl(n, ref x, ref wkronrod, ref wgauss, ref eps, _params);
     }
-
 }
-public partial class alglib
+
+public partial class Alglib
 {
-
-
     /*************************************************************************
     Integration report:
     * TerminationType = completetion code:
@@ -627,32 +800,47 @@ public partial class alglib
         //
         // Public declarations
         //
-        public int terminationtype { get { return _innerobj.terminationtype; } set { _innerobj.terminationtype = value; } }
-        public int nfev { get { return _innerobj.nfev; } set { _innerobj.nfev = value; } }
-        public int nintervals { get { return _innerobj.nintervals; } set { _innerobj.nintervals = value; } }
-    
+        public int terminationtype
+        {
+            get { return _innerobj.terminationtype; }
+            set { _innerobj.terminationtype = value; }
+        }
+        public int nfev
+        {
+            get { return _innerobj.nfev; }
+            set { _innerobj.nfev = value; }
+        }
+        public int nintervals
+        {
+            get { return _innerobj.nintervals; }
+            set { _innerobj.nintervals = value; }
+        }
+
         public autogkreport()
         {
             _innerobj = new autogk.autogkreport();
         }
-        
-        public override alglib.alglibobject make_copy()
+
+        public override Alglib.alglibobject make_copy()
         {
             return new autogkreport((autogk.autogkreport)_innerobj.make_copy());
         }
-    
+
         //
         // Although some of declarations below are public, you should not use them
         // They are intended for internal use only
         //
         private autogk.autogkreport _innerobj;
-        public autogk.autogkreport innerobj { get { return _innerobj; } }
+        public autogk.autogkreport innerobj
+        {
+            get { return _innerobj; }
+        }
+
         public autogkreport(autogk.autogkreport obj)
         {
             _innerobj = obj;
         }
     }
-
 
     /*************************************************************************
     This structure stores state of the integration algorithm.
@@ -668,34 +856,58 @@ public partial class alglib
         //
         // Public declarations
         //
-        public bool needf { get { return _innerobj.needf; } set { _innerobj.needf = value; } }
-        public double x { get { return _innerobj.x; } set { _innerobj.x = value; } }
-        public double xminusa { get { return _innerobj.xminusa; } set { _innerobj.xminusa = value; } }
-        public double bminusx { get { return _innerobj.bminusx; } set { _innerobj.bminusx = value; } }
-        public double f { get { return _innerobj.f; } set { _innerobj.f = value; } }
-    
+        public bool needf
+        {
+            get { return _innerobj.needf; }
+            set { _innerobj.needf = value; }
+        }
+        public double x
+        {
+            get { return _innerobj.x; }
+            set { _innerobj.x = value; }
+        }
+        public double xminusa
+        {
+            get { return _innerobj.xminusa; }
+            set { _innerobj.xminusa = value; }
+        }
+        public double bminusx
+        {
+            get { return _innerobj.bminusx; }
+            set { _innerobj.bminusx = value; }
+        }
+        public double f
+        {
+            get { return _innerobj.f; }
+            set { _innerobj.f = value; }
+        }
+
         public autogkstate()
         {
             _innerobj = new autogk.autogkstate();
         }
-        
-        public override alglib.alglibobject make_copy()
+
+        public override Alglib.alglibobject make_copy()
         {
             return new autogkstate((autogk.autogkstate)_innerobj.make_copy());
         }
-    
+
         //
         // Although some of declarations below are public, you should not use them
         // They are intended for internal use only
         //
         private autogk.autogkstate _innerobj;
-        public autogk.autogkstate innerobj { get { return _innerobj; } }
+        public autogk.autogkstate innerobj
+        {
+            get { return _innerobj; }
+        }
+
         public autogkstate(autogk.autogkstate obj)
         {
             _innerobj = obj;
         }
     }
-    
+
     /*************************************************************************
     Integration of a smooth function F(x) on a finite interval [a,b].
 
@@ -727,13 +939,18 @@ public partial class alglib
         state = new autogkstate();
         autogk.autogksmooth(a, b, state.innerobj, null);
     }
-    
-    public static void autogksmooth(double a, double b, out autogkstate state, alglib.xparams _params)
+
+    public static void autogksmooth(
+        double a,
+        double b,
+        out autogkstate state,
+        Alglib.xparams _params
+    )
     {
         state = new autogkstate();
         autogk.autogksmooth(a, b, state.innerobj, _params);
     }
-    
+
     /*************************************************************************
     Integration of a smooth function F(x) on a finite interval [a,b].
 
@@ -762,13 +979,19 @@ public partial class alglib
         state = new autogkstate();
         autogk.autogksmoothw(a, b, xwidth, state.innerobj, null);
     }
-    
-    public static void autogksmoothw(double a, double b, double xwidth, out autogkstate state, alglib.xparams _params)
+
+    public static void autogksmoothw(
+        double a,
+        double b,
+        double xwidth,
+        out autogkstate state,
+        Alglib.xparams _params
+    )
     {
         state = new autogkstate();
         autogk.autogksmoothw(a, b, xwidth, state.innerobj, _params);
     }
-    
+
     /*************************************************************************
     Integration on a finite interval [A,B].
     Integrand have integrable singularities at A/B.
@@ -801,18 +1024,31 @@ public partial class alglib
       -- ALGLIB --
          Copyright 06.05.2009 by Bochkanov Sergey
     *************************************************************************/
-    public static void autogksingular(double a, double b, double alpha, double beta, out autogkstate state)
+    public static void autogksingular(
+        double a,
+        double b,
+        double alpha,
+        double beta,
+        out autogkstate state
+    )
     {
         state = new autogkstate();
         autogk.autogksingular(a, b, alpha, beta, state.innerobj, null);
     }
-    
-    public static void autogksingular(double a, double b, double alpha, double beta, out autogkstate state, alglib.xparams _params)
+
+    public static void autogksingular(
+        double a,
+        double b,
+        double alpha,
+        double beta,
+        out autogkstate state,
+        Alglib.xparams _params
+    )
     {
         state = new autogkstate();
         autogk.autogksingular(a, b, alpha, beta, state.innerobj, _params);
     }
-    
+
     /*************************************************************************
     This function provides reverse communication interface
     Reverse communication interface is not documented or recommended to use.
@@ -820,16 +1056,13 @@ public partial class alglib
     *************************************************************************/
     public static bool autogkiteration(autogkstate state)
     {
-    
         return autogk.autogkiteration(state.innerobj, null);
     }
-    
-    public static bool autogkiteration(autogkstate state, alglib.xparams _params)
+
+    public static bool autogkiteration(autogkstate state, Alglib.xparams _params)
     {
-    
         return autogk.autogkiteration(state.innerobj, _params);
     }
-
 
     /*************************************************************************
     This function is used to launcn iterations of ODE solver
@@ -847,22 +1080,33 @@ public partial class alglib
     {
         autogkintegrate(state, func, obj, null);
     }
-        
-    public static void autogkintegrate(autogkstate state, integrator1_func func, object obj, alglib.xparams _params)
+
+    public static void autogkintegrate(
+        autogkstate state,
+        integrator1_func func,
+        object obj,
+        Alglib.xparams _params
+    )
     {
-        if( func==null )
+        if (func == null)
             throw new alglibexception("ALGLIB: error in 'autogkintegrate()' (func is null)");
-        while( alglib.autogkiteration(state, _params) )
+        while (Alglib.autogkiteration(state, _params))
         {
-            if( state.needf )
+            if (state.needf)
             {
-                func(state.innerobj.x, state.innerobj.xminusa, state.innerobj.bminusx, ref state.innerobj.f, obj);
+                func(
+                    state.innerobj.x,
+                    state.innerobj.xminusa,
+                    state.innerobj.bminusx,
+                    ref state.innerobj.f,
+                    obj
+                );
                 continue;
             }
             throw new alglibexception("ALGLIB: unexpected error in 'autogksolve'");
         }
     }
-    
+
     /*************************************************************************
     Adaptive integration results
 
@@ -884,16 +1128,21 @@ public partial class alglib
         rep = new autogkreport();
         autogk.autogkresults(state.innerobj, ref v, rep.innerobj, null);
     }
-    
-    public static void autogkresults(autogkstate state, out double v, out autogkreport rep, alglib.xparams _params)
+
+    public static void autogkresults(
+        autogkstate state,
+        out double v,
+        out autogkreport rep,
+        Alglib.xparams _params
+    )
     {
         v = 0;
         rep = new autogkreport();
         autogk.autogkresults(state.innerobj, ref v, rep.innerobj, _params);
     }
-
 }
-public partial class alglib
+
+public partial class Alglib
 {
     public class gq
     {
@@ -933,69 +1182,70 @@ public partial class alglib
           -- ALGLIB --
              Copyright 2005-2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void gqgeneraterec(double[] alpha,
+        public static void gqgeneraterec(
+            double[] alpha,
             double[] beta,
             double mu0,
             int n,
             ref int info,
             ref double[] x,
             ref double[] w,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             double[] d = new double[0];
             double[] e = new double[0];
-            double[,] z = new double[0,0];
+            double[,] z = new double[0, 0];
 
             info = 0;
             x = new double[0];
             w = new double[0];
 
-            if( n<1 )
+            if (n < 1)
             {
                 info = -1;
                 return;
             }
             info = 1;
-            
+
             //
             // Initialize
             //
             d = new double[n];
             e = new double[n];
-            for(i=1; i<=n-1; i++)
+            for (i = 1; i <= n - 1; i++)
             {
-                d[i-1] = alpha[i-1];
-                if( (double)(beta[i])<=(double)(0) )
+                d[i - 1] = alpha[i - 1];
+                if ((double)(beta[i]) <= (double)(0))
                 {
                     info = -2;
                     return;
                 }
-                e[i-1] = Math.Sqrt(beta[i]);
+                e[i - 1] = Math.Sqrt(beta[i]);
             }
-            d[n-1] = alpha[n-1];
-            
+            d[n - 1] = alpha[n - 1];
+
             //
             // EVD
             //
-            if( !evd.smatrixtdevd(ref d, e, n, 3, ref z, _params) )
+            if (!evd.smatrixtdevd(ref d, e, n, 3, ref z, _params))
             {
                 info = -3;
                 return;
             }
-            
+
             //
             // Generate
             //
             x = new double[n];
             w = new double[n];
-            for(i=1; i<=n; i++)
+            for (i = 1; i <= n; i++)
             {
-                x[i-1] = d[i-1];
-                w[i-1] = mu0*math.sqr(z[0,i-1]);
+                x[i - 1] = d[i - 1];
+                w[i - 1] = mu0 * math.sqr(z[0, i - 1]);
             }
         }
-
 
         /*************************************************************************
         Computation of nodes and weights for a Gauss-Lobatto quadrature formula
@@ -1036,7 +1286,8 @@ public partial class alglib
           -- ALGLIB --
              Copyright 2005-2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void gqgenerategausslobattorec(double[] alpha,
+        public static void gqgenerategausslobattorec(
+            double[] alpha,
             double[] beta,
             double mu0,
             double a,
@@ -1045,12 +1296,13 @@ public partial class alglib
             ref int info,
             ref double[] x,
             ref double[] w,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             double[] d = new double[0];
             double[] e = new double[0];
-            double[,] z = new double[0,0];
+            double[,] z = new double[0, 0];
             double pim1a = 0;
             double pia = 0;
             double pim1b = 0;
@@ -1071,33 +1323,33 @@ public partial class alglib
             x = new double[0];
             w = new double[0];
 
-            if( n<=2 )
+            if (n <= 2)
             {
                 info = -1;
                 return;
             }
             info = 1;
-            
+
             //
             // Initialize, D[1:N+1], E[1:N]
             //
-            n = n-2;
-            d = new double[n+2];
-            e = new double[n+1];
-            for(i=1; i<=n+1; i++)
+            n = n - 2;
+            d = new double[n + 2];
+            e = new double[n + 1];
+            for (i = 1; i <= n + 1; i++)
             {
-                d[i-1] = alpha[i-1];
+                d[i - 1] = alpha[i - 1];
             }
-            for(i=1; i<=n; i++)
+            for (i = 1; i <= n; i++)
             {
-                if( (double)(beta[i])<=(double)(0) )
+                if ((double)(beta[i]) <= (double)(0))
                 {
                     info = -2;
                     return;
                 }
-                e[i-1] = Math.Sqrt(beta[i]);
+                e[i - 1] = Math.Sqrt(beta[i]);
             }
-            
+
             //
             // Caclulate Pn(a), Pn+1(a), Pn(b), Pn+1(b)
             //
@@ -1106,24 +1358,23 @@ public partial class alglib
             pia = 1;
             pim1b = 0;
             pib = 1;
-            for(i=1; i<=n+1; i++)
+            for (i = 1; i <= n + 1; i++)
             {
-                
                 //
                 // Pi(a)
                 //
-                t = (a-alpha[i-1])*pia-beta[i-1]*pim1a;
+                t = (a - alpha[i - 1]) * pia - beta[i - 1] * pim1a;
                 pim1a = pia;
                 pia = t;
-                
+
                 //
                 // Pi(b)
                 //
-                t = (b-alpha[i-1])*pib-beta[i-1]*pim1b;
+                t = (b - alpha[i - 1]) * pib - beta[i - 1] * pim1b;
                 pim1b = pib;
                 pib = t;
             }
-            
+
             //
             // Calculate alpha'(n+1), beta'(n+1)
             //
@@ -1131,51 +1382,50 @@ public partial class alglib
             a12 = pim1a;
             a21 = pib;
             a22 = pim1b;
-            b1 = a*pia;
-            b2 = b*pib;
-            if( (double)(Math.Abs(a11))>(double)(Math.Abs(a21)) )
+            b1 = a * pia;
+            b2 = b * pib;
+            if ((double)(Math.Abs(a11)) > (double)(Math.Abs(a21)))
             {
-                a22 = a22-a12*a21/a11;
-                b2 = b2-b1*a21/a11;
-                bet = b2/a22;
-                alph = (b1-bet*a12)/a11;
+                a22 = a22 - a12 * a21 / a11;
+                b2 = b2 - b1 * a21 / a11;
+                bet = b2 / a22;
+                alph = (b1 - bet * a12) / a11;
             }
             else
             {
-                a12 = a12-a22*a11/a21;
-                b1 = b1-b2*a11/a21;
-                bet = b1/a12;
-                alph = (b2-bet*a22)/a21;
+                a12 = a12 - a22 * a11 / a21;
+                b1 = b1 - b2 * a11 / a21;
+                bet = b1 / a12;
+                alph = (b2 - bet * a22) / a21;
             }
-            if( (double)(bet)<(double)(0) )
+            if ((double)(bet) < (double)(0))
             {
                 info = -3;
                 return;
             }
-            d[n+1] = alph;
+            d[n + 1] = alph;
             e[n] = Math.Sqrt(bet);
-            
+
             //
             // EVD
             //
-            if( !evd.smatrixtdevd(ref d, e, n+2, 3, ref z, _params) )
+            if (!evd.smatrixtdevd(ref d, e, n + 2, 3, ref z, _params))
             {
                 info = -3;
                 return;
             }
-            
+
             //
             // Generate
             //
-            x = new double[n+2];
-            w = new double[n+2];
-            for(i=1; i<=n+2; i++)
+            x = new double[n + 2];
+            w = new double[n + 2];
+            for (i = 1; i <= n + 2; i++)
             {
-                x[i-1] = d[i-1];
-                w[i-1] = mu0*math.sqr(z[0,i-1]);
+                x[i - 1] = d[i - 1];
+                w[i - 1] = mu0 * math.sqr(z[0, i - 1]);
             }
         }
-
 
         /*************************************************************************
         Computation of nodes and weights for a Gauss-Radau quadrature formula
@@ -1216,7 +1466,8 @@ public partial class alglib
           -- ALGLIB --
              Copyright 2005-2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void gqgenerategaussradaurec(double[] alpha,
+        public static void gqgenerategaussradaurec(
+            double[] alpha,
             double[] beta,
             double mu0,
             double a,
@@ -1224,12 +1475,13 @@ public partial class alglib
             ref int info,
             ref double[] x,
             ref double[] w,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             double[] d = new double[0];
             double[] e = new double[0];
-            double[,] z = new double[0,0];
+            double[,] z = new double[0, 0];
             double polim1 = 0;
             double poli = 0;
             double t = 0;
@@ -1240,65 +1492,64 @@ public partial class alglib
             x = new double[0];
             w = new double[0];
 
-            if( n<2 )
+            if (n < 2)
             {
                 info = -1;
                 return;
             }
             info = 1;
-            
+
             //
             // Initialize, D[1:N], E[1:N]
             //
-            n = n-1;
-            d = new double[n+1];
+            n = n - 1;
+            d = new double[n + 1];
             e = new double[n];
-            for(i=1; i<=n; i++)
+            for (i = 1; i <= n; i++)
             {
-                d[i-1] = alpha[i-1];
-                if( (double)(beta[i])<=(double)(0) )
+                d[i - 1] = alpha[i - 1];
+                if ((double)(beta[i]) <= (double)(0))
                 {
                     info = -2;
                     return;
                 }
-                e[i-1] = Math.Sqrt(beta[i]);
+                e[i - 1] = Math.Sqrt(beta[i]);
             }
-            
+
             //
             // Caclulate Pn(a), Pn-1(a), and D[N+1]
             //
             beta[0] = 0;
             polim1 = 0;
             poli = 1;
-            for(i=1; i<=n; i++)
+            for (i = 1; i <= n; i++)
             {
-                t = (a-alpha[i-1])*poli-beta[i-1]*polim1;
+                t = (a - alpha[i - 1]) * poli - beta[i - 1] * polim1;
                 polim1 = poli;
                 poli = t;
             }
-            d[n] = a-beta[n]*polim1/poli;
-            
+            d[n] = a - beta[n] * polim1 / poli;
+
             //
             // EVD
             //
-            if( !evd.smatrixtdevd(ref d, e, n+1, 3, ref z, _params) )
+            if (!evd.smatrixtdevd(ref d, e, n + 1, 3, ref z, _params))
             {
                 info = -3;
                 return;
             }
-            
+
             //
             // Generate
             //
-            x = new double[n+1];
-            w = new double[n+1];
-            for(i=1; i<=n+1; i++)
+            x = new double[n + 1];
+            w = new double[n + 1];
+            for (i = 1; i <= n + 1; i++)
             {
-                x[i-1] = d[i-1];
-                w[i-1] = mu0*math.sqr(z[0,i-1]);
+                x[i - 1] = d[i - 1];
+                w[i - 1] = mu0 * math.sqr(z[0, i - 1]);
             }
         }
-
 
         /*************************************************************************
         Returns nodes/weights for Gauss-Legendre quadrature on [-1,1] with N
@@ -1324,11 +1575,13 @@ public partial class alglib
           -- ALGLIB --
              Copyright 12.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void gqgenerategausslegendre(int n,
+        public static void gqgenerategausslegendre(
+            int n,
             ref int info,
             ref double[] x,
             ref double[] w,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             double[] alpha = new double[0];
             double[] beta = new double[0];
@@ -1338,43 +1591,42 @@ public partial class alglib
             x = new double[0];
             w = new double[0];
 
-            if( n<1 )
+            if (n < 1)
             {
                 info = -1;
                 return;
             }
             alpha = new double[n];
             beta = new double[n];
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 alpha[i] = 0;
             }
             beta[0] = 2;
-            for(i=1; i<=n-1; i++)
+            for (i = 1; i <= n - 1; i++)
             {
-                beta[i] = 1/(4-1/math.sqr(i));
+                beta[i] = 1 / (4 - 1 / math.sqr(i));
             }
             gqgeneraterec(alpha, beta, beta[0], n, ref info, ref x, ref w, _params);
-            
+
             //
             // test basic properties to detect errors
             //
-            if( info>0 )
+            if (info > 0)
             {
-                if( (double)(x[0])<(double)(-1) || (double)(x[n-1])>(double)(1) )
+                if ((double)(x[0]) < (double)(-1) || (double)(x[n - 1]) > (double)(1))
                 {
                     info = -4;
                 }
-                for(i=0; i<=n-2; i++)
+                for (i = 0; i <= n - 2; i++)
                 {
-                    if( (double)(x[i])>=(double)(x[i+1]) )
+                    if ((double)(x[i]) >= (double)(x[i + 1]))
                     {
                         info = -4;
                     }
                 }
             }
         }
-
 
         /*************************************************************************
         Returns  nodes/weights  for  Gauss-Jacobi quadrature on [-1,1] with weight
@@ -1403,13 +1655,15 @@ public partial class alglib
           -- ALGLIB --
              Copyright 12.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void gqgenerategaussjacobi(int n,
+        public static void gqgenerategaussjacobi(
+            int n,
             double alpha,
             double beta,
             ref int info,
             ref double[] x,
             ref double[] w,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             double[] a = new double[0];
             double[] b = new double[0];
@@ -1424,55 +1678,70 @@ public partial class alglib
             x = new double[0];
             w = new double[0];
 
-            if( (n<1 || (double)(alpha)<=(double)(-1)) || (double)(beta)<=(double)(-1) )
+            if ((n < 1 || (double)(alpha) <= (double)(-1)) || (double)(beta) <= (double)(-1))
             {
                 info = -1;
                 return;
             }
             a = new double[n];
             b = new double[n];
-            apb = alpha+beta;
-            a[0] = (beta-alpha)/(apb+2);
-            t = (apb+1)*Math.Log(2)+gammafunc.lngamma(alpha+1, ref s, _params)+gammafunc.lngamma(beta+1, ref s, _params)-gammafunc.lngamma(apb+2, ref s, _params);
-            if( (double)(t)>(double)(Math.Log(math.maxrealnumber)) )
+            apb = alpha + beta;
+            a[0] = (beta - alpha) / (apb + 2);
+            t =
+                (apb + 1) * Math.Log(2)
+                + gammafunc.lngamma(alpha + 1, ref s, _params)
+                + gammafunc.lngamma(beta + 1, ref s, _params)
+                - gammafunc.lngamma(apb + 2, ref s, _params);
+            if ((double)(t) > (double)(Math.Log(math.maxrealnumber)))
             {
                 info = -4;
                 return;
             }
             b[0] = Math.Exp(t);
-            if( n>1 )
+            if (n > 1)
             {
                 alpha2 = math.sqr(alpha);
                 beta2 = math.sqr(beta);
-                a[1] = (beta2-alpha2)/((apb+2)*(apb+4));
-                b[1] = 4*(alpha+1)*(beta+1)/((apb+3)*math.sqr(apb+2));
-                for(i=2; i<=n-1; i++)
+                a[1] = (beta2 - alpha2) / ((apb + 2) * (apb + 4));
+                b[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * math.sqr(apb + 2));
+                for (i = 2; i <= n - 1; i++)
                 {
-                    a[i] = 0.25*(beta2-alpha2)/(i*i*(1+0.5*apb/i)*(1+0.5*(apb+2)/i));
-                    b[i] = 0.25*(1+alpha/i)*(1+beta/i)*(1+apb/i)/((1+0.5*(apb+1)/i)*(1+0.5*(apb-1)/i)*math.sqr(1+0.5*apb/i));
+                    a[i] =
+                        0.25
+                        * (beta2 - alpha2)
+                        / (i * i * (1 + 0.5 * apb / i) * (1 + 0.5 * (apb + 2) / i));
+                    b[i] =
+                        0.25
+                        * (1 + alpha / i)
+                        * (1 + beta / i)
+                        * (1 + apb / i)
+                        / (
+                            (1 + 0.5 * (apb + 1) / i)
+                            * (1 + 0.5 * (apb - 1) / i)
+                            * math.sqr(1 + 0.5 * apb / i)
+                        );
                 }
             }
             gqgeneraterec(a, b, b[0], n, ref info, ref x, ref w, _params);
-            
+
             //
             // test basic properties to detect errors
             //
-            if( info>0 )
+            if (info > 0)
             {
-                if( (double)(x[0])<(double)(-1) || (double)(x[n-1])>(double)(1) )
+                if ((double)(x[0]) < (double)(-1) || (double)(x[n - 1]) > (double)(1))
                 {
                     info = -4;
                 }
-                for(i=0; i<=n-2; i++)
+                for (i = 0; i <= n - 2; i++)
                 {
-                    if( (double)(x[i])>=(double)(x[i+1]) )
+                    if ((double)(x[i]) >= (double)(x[i + 1]))
                     {
                         info = -4;
                     }
                 }
             }
         }
-
 
         /*************************************************************************
         Returns  nodes/weights  for  Gauss-Laguerre  quadrature  on  [0,+inf) with
@@ -1500,12 +1769,14 @@ public partial class alglib
           -- ALGLIB --
              Copyright 12.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void gqgenerategausslaguerre(int n,
+        public static void gqgenerategausslaguerre(
+            int n,
             double alpha,
             ref int info,
             ref double[] x,
             ref double[] w,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             double[] a = new double[0];
             double[] b = new double[0];
@@ -1517,50 +1788,49 @@ public partial class alglib
             x = new double[0];
             w = new double[0];
 
-            if( n<1 || (double)(alpha)<=(double)(-1) )
+            if (n < 1 || (double)(alpha) <= (double)(-1))
             {
                 info = -1;
                 return;
             }
             a = new double[n];
             b = new double[n];
-            a[0] = alpha+1;
-            t = gammafunc.lngamma(alpha+1, ref s, _params);
-            if( (double)(t)>=(double)(Math.Log(math.maxrealnumber)) )
+            a[0] = alpha + 1;
+            t = gammafunc.lngamma(alpha + 1, ref s, _params);
+            if ((double)(t) >= (double)(Math.Log(math.maxrealnumber)))
             {
                 info = -4;
                 return;
             }
             b[0] = Math.Exp(t);
-            if( n>1 )
+            if (n > 1)
             {
-                for(i=1; i<=n-1; i++)
+                for (i = 1; i <= n - 1; i++)
                 {
-                    a[i] = 2*i+alpha+1;
-                    b[i] = i*(i+alpha);
+                    a[i] = 2 * i + alpha + 1;
+                    b[i] = i * (i + alpha);
                 }
             }
             gqgeneraterec(a, b, b[0], n, ref info, ref x, ref w, _params);
-            
+
             //
             // test basic properties to detect errors
             //
-            if( info>0 )
+            if (info > 0)
             {
-                if( (double)(x[0])<(double)(0) )
+                if ((double)(x[0]) < (double)(0))
                 {
                     info = -4;
                 }
-                for(i=0; i<=n-2; i++)
+                for (i = 0; i <= n - 2; i++)
                 {
-                    if( (double)(x[i])>=(double)(x[i+1]) )
+                    if ((double)(x[i]) >= (double)(x[i + 1]))
                     {
                         info = -4;
                     }
                 }
             }
         }
-
 
         /*************************************************************************
         Returns  nodes/weights  for  Gauss-Hermite  quadrature on (-inf,+inf) with
@@ -1585,11 +1855,13 @@ public partial class alglib
           -- ALGLIB --
              Copyright 12.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void gqgenerategausshermite(int n,
+        public static void gqgenerategausshermite(
+            int n,
             ref int info,
             ref double[] x,
             ref double[] w,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             double[] a = new double[0];
             double[] b = new double[0];
@@ -1599,44 +1871,43 @@ public partial class alglib
             x = new double[0];
             w = new double[0];
 
-            if( n<1 )
+            if (n < 1)
             {
                 info = -1;
                 return;
             }
             a = new double[n];
             b = new double[n];
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 a[i] = 0;
             }
-            b[0] = Math.Sqrt(4*Math.Atan(1));
-            if( n>1 )
+            b[0] = Math.Sqrt(4 * Math.Atan(1));
+            if (n > 1)
             {
-                for(i=1; i<=n-1; i++)
+                for (i = 1; i <= n - 1; i++)
                 {
-                    b[i] = 0.5*i;
+                    b[i] = 0.5 * i;
                 }
             }
             gqgeneraterec(a, b, b[0], n, ref info, ref x, ref w, _params);
-            
+
             //
             // test basic properties to detect errors
             //
-            if( info>0 )
+            if (info > 0)
             {
-                for(i=0; i<=n-2; i++)
+                for (i = 0; i <= n - 2; i++)
                 {
-                    if( (double)(x[i])>=(double)(x[i+1]) )
+                    if ((double)(x[i]) >= (double)(x[i + 1]))
                     {
                         info = -4;
                     }
                 }
             }
         }
-
-
     }
+
     public class gkq
     {
         /*************************************************************************
@@ -1685,7 +1956,8 @@ public partial class alglib
           -- ALGLIB --
              Copyright 08.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void gkqgeneraterec(double[] alpha,
+        public static void gkqgeneraterec(
+            double[] alpha,
             double[] beta,
             double mu0,
             int n,
@@ -1693,7 +1965,8 @@ public partial class alglib
             ref double[] x,
             ref double[] wkronrod,
             ref double[] wgauss,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             double[] ta = new double[0];
             int i = 0;
@@ -1717,183 +1990,192 @@ public partial class alglib
             wkronrod = new double[0];
             wgauss = new double[0];
 
-            if( n%2!=1 || n<3 )
+            if (n % 2 != 1 || n < 3)
             {
                 info = -1;
                 return;
             }
-            for(i=0; i<=(int)Math.Ceiling((double)(3*(n/2))/(double)2); i++)
+            for (i = 0; i <= (int)Math.Ceiling((double)(3 * (n / 2)) / (double)2); i++)
             {
-                if( (double)(beta[i])<=(double)(0) )
+                if ((double)(beta[i]) <= (double)(0))
                 {
                     info = -2;
                     return;
                 }
             }
             info = 1;
-            
+
             //
             // from external conventions about N/Beta/Mu0 to internal
             //
-            n = n/2;
+            n = n / 2;
             beta[0] = mu0;
-            
+
             //
             // Calculate Gauss nodes/weights, save them for later processing
             //
             gq.gqgeneraterec(alpha, beta, mu0, n, ref info, ref xgtmp, ref wgtmp, _params);
-            if( info<0 )
+            if (info < 0)
             {
                 return;
             }
-            
+
             //
             // Resize:
             // * A from 0..floor(3*n/2) to 0..2*n
             // * B from 0..ceil(3*n/2)  to 0..2*n
             //
-            ta = new double[(int)Math.Floor((double)(3*n)/(double)2)+1];
-            for(i_=0; i_<=(int)Math.Floor((double)(3*n)/(double)2);i_++)
+            ta = new double[(int)Math.Floor((double)(3 * n) / (double)2) + 1];
+            for (i_ = 0; i_ <= (int)Math.Floor((double)(3 * n) / (double)2); i_++)
             {
                 ta[i_] = alpha[i_];
             }
-            alpha = new double[2*n+1];
-            for(i_=0; i_<=(int)Math.Floor((double)(3*n)/(double)2);i_++)
+            alpha = new double[2 * n + 1];
+            for (i_ = 0; i_ <= (int)Math.Floor((double)(3 * n) / (double)2); i_++)
             {
                 alpha[i_] = ta[i_];
             }
-            for(i=(int)Math.Floor((double)(3*n)/(double)2)+1; i<=2*n; i++)
+            for (i = (int)Math.Floor((double)(3 * n) / (double)2) + 1; i <= 2 * n; i++)
             {
                 alpha[i] = 0;
             }
-            ta = new double[(int)Math.Ceiling((double)(3*n)/(double)2)+1];
-            for(i_=0; i_<=(int)Math.Ceiling((double)(3*n)/(double)2);i_++)
+            ta = new double[(int)Math.Ceiling((double)(3 * n) / (double)2) + 1];
+            for (i_ = 0; i_ <= (int)Math.Ceiling((double)(3 * n) / (double)2); i_++)
             {
                 ta[i_] = beta[i_];
             }
-            beta = new double[2*n+1];
-            for(i_=0; i_<=(int)Math.Ceiling((double)(3*n)/(double)2);i_++)
+            beta = new double[2 * n + 1];
+            for (i_ = 0; i_ <= (int)Math.Ceiling((double)(3 * n) / (double)2); i_++)
             {
                 beta[i_] = ta[i_];
             }
-            for(i=(int)Math.Ceiling((double)(3*n)/(double)2)+1; i<=2*n; i++)
+            for (i = (int)Math.Ceiling((double)(3 * n) / (double)2) + 1; i <= 2 * n; i++)
             {
                 beta[i] = 0;
             }
-            
+
             //
             // Initialize T, S
             //
-            wlen = 2+n/2;
+            wlen = 2 + n / 2;
             t = new double[wlen];
             s = new double[wlen];
             ta = new double[wlen];
             woffs = 1;
-            for(i=0; i<=wlen-1; i++)
+            for (i = 0; i <= wlen - 1; i++)
             {
                 t[i] = 0;
                 s[i] = 0;
             }
-            
+
             //
             // Algorithm from Dirk P. Laurie, "Calculation of Gauss-Kronrod quadrature rules", 1997.
             //
-            t[woffs+0] = beta[n+1];
-            for(m=0; m<=n-2; m++)
+            t[woffs + 0] = beta[n + 1];
+            for (m = 0; m <= n - 2; m++)
             {
                 u = 0;
-                for(k=(m+1)/2; k>=0; k--)
+                for (k = (m + 1) / 2; k >= 0; k--)
                 {
-                    l = m-k;
-                    u = u+(alpha[k+n+1]-alpha[l])*t[woffs+k]+beta[k+n+1]*s[woffs+k-1]-beta[l]*s[woffs+k];
-                    s[woffs+k] = u;
+                    l = m - k;
+                    u =
+                        u
+                        + (alpha[k + n + 1] - alpha[l]) * t[woffs + k]
+                        + beta[k + n + 1] * s[woffs + k - 1]
+                        - beta[l] * s[woffs + k];
+                    s[woffs + k] = u;
                 }
-                for(i_=0; i_<=wlen-1;i_++)
+                for (i_ = 0; i_ <= wlen - 1; i_++)
                 {
                     ta[i_] = t[i_];
                 }
-                for(i_=0; i_<=wlen-1;i_++)
+                for (i_ = 0; i_ <= wlen - 1; i_++)
                 {
                     t[i_] = s[i_];
                 }
-                for(i_=0; i_<=wlen-1;i_++)
+                for (i_ = 0; i_ <= wlen - 1; i_++)
                 {
                     s[i_] = ta[i_];
                 }
             }
-            for(j=n/2; j>=0; j--)
+            for (j = n / 2; j >= 0; j--)
             {
-                s[woffs+j] = s[woffs+j-1];
+                s[woffs + j] = s[woffs + j - 1];
             }
-            for(m=n-1; m<=2*n-3; m++)
+            for (m = n - 1; m <= 2 * n - 3; m++)
             {
                 u = 0;
-                for(k=m+1-n; k<=(m-1)/2; k++)
+                for (k = m + 1 - n; k <= (m - 1) / 2; k++)
                 {
-                    l = m-k;
-                    j = n-1-l;
-                    u = u-(alpha[k+n+1]-alpha[l])*t[woffs+j]-beta[k+n+1]*s[woffs+j]+beta[l]*s[woffs+j+1];
-                    s[woffs+j] = u;
+                    l = m - k;
+                    j = n - 1 - l;
+                    u =
+                        u
+                        - (alpha[k + n + 1] - alpha[l]) * t[woffs + j]
+                        - beta[k + n + 1] * s[woffs + j]
+                        + beta[l] * s[woffs + j + 1];
+                    s[woffs + j] = u;
                 }
-                if( m%2==0 )
+                if (m % 2 == 0)
                 {
-                    k = m/2;
-                    alpha[k+n+1] = alpha[k]+(s[woffs+j]-beta[k+n+1]*s[woffs+j+1])/t[woffs+j+1];
+                    k = m / 2;
+                    alpha[k + n + 1] =
+                        alpha[k]
+                        + (s[woffs + j] - beta[k + n + 1] * s[woffs + j + 1]) / t[woffs + j + 1];
                 }
                 else
                 {
-                    k = (m+1)/2;
-                    beta[k+n+1] = s[woffs+j]/s[woffs+j+1];
+                    k = (m + 1) / 2;
+                    beta[k + n + 1] = s[woffs + j] / s[woffs + j + 1];
                 }
-                for(i_=0; i_<=wlen-1;i_++)
+                for (i_ = 0; i_ <= wlen - 1; i_++)
                 {
                     ta[i_] = t[i_];
                 }
-                for(i_=0; i_<=wlen-1;i_++)
+                for (i_ = 0; i_ <= wlen - 1; i_++)
                 {
                     t[i_] = s[i_];
                 }
-                for(i_=0; i_<=wlen-1;i_++)
+                for (i_ = 0; i_ <= wlen - 1; i_++)
                 {
                     s[i_] = ta[i_];
                 }
             }
-            alpha[2*n] = alpha[n-1]-beta[2*n]*s[woffs+0]/t[woffs+0];
-            
+            alpha[2 * n] = alpha[n - 1] - beta[2 * n] * s[woffs + 0] / t[woffs + 0];
+
             //
             // calculation of Kronrod nodes and weights, unpacking of Gauss weights
             //
-            gq.gqgeneraterec(alpha, beta, mu0, 2*n+1, ref info, ref x, ref wkronrod, _params);
-            if( info==-2 )
+            gq.gqgeneraterec(alpha, beta, mu0, 2 * n + 1, ref info, ref x, ref wkronrod, _params);
+            if (info == -2)
             {
                 info = -5;
             }
-            if( info<0 )
+            if (info < 0)
             {
                 return;
             }
-            for(i=0; i<=2*n-1; i++)
+            for (i = 0; i <= 2 * n - 1; i++)
             {
-                if( (double)(x[i])>=(double)(x[i+1]) )
+                if ((double)(x[i]) >= (double)(x[i + 1]))
                 {
                     info = -4;
                 }
             }
-            if( info<0 )
+            if (info < 0)
             {
                 return;
             }
-            wgauss = new double[2*n+1];
-            for(i=0; i<=2*n; i++)
+            wgauss = new double[2 * n + 1];
+            for (i = 0; i <= 2 * n; i++)
             {
                 wgauss[i] = 0;
             }
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
-                wgauss[2*i+1] = wgtmp[i];
+                wgauss[2 * i + 1] = wgtmp[i];
             }
         }
-
 
         /*************************************************************************
         Returns   Gauss   and   Gauss-Kronrod   nodes/weights  for  Gauss-Legendre
@@ -1924,12 +2206,14 @@ public partial class alglib
           -- ALGLIB --
              Copyright 12.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void gkqgenerategausslegendre(int n,
+        public static void gkqgenerategausslegendre(
+            int n,
             ref int info,
             ref double[] x,
             ref double[] wkronrod,
             ref double[] wgauss,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             double eps = 0;
 
@@ -1938,7 +2222,10 @@ public partial class alglib
             wkronrod = new double[0];
             wgauss = new double[0];
 
-            if( (double)(math.machineepsilon)>(double)(1.0E-32) && (((((n==15 || n==21) || n==31) || n==41) || n==51) || n==61) )
+            if (
+                (double)(math.machineepsilon) > (double)(1.0E-32)
+                && (((((n == 15 || n == 21) || n == 31) || n == 41) || n == 51) || n == 61)
+            )
             {
                 info = 1;
                 gkqlegendretbl(n, ref x, ref wkronrod, ref wgauss, ref eps, _params);
@@ -1948,7 +2235,6 @@ public partial class alglib
                 gkqlegendrecalc(n, ref info, ref x, ref wkronrod, ref wgauss, _params);
             }
         }
-
 
         /*************************************************************************
         Returns   Gauss   and   Gauss-Kronrod   nodes/weights   for   Gauss-Jacobi
@@ -1986,14 +2272,16 @@ public partial class alglib
           -- ALGLIB --
              Copyright 12.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void gkqgenerategaussjacobi(int n,
+        public static void gkqgenerategaussjacobi(
+            int n,
             double alpha,
             double beta,
             ref int info,
             ref double[] x,
             ref double[] wkronrod,
             ref double[] wgauss,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int clen = 0;
             double[] a = new double[0];
@@ -2010,65 +2298,80 @@ public partial class alglib
             wkronrod = new double[0];
             wgauss = new double[0];
 
-            if( n%2!=1 || n<3 )
+            if (n % 2 != 1 || n < 3)
             {
                 info = -1;
                 return;
             }
-            if( (double)(alpha)<=(double)(-1) || (double)(beta)<=(double)(-1) )
+            if ((double)(alpha) <= (double)(-1) || (double)(beta) <= (double)(-1))
             {
                 info = -1;
                 return;
             }
-            clen = (int)Math.Ceiling((double)(3*(n/2))/(double)2)+1;
+            clen = (int)Math.Ceiling((double)(3 * (n / 2)) / (double)2) + 1;
             a = new double[clen];
             b = new double[clen];
-            for(i=0; i<=clen-1; i++)
+            for (i = 0; i <= clen - 1; i++)
             {
                 a[i] = 0;
             }
-            apb = alpha+beta;
-            a[0] = (beta-alpha)/(apb+2);
-            t = (apb+1)*Math.Log(2)+gammafunc.lngamma(alpha+1, ref s, _params)+gammafunc.lngamma(beta+1, ref s, _params)-gammafunc.lngamma(apb+2, ref s, _params);
-            if( (double)(t)>(double)(Math.Log(math.maxrealnumber)) )
+            apb = alpha + beta;
+            a[0] = (beta - alpha) / (apb + 2);
+            t =
+                (apb + 1) * Math.Log(2)
+                + gammafunc.lngamma(alpha + 1, ref s, _params)
+                + gammafunc.lngamma(beta + 1, ref s, _params)
+                - gammafunc.lngamma(apb + 2, ref s, _params);
+            if ((double)(t) > (double)(Math.Log(math.maxrealnumber)))
             {
                 info = -4;
                 return;
             }
             b[0] = Math.Exp(t);
-            if( clen>1 )
+            if (clen > 1)
             {
                 alpha2 = math.sqr(alpha);
                 beta2 = math.sqr(beta);
-                a[1] = (beta2-alpha2)/((apb+2)*(apb+4));
-                b[1] = 4*(alpha+1)*(beta+1)/((apb+3)*math.sqr(apb+2));
-                for(i=2; i<=clen-1; i++)
+                a[1] = (beta2 - alpha2) / ((apb + 2) * (apb + 4));
+                b[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * math.sqr(apb + 2));
+                for (i = 2; i <= clen - 1; i++)
                 {
-                    a[i] = 0.25*(beta2-alpha2)/(i*i*(1+0.5*apb/i)*(1+0.5*(apb+2)/i));
-                    b[i] = 0.25*(1+alpha/i)*(1+beta/i)*(1+apb/i)/((1+0.5*(apb+1)/i)*(1+0.5*(apb-1)/i)*math.sqr(1+0.5*apb/i));
+                    a[i] =
+                        0.25
+                        * (beta2 - alpha2)
+                        / (i * i * (1 + 0.5 * apb / i) * (1 + 0.5 * (apb + 2) / i));
+                    b[i] =
+                        0.25
+                        * (1 + alpha / i)
+                        * (1 + beta / i)
+                        * (1 + apb / i)
+                        / (
+                            (1 + 0.5 * (apb + 1) / i)
+                            * (1 + 0.5 * (apb - 1) / i)
+                            * math.sqr(1 + 0.5 * apb / i)
+                        );
                 }
             }
             gkqgeneraterec(a, b, b[0], n, ref info, ref x, ref wkronrod, ref wgauss, _params);
-            
+
             //
             // test basic properties to detect errors
             //
-            if( info>0 )
+            if (info > 0)
             {
-                if( (double)(x[0])<(double)(-1) || (double)(x[n-1])>(double)(1) )
+                if ((double)(x[0]) < (double)(-1) || (double)(x[n - 1]) > (double)(1))
                 {
                     info = 2;
                 }
-                for(i=0; i<=n-2; i++)
+                for (i = 0; i <= n - 2; i++)
                 {
-                    if( (double)(x[i])>=(double)(x[i+1]) )
+                    if ((double)(x[i]) >= (double)(x[i + 1]))
                     {
                         info = -4;
                     }
                 }
             }
         }
-
 
         /*************************************************************************
         Returns Gauss and Gauss-Kronrod nodes for quadrature with N points.
@@ -2096,12 +2399,14 @@ public partial class alglib
           -- ALGLIB --
              Copyright 12.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void gkqlegendrecalc(int n,
+        public static void gkqlegendrecalc(
+            int n,
             ref int info,
             ref double[] x,
             ref double[] wkronrod,
             ref double[] wgauss,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             double[] alpha = new double[0];
             double[] beta = new double[0];
@@ -2116,46 +2421,45 @@ public partial class alglib
             wkronrod = new double[0];
             wgauss = new double[0];
 
-            if( n%2!=1 || n<3 )
+            if (n % 2 != 1 || n < 3)
             {
                 info = -1;
                 return;
             }
             mu0 = 2;
-            alen = (int)Math.Floor((double)(3*(n/2))/(double)2)+1;
-            blen = (int)Math.Ceiling((double)(3*(n/2))/(double)2)+1;
+            alen = (int)Math.Floor((double)(3 * (n / 2)) / (double)2) + 1;
+            blen = (int)Math.Ceiling((double)(3 * (n / 2)) / (double)2) + 1;
             alpha = new double[alen];
             beta = new double[blen];
-            for(k=0; k<=alen-1; k++)
+            for (k = 0; k <= alen - 1; k++)
             {
                 alpha[k] = 0;
             }
             beta[0] = 2;
-            for(k=1; k<=blen-1; k++)
+            for (k = 1; k <= blen - 1; k++)
             {
-                beta[k] = 1/(4-1/math.sqr(k));
+                beta[k] = 1 / (4 - 1 / math.sqr(k));
             }
             gkqgeneraterec(alpha, beta, mu0, n, ref info, ref x, ref wkronrod, ref wgauss, _params);
-            
+
             //
             // test basic properties to detect errors
             //
-            if( info>0 )
+            if (info > 0)
             {
-                if( (double)(x[0])<(double)(-1) || (double)(x[n-1])>(double)(1) )
+                if ((double)(x[0]) < (double)(-1) || (double)(x[n - 1]) > (double)(1))
                 {
                     info = -4;
                 }
-                for(i=0; i<=n-2; i++)
+                for (i = 0; i <= n - 2; i++)
                 {
-                    if( (double)(x[i])>=(double)(x[i+1]) )
+                    if ((double)(x[i]) >= (double)(x[i + 1]))
                     {
                         info = -4;
                     }
                 }
             }
         }
-
 
         /*************************************************************************
         Returns Gauss and Gauss-Kronrod nodes for quadrature with N  points  using
@@ -2179,12 +2483,14 @@ public partial class alglib
           -- ALGLIB --
              Copyright 12.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void gkqlegendretbl(int n,
+        public static void gkqlegendretbl(
+            int n,
             ref double[] x,
             ref double[] wkronrod,
             ref double[] wgauss,
             ref double eps,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int ng = 0;
@@ -2197,28 +2503,30 @@ public partial class alglib
             wgauss = new double[0];
             eps = 0;
 
-            
             //
             // these initializers are not really necessary,
             // but without them compiler complains about uninitialized locals
             //
             ng = 0;
-            
+
             //
             // Process
             //
-            alglib.ap.assert(((((n==15 || n==21) || n==31) || n==41) || n==51) || n==61, "GKQNodesTbl: incorrect N!");
+            Alglib.ap.assert(
+                ((((n == 15 || n == 21) || n == 31) || n == 41) || n == 51) || n == 61,
+                "GKQNodesTbl: incorrect N!"
+            );
             x = new double[n];
             wkronrod = new double[n];
             wgauss = new double[n];
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 x[i] = 0;
                 wkronrod[i] = 0;
                 wgauss[i] = 0;
             }
             eps = Math.Max(math.machineepsilon, 1.0E-32);
-            if( n==15 )
+            if (n == 15)
             {
                 ng = 4;
                 wgauss[0] = 0.129484966168869693270611432679082;
@@ -2242,7 +2550,7 @@ public partial class alglib
                 wkronrod[6] = 0.204432940075298892414161999234649;
                 wkronrod[7] = 0.209482141084727828012999174891714;
             }
-            if( n==21 )
+            if (n == 21)
             {
                 ng = 5;
                 wgauss[0] = 0.066671344308688137593568809893332;
@@ -2273,7 +2581,7 @@ public partial class alglib
                 wkronrod[9] = 0.147739104901338491374841515972068;
                 wkronrod[10] = 0.149445554002916905664936468389821;
             }
-            if( n==31 )
+            if (n == 31)
             {
                 ng = 8;
                 wgauss[0] = 0.030753241996117268354628393577204;
@@ -2317,7 +2625,7 @@ public partial class alglib
                 wkronrod[14] = 0.100769845523875595044946662617570;
                 wkronrod[15] = 0.101330007014791549017374792767493;
             }
-            if( n==41 )
+            if (n == 41)
             {
                 ng = 10;
                 wgauss[0] = 0.017614007139152118311861962351853;
@@ -2373,7 +2681,7 @@ public partial class alglib
                 wkronrod[19] = 0.076377867672080736705502835038061;
                 wkronrod[20] = 0.076600711917999656445049901530102;
             }
-            if( n==51 )
+            if (n == 51)
             {
                 ng = 13;
                 wgauss[0] = 0.011393798501026287947902964113235;
@@ -2442,7 +2750,7 @@ public partial class alglib
                 wkronrod[24] = 0.061471189871425316661544131965264;
                 wkronrod[25] = 0.061580818067832935078759824240055;
             }
-            if( n==61 )
+            if (n == 61)
             {
                 ng = 15;
                 wgauss[0] = 0.007968192496166605615465883474674;
@@ -2523,41 +2831,41 @@ public partial class alglib
                 wkronrod[29] = 0.051426128537459025933862879215781;
                 wkronrod[30] = 0.051494729429451567558340433647099;
             }
-            
+
             //
             // copy nodes
             //
-            for(i=n-1; i>=n/2; i--)
+            for (i = n - 1; i >= n / 2; i--)
             {
-                x[i] = -x[n-1-i];
+                x[i] = -x[n - 1 - i];
             }
-            
+
             //
             // copy Kronrod weights
             //
-            for(i=n-1; i>=n/2; i--)
+            for (i = n - 1; i >= n / 2; i--)
             {
-                wkronrod[i] = wkronrod[n-1-i];
+                wkronrod[i] = wkronrod[n - 1 - i];
             }
-            
+
             //
             // copy Gauss weights
             //
-            for(i=ng-1; i>=0; i--)
+            for (i = ng - 1; i >= 0; i--)
             {
-                wgauss[n-2-2*i] = wgauss[i];
-                wgauss[1+2*i] = wgauss[i];
+                wgauss[n - 2 - 2 * i] = wgauss[i];
+                wgauss[1 + 2 * i] = wgauss[i];
             }
-            for(i=0; i<=n/2; i++)
+            for (i = 0; i <= n / 2; i++)
             {
-                wgauss[2*i] = 0;
+                wgauss[2 * i] = 0;
             }
-            
+
             //
             // reorder
             //
             tsort.tagsort(ref x, n, ref p1, ref p2, _params);
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 tmp = wkronrod[i];
                 wkronrod[i] = wkronrod[p2[i]];
@@ -2567,9 +2875,8 @@ public partial class alglib
                 wgauss[p2[i]] = tmp;
             }
         }
-
-
     }
+
     public class autogk
     {
         /*************************************************************************
@@ -2588,14 +2895,15 @@ public partial class alglib
             public int terminationtype;
             public int nfev;
             public int nintervals;
+
             public autogkreport()
             {
                 init();
             }
-            public override void init()
-            {
-            }
-            public override alglib.apobject make_copy()
+
+            public override void init() { }
+
+            public override Alglib.apobject make_copy()
             {
                 autogkreport _result = new autogkreport();
                 _result.terminationtype = terminationtype;
@@ -2604,7 +2912,6 @@ public partial class alglib
                 return _result;
             }
         };
-
 
         public class autogkinternalstate : apobject
         {
@@ -2628,20 +2935,23 @@ public partial class alglib
             public double[] wr;
             public int n;
             public rcommstate rstate;
+
             public autogkinternalstate()
             {
                 init();
             }
+
             public override void init()
             {
-                heap = new double[0,0];
+                heap = new double[0, 0];
                 qn = new double[0];
                 wg = new double[0];
                 wk = new double[0];
                 wr = new double[0];
                 rstate = new rcommstate();
             }
-            public override alglib.apobject make_copy()
+
+            public override Alglib.apobject make_copy()
             {
                 autogkinternalstate _result = new autogkinternalstate();
                 _result.a = a;
@@ -2667,7 +2977,6 @@ public partial class alglib
                 return _result;
             }
         };
-
 
         /*************************************************************************
         This structure stores state of the integration algorithm.
@@ -2697,16 +3006,19 @@ public partial class alglib
             public int terminationtype;
             public int nfev;
             public int nintervals;
+
             public autogkstate()
             {
                 init();
             }
+
             public override void init()
             {
                 internalstate = new autogkinternalstate();
                 rstate = new rcommstate();
             }
-            public override alglib.apobject make_copy()
+
+            public override Alglib.apobject make_copy()
             {
                 autogkstate _result = new autogkstate();
                 _result.a = a;
@@ -2730,11 +3042,7 @@ public partial class alglib
             }
         };
 
-
-
-
         public const int maxsubintervals = 10000;
-
 
         /*************************************************************************
         Integration of a smooth function F(x) on a finite interval [a,b].
@@ -2762,16 +3070,17 @@ public partial class alglib
           -- ALGLIB --
              Copyright 06.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void autogksmooth(double a,
+        public static void autogksmooth(
+            double a,
             double b,
             autogkstate state,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
-            alglib.ap.assert(math.isfinite(a), "AutoGKSmooth: A is not finite!");
-            alglib.ap.assert(math.isfinite(b), "AutoGKSmooth: B is not finite!");
+            Alglib.ap.assert(math.isfinite(a), "AutoGKSmooth: A is not finite!");
+            Alglib.ap.assert(math.isfinite(b), "AutoGKSmooth: B is not finite!");
             autogksmoothw(a, b, 0.0, state, _params);
         }
-
 
         /*************************************************************************
         Integration of a smooth function F(x) on a finite interval [a,b].
@@ -2796,24 +3105,25 @@ public partial class alglib
           -- ALGLIB --
              Copyright 06.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void autogksmoothw(double a,
+        public static void autogksmoothw(
+            double a,
             double b,
             double xwidth,
             autogkstate state,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
-            alglib.ap.assert(math.isfinite(a), "AutoGKSmoothW: A is not finite!");
-            alglib.ap.assert(math.isfinite(b), "AutoGKSmoothW: B is not finite!");
-            alglib.ap.assert(math.isfinite(xwidth), "AutoGKSmoothW: XWidth is not finite!");
+            Alglib.ap.assert(math.isfinite(a), "AutoGKSmoothW: A is not finite!");
+            Alglib.ap.assert(math.isfinite(b), "AutoGKSmoothW: B is not finite!");
+            Alglib.ap.assert(math.isfinite(xwidth), "AutoGKSmoothW: XWidth is not finite!");
             state.wrappermode = 0;
             state.a = a;
             state.b = b;
             state.xwidth = xwidth;
             state.needf = false;
-            state.rstate.ra = new double[10+1];
+            state.rstate.ra = new double[10 + 1];
             state.rstate.stage = -1;
         }
-
 
         /*************************************************************************
         Integration on a finite interval [A,B].
@@ -2847,17 +3157,19 @@ public partial class alglib
           -- ALGLIB --
              Copyright 06.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void autogksingular(double a,
+        public static void autogksingular(
+            double a,
             double b,
             double alpha,
             double beta,
             autogkstate state,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
-            alglib.ap.assert(math.isfinite(a), "AutoGKSingular: A is not finite!");
-            alglib.ap.assert(math.isfinite(b), "AutoGKSingular: B is not finite!");
-            alglib.ap.assert(math.isfinite(alpha), "AutoGKSingular: Alpha is not finite!");
-            alglib.ap.assert(math.isfinite(beta), "AutoGKSingular: Beta is not finite!");
+            Alglib.ap.assert(math.isfinite(a), "AutoGKSingular: A is not finite!");
+            Alglib.ap.assert(math.isfinite(b), "AutoGKSingular: B is not finite!");
+            Alglib.ap.assert(math.isfinite(alpha), "AutoGKSingular: Alpha is not finite!");
+            Alglib.ap.assert(math.isfinite(beta), "AutoGKSingular: Beta is not finite!");
             state.wrappermode = 1;
             state.a = a;
             state.b = b;
@@ -2865,18 +3177,16 @@ public partial class alglib
             state.beta = beta;
             state.xwidth = 0.0;
             state.needf = false;
-            state.rstate.ra = new double[10+1];
+            state.rstate.ra = new double[10 + 1];
             state.rstate.stage = -1;
         }
-
 
         /*************************************************************************
 
           -- ALGLIB --
              Copyright 07.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static bool autogkiteration(autogkstate state,
-            alglib.xparams _params)
+        public static bool autogkiteration(autogkstate state, Alglib.xparams _params)
         {
             bool result = new bool();
             double s = 0;
@@ -2891,7 +3201,6 @@ public partial class alglib
             double v1 = 0;
             double v2 = 0;
 
-            
             //
             // Reverse communication preparations
             // I know it looks ugly, but it works the same way
@@ -2902,7 +3211,7 @@ public partial class alglib
             //   generation - on first subroutine call
             // * values from previous call - on subsequent calls
             //
-            if( state.rstate.stage>=0 )
+            if (state.rstate.stage >= 0)
             {
                 s = state.rstate.ra[0];
                 tmp = state.rstate.ra[1];
@@ -2930,19 +3239,19 @@ public partial class alglib
                 v1 = 205;
                 v2 = -838;
             }
-            if( state.rstate.stage==0 )
+            if (state.rstate.stage == 0)
             {
                 goto lbl_0;
             }
-            if( state.rstate.stage==1 )
+            if (state.rstate.stage == 1)
             {
                 goto lbl_1;
             }
-            if( state.rstate.stage==2 )
+            if (state.rstate.stage == 2)
             {
                 goto lbl_2;
             }
-            
+
             //
             // Routine body
             //
@@ -2954,89 +3263,89 @@ public partial class alglib
             state.terminationtype = -1;
             state.nfev = 0;
             state.nintervals = 0;
-            
+
             //
             // smooth function  at a finite interval
             //
-            if( state.wrappermode!=0 )
+            if (state.wrappermode != 0)
             {
                 goto lbl_3;
             }
-            
+
             //
             // special case
             //
-            if( (double)(a)==(double)(b) )
+            if ((double)(a) == (double)(b))
             {
                 state.terminationtype = 1;
                 state.v = 0;
                 result = false;
                 return result;
             }
-            
+
             //
             // general case
             //
             autogkinternalprepare(a, b, eps, state.xwidth, state.internalstate, _params);
-        lbl_5:
-            if( !autogkinternaliteration(state.internalstate, _params) )
+            lbl_5:
+            if (!autogkinternaliteration(state.internalstate, _params))
             {
                 goto lbl_6;
             }
             x = state.internalstate.x;
             state.x = x;
-            state.xminusa = x-a;
-            state.bminusx = b-x;
+            state.xminusa = x - a;
+            state.bminusx = b - x;
             state.needf = true;
             state.rstate.stage = 0;
             goto lbl_rcomm;
-        lbl_0:
+            lbl_0:
             state.needf = false;
-            state.nfev = state.nfev+1;
+            state.nfev = state.nfev + 1;
             state.internalstate.f = state.f;
             goto lbl_5;
-        lbl_6:
+            lbl_6:
             state.v = state.internalstate.r;
             state.terminationtype = state.internalstate.info;
             state.nintervals = state.internalstate.heapused;
             result = false;
             return result;
-        lbl_3:
-            
+            lbl_3:
+
             //
             // function with power-law singularities at the ends of a finite interval
             //
-            if( state.wrappermode!=1 )
+            if (state.wrappermode != 1)
             {
                 goto lbl_7;
             }
-            
+
             //
             // test coefficients
             //
-            if( (double)(alpha)<=(double)(-1) || (double)(beta)<=(double)(-1) )
+            if ((double)(alpha) <= (double)(-1) || (double)(beta) <= (double)(-1))
             {
                 state.terminationtype = -1;
                 state.v = 0;
                 result = false;
                 return result;
             }
-            
+
             //
             // special cases
             //
-            if( (double)(a)==(double)(b) )
+            if ((double)(a) == (double)(b))
             {
                 state.terminationtype = 1;
                 state.v = 0;
                 result = false;
                 return result;
             }
-            
+
             //
             // reduction to general form
             //
-            if( (double)(a)<(double)(b) )
+            if ((double)(a) < (double)(b))
             {
                 s = 1;
             }
@@ -3052,118 +3361,132 @@ public partial class alglib
             }
             alpha = Math.Min(alpha, 0);
             beta = Math.Min(beta, 0);
-            
+
             //
             // first, integrate left half of [a,b]:
             //     integral(f(x)dx, a, (b+a)/2) =
             //     = 1/(1+alpha) * integral(t^(-alpha/(1+alpha))*f(a+t^(1/(1+alpha)))dt, 0, (0.5*(b-a))^(1+alpha))
             //
-            autogkinternalprepare(0, Math.Pow(0.5*(b-a), 1+alpha), eps, state.xwidth, state.internalstate, _params);
-        lbl_9:
-            if( !autogkinternaliteration(state.internalstate, _params) )
+            autogkinternalprepare(
+                0,
+                Math.Pow(0.5 * (b - a), 1 + alpha),
+                eps,
+                state.xwidth,
+                state.internalstate,
+                _params
+            );
+            lbl_9:
+            if (!autogkinternaliteration(state.internalstate, _params))
             {
                 goto lbl_10;
             }
-            
+
             //
             // Fill State.X, State.XMinusA, State.BMinusX.
             // Latter two are filled correctly even if B<A.
             //
             x = state.internalstate.x;
-            t = Math.Pow(x, 1/(1+alpha));
-            state.x = a+t;
-            if( (double)(s)>(double)(0) )
+            t = Math.Pow(x, 1 / (1 + alpha));
+            state.x = a + t;
+            if ((double)(s) > (double)(0))
             {
                 state.xminusa = t;
-                state.bminusx = b-(a+t);
+                state.bminusx = b - (a + t);
             }
             else
             {
-                state.xminusa = a+t-b;
+                state.xminusa = a + t - b;
                 state.bminusx = -t;
             }
             state.needf = true;
             state.rstate.stage = 1;
             goto lbl_rcomm;
-        lbl_1:
+            lbl_1:
             state.needf = false;
-            if( (double)(alpha)!=(double)(0) )
+            if ((double)(alpha) != (double)(0))
             {
-                state.internalstate.f = state.f*Math.Pow(x, -(alpha/(1+alpha)))/(1+alpha);
+                state.internalstate.f = state.f * Math.Pow(x, -(alpha / (1 + alpha))) / (1 + alpha);
             }
             else
             {
                 state.internalstate.f = state.f;
             }
-            state.nfev = state.nfev+1;
+            state.nfev = state.nfev + 1;
             goto lbl_9;
-        lbl_10:
+            lbl_10:
             v1 = state.internalstate.r;
-            state.nintervals = state.nintervals+state.internalstate.heapused;
-            
+            state.nintervals = state.nintervals + state.internalstate.heapused;
+
             //
             // then, integrate right half of [a,b]:
             //     integral(f(x)dx, (b+a)/2, b) =
             //     = 1/(1+beta) * integral(t^(-beta/(1+beta))*f(b-t^(1/(1+beta)))dt, 0, (0.5*(b-a))^(1+beta))
             //
-            autogkinternalprepare(0, Math.Pow(0.5*(b-a), 1+beta), eps, state.xwidth, state.internalstate, _params);
-        lbl_11:
-            if( !autogkinternaliteration(state.internalstate, _params) )
+            autogkinternalprepare(
+                0,
+                Math.Pow(0.5 * (b - a), 1 + beta),
+                eps,
+                state.xwidth,
+                state.internalstate,
+                _params
+            );
+            lbl_11:
+            if (!autogkinternaliteration(state.internalstate, _params))
             {
                 goto lbl_12;
             }
-            
+
             //
             // Fill State.X, State.XMinusA, State.BMinusX.
             // Latter two are filled correctly (X-A, B-X) even if B<A.
             //
             x = state.internalstate.x;
-            t = Math.Pow(x, 1/(1+beta));
-            state.x = b-t;
-            if( (double)(s)>(double)(0) )
+            t = Math.Pow(x, 1 / (1 + beta));
+            state.x = b - t;
+            if ((double)(s) > (double)(0))
             {
-                state.xminusa = b-t-a;
+                state.xminusa = b - t - a;
                 state.bminusx = t;
             }
             else
             {
                 state.xminusa = -t;
-                state.bminusx = a-(b-t);
+                state.bminusx = a - (b - t);
             }
             state.needf = true;
             state.rstate.stage = 2;
             goto lbl_rcomm;
-        lbl_2:
+            lbl_2:
             state.needf = false;
-            if( (double)(beta)!=(double)(0) )
+            if ((double)(beta) != (double)(0))
             {
-                state.internalstate.f = state.f*Math.Pow(x, -(beta/(1+beta)))/(1+beta);
+                state.internalstate.f = state.f * Math.Pow(x, -(beta / (1 + beta))) / (1 + beta);
             }
             else
             {
                 state.internalstate.f = state.f;
             }
-            state.nfev = state.nfev+1;
+            state.nfev = state.nfev + 1;
             goto lbl_11;
-        lbl_12:
+            lbl_12:
             v2 = state.internalstate.r;
-            state.nintervals = state.nintervals+state.internalstate.heapused;
-            
+            state.nintervals = state.nintervals + state.internalstate.heapused;
+
             //
             // final result
             //
-            state.v = s*(v1+v2);
+            state.v = s * (v1 + v2);
             state.terminationtype = 1;
             result = false;
             return result;
-        lbl_7:
+            lbl_7:
             result = false;
             return result;
-            
+
             //
             // Saving state
             //
-        lbl_rcomm:
+            lbl_rcomm:
             result = true;
             state.rstate.ra[0] = s;
             state.rstate.ra[1] = tmp;
@@ -3178,7 +3501,6 @@ public partial class alglib
             state.rstate.ra[10] = v2;
             return result;
         }
-
 
         /*************************************************************************
         Adaptive integration results
@@ -3195,10 +3517,12 @@ public partial class alglib
           -- ALGLIB --
              Copyright 14.11.2007 by Bochkanov Sergey
         *************************************************************************/
-        public static void autogkresults(autogkstate state,
+        public static void autogkresults(
+            autogkstate state,
             ref double v,
             autogkreport rep,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             v = 0;
 
@@ -3208,7 +3532,6 @@ public partial class alglib
             rep.nintervals = state.nintervals;
         }
 
-
         /*************************************************************************
         Internal AutoGK subroutine
         eps<0   - error
@@ -3217,14 +3540,15 @@ public partial class alglib
         width<0 -   error
         width=0 -   no width requirements
         *************************************************************************/
-        private static void autogkinternalprepare(double a,
+        private static void autogkinternalprepare(
+            double a,
             double b,
             double eps,
             double xwidth,
             autogkinternalstate state,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
-            
             //
             // Save settings
             //
@@ -3232,21 +3556,22 @@ public partial class alglib
             state.b = b;
             state.eps = eps;
             state.xwidth = xwidth;
-            
+
             //
             // Prepare RComm structure
             //
-            state.rstate.ia = new int[3+1];
-            state.rstate.ra = new double[8+1];
+            state.rstate.ia = new int[3 + 1];
+            state.rstate.ra = new double[8 + 1];
             state.rstate.stage = -1;
         }
-
 
         /*************************************************************************
         Internal AutoGK subroutine
         *************************************************************************/
-        private static bool autogkinternaliteration(autogkinternalstate state,
-            alglib.xparams _params)
+        private static bool autogkinternaliteration(
+            autogkinternalstate state,
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
             double c1 = 0;
@@ -3263,7 +3588,6 @@ public partial class alglib
             double qeps = 0;
             int info = 0;
 
-            
             //
             // Reverse communication preparations
             // I know it looks ugly, but it works the same way
@@ -3274,7 +3598,7 @@ public partial class alglib
             //   generation - on first subroutine call
             // * values from previous call - on subsequent calls
             //
-            if( state.rstate.stage>=0 )
+            if (state.rstate.stage >= 0)
             {
                 i = state.rstate.ia[0];
                 j = state.rstate.ia[1];
@@ -3306,30 +3630,37 @@ public partial class alglib
                 tb = 487;
                 qeps = -115;
             }
-            if( state.rstate.stage==0 )
+            if (state.rstate.stage == 0)
             {
                 goto lbl_0;
             }
-            if( state.rstate.stage==1 )
+            if (state.rstate.stage == 1)
             {
                 goto lbl_1;
             }
-            if( state.rstate.stage==2 )
+            if (state.rstate.stage == 2)
             {
                 goto lbl_2;
             }
-            
+
             //
             // Routine body
             //
-            
+
             //
             // initialize quadratures.
             // use 15-point Gauss-Kronrod formula.
             //
             state.n = 15;
-            gkq.gkqgenerategausslegendre(state.n, ref info, ref state.qn, ref state.wk, ref state.wg, _params);
-            if( info<0 )
+            gkq.gkqgenerategausslegendre(
+                state.n,
+                ref info,
+                ref state.qn,
+                ref state.wk,
+                ref state.wg,
+                _params
+            );
+            if (info < 0)
             {
                 state.info = -5;
                 state.r = 0;
@@ -3337,36 +3668,37 @@ public partial class alglib
                 return result;
             }
             state.wr = new double[state.n];
-            for(i=0; i<=state.n-1; i++)
+            for (i = 0; i <= state.n - 1; i++)
             {
-                if( i==0 )
+                if (i == 0)
                 {
-                    state.wr[i] = 0.5*Math.Abs(state.qn[1]-state.qn[0]);
+                    state.wr[i] = 0.5 * Math.Abs(state.qn[1] - state.qn[0]);
                     continue;
                 }
-                if( i==state.n-1 )
+                if (i == state.n - 1)
                 {
-                    state.wr[state.n-1] = 0.5*Math.Abs(state.qn[state.n-1]-state.qn[state.n-2]);
+                    state.wr[state.n - 1] =
+                        0.5 * Math.Abs(state.qn[state.n - 1] - state.qn[state.n - 2]);
                     continue;
                 }
-                state.wr[i] = 0.5*Math.Abs(state.qn[i-1]-state.qn[i+1]);
+                state.wr[i] = 0.5 * Math.Abs(state.qn[i - 1] - state.qn[i + 1]);
             }
-            
+
             //
             // special case
             //
-            if( (double)(state.a)==(double)(state.b) )
+            if ((double)(state.a) == (double)(state.b))
             {
                 state.info = 1;
                 state.r = 0;
                 result = false;
                 return result;
             }
-            
+
             //
             // test parameters
             //
-            if( (double)(state.eps)<(double)(0) || (double)(state.xwidth)<(double)(0) )
+            if ((double)(state.eps) < (double)(0) || (double)(state.xwidth) < (double)(0))
             {
                 state.info = -1;
                 state.r = 0;
@@ -3374,11 +3706,11 @@ public partial class alglib
                 return result;
             }
             state.info = 1;
-            if( (double)(state.eps)==(double)(0) )
+            if ((double)(state.eps) == (double)(0))
             {
-                state.eps = 100000*math.machineepsilon;
+                state.eps = 100000 * math.machineepsilon;
             }
-            
+
             //
             // First, prepare heap
             // * column 0   -   absolute error
@@ -3387,11 +3719,11 @@ public partial class alglib
             // * column 3   -   left boundary of a subinterval
             // * column 4   -   right boundary of a subinterval
             //
-            if( (double)(state.xwidth)!=(double)(0) )
+            if ((double)(state.xwidth) != (double)(0))
             {
                 goto lbl_3;
             }
-            
+
             //
             // no maximum width requirements
             // start from one big subinterval
@@ -3400,62 +3732,62 @@ public partial class alglib
             state.heapsize = 1;
             state.heapused = 1;
             state.heap = new double[state.heapsize, state.heapwidth];
-            c1 = 0.5*(state.b-state.a);
-            c2 = 0.5*(state.b+state.a);
+            c1 = 0.5 * (state.b - state.a);
+            c2 = 0.5 * (state.b + state.a);
             intg = 0;
             intk = 0;
             inta = 0;
             i = 0;
-        lbl_5:
-            if( i>state.n-1 )
+            lbl_5:
+            if (i > state.n - 1)
             {
                 goto lbl_7;
             }
-            
+
             //
             // obtain F
             //
-            state.x = c1*state.qn[i]+c2;
+            state.x = c1 * state.qn[i] + c2;
             state.rstate.stage = 0;
             goto lbl_rcomm;
-        lbl_0:
+            lbl_0:
             v = state.f;
-            
+
             //
             // Gauss-Kronrod formula
             //
-            intk = intk+v*state.wk[i];
-            if( i%2==1 )
+            intk = intk + v * state.wk[i];
+            if (i % 2 == 1)
             {
-                intg = intg+v*state.wg[i];
+                intg = intg + v * state.wg[i];
             }
-            
+
             //
             // Integral |F(x)|
             // Use rectangles method
             //
-            inta = inta+Math.Abs(v)*state.wr[i];
-            i = i+1;
+            inta = inta + Math.Abs(v) * state.wr[i];
+            i = i + 1;
             goto lbl_5;
-        lbl_7:
-            intk = intk*(state.b-state.a)*0.5;
-            intg = intg*(state.b-state.a)*0.5;
-            inta = inta*(state.b-state.a)*0.5;
-            state.heap[0,0] = Math.Abs(intg-intk);
-            state.heap[0,1] = intk;
-            state.heap[0,2] = inta;
-            state.heap[0,3] = state.a;
-            state.heap[0,4] = state.b;
-            state.sumerr = state.heap[0,0];
+            lbl_7:
+            intk = intk * (state.b - state.a) * 0.5;
+            intg = intg * (state.b - state.a) * 0.5;
+            inta = inta * (state.b - state.a) * 0.5;
+            state.heap[0, 0] = Math.Abs(intg - intk);
+            state.heap[0, 1] = intk;
+            state.heap[0, 2] = inta;
+            state.heap[0, 3] = state.a;
+            state.heap[0, 4] = state.b;
+            state.sumerr = state.heap[0, 0];
             state.sumabs = Math.Abs(inta);
             goto lbl_4;
-        lbl_3:
-            
+            lbl_3:
+
             //
             // maximum subinterval should be no more than XWidth.
             // so we create Ceil((B-A)/XWidth)+1 small subintervals
             //
-            ns = (int)Math.Ceiling(Math.Abs(state.b-state.a)/state.xwidth)+1;
+            ns = (int)Math.Ceiling(Math.Abs(state.b - state.a) / state.xwidth) + 1;
             state.heapsize = ns;
             state.heapused = ns;
             state.heapwidth = 5;
@@ -3463,180 +3795,189 @@ public partial class alglib
             state.sumerr = 0;
             state.sumabs = 0;
             j = 0;
-        lbl_8:
-            if( j>ns-1 )
+            lbl_8:
+            if (j > ns - 1)
             {
                 goto lbl_10;
             }
-            ta = state.a+j*(state.b-state.a)/ns;
-            tb = state.a+(j+1)*(state.b-state.a)/ns;
-            c1 = 0.5*(tb-ta);
-            c2 = 0.5*(tb+ta);
+            ta = state.a + j * (state.b - state.a) / ns;
+            tb = state.a + (j + 1) * (state.b - state.a) / ns;
+            c1 = 0.5 * (tb - ta);
+            c2 = 0.5 * (tb + ta);
             intg = 0;
             intk = 0;
             inta = 0;
             i = 0;
-        lbl_11:
-            if( i>state.n-1 )
+            lbl_11:
+            if (i > state.n - 1)
             {
                 goto lbl_13;
             }
-            
+
             //
             // obtain F
             //
-            state.x = c1*state.qn[i]+c2;
+            state.x = c1 * state.qn[i] + c2;
             state.rstate.stage = 1;
             goto lbl_rcomm;
-        lbl_1:
+            lbl_1:
             v = state.f;
-            
+
             //
             // Gauss-Kronrod formula
             //
-            intk = intk+v*state.wk[i];
-            if( i%2==1 )
+            intk = intk + v * state.wk[i];
+            if (i % 2 == 1)
             {
-                intg = intg+v*state.wg[i];
+                intg = intg + v * state.wg[i];
             }
-            
+
             //
             // Integral |F(x)|
             // Use rectangles method
             //
-            inta = inta+Math.Abs(v)*state.wr[i];
-            i = i+1;
+            inta = inta + Math.Abs(v) * state.wr[i];
+            i = i + 1;
             goto lbl_11;
-        lbl_13:
-            intk = intk*(tb-ta)*0.5;
-            intg = intg*(tb-ta)*0.5;
-            inta = inta*(tb-ta)*0.5;
-            state.heap[j,0] = Math.Abs(intg-intk);
-            state.heap[j,1] = intk;
-            state.heap[j,2] = inta;
-            state.heap[j,3] = ta;
-            state.heap[j,4] = tb;
-            state.sumerr = state.sumerr+state.heap[j,0];
-            state.sumabs = state.sumabs+Math.Abs(inta);
-            j = j+1;
+            lbl_13:
+            intk = intk * (tb - ta) * 0.5;
+            intg = intg * (tb - ta) * 0.5;
+            inta = inta * (tb - ta) * 0.5;
+            state.heap[j, 0] = Math.Abs(intg - intk);
+            state.heap[j, 1] = intk;
+            state.heap[j, 2] = inta;
+            state.heap[j, 3] = ta;
+            state.heap[j, 4] = tb;
+            state.sumerr = state.sumerr + state.heap[j, 0];
+            state.sumabs = state.sumabs + Math.Abs(inta);
+            j = j + 1;
             goto lbl_8;
-        lbl_10:
-        lbl_4:
-            
+            lbl_10:
+            lbl_4:
+
             //
             // method iterations
             //
-        lbl_14:
-            if( false )
+            lbl_14:
+            if (false)
             {
                 goto lbl_15;
             }
-            
+
             //
             // additional memory if needed
             //
-            if( state.heapused==state.heapsize )
+            if (state.heapused == state.heapsize)
             {
-                mheapresize(ref state.heap, ref state.heapsize, 4*state.heapsize, state.heapwidth, _params);
+                mheapresize(
+                    ref state.heap,
+                    ref state.heapsize,
+                    4 * state.heapsize,
+                    state.heapwidth,
+                    _params
+                );
             }
-            
+
             //
             // TODO: every 20 iterations recalculate errors/sums
             //
-            if( (double)(state.sumerr)<=(double)(state.eps*state.sumabs) || state.heapused>=maxsubintervals )
+            if (
+                (double)(state.sumerr) <= (double)(state.eps * state.sumabs)
+                || state.heapused >= maxsubintervals
+            )
             {
                 state.r = 0;
-                for(j=0; j<=state.heapused-1; j++)
+                for (j = 0; j <= state.heapused - 1; j++)
                 {
-                    state.r = state.r+state.heap[j,1];
+                    state.r = state.r + state.heap[j, 1];
                 }
                 result = false;
                 return result;
             }
-            
+
             //
             // Exclude interval with maximum absolute error
             //
             mheappop(ref state.heap, state.heapused, state.heapwidth, _params);
-            state.sumerr = state.sumerr-state.heap[state.heapused-1,0];
-            state.sumabs = state.sumabs-state.heap[state.heapused-1,2];
-            
+            state.sumerr = state.sumerr - state.heap[state.heapused - 1, 0];
+            state.sumabs = state.sumabs - state.heap[state.heapused - 1, 2];
+
             //
             // Divide interval, create subintervals
             //
-            ta = state.heap[state.heapused-1,3];
-            tb = state.heap[state.heapused-1,4];
-            state.heap[state.heapused-1,3] = ta;
-            state.heap[state.heapused-1,4] = 0.5*(ta+tb);
-            state.heap[state.heapused,3] = 0.5*(ta+tb);
-            state.heap[state.heapused,4] = tb;
-            j = state.heapused-1;
-        lbl_16:
-            if( j>state.heapused )
+            ta = state.heap[state.heapused - 1, 3];
+            tb = state.heap[state.heapused - 1, 4];
+            state.heap[state.heapused - 1, 3] = ta;
+            state.heap[state.heapused - 1, 4] = 0.5 * (ta + tb);
+            state.heap[state.heapused, 3] = 0.5 * (ta + tb);
+            state.heap[state.heapused, 4] = tb;
+            j = state.heapused - 1;
+            lbl_16:
+            if (j > state.heapused)
             {
                 goto lbl_18;
             }
-            c1 = 0.5*(state.heap[j,4]-state.heap[j,3]);
-            c2 = 0.5*(state.heap[j,4]+state.heap[j,3]);
+            c1 = 0.5 * (state.heap[j, 4] - state.heap[j, 3]);
+            c2 = 0.5 * (state.heap[j, 4] + state.heap[j, 3]);
             intg = 0;
             intk = 0;
             inta = 0;
             i = 0;
-        lbl_19:
-            if( i>state.n-1 )
+            lbl_19:
+            if (i > state.n - 1)
             {
                 goto lbl_21;
             }
-            
+
             //
             // F(x)
             //
-            state.x = c1*state.qn[i]+c2;
+            state.x = c1 * state.qn[i] + c2;
             state.rstate.stage = 2;
             goto lbl_rcomm;
-        lbl_2:
+            lbl_2:
             v = state.f;
-            
+
             //
             // Gauss-Kronrod formula
             //
-            intk = intk+v*state.wk[i];
-            if( i%2==1 )
+            intk = intk + v * state.wk[i];
+            if (i % 2 == 1)
             {
-                intg = intg+v*state.wg[i];
+                intg = intg + v * state.wg[i];
             }
-            
+
             //
             // Integral |F(x)|
             // Use rectangles method
             //
-            inta = inta+Math.Abs(v)*state.wr[i];
-            i = i+1;
+            inta = inta + Math.Abs(v) * state.wr[i];
+            i = i + 1;
             goto lbl_19;
-        lbl_21:
-            intk = intk*(state.heap[j,4]-state.heap[j,3])*0.5;
-            intg = intg*(state.heap[j,4]-state.heap[j,3])*0.5;
-            inta = inta*(state.heap[j,4]-state.heap[j,3])*0.5;
-            state.heap[j,0] = Math.Abs(intg-intk);
-            state.heap[j,1] = intk;
-            state.heap[j,2] = inta;
-            state.sumerr = state.sumerr+state.heap[j,0];
-            state.sumabs = state.sumabs+state.heap[j,2];
-            j = j+1;
+            lbl_21:
+            intk = intk * (state.heap[j, 4] - state.heap[j, 3]) * 0.5;
+            intg = intg * (state.heap[j, 4] - state.heap[j, 3]) * 0.5;
+            inta = inta * (state.heap[j, 4] - state.heap[j, 3]) * 0.5;
+            state.heap[j, 0] = Math.Abs(intg - intk);
+            state.heap[j, 1] = intk;
+            state.heap[j, 2] = inta;
+            state.sumerr = state.sumerr + state.heap[j, 0];
+            state.sumabs = state.sumabs + state.heap[j, 2];
+            j = j + 1;
             goto lbl_16;
-        lbl_18:
-            mheappush(ref state.heap, state.heapused-1, state.heapwidth, _params);
+            lbl_18:
+            mheappush(ref state.heap, state.heapused - 1, state.heapwidth, _params);
             mheappush(ref state.heap, state.heapused, state.heapwidth, _params);
-            state.heapused = state.heapused+1;
+            state.heapused = state.heapused + 1;
             goto lbl_14;
-        lbl_15:
+            lbl_15:
             result = false;
             return result;
-            
+
             //
             // Saving state
             //
-        lbl_rcomm:
+            lbl_rcomm:
             result = true;
             state.rstate.ia[0] = i;
             state.rstate.ia[1] = j;
@@ -3654,45 +3995,46 @@ public partial class alglib
             return result;
         }
 
-
-        private static void mheappop(ref double[,] heap,
+        private static void mheappop(
+            ref double[,] heap,
             int heapsize,
             int heapwidth,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int p = 0;
             double t = 0;
             int maxcp = 0;
 
-            if( heapsize==1 )
+            if (heapsize == 1)
             {
                 return;
             }
-            for(i=0; i<=heapwidth-1; i++)
+            for (i = 0; i <= heapwidth - 1; i++)
             {
-                t = heap[heapsize-1,i];
-                heap[heapsize-1,i] = heap[0,i];
-                heap[0,i] = t;
+                t = heap[heapsize - 1, i];
+                heap[heapsize - 1, i] = heap[0, i];
+                heap[0, i] = t;
             }
             p = 0;
-            while( 2*p+1<heapsize-1 )
+            while (2 * p + 1 < heapsize - 1)
             {
-                maxcp = 2*p+1;
-                if( 2*p+2<heapsize-1 )
+                maxcp = 2 * p + 1;
+                if (2 * p + 2 < heapsize - 1)
                 {
-                    if( (double)(heap[2*p+2,0])>(double)(heap[2*p+1,0]) )
+                    if ((double)(heap[2 * p + 2, 0]) > (double)(heap[2 * p + 1, 0]))
                     {
-                        maxcp = 2*p+2;
+                        maxcp = 2 * p + 2;
                     }
                 }
-                if( (double)(heap[p,0])<(double)(heap[maxcp,0]) )
+                if ((double)(heap[p, 0]) < (double)(heap[maxcp, 0]))
                 {
-                    for(i=0; i<=heapwidth-1; i++)
+                    for (i = 0; i <= heapwidth - 1; i++)
                     {
-                        t = heap[p,i];
-                        heap[p,i] = heap[maxcp,i];
-                        heap[maxcp,i] = t;
+                        t = heap[p, i];
+                        heap[p, i] = heap[maxcp, i];
+                        heap[maxcp, i] = t;
                     }
                     p = maxcp;
                 }
@@ -3703,32 +4045,33 @@ public partial class alglib
             }
         }
 
-
-        private static void mheappush(ref double[,] heap,
+        private static void mheappush(
+            ref double[,] heap,
             int heapsize,
             int heapwidth,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int p = 0;
             double t = 0;
             int parent = 0;
 
-            if( heapsize==0 )
+            if (heapsize == 0)
             {
                 return;
             }
             p = heapsize;
-            while( p!=0 )
+            while (p != 0)
             {
-                parent = (p-1)/2;
-                if( (double)(heap[p,0])>(double)(heap[parent,0]) )
+                parent = (p - 1) / 2;
+                if ((double)(heap[p, 0]) > (double)(heap[parent, 0]))
                 {
-                    for(i=0; i<=heapwidth-1; i++)
+                    for (i = 0; i <= heapwidth - 1; i++)
                     {
-                        t = heap[p,i];
-                        heap[p,i] = heap[parent,i];
-                        heap[parent,i] = t;
+                        t = heap[p, i];
+                        heap[p, i] = heap[parent, i];
+                        heap[parent, i] = t;
                     }
                     p = parent;
                 }
@@ -3739,37 +4082,35 @@ public partial class alglib
             }
         }
 
-
-        private static void mheapresize(ref double[,] heap,
+        private static void mheapresize(
+            ref double[,] heap,
             ref int heapsize,
             int newheapsize,
             int heapwidth,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
-            double[,] tmp = new double[0,0];
+            double[,] tmp = new double[0, 0];
             int i = 0;
             int i_ = 0;
 
             tmp = new double[heapsize, heapwidth];
-            for(i=0; i<=heapsize-1; i++)
+            for (i = 0; i <= heapsize - 1; i++)
             {
-                for(i_=0; i_<=heapwidth-1;i_++)
+                for (i_ = 0; i_ <= heapwidth - 1; i_++)
                 {
-                    tmp[i,i_] = heap[i,i_];
+                    tmp[i, i_] = heap[i, i_];
                 }
             }
             heap = new double[newheapsize, heapwidth];
-            for(i=0; i<=heapsize-1; i++)
+            for (i = 0; i <= heapsize - 1; i++)
             {
-                for(i_=0; i_<=heapwidth-1;i_++)
+                for (i_ = 0; i_ <= heapwidth - 1; i_++)
                 {
-                    heap[i,i_] = tmp[i,i_];
+                    heap[i, i_] = tmp[i, i_];
                 }
             }
             heapsize = newheapsize;
         }
-
-
     }
 }
-

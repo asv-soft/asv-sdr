@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 
 namespace Asv.Sdr.SignalHound
 {
-
     enum SgMode
     {
         SgModeCw = 0,
@@ -16,14 +15,14 @@ namespace Asv.Sdr.SignalHound
         SgModeStepSweep = 5,
         SgModeListSweep = 6,
         SgModeNoise = 7,
-        SgCustomIq = 8
+        SgCustomIq = 8,
     }
 
     enum SgMultiTonePhase
     {
         SgParabolic = 0,
         SgRandom = 1,
-        SgRandomFixedSeed = 2
+        SgRandomFixedSeed = 2,
     }
 
     enum SgShape
@@ -31,7 +30,7 @@ namespace Asv.Sdr.SignalHound
         SgShapeSine = 0,
         SgShapeTriangle = 1,
         SgShapeSquare = 2,
-        SgShapeRamp = 3
+        SgShapeRamp = 3,
     }
 
     enum SgFilterType
@@ -39,7 +38,7 @@ namespace Asv.Sdr.SignalHound
         SgRaisedCosine = 0,
         SgRootRaisedCosine = 1,
         SgGaussian = 2,
-        SgNone = 3
+        SgNone = 3,
     }
 
     enum SgModulationType
@@ -55,7 +54,7 @@ namespace Asv.Sdr.SignalHound
         SgMod16Psk = 8,
         SgMod16Qam = 9,
         SgMod64Qam = 10,
-        SgMod256Qam = 11
+        SgMod256Qam = 11,
     }
 
     enum SgStatus
@@ -66,7 +65,7 @@ namespace Asv.Sdr.SignalHound
         SgInvalidDeviceHandle = -3,
         SgNullPtrErr = -1,
         SgNoError = 0,
-        SgSettingClamped = 1
+        SgSettingClamped = 1,
     }
 
     static class SgApi
@@ -106,98 +105,144 @@ namespace Asv.Sdr.SignalHound
         #endregion
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgGetDeviceList(int[] deviceList, ref int length);
+        public static extern SgStatus SgGetDeviceList(int[] deviceList, ref int length);
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgOpenDevice(ref int device);
+        public static extern SgStatus SgOpenDevice(ref int device);
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgOpenDeviceBySerial(ref int device, int serialNumber);
+        public static extern SgStatus SgOpenDeviceBySerial(ref int device, int serialNumber);
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgCloseDevice(int device);
+        public static extern SgStatus SgCloseDevice(int device);
 
         public static string SgGetSerialNumber(int device)
         {
             var serialNumber = 0;
-            return sgGetSerialNumber(device, ref serialNumber) == SgStatus.SgNoError ? serialNumber.ToString() : "";
+            return SgGetSerialNumber1(device, ref serialNumber) == SgStatus.SgNoError
+                ? serialNumber.ToString()
+                : string.Empty;
         }
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern SgStatus sgGetSerialNumber(int device, ref int serialNumber);
+        private static extern SgStatus SgGetSerialNumber1(int device, ref int serialNumber);
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgSetFrequencyAmplitude(int device, double frequency, double amplitude);
+        public static extern SgStatus SgSetFrequencyAmplitude(
+            int device,
+            double frequency,
+            double amplitude
+        );
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgRFOff(int device);
+        public static extern SgStatus SgRFOff(int device);
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgSetCW(int device);
+        public static extern SgStatus SgSetCW(int device);
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgSetAM(int device, double frequency, double depth, SgShape shape);
+        public static extern SgStatus SgSetAM(
+            int device,
+            double frequency,
+            double depth,
+            SgShape shape
+        );
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgSetFM(int device, double frequency, double deviation, SgShape shape);
+        public static extern SgStatus SgSetFM(
+            int device,
+            double frequency,
+            double deviation,
+            SgShape shape
+        );
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgRFOsgSetPulse(int device, double period, double width);
+        public static extern SgStatus SgRFOsgSetPulse(int device, double period, double width);
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgSetSweep(int device, double time, double span);
+        public static extern SgStatus SgSetSweep(int device, double time, double span);
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgSetMultitone(int device, int count, double spacing, double notchWidth,
-            SgMultiTonePhase phase);
+        public static extern SgStatus SgSetMultitone(
+            int device,
+            int count,
+            double spacing,
+            double notchWidth,
+            SgMultiTonePhase phase
+        );
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgSetASK(int device, double symbolRate, SgFilterType filterType,
-            double filterAlpha, double depth, int[] symbols, int symbolCount);
+        public static extern SgStatus SgSetASK(
+            int device,
+            double symbolRate,
+            SgFilterType filterType,
+            double filterAlpha,
+            double depth,
+            int[] symbols,
+            int symbolCount
+        );
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgSetFSK(int device, double symbolRate, SgFilterType filterType,
-            double filterAlpha, double modulationIndex, int[] symbols, int symbolCount);
+        public static extern SgStatus SgSetFSK(
+            int device,
+            double symbolRate,
+            SgFilterType filterType,
+            double filterAlpha,
+            double modulationIndex,
+            int[] symbols,
+            int symbolCount
+        );
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgSetPSK(int device, double symbolRate, SgModulationType modType,
-            SgFilterType filterType, double filterAlpha, int[] symbols, int symbolCount);
+        public static extern SgStatus SgSetPSK(
+            int device,
+            double symbolRate,
+            SgModulationType modType,
+            SgFilterType filterType,
+            double filterAlpha,
+            int[] symbols,
+            int symbolCount
+        );
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgSetCustomIQ(int device, double clockRate, double[] IVals, double[] QVals,
-            int length, int period);
+        public static extern SgStatus SgSetCustomIQ(
+            int device,
+            double clockRate,
+            double[] iVals,
+            double[] qVals,
+            int length,
+            int period
+        );
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgQueryPulse(int device, ref double period, ref double width);
+        public static extern SgStatus SgQueryPulse(int device, ref double period, ref double width);
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgQuerySymbolClockRate(int device, ref double clock);
+        public static extern SgStatus SgQuerySymbolClockRate(int device, ref double clock);
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgQueryClockError(int device, ref double error);
+        public static extern SgStatus SgQueryClockError(int device, ref double error);
 
-        public static string SgGetStatusString(SgStatus status)
+        public static string SgGetStatusStringStr(SgStatus status)
         {
-            var strPtr = sgGetStatusString(status);
-            return Marshal.PtrToStringAnsi(strPtr);
+            var strPtr = SgGetStatusString(status);
+            return Marshal.PtrToStringAnsi(strPtr) ?? string.Empty;
         }
 
         public static string SgGetApiVersion()
         {
-            var strPtr = sgGetAPIVersion();
-            return Marshal.PtrToStringAnsi(strPtr);
+            var strPtr = SgGetAPIVersion();
+            return Marshal.PtrToStringAnsi(strPtr) ?? string.Empty;
         }
 
         // Sets an I/Q value to null the LO feed-thru. This may belong in SG_API_internal
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern SgStatus sgSetIQNullValue(int device, int Icount, int Qcount);
+        public static extern SgStatus SgSetIQNullValue(int device, int iCount, int qCount);
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr sgGetStatusString(SgStatus status);
+        private static extern IntPtr SgGetStatusString(SgStatus status);
 
         [DllImport("sg_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr sgGetAPIVersion();
+        private static extern IntPtr SgGetAPIVersion();
     }
-
-
 }

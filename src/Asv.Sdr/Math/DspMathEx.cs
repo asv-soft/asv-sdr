@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Asv.Sdr
 {
@@ -15,23 +14,31 @@ namespace Asv.Sdr
             return Math.Atan2(y, x);
         }
 
-        public static (double, double) FromPolarCoordinates(double magnitude, double phase) => (magnitude * Math.Cos(phase), magnitude * Math.Sin(phase));
+        public static (double, double) FromPolarCoordinates(double magnitude, double phase) =>
+            (magnitude * Math.Cos(phase), magnitude * Math.Sin(phase));
 
         public static double Abs(double x, double y)
         {
             if (double.IsInfinity(x) || double.IsInfinity(y))
+            {
                 return double.PositiveInfinity;
+            }
+
             var num1 = Math.Abs(x);
             var num2 = Math.Abs(y);
             if (num1 > num2)
             {
                 var num3 = num2 / num1;
-                return num1 * Math.Sqrt(1.0 + num3 * num3);
+                return num1 * Math.Sqrt(1.0 + (num3 * num3));
             }
+
             if (num2 == 0.0)
+            {
                 return num1;
+            }
+
             var num4 = num1 / num2;
-            return num2 * Math.Sqrt(1.0 + num4 * num4);
+            return num2 * Math.Sqrt(1.0 + (num4 * num4));
         }
 
         public static void CopyTo(this ReadOnlySpan<float> src, Span<double> destination)
@@ -46,10 +53,16 @@ namespace Asv.Sdr
         {
             // https://en.wikipedia.org/wiki/Mean_of_circular_quantities
             var distance = (a - b) % 360;
-            if (distance < -180)
-                distance += 360;
-            else if (distance > 179)
-                distance -= 360;
+            switch (distance)
+            {
+                case < -180:
+                    distance += 360;
+                    break;
+                case > 179:
+                    distance -= 360;
+                    break;
+            }
+
             return distance;
         }
 
@@ -67,13 +80,17 @@ namespace Asv.Sdr
                 distance += Pi2;
             }
 
-            if (distance < -Math.PI)
-                distance += Pi2;
-            else if (distance > Math.PI)
-                distance -= Pi2;
+            switch (distance)
+            {
+                case < -Math.PI:
+                    distance += Pi2;
+                    break;
+                case > Math.PI:
+                    distance -= Pi2;
+                    break;
+            }
 
             return distance;
-
         }
 
         public static double GetAvgAngleRad(IEnumerable<double> angles)
@@ -91,18 +108,18 @@ namespace Asv.Sdr
 
             return Math.Atan2(sumQ / count, sumI / count);
         }
+
         public static double GetAvgAngleDeg(IEnumerable<double> angles)
         {
             // https://rosettacode.org/wiki/Averages/Mean_angle#C.23
             var sumI = 0.0;
             var sumQ = 0.0;
             var count = 0;
-            
 
             foreach (var angle in angles)
             {
-                sumI += Math.Cos(angle* PiDev180Deg);
-                sumQ += Math.Sin(angle* PiDev180Deg);
+                sumI += Math.Cos(angle * PiDev180Deg);
+                sumQ += Math.Sin(angle * PiDev180Deg);
                 ++count;
             }
 
@@ -118,44 +135,45 @@ namespace Asv.Sdr
         // }
 
         /// <summary>
-        /// Calculate мВт в мкВ
+        /// Calculate мВт в мкВ.
         /// </summary>
-        /// <param name="mW"></param>
-        /// <param name="ohm"></param>
-        /// <returns></returns>
-        public static double mW2uV(double mW, double ohm)
+        /// <param name="mW">mW.</param>
+        /// <param name="ohm">ohm.</param>
+        /// <returns>.</returns>
+        public static double Mw2Uv(double mW, double ohm)
         {
             return Math.Sqrt((mW / 1000) * ohm) * 1e6;
         }
+
         /// <summary>
-        /// Calculate дБм в мВт
+        /// Calculate дБм в мВт.
         /// </summary>
-        /// <param name="mW"></param>
-        /// <returns></returns>
-        public static double mW2dBm(double mW)
+        /// <param name="mW">mW.</param>
+        /// <returns>.</returns>
+        public static double Mw2dBm(double mW)
         {
             return 10 * Math.Log10(mW);
         }
 
         /// <summary>
-        /// Calculate мВт в дБм
+        /// Calculate мВт в дБм.
         /// </summary>
-        /// <param name="dBm"></param>
-        /// <returns></returns>
-        public static double dBm2mW(double dBm)
+        /// <param name="dBm">dBm.</param>
+        /// <returns>.</returns>
+        public static double DBm2Mw(double dBm)
         {
             return Math.Pow(10, dBm / 10);
         }
 
         /// <summary>
-        /// Calculate dBm в мкВ
+        /// Calculate dBm в мкВ.
         /// </summary>
-        /// <param name="dBm"></param>
-        /// <param name="ohm"></param>
-        /// <returns></returns>
-        public static double dBm2uV(double dBm, double ohm)
+        /// <param name="dBm">dBm.</param>
+        /// <param name="ohm">ohm.</param>
+        /// <returns>.</returns>
+        public static double DBm2Uv(double dBm, double ohm)
         {
-            return mW2uV(dBm2mW(dBm), ohm);
+            return Mw2Uv(DBm2Mw(dBm), ohm);
         }
 
         /// <summary>
@@ -175,20 +193,27 @@ namespace Asv.Sdr
             double[] x,
             double[] y,
             double lower,
-            double upper)
+            double upper
+        )
         {
             for (int index1 = 0; index1 < x.Length; ++index1)
             {
-                if (value < x[index1])
+                if (!(value < x[index1]))
                 {
-                    if (index1 == 0)
-                        return lower;
-                    int index2 = index1 - 1;
-                    int index3 = index1;
-                    double num = (value - x[index2]) / (x[index3] - x[index2]);
-                    return y[index2] + (y[index3] - y[index2]) * num;
+                    continue;
                 }
+
+                if (index1 == 0)
+                {
+                    return lower;
+                }
+
+                int index2 = index1 - 1;
+                int index3 = index1;
+                double num = (value - x[index2]) / (x[index3] - x[index2]);
+                return y[index2] + ((y[index3] - y[index2]) * num);
             }
+
             return upper;
         }
     }

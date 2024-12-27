@@ -24,7 +24,7 @@ public static class AdsbParserFactory
             yield return () => new AdsbAircraftOperationStatusV2();
         }
     }
-    
+
     /// <summary>
     /// Registers the default messages to the Nmea0183Parser instance.
     /// </summary>
@@ -36,10 +36,10 @@ public static class AdsbParserFactory
         {
             src.Register(func);
         }
-        
+
         return src;
     }
-    
+
     /// <summary>
     /// Filters the messages of the given type from the GNSS connection messages.
     /// </summary>
@@ -48,6 +48,9 @@ public static class AdsbParserFactory
     /// <returns>An Observable that contains only the messages of type TMsg.</returns>
     public static IObservable<TMsg> Filter<TMsg>(this AdsbMessageParser src)
     {
-        return src.OnMessage./*ObserveOn(Scheduler.Default).*/Where(_ => _ is TMsg).Cast<TMsg>();
+        return src
+            .OnMessage. /*ObserveOn(Scheduler.Default).*/
+            Where(_ => _ is TMsg)
+            .Cast<TMsg>();
     }
 }

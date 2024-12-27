@@ -1,14 +1,15 @@
 using System;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Net.NetworkInformation;
 using System.Reactive.Linq;
 using Asv.Common;
-using Asv.IO;
 
 namespace Asv.Sdr.Gui;
 
-public delegate void DebugPlotDelegate(string name, double[] data, DataType type, PlotNumber plotNumber);
+public delegate void DebugPlotDelegate(
+    string name,
+    double[] data,
+    DataType type,
+    PlotNumber plotNumber
+);
 
 public enum DataType
 {
@@ -16,7 +17,7 @@ public enum DataType
     Bar,
     Signal,
     HorizontalLine,
-    VerticalLine
+    VerticalLine,
 }
 
 public enum PlotNumber
@@ -24,7 +25,6 @@ public enum PlotNumber
     Plot1,
     Plot2,
 }
-
 
 public class AdsbSignalProcessor
 {
@@ -35,7 +35,7 @@ public class AdsbSignalProcessor
     private const int PrefixPostfixSize = 10;
     private const int AdsbHalfBitRate = 2_000_000;
     private const int MinAdsbMessageSize = 56;
-    
+
     private readonly PulseCrossCorrelation _correlation;
     private readonly CircularBuffer2<double> _rawBuffer;
     private readonly CircularBuffer2<double> _correlationBuffer;
@@ -56,44 +56,52 @@ public class AdsbSignalProcessor
         {
             throw new ArgumentException($"Sample rate must be multiple of {AdsbHalfBitRate}");
         }
+
         _correlation = new PulseCrossCorrelation(_pulseLength, Preamble);
-        
+
         _correlationBuffer = new CircularBuffer2<double>(Preamble.Length * _pulseLength);
-        _rawBuffer = new CircularBuffer2<double>( (Preamble.Length + MaxAdsbMessageSize * 2  /*cause 1 bit is 2 pulse*/ + PrefixPostfixSize*2) * _pulseLength);
+        _rawBuffer = new CircularBuffer2<double>(
+            (
+                Preamble.Length
+                + (MaxAdsbMessageSize * 2) /*cause 1 bit is 2 pulse*/
+                + (PrefixPostfixSize * 2)
+            ) * _pulseLength
+        );
         _prefixPulseSize = PrefixPostfixSize * _pulseLength;
-        _avgSize = (Preamble.Length + MinAdsbMessageSize * 2  /*cause 1 bit is 2 pulse*/) * _pulseLength;
+        _avgSize =
+            (
+                Preamble.Length + (MinAdsbMessageSize * 2) /*cause 1 bit is 2 pulse*/
+            ) * _pulseLength;
         _bitPulseMinimumLevel = _pulseLength / 2;
-        
-        
+
         _parser = new AdsbMessageParser();
-        //_parser.Register(()=>new AdsbAirbornePosition());
-        _parser.Register(()=>new AdsbAircraftIdentification());
+        _parser.Register(() => new AdsbAircraftIdentification());
         _parser2 = new AdsbBitDecoder();
         _parser.OnMessageRecev.Subscribe(x =>
         {
-            Console.WriteLine($"{DateTime.Now:O} {x}");
+            Console.WriteLine(@$"{DateTime.Now:O} {x}");
         });
         var timeBuffer = new double[1000];
-        Observable.Timer(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1))
+        Observable
+            .Timer(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1))
             .Subscribe(x =>
             {
                 lock (_sync)
                 {
-                    _debugCallback.Invoke("Time", [], DataType.Clear, PlotNumber.Plot2);
-                    _debugCallback.Invoke("Time", timeBuffer, DataType.Bar, PlotNumber.Plot2);
+                    _debugCallback?.Invoke("Time", [], DataType.Clear, PlotNumber.Plot2);
+                    _debugCallback?.Invoke("Time", timeBuffer, DataType.Bar, PlotNumber.Plot2);
                 }
-                
             });
-        _parser2.FrameReceived+= (frame, actualLength) =>
+        _parser2.FrameReceived += (frame, actualLength) =>
         {
             lock (_sync)
             {
                 timeBuffer[DateTime.Now.Millisecond] += 1;
                 _parser2.Reset();
             }
-            Console.WriteLine($"{DateTime.Now:O} {AdsbBitDecoder.GetICAOAddress(frame):X}");
-        };
 
+            Console.WriteLine(@$"{DateTime.Now:O} {AdsbBitDecoder.GetICAOAddress(frame):X}");
+        };
     }
 
     enum State
@@ -103,7 +111,6 @@ public class AdsbSignalProcessor
         Data,
     }
 
-    
     public void Process(double input)
     {
         switch (_state)
@@ -116,16 +123,18 @@ public class AdsbSignalProcessor
                     _state = State.Fall;
                     _correlationBuffer.Clear();
                     _correlationBuffer.PushBack(riseCorr);
-                    while(_rawBuffer.Size > _prefixPulseSize)
+                    while (_rawBuffer.Size > _prefixPulseSize)
                     {
                         _rawBuffer.PopFront();
                     }
                 }
+
                 break;
             case State.Fall:
                 var fallCorr = _correlation.Process(input);
                 _correlationBuffer.PushBack(fallCorr);
                 _rawBuffer.PushBack(input);
+
                 // found new rise correlation
                 if (_correlationBuffer.IsFull)
                 {
@@ -139,13 +148,16 @@ public class AdsbSignalProcessor
                             maxIndex = i;
                         }
                     }
+
                     for (int i = 0; i < maxIndex; i++)
                     {
                         _correlationBuffer.PopFront();
                     }
+
                     _state = State.Data;
                     _correlation.Reset();
                 }
+
                 break;
             case State.Data:
                 _rawBuffer.PushBack(input);
@@ -154,44 +166,50 @@ public class AdsbSignalProcessor
                     _state = State.Rise;
                     TryFindMessage();
                 }
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
     }
 
-
     private void TryFindMessage()
     {
         // clear all plots
         _debugCallback?.Invoke(string.Empty, [], DataType.Clear, PlotNumber.Plot1);
-        
+
         // calculate average for minimum size of message (skip prefix)
         var avg = 0.0;
         for (int i = 0; i < _avgSize; i++)
         {
-            avg+=_rawBuffer[_prefixPulseSize + i];
+            avg += _rawBuffer[_prefixPulseSize + i];
         }
-        _debugCallback?.Invoke("Raw signal", _rawBuffer.ToArray(), DataType.Signal, PlotNumber.Plot1);
+
+        _debugCallback?.Invoke(
+            "Raw signal",
+            _rawBuffer.ToArray(),
+            DataType.Signal,
+            PlotNumber.Plot1
+        );
         avg /= _avgSize;
         _debugCallback?.Invoke("Average", [avg], DataType.HorizontalLine, PlotNumber.Plot1);
-        
+
         if (_debugCallback != null)
         {
             var normilizedBuffer = new double[_rawBuffer.Size];
-            for (var i = 0; i < _rawBuffer.Size; i ++)
+            for (var i = 0; i < _rawBuffer.Size; i++)
             {
                 normilizedBuffer[i] = _rawBuffer[i] > avg ? avg * 2.0 : 0.0;
             }
+
             _debugCallback.Invoke("Normalized", normilizedBuffer, DataType.Bar, PlotNumber.Plot1);
         }
-        
+
         // clear buffer before first rise
         while (_rawBuffer.IsEmpty == false && _rawBuffer[0] < avg)
         {
-            _rawBuffer.PopFront(); 
+            _rawBuffer.PopFront();
         }
-        
 
         while (_rawBuffer.IsEmpty == false && _rawBuffer.Size > _pulseLength)
         {
@@ -204,22 +222,19 @@ public class AdsbSignalProcessor
                     cnt++;
                 }
             }
+
             if (cnt > _bitPulseMinimumLevel)
             {
                 value = 1;
             }
+
             _parser2.ProcessSample(value);
-            if (_parser.ProcessSample((byte)value) == true)
-            {
-                
-            }
+            if (_parser.ProcessSample((byte)value) == true) { }
             for (var i = 0; i < _pulseLength; i++)
             {
                 _rawBuffer.PopFront();
             }
         }
-        
-       
     }
 
     public IObservable<AdsbDfMessageBase> OnMessage => _parser.OnMessage;

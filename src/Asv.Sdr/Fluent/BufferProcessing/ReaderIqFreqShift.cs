@@ -2,13 +2,19 @@
 
 namespace Asv.Sdr
 {
-    public class ReaderIqFreqShiftDouble:ReaderIqSubject<double, double>
+    public class ReaderIqFreqShiftDouble : ReaderIqSubject<double, double>
     {
         private readonly double _argMultiplier;
         private uint _increment;
         private readonly int _size;
 
-        public ReaderIqFreqShiftDouble(IReaderIqSubject<double> input, double sampleRate,int freqHz, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
+        public ReaderIqFreqShiftDouble(
+            IReaderIqSubject<double> input,
+            double sampleRate,
+            int freqHz,
+            bool useArrayPool
+        )
+            : base(input, input.OutputBufferSize, useArrayPool)
         {
             _argMultiplier = 2 * Math.PI * freqHz / sampleRate;
             _increment = 0;
@@ -20,7 +26,7 @@ namespace Asv.Sdr
             for (var i = 0; i < _size; i++)
             {
                 output[i * 2] = Math.Sin(_increment * _argMultiplier) * input[i * 2];
-                output[i * 2 + 1] = Math.Cos(_increment * _argMultiplier) * input[i * 2 + 1];
+                output[(i * 2) + 1] = Math.Cos(_increment * _argMultiplier) * input[(i * 2) + 1];
                 _increment++;
             }
         }
@@ -32,7 +38,13 @@ namespace Asv.Sdr
         private uint _increment;
         private readonly int _size;
 
-        public ReaderIqFreqShiftFloat(IReaderIqSubject<float> input, double sampleRate, int freqHz, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
+        public ReaderIqFreqShiftFloat(
+            IReaderIqSubject<float> input,
+            double sampleRate,
+            int freqHz,
+            bool useArrayPool
+        )
+            : base(input, input.OutputBufferSize, useArrayPool)
         {
             _argMultiplier = 2 * Math.PI * freqHz / sampleRate;
             _increment = 0;

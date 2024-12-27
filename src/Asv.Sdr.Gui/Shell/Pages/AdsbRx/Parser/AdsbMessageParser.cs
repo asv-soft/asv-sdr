@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reactive.Subjects;
 using System.Threading;
 using Asv.Common;
-using Asv.IO;
 
 namespace Asv.Sdr.Gui;
 
@@ -16,23 +15,23 @@ public class AdsbMessageParser : DisposableOnce
 
     private readonly Dictionary<ushort, Func<AdsbDfMessageBase>> _factory = new();
     private int _readBytes;
-    
+
     /// <summary>
     /// Number of bytes in the message buffer.
     /// </summary>
-    private int _readedBytes;          /* number of bytes in message buffer */
+    private int _readedBytes; /* number of bytes in message buffer */
 
     /// <summary>
     /// The number of bits in the word buffer.
     /// </summary>
-    private int _readedBits;           /* number of bits in word buffer     */
+    private int _readedBits; /* number of bits in word buffer     */
 
     private byte _syncByte;
     private byte _currentByte;
     private byte _stateByte;
 
     private State _state = State.Preamb1;
-    
+
     private enum State
     {
         /// <summary>
@@ -45,8 +44,8 @@ public class AdsbMessageParser : DisposableOnce
         /// </summary>
         Preamb2,
 
-        DFAndAC,
-        
+        DfAndAc,
+
         /// <summary>
         /// Represents the possible states of a transmission.
         /// </summary>
@@ -56,7 +55,7 @@ public class AdsbMessageParser : DisposableOnce
         /// Represents the Crc1 state of a system.
         /// </summary>
         Crc1,
-        
+
         /// <summary>
         /// Represents the Crc2 state of a system.
         /// </summary>
@@ -65,13 +64,11 @@ public class AdsbMessageParser : DisposableOnce
         /// <summary>
         /// Represents the Crc3 state of a system.
         /// </summary>
-        Crc3
+        Crc3,
     }
-    
+
     private readonly byte[] _frame = new byte[AdsbHelper.LongFrameLengthBytes];
     private int _msgLen;
-    private bool _first;
-    private int _firstValue;
 
     /// <summary>
     /// Registers a factory.
@@ -87,7 +84,7 @@ public class AdsbMessageParser : DisposableOnce
     /// Gets the statistic input bytes.
     /// </summary>
     public int StatisticInputBytes => _readBytes;
-    
+
     /// <summary>
     /// Notifies when a message is received.
     /// </summary>
@@ -96,21 +93,25 @@ public class AdsbMessageParser : DisposableOnce
     {
         _onMessageSubject.OnNext(message);
     }
-    
+
     /// <summary>
     /// Parses a packet.
     /// </summary>
     /// <param name="id">The ID of the packet.</param>
     /// <param name="data">The data of the packet.</param>
     /// <param name="ignoreReadNotAllData">Optional boolean that defaults to false. If true, does not check if all data was read.</param>
-    private void ParsePacket(ushort id, ref ReadOnlySpan<byte> data, bool ignoreReadNotAllData = false)
+    private void ParsePacket(
+        ushort id,
+        ref ReadOnlySpan<byte> data,
+        bool ignoreReadNotAllData = false
+    )
     {
         if (!_factory.TryGetValue(id, out var factory))
         {
             InternalOnError(new AdsbUnknownMessageException(id.ToString()));
             return;
         }
-            
+
         var message = factory();
         try
         {
@@ -123,7 +124,7 @@ public class AdsbMessageParser : DisposableOnce
             InternalOnError(new AdsbDeserializeMessageException(id.ToString(), e));
             return;
         }
-            
+
         try
         {
             InternalOnMessage(message);
@@ -138,7 +139,7 @@ public class AdsbMessageParser : DisposableOnce
             PublishWhenReadNotAllDataWhenDeserializePacket(message.DownlinkFormat.ToString());
         }
     }
-    
+
     private bool TryFormByte(byte mag, out byte result)
     {
         _readedBits++;
@@ -151,6 +152,7 @@ public class AdsbMessageParser : DisposableOnce
                 result = 0;
                 return false;
             }
+
             _currentByte <<= 1;
             _currentByte |= (byte)((_stateByte & 0b11) == 0b01 ? 0 : 1);
             _stateByte = 0;
@@ -167,6 +169,7 @@ public class AdsbMessageParser : DisposableOnce
         result = 0;
         return false;
     }
+
     /// <summary>
     /// Reads a bit of data.
     /// </summary>
@@ -186,6 +189,7 @@ public class AdsbMessageParser : DisposableOnce
                     _state = State.Preamb2;
                     _readedBytes++;
                 }
+
                 break;
             case State.Preamb2:
                 _syncByte <<= 1;
@@ -199,23 +203,27 @@ public class AdsbMessageParser : DisposableOnce
                         _syncByte = 0;
                         _readedBits = 0;
                         _readedBytes++;
-                        _state = State.DFAndAC;
+                        _state = State.DfAndAc;
                     }
                     else
                     {
                         Reset();
                     }
                 }
+
                 break;
-            case State.DFAndAC:
+            case State.DfAndAc:
                 if (TryFormByte(mag, out var dfacByte))
                 {
                     _frame[_readedBytes] = dfacByte;
                     _readedBytes++;
-                    var df = AdsbHelper.GetDownlinkFormat(new ReadOnlySpan<byte>(_frame)[.._readedBytes]);
+                    var df = AdsbHelper.GetDownlinkFormat(
+                        new ReadOnlySpan<byte>(_frame)[.._readedBytes]
+                    );
                     _msgLen = AdsbHelper.GetMessageLength(df);
                     _state = State.Payload;
                 }
+
                 break;
             case State.Payload:
                 if (TryFormByte(mag, out var payloadByte))
@@ -227,6 +235,7 @@ public class AdsbMessageParser : DisposableOnce
                         _state = State.Crc1;
                     }
                 }
+
                 break;
             case State.Crc1:
                 if (TryFormByte(mag, out var crc1Byte))
@@ -238,6 +247,7 @@ public class AdsbMessageParser : DisposableOnce
                         _state = State.Crc2;
                     }
                 }
+
                 break;
             case State.Crc2:
                 if (TryFormByte(mag, out var crc2Byte))
@@ -249,6 +259,7 @@ public class AdsbMessageParser : DisposableOnce
                         _state = State.Crc3;
                     }
                 }
+
                 break;
             case State.Crc3:
                 if (TryFormByte(mag, out var crc3Byte))
@@ -258,8 +269,10 @@ public class AdsbMessageParser : DisposableOnce
                     if (_readedBytes == _msgLen)
                     {
                         var originalCrc = AdsbHelper.CalcCrc(_frame);
-                        var sourceCrc = (uint)(_frame[_msgLen - 3] << 16) | (uint)(_frame[_msgLen - 2] << 8) |
-                                        _frame[_msgLen - 1];
+                        var sourceCrc =
+                            (uint)(_frame[_msgLen - 3] << 16)
+                            | (uint)(_frame[_msgLen - 2] << 8)
+                            | _frame[_msgLen - 1];
                         if (originalCrc == sourceCrc)
                         {
                             var id = AdsbHelper.GetMessageId(_frame);
@@ -269,10 +282,12 @@ public class AdsbMessageParser : DisposableOnce
                             Reset();
                             return true;
                         }
+
                         PublishWhenCrcError();
                         Reset();
                     }
                 }
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -335,10 +350,10 @@ public class AdsbMessageParser : DisposableOnce
     {
         _onErrorSubject.OnCompleted();
         _onErrorSubject.Dispose();
-            
+
         _onMessageSubject.OnCompleted();
         _onMessageSubject.Dispose();
-        
+
         _factory.Clear();
     }
 }

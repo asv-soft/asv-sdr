@@ -16,9 +16,8 @@ public partial class LimeSdrView : ReactiveUserControl<LimeSdrViewModel>
         {
             this.WhenAnyValue(x => x.ViewModel)
                 .WhereNotNull()
-                .Subscribe(x => x.InitCharts(AvaPlotLms,AvaPlotSh))
+                .Subscribe(x => x.InitCharts(AvaPlotLms, AvaPlotSh))
                 .DisposeWith(disp);
-
         });
     }
 }

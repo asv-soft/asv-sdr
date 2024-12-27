@@ -13,7 +13,9 @@ namespace Asv.Sdr.Gui
             AvaloniaProperty.RegisterAttached<WindowHelper, Control, bool>("EnableDrag");
 
         public static readonly AttachedProperty<bool> DoubleTappedWindowStateProperty =
-            AvaloniaProperty.RegisterAttached<WindowHelper, Control, bool>("DoubleTappedWindowState");
+            AvaloniaProperty.RegisterAttached<WindowHelper, Control, bool>(
+                "DoubleTappedWindowState"
+            );
 
         public static readonly AttachedProperty<bool> IgnoreDragProperty =
             AvaloniaProperty.RegisterAttached<WindowHelper, Control, bool>("IgnoreDrag");
@@ -40,35 +42,47 @@ namespace Asv.Sdr.Gui
 
         #region DoubleTappedWindowStateProperty
 
-        private static void OnChangedDoubleClickWindowState(AvaloniaPropertyChangedEventArgs<bool> source)
+        private static void OnChangedDoubleClickWindowState(
+            AvaloniaPropertyChangedEventArgs<bool> source
+        )
         {
-            if (source.Sender is InputElement uiElement)
+            if (source.Sender is not InputElement uiElement)
             {
-                if (source.OldValue == false && source.NewValue.Value)
-                {
-                    uiElement.DoubleTapped += DoubleTappedHandler;
-                }
-                else
-                {
-                    uiElement.PointerPressed -= DoubleTappedHandler;
-                }
+                return;
+            }
+
+            if (source.OldValue == false && source.NewValue.Value)
+            {
+                uiElement.DoubleTapped += DoubleTappedHandler;
+            }
+            else
+            {
+                uiElement.PointerPressed -= DoubleTappedHandler;
             }
         }
 
         private static void DoubleTappedHandler(object? sender, RoutedEventArgs e)
         {
-            if (sender is not Visual uiElement) return;
+            if (sender is not Visual uiElement)
+            {
+                return;
+            }
+
             if (uiElement is AvaloniaObject avalonia)
             {
-                if (GetIgnoreDrag(avalonia)) return;
+                if (GetIgnoreDrag(avalonia))
+                {
+                    return;
+                }
             }
 
             var parent = uiElement;
             var avoidInfiniteLoop = 0;
+
             // Search up the visual tree to find the first parent window.
             while (parent is Window == false)
             {
-                parent = parent.GetVisualParent();
+                parent = parent?.GetVisualParent();
                 avoidInfiniteLoop++;
                 if (avoidInfiniteLoop == 1000)
                 {
@@ -77,14 +91,16 @@ namespace Asv.Sdr.Gui
                 }
             }
 
-            var window = parent as Window;
-            window.WindowState = window.WindowState switch
+            if (parent is Window window)
             {
-                WindowState.Normal => WindowState.Maximized,
-                WindowState.Minimized => WindowState.Maximized,
-                WindowState.Maximized => WindowState.Normal,
-                _ => throw new ArgumentOutOfRangeException()
-            };
+                window.WindowState = window.WindowState switch
+                {
+                    WindowState.Normal => WindowState.Maximized,
+                    WindowState.Minimized => WindowState.Maximized,
+                    WindowState.Maximized => WindowState.Normal,
+                    _ => throw new ArgumentOutOfRangeException(),
+                };
+            }
         }
 
         public static void SetDoubleTappedWindowState(AvaloniaObject element, bool commandValue)
@@ -103,28 +119,35 @@ namespace Asv.Sdr.Gui
 
         private static void OnChangedEnableDrag(AvaloniaPropertyChangedEventArgs<bool> source)
         {
-            if (source.Sender is IInputElement uiElement)
+            if (source.Sender is not IInputElement uiElement)
             {
-                if (source.OldValue == false && source.NewValue.Value)
-                {
-                    uiElement.PointerPressed += MouseDownHandler;
-                }
-                else
-                {
-                    uiElement.PointerPressed -= MouseDownHandler;
-                }
+                return;
+            }
+
+            if (source.OldValue == false && source.NewValue.Value)
+            {
+                uiElement.PointerPressed += MouseDownHandler;
+            }
+            else
+            {
+                uiElement.PointerPressed -= MouseDownHandler;
             }
         }
 
-        private static void MouseDownHandler(object sender, PointerPressedEventArgs e)
+        private static void MouseDownHandler(object? sender, PointerPressedEventArgs e)
         {
-            if (sender is not Visual uiElement) return;
+            if (sender is not Visual uiElement)
+            {
+                return;
+            }
+
             var parent = uiElement;
             var avoidInfiniteLoop = 0;
+
             // Search up the visual tree to find the first parent window.
             while (parent is Window == false)
             {
-                parent = parent.GetVisualParent();
+                parent = parent?.GetVisualParent();
                 avoidInfiniteLoop++;
                 if (avoidInfiniteLoop == 1000)
                 {
@@ -134,13 +157,14 @@ namespace Asv.Sdr.Gui
             }
 
             var window = parent as Window;
-            window.BeginMoveDrag(e);
+            window?.BeginMoveDrag(e);
         }
 
         public static void SetEnableDrag(AvaloniaObject element, bool commandValue)
         {
             element.SetValue(EnableDragProperty, commandValue);
         }
+
         public static bool GetEnableDrag(AvaloniaObject element)
         {
             return element.GetValue(EnableDragProperty);

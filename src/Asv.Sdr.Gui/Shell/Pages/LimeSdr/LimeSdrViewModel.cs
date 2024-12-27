@@ -15,7 +15,7 @@ using ScottPlot.Avalonia;
 namespace Asv.Sdr.Gui;
 
 [Export(typeof(IShellPage))]
-public class LimeSdrViewModel:ShellPage
+public class LimeSdrViewModel : ShellPage
 {
     private ShBbDevice _shDevice;
     private CancellationTokenSource _cancelShStream;
@@ -23,7 +23,8 @@ public class LimeSdrViewModel:ShellPage
     private AvaPlot _plotLms;
     private LimeSdrDevice _device;
 
-    public LimeSdrViewModel() : base(WellKnownUri.Shell + ".lms")
+    public LimeSdrViewModel()
+        : base(WellKnownUri.Shell + ".lms")
     {
         Title = "LimeSDR mini";
         Icon = MaterialIconKind.ChartFinance;
@@ -36,17 +37,19 @@ public class LimeSdrViewModel:ShellPage
         });
     }
 
-    
-
     private async void ConnectLmsImpl()
     {
         LmsNativeDllUsage.Is64BitOperatingSystem = true;
-        
+
         try
         {
             _cancelShStream = new CancellationTokenSource();
             var dev = LimeSdrDevice.GetAvailableDevices().FirstOrDefault();
-            if (dev == null) throw new Exception("LMS device not found");
+            if (dev == null)
+            {
+                throw new Exception("LMS device not found");
+            }
+
             _device = new LimeSdrDevice(dev, true);
             var sampleRate = 40_000_000;
             var frequencyHz = 915_000_000;
@@ -62,30 +65,24 @@ public class LimeSdrViewModel:ShellPage
                 LmsLpfBandWidth = 19e6,
                 Channel = 0,
                 AmountDataRssi = 1,
-                //LmsSelfCalibrate = true,
                 Path = LmsPathRx.LMS_PATH_LNAH,
             };
-            var lime = new LimeReaderIq(_device,cfg );
+            var lime = new LimeReaderIq(_device, cfg);
             var bufferSize = 400_000;
             var stopwach = new Stopwatch();
             var count = 10;
             var seq = 0;
-            var plotData1 = new double[bufferSize/2];
-            var plotData2 = new double[bufferSize/2];
+            var plotData1 = new double[bufferSize / 2];
+            var plotData2 = new double[bufferSize / 2];
             var fill = plotData1;
             var view = plotData2;
-            var source = lime
-                .Sample(bufferSize, out var start)
+            var source = lime.Sample(bufferSize, out var start)
                 .Fft1d()
-                .Magnitude().Subscribe(data =>
+                .Magnitude()
+                .Subscribe(data =>
                 {
                     if (++seq % count == 0)
                     {
-                        /*(view, fill) = (fill, view);
-                        for (var i = 0; i < fill.Length; i++)
-                        {
-                            fill[i] = 0;
-                        }*/
                         _plotLms?.Plot.Clear();
                     }
 
@@ -95,11 +92,8 @@ public class LimeSdrViewModel:ShellPage
                     {
                         var val = plotData[i * 2];
                         fill[i] = val;
-                        /*if (val > fill[i])
-                        {
-                            
-                        }*/
                     }
+
                     RxApp.MainThreadScheduler.Schedule(() =>
                     {
                         _plotLms?.Plot.Add.Signal(fill);
@@ -109,18 +103,18 @@ public class LimeSdrViewModel:ShellPage
                     tcs.Task.Wait();
                     Console.WriteLine(stopwach.ElapsedMilliseconds);
                     stopwach.Restart();
-                    
                 });
             start();
         }
-        catch (Exception e)
+        catch
         {
-            
+            // ignored
         }
     }
-    public ReactiveCommand<Unit,Unit> ConnectLms { get; }
-    public ReactiveCommand<Unit,Unit> ConnectSh { get; }
-    public ReactiveCommand<Unit,Unit> AutoscaleLms { get; }
+
+    public ReactiveCommand<Unit, Unit> ConnectLms { get; }
+    public ReactiveCommand<Unit, Unit> ConnectSh { get; }
+    public ReactiveCommand<Unit, Unit> AutoscaleLms { get; }
 
     public LimeSdrViewModel InitCharts(AvaPlot plotLms, AvaPlot plotSh)
     {
@@ -128,7 +122,7 @@ public class LimeSdrViewModel:ShellPage
         _plotSh = plotSh;
         return this;
     }
-    
+
     private async void ConnectShImpl()
     {
         try
@@ -138,8 +132,14 @@ public class LimeSdrViewModel:ShellPage
             await _shDevice.ConfigureLevel(-20);
             var freq = 915_000_000;
             var span = 27.0e6;
-            await _shDevice.ConfigureCenterSpan( freq, span);
-            await _shDevice.ConfigureSweepCoupling( 3e3, 3.0e3, 0.001, BBRbwShape.Nuttall, BbRejection.NoSpurReject);
+            await _shDevice.ConfigureCenterSpan(freq, span);
+            await _shDevice.ConfigureSweepCoupling(
+                3e3,
+                3.0e3,
+                0.001,
+                BBRbwShape.Nuttall,
+                BbRejection.NoSpurReject
+            );
             await _shDevice.ConfigureAcquisition(BbDetector.MinAndMax, BbScale.LogScale);
             await _shDevice.ConfigureRealTime(200.0, 4);
             await _shDevice.Init(BBMode.RealTime, 0, CancellationToken.None);
@@ -150,7 +150,7 @@ public class LimeSdrViewModel:ShellPage
             var sweepMax = new float[traceInfo.TraceLen];
             var frame = new float[realTimeInfo.FrameHeight * realTimeInfo.FrameWidth];
             var alphaFrame = new float[realTimeInfo.FrameHeight * realTimeInfo.FrameWidth];
-            
+
             var readThread = new Thread(() =>
             {
                 while (_cancelShStream.IsCancellationRequested == false)
@@ -160,26 +160,22 @@ public class LimeSdrViewModel:ShellPage
                     RxApp.MainThreadScheduler.Schedule(() =>
                     {
                         _plotSh?.Plot.Clear();
-                        
+
                         _plotSh?.Plot.Add.Signal(sweepMin);
                         _plotSh?.Plot.Add.Signal(sweepMax);
                         _plotSh?.Plot.Axes.AutoScale();
-                        /*_plot?.Plot.Add.Heatmap(ConvertTo2DArray(alphaFrame, realTimeInfo.FrameHeight,
-                            realTimeInfo.FrameWidth));*/
-                        
-                        
                         _plotSh?.Refresh();
                         tcs.TrySetResult();
                     });
                     tcs.Task.Wait();
                     Thread.Sleep(100);
-                }    
+                }
             });
             readThread.Start();
         }
-        catch (Exception e)
+        catch
         {
-            
+            // ignored
         }
     }
 }

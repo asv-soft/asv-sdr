@@ -21,5 +21,4 @@ public static class WellKnownUri
     /// </summary>
     public const string Shell = $"{UriScheme}:shell";
     public static Uri ShellUri => new(Shell);
-
 }

@@ -11,12 +11,11 @@ public abstract class AdsbDfMessageBase : ISizedSpanSerializable
     /// </summary>
     private int _rawCa = 5;
 
-    
     /// <summary>
     /// Id: [...DF (5 bit)... | ...TC (5 bit)... | SubType (3 bit) ]
     /// </summary>
     public abstract ushort Id { get; }
-    
+
     public abstract int DownlinkFormat { get; }
 
     public CapabilityEnum Capability
@@ -26,7 +25,7 @@ public abstract class AdsbDfMessageBase : ISizedSpanSerializable
     }
 
     public int AircraftAddress { get; set; }
-    
+
     public void Deserialize(ref ReadOnlySpan<byte> buffer)
     {
         var preamble1 = BinSerialize.ReadByte(ref buffer);
@@ -34,20 +33,24 @@ public abstract class AdsbDfMessageBase : ISizedSpanSerializable
         if (preamble1 != AdsbHelper.Preamble[0] || preamble2 != AdsbHelper.Preamble[1])
         {
             throw new Exception(
-                $"Deserialization ADS-B message failed: want 0x{AdsbHelper.Preamble[0]:X} 0x{AdsbHelper.Preamble[1]}. Read 0x{preamble1:X} 0x{preamble2:X}");
+                $"Deserialization ADS-B message failed: want 0x{AdsbHelper.Preamble[0]:X} 0x{AdsbHelper.Preamble[1]}. Read 0x{preamble1:X} 0x{preamble2:X}"
+            );
         }
 
         var dfAndCa = BinSerialize.ReadByte(ref buffer);
         var downLinkFormat = (dfAndCa >> 3) & 0x1F;
         _rawCa = dfAndCa & 0x7;
-        
+
         if (!CheckMessageId(downLinkFormat))
         {
-            throw new Exception($"Deserialization ADS-B message failed: want message number '{DownlinkFormat}'. Read = '{downLinkFormat}'");
+            throw new Exception(
+                $"Deserialization ADS-B message failed: want message number '{DownlinkFormat}'. Read = '{downLinkFormat}'"
+            );
         }
+
         AircraftAddress = ReadAircraftAddress(ref buffer);
         InternalDeserialize(ref buffer);
-        
+
         // Read CRC
         BinSerialize.ReadByte(ref buffer); // << 16;
         BinSerialize.ReadByte(ref buffer); // << 8;
@@ -60,9 +63,9 @@ public abstract class AdsbDfMessageBase : ISizedSpanSerializable
 
     private static int ReadAircraftAddress(ref ReadOnlySpan<byte> aaFrame)
     {
-        return (BinSerialize.ReadByte(ref aaFrame) << 16) |
-               (BinSerialize.ReadByte(ref aaFrame) << 8) |
-               BinSerialize.ReadByte(ref aaFrame);
+        return (BinSerialize.ReadByte(ref aaFrame) << 16)
+            | (BinSerialize.ReadByte(ref aaFrame) << 8)
+            | BinSerialize.ReadByte(ref aaFrame);
     }
 
     private static void WriteAircraftAddress(ref Span<byte> aaFrame, int address)
@@ -71,7 +74,7 @@ public abstract class AdsbDfMessageBase : ISizedSpanSerializable
         BinSerialize.WriteByte(ref aaFrame, (byte)((address >> 8) & 0xFF));
         BinSerialize.WriteByte(ref aaFrame, (byte)(address & 0xFF));
     }
-    
+
     public void Serialize(ref Span<byte> buffer)
     {
         var originSpan = buffer;
@@ -85,7 +88,7 @@ public abstract class AdsbDfMessageBase : ISizedSpanSerializable
         BinSerialize.WriteByte(ref buffer, (byte)((crc >> 8) & 0xFF));
         BinSerialize.WriteByte(ref buffer, (byte)(crc & 0xFF));
     }
-    
+
     protected abstract void InternalSerialize(ref Span<byte> buffer);
     public abstract int GetByteSize();
 }

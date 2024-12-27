@@ -21,7 +21,7 @@ namespace Asv.Sdr.Gui
 
         protected void ThrowIfDisposed()
         {
-            if (IsDisposed) throw new ObjectDisposedException(GetType().Name);
+            ObjectDisposedException.ThrowIf(IsDisposed, this);
         }
 
         protected CancellationToken DisposeCancel
@@ -50,7 +50,11 @@ namespace Asv.Sdr.Gui
         {
             get
             {
-                if (_dispose != null) return _dispose;
+                if (_dispose != null)
+                {
+                    return _dispose;
+                }
+
                 lock (_sync1)
                 {
                     return _dispose ??= new CompositeDisposable();
@@ -61,7 +65,10 @@ namespace Asv.Sdr.Gui
         protected virtual void InternalDisposeOnce()
         {
             if (_cancel?.Token.CanBeCanceled == true)
+            {
                 _cancel.Cancel(false);
+            }
+
             _cancel?.Dispose();
             _dispose?.Dispose();
         }
@@ -70,7 +77,11 @@ namespace Asv.Sdr.Gui
 
         public void Dispose()
         {
-            if (Interlocked.CompareExchange(ref _disposeFlag, Disposed, NotDisposed) != NotDisposed) return;
+            if (Interlocked.CompareExchange(ref _disposeFlag, Disposed, NotDisposed) != NotDisposed)
+            {
+                return;
+            }
+
             InternalDisposeOnce();
             GC.SuppressFinalize(this);
         }

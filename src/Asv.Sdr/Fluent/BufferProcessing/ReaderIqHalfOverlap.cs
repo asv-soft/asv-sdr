@@ -6,7 +6,8 @@ namespace Asv.Sdr
     {
         private readonly int _overlapIndex;
 
-        public ReaderIqHalfOverlapDouble(IReaderIqSubject<double> input, bool useArrayPool = true) : base(input, input.OutputBufferSize, useArrayPool)
+        public ReaderIqHalfOverlapDouble(IReaderIqSubject<double> input, bool useArrayPool = true)
+            : base(input, input.OutputBufferSize, useArrayPool)
         {
             _overlapIndex = (int)Math.Round(input.OutputBufferSize / 2.0);
         }
@@ -21,7 +22,6 @@ namespace Asv.Sdr
             var new2 = input[_overlapIndex..];
             new1.CopyTo(old2);
 
-
             Publish();
             old2.CopyTo(old1);
             new2.CopyTo(old2);
@@ -34,7 +34,8 @@ namespace Asv.Sdr
     {
         private readonly int _overlapIndex;
 
-        public ReaderIqHalfOverlapFloat(IReaderIqSubject<float> input, bool useArrayPool = true) : base(input, input.OutputBufferSize, useArrayPool)
+        public ReaderIqHalfOverlapFloat(IReaderIqSubject<float> input, bool useArrayPool = true)
+            : base(input, input.OutputBufferSize, useArrayPool)
         {
             _overlapIndex = (int)Math.Round(input.OutputBufferSize / 2.0);
         }
@@ -48,7 +49,6 @@ namespace Asv.Sdr
             var new1 = input[.._overlapIndex];
             var new2 = input[_overlapIndex..];
             new1.CopyTo(old2);
-
 
             Publish();
             old2.CopyTo(old1);

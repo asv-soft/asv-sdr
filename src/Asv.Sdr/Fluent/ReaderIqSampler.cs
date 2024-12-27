@@ -6,24 +6,26 @@ using Asv.Common;
 
 namespace Asv.Sdr
 {
-    public class ReaderIqSampler<TOut>: ReaderIqSubject<TOut>
+    public class ReaderIqSampler<TOut> : ReaderIqSubject<TOut>
     {
         private readonly IReaderIq<TOut> _source;
 
-        public ReaderIqSampler(IReaderIq<TOut> source, int readSize,out Action start, bool useArrayPool = true,
-            ThreadPriority priority = ThreadPriority.Highest):base(readSize, useArrayPool)
+        public ReaderIqSampler(
+            IReaderIq<TOut> source,
+            int readSize,
+            out Action start,
+            bool useArrayPool = true,
+            ThreadPriority priority = ThreadPriority.Highest
+        )
+            : base(readSize, useArrayPool)
         {
             _source = source;
-            var thread = new Thread(SampleTick)
-            {
-                Priority = priority,
-                IsBackground = true,
-            };
+            var thread = new Thread(SampleTick) { Priority = priority, IsBackground = true };
             Disposable.AddAction(() =>
             {
                 thread.Interrupt();
             });
-            start = ()=> thread.Start();
+            start = () => thread.Start();
         }
 
         private async void SampleTick()

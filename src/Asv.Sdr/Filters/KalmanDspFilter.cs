@@ -2,8 +2,7 @@
 
 namespace Asv.Sdr
 {
-
-    public class KalmanRadianDspFilter:IDspFilter
+    public class KalmanRadianDspFilter : IDspFilter
     {
         private readonly KalmanDspFilter _cos;
         private readonly KalmanDspFilter _sin;
@@ -13,6 +12,7 @@ namespace Asv.Sdr
             _cos = new KalmanDspFilter(q, r, f, h);
             _sin = new KalmanDspFilter(q, r, f, h);
         }
+
         public double Process(double input)
         {
             var cos = Math.Cos(input);
@@ -20,38 +20,38 @@ namespace Asv.Sdr
             var x = _cos.Process(cos);
             var y = _sin.Process(sin);
             return Math.Atan2(y, x);
-
         }
     }
-    public class KalmanDspFilter:IDspFilter
+
+    public class KalmanDspFilter : IDspFilter
     {
         /// <summary>
-        /// predicted state
+        /// predicted state.
         /// </summary>
         private double _x0;
 
         /// <summary>
-        /// predicted covariance
+        /// predicted covariance.
         /// </summary>
         private double _p0;
 
         /// <summary>
-        /// factor of real value to previous real value
+        /// factor of real value to previous real value.
         /// </summary>
         private readonly double _f;
 
         /// <summary>
-        /// measurement noise
+        /// measurement noise.
         /// </summary>
         private readonly double _q;
 
         /// <summary>
-        /// factor of measured value to real value
+        /// factor of measured value to real value.
         /// </summary>
         private readonly double _h;
 
         /// <summary>
-        ///  environment noise
+        ///  environment noise.
         /// </summary>
         private readonly double _r;
 
@@ -59,7 +59,7 @@ namespace Asv.Sdr
         private double _covariance;
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="KalmanDspFilter"/> class.
         /// </summary>
         /// <param name="q">measurement noise</param>
         /// <param name="r">environment noise</param>
@@ -81,14 +81,14 @@ namespace Asv.Sdr
 
         public double Process(double input)
         {
-            //time update - prediction
+            // time update - prediction
             _x0 = _f * _state;
-            _p0 = _f * _covariance * _f + _q;
+            _p0 = (_f * _covariance * _f) + _q;
 
-            //measurement update - correction
-            var k = _h * _p0 / (_h * _p0 * _h + _r);
-            _state = _x0 + k * (input - _h * _x0);
-            _covariance = (1 - k * _h) * _p0;
+            // measurement update - correction
+            var k = _h * _p0 / ((_h * _p0 * _h) + _r);
+            _state = _x0 + (k * (input - (_h * _x0)));
+            _covariance = (1 - (k * _h)) * _p0;
             return _state;
         }
     }

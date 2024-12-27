@@ -5,14 +5,15 @@ namespace Asv.Sdr.Gui;
 public enum SquitterTypeEnum
 {
     NonTransponder,
-    WithTransponder
+    WithTransponder,
 }
 
 public abstract class AdsbExtendedSquitterBase : AdsbDfMessageBase
 {
     public override ushort Id => (ushort)((17 << 8) | ((ushort)MessageType << 3));
-    public override int DownlinkFormat => SquitterType == SquitterTypeEnum.WithTransponder ? 17 : 18;
-    
+    public override int DownlinkFormat =>
+        SquitterType == SquitterTypeEnum.WithTransponder ? 17 : 18;
+
     public SquitterTypeEnum SquitterType { get; set; }
 
     public abstract AdsbMessageTypeEnum MessageType { get; }
@@ -31,12 +32,14 @@ public abstract class AdsbExtendedSquitterBase : AdsbDfMessageBase
             28 => AdsbMessageTypeEnum.AircraftStatus,
             29 => AdsbMessageTypeEnum.TargetStateAndStatusInformation,
             31 => AdsbMessageTypeEnum.AircraftOperationStatus,
-            _ => AdsbMessageTypeEnum.Reserved
+            _ => AdsbMessageTypeEnum.Reserved,
         };
-        
+
         if (msgType != MessageType)
         {
-            throw new Exception($"Deserialization ADS-B message failed: want message type '{MessageType:G}'. Read = '{msgType:G}'");
+            throw new Exception(
+                $"Deserialization ADS-B message failed: want message type '{MessageType:G}'. Read = '{msgType:G}'"
+            );
         }
     }
 
@@ -51,7 +54,7 @@ public abstract class AdsbExtendedSquitterBase : AdsbDfMessageBase
         {
             17 => SquitterTypeEnum.WithTransponder,
             18 => SquitterTypeEnum.NonTransponder,
-            _ => SquitterType
+            _ => SquitterType,
         };
         return downlinkFormat is 17 or 18;
     }

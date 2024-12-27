@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace Asv.Sdr.Gui;
 
-public delegate void FrameReceivedDelegate(byte [] frame, int actualLength);
+public delegate void FrameReceivedDelegate(byte[] frame, int actualLength);
 
 public class AdsbBitDecoder
 {
-    public event FrameReceivedDelegate FrameReceived;
+    public event FrameReceivedDelegate? FrameReceived;
 
     private const int LongFrameLengthBits = 112;
     private const int ShortFrameLengthBits = 56;
@@ -18,12 +18,12 @@ public class AdsbBitDecoder
     private const int OneSecond = 2000000;
     private const float CorrectionFactor = 20.0f;
 
-    private static readonly byte[] _preamble = { 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0 };
+    private static readonly byte[] Preamble = { 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0 };
 
     private Dictionary<uint, ulong> _icaos = new Dictionary<uint, ulong>();
-    private Dictionary<uint, int> _candidateICAOs = new Dictionary<uint, int>();
+    private Dictionary<uint, int> _candidateIcaOs = new Dictionary<uint, int>();
     private readonly byte[] _frame = new byte[LongFrameLengthBits / 8];
-    private readonly int[] _candidate = new int[PreambleLengthBits + LongFrameLengthBits * 2];
+    private readonly int[] _candidate = new int[PreambleLengthBits + (LongFrameLengthBits * 2)];
     private int _candidateHead;
     private int _confidenceLevel = DefaultConfidence;
     private bool _reset;
@@ -53,12 +53,12 @@ public class AdsbBitDecoder
         var lastZero = 0;
         var queuePtr = _candidateHead;
 
-        for (var i = 0; i < _preamble.Length; i++)
+        for (var i = 0; i < Preamble.Length; i++)
         {
             var mag = _candidate[queuePtr];
             queuePtr = (queuePtr + 1) % _candidate.Length;
 
-            if (_preamble[i] == 1)
+            if (Preamble[i] == 1)
             {
                 if (mag > lastZero)
                 {
@@ -101,11 +101,6 @@ public class AdsbBitDecoder
 
             if (i % 2 != 0)
             {
-                //if (i == frameBitLength * 2 - 1 && _frame[0] == 0x5d && _frame[1] == 0x3c && _frame[2] == 0x4d && _frame[3] == 0xd2)
-                //{
-                //    Console.WriteLine("Ba333");
-                //}
-
                 var avg = (mag + lastMag) * 0.5f;
                 if (lastAvg > 0f)
                 {
@@ -144,7 +139,11 @@ public class AdsbBitDecoder
                 if (frameBitLength > 0 && frameBitPosition == frameBitLength - 1)
                 {
                     var length = frameBitLength / 8;
-                    if (_frame[length - 1] == 0 && _frame[length - 2] == 0 && _frame[length - 3] == 0)
+                    if (
+                        _frame[length - 1] == 0
+                        && _frame[length - 2] == 0
+                        && _frame[length - 3] == 0
+                    )
                     {
                         return;
                     }
@@ -176,7 +175,7 @@ public class AdsbBitDecoder
                     }
 
                     _icaos[icao] = _ticks;
-                    _candidateICAOs.Remove(icao);
+                    _candidateIcaOs.Remove(icao);
                     if (FrameReceived != null)
                     {
                         FrameReceived(_frame, frameBitLength / 8);
@@ -192,13 +191,14 @@ public class AdsbBitDecoder
 
     private bool UpdateConfidenceList(uint icao)
     {
-        var rank = _candidateICAOs.ContainsKey(icao) ? _candidateICAOs[icao] : 0;
+        var rank = _candidateIcaOs.ContainsKey(icao) ? _candidateIcaOs[icao] : 0;
         rank++;
-        _candidateICAOs[icao] = rank;
+        _candidateIcaOs[icao] = rank;
 
-        if (_candidateICAOs.Count > 500000)
+        if (_candidateIcaOs.Count > 500000)
         {
-            _candidateICAOs = _candidateICAOs.Where(pair => pair.Value > 1)
+            _candidateIcaOs = _candidateIcaOs
+                .Where(pair => pair.Value > 1)
                 .ToDictionary(pair => pair.Key, pair => pair.Value - 1);
         }
 
@@ -209,17 +209,19 @@ public class AdsbBitDecoder
     {
         _ticks++;
 
-        if (_ticks % (10 * OneSecond) == 0) // Happens every 10sec
+        // Happens every 10sec
+        if (_ticks % (10 * OneSecond) == 0)
         {
             var timeoutTicks = _timeout * OneSecond;
-            _icaos = _icaos.Where(pair => (int)(_ticks - pair.Value) < timeoutTicks)
+            _icaos = _icaos
+                .Where(pair => (int)(_ticks - pair.Value) < timeoutTicks)
                 .ToDictionary(pair => pair.Key, pair => pair.Value);
         }
 
         if (_reset)
         {
             _icaos.Clear();
-            _candidateICAOs.Clear();
+            _candidateIcaOs.Clear();
             _reset = false;
         }
 
@@ -259,8 +261,10 @@ public class AdsbBitDecoder
 
     private static uint GetLongFrameParity(byte[] frame)
     {
-        var data = (uint)(frame[0] << 24) | (uint)(frame[1] << 16) | (uint)(frame[2] << 8) | frame[3];
-        var data1 = (uint)(frame[4] << 24) | (uint)(frame[5] << 16) | (uint)(frame[6] << 8) | frame[7];
+        var data =
+            (uint)(frame[0] << 24) | (uint)(frame[1] << 16) | (uint)(frame[2] << 8) | frame[3];
+        var data1 =
+            (uint)(frame[4] << 24) | (uint)(frame[5] << 16) | (uint)(frame[6] << 8) | frame[7];
         var data2 = (uint)(frame[8] << 24) | (uint)(frame[9] << 16) | (uint)(frame[10] << 8);
 
         for (var i = 0; i < 88; i++)
@@ -289,15 +293,18 @@ public class AdsbBitDecoder
         var result1 = (byte)((data >> 16) & 0xff);
         var result2 = (byte)((data >> 8) & 0xff);
 
-        var sum = (uint)((result0 ^ frame[11]) << 16) | (uint)((result1 ^ frame[12]) << 8) |
-                  (uint)(result2 ^ frame[13]);
+        var sum =
+            (uint)((result0 ^ frame[11]) << 16)
+            | (uint)((result1 ^ frame[12]) << 8)
+            | (uint)(result2 ^ frame[13]);
 
         return sum;
     }
 
     private static uint GetShortFrameParity(byte[] frame)
     {
-        var data = (uint)(frame[0] << 24) | (uint)(frame[1] << 16) | (uint)(frame[2] << 8) | frame[3];
+        var data =
+            (uint)(frame[0] << 24) | (uint)(frame[1] << 16) | (uint)(frame[2] << 8) | frame[3];
         for (var i = 0; i < 32; i++)
         {
             if ((data & 0x80000000) != 0)
@@ -312,7 +319,10 @@ public class AdsbBitDecoder
         var result1 = (byte)((data >> 16) & 0xff);
         var result2 = (byte)((data >> 8) & 0xff);
 
-        var sum = (uint)((result0 ^ frame[4]) << 16) | (uint)((result1 ^ frame[5]) << 8) | (uint)(result2 ^ frame[6]);
+        var sum =
+            (uint)((result0 ^ frame[4]) << 16)
+            | (uint)((result1 ^ frame[5]) << 8)
+            | (uint)(result2 ^ frame[6]);
 
         return sum;
     }

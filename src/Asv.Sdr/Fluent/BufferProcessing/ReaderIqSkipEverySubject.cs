@@ -5,7 +5,7 @@ using Asv.Common;
 
 namespace Asv.Sdr
 {
-    public class ReaderIqSkipEverySubject<TOut> :DisposableOnce, IReaderIqSubject<TOut>
+    public class ReaderIqSkipEverySubject<TOut> : DisposableOnce, IReaderIqSubject<TOut>
     {
         private readonly int _startOffset;
         private readonly int _skipEveryTime;
@@ -13,7 +13,11 @@ namespace Asv.Sdr
         private readonly IDisposable _subscribe;
         private uint _value;
 
-        public ReaderIqSkipEverySubject(IReaderIqSubject<TOut> source, int skipEveryTime, int startOffset = 0)
+        public ReaderIqSkipEverySubject(
+            IReaderIqSubject<TOut> source,
+            int skipEveryTime,
+            int startOffset = 0
+        )
         {
             _startOffset = startOffset;
             OutputBufferSize = source.OutputBufferSize;
@@ -28,7 +32,7 @@ namespace Asv.Sdr
                 _subject.OnNext(value);
             }
         }
-        
+
         protected override void InternalDisposeOnce()
         {
             _subscribe.Dispose();

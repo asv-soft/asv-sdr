@@ -16,7 +16,6 @@ public class ViewLocator : IDataTemplate
 {
     private readonly CompositionHost _container;
 
-
     public ViewLocator(CompositionHost container)
     {
         _container = container ?? throw new ArgumentNullException(nameof(container));
@@ -25,16 +24,29 @@ public class ViewLocator : IDataTemplate
     public Control? Build(object? data)
     {
         if (data is null)
+        {
             return null;
+        }
+
         var viewModelType = data.GetType();
+
         // try to find view by attribute
-        var defaultView = _container.GetExports<Lazy<Control, ViewMetadata>>()
+        var defaultView = _container
+            .GetExports<Lazy<Control, ViewMetadata>>()
             .FirstOrDefault(view => view.Metadata.ViewModelType == viewModelType);
-        if (defaultView != null) return defaultView.Value;
+        if (defaultView != null)
+        {
+            return defaultView.Value;
+        }
+
         // try to find view for base class
-        defaultView = _container.GetExports<Lazy<Control, ViewMetadata>>()
+        defaultView = _container
+            .GetExports<Lazy<Control, ViewMetadata>>()
             .FirstOrDefault(view => viewModelType.IsSubclassOf(view.Metadata.ViewModelType));
-        if (defaultView != null) return defaultView.Value;
+        if (defaultView != null)
+        {
+            return defaultView.Value;
+        }
 
         var name = data.GetType().FullName!.Replace("ViewModel", "View");
         var type = Type.GetType(name);

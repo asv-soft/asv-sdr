@@ -6,27 +6,26 @@ namespace Asv.Sdr.LimeSdr;
 public enum DmeWorkMode
 {
     Air = 0,
-    Ground = 1
+    Ground = 1,
 }
 
 public enum DmeChannel
 {
     XChannel = 0,
-    YChannel = 1
+    YChannel = 1,
 }
 
 public enum EnvelopeType
 {
     Gauss = 0,
-    Rectangle = 1
+    Rectangle = 1,
 }
-
 
 /// <summary>
 /// Custom extension interface for LimeSdr mini device
 /// WOrk only with custom FPGA firmware
 /// </summary>
-public interface ILimeSdrDmeDevice:ILimeSdrDevice
+public interface ILimeSdrDmeDevice : ILimeSdrDevice
 {
     /// <summary>
     /// Gets the DME mode.
@@ -88,6 +87,7 @@ public interface ILimeSdrDmeDevice:ILimeSdrDevice
     /// Gets the envelope type for DME (Distance Measuring Equipment).
     /// </summary>
     Task<EnvelopeType> DmeGetEnvelopeType(CancellationToken cancel = default);
+
     /// <summary>
     /// Sets the envelope type for DME.
     /// </summary>
@@ -95,15 +95,18 @@ public interface ILimeSdrDmeDevice:ILimeSdrDevice
 
     Task DmeSetRelayInvert(bool isInvert, CancellationToken cancel = default);
     Task<bool> DmeGetRelayInvert(bool isInvert, CancellationToken cancel = default);
+
     /// <summary>
     /// Gets measured distance in meters (AIR mode).
     /// </summary>
     Task<int> DmeGetMeasuredDistance(CancellationToken cancel = default);
+
     /// <summary>
     /// Gets the HIP period in microseconds.
     /// Returns 0xFFFF if HIPs are disabled.
     /// </summary>
     Task<ushort> DmeGetHipPeriod(CancellationToken cancel = default);
+
     /// <summary>
     /// Sets the HIP period in microseconds.
     /// Set to 0xFFFF to disable HIPs.
@@ -124,8 +127,6 @@ public interface ILimeSdrDmeDevice:ILimeSdrDevice
     /// Gets the MAX_HITS value, which is the maximum number of hits out of 32 queries.
     /// </summary>
     Task<byte> DmeGetMaxHitsMeasure(CancellationToken cancel = default);
-
-   
 
     /// <summary>
     /// Gets the PEAK_AMP value, which represents the maximum signal amplitude over the last 100 milliseconds.

@@ -3,18 +3,18 @@
     /// <summary>
     /// FIR filter designed with
     /// http://t-filter.appspot.com
-    /// 
+    ///
     /// sampling frequency: 96000 Hz
-    /// 
+    ///
     /// * 0 Hz - 14000 Hz
     ///   gain = 0
     ///   desired attenuation = -40 dB
     ///   actual attenuation = -40.4961039180978 dB
-    /// 
+    ///
     /// * 16000 Hz - 48000 Hz
     ///   gain = 1
     ///   desired ripple = 5 dB
-    ///   actual ripple = 3.93586177608713 dB
+    ///   actual ripple = 3.93586177608713 dB.
     /// </summary>
     public class IlsHighPass : CicSincFilter
     {
@@ -68,38 +68,35 @@
             -0.055921912168529056,
             0.06811556812638198,
             0.004532513513173911,
-            -0.02574768930839303
+            -0.02574768930839303,
         };
-        
-        public IlsHighPass():base(Filter)
-        {
-            
-        }
+
+        public IlsHighPass()
+            : base(Filter) { }
     }
-
-
 
     /// <summary>
     /// http://t-filter.engineerjs.com/
     /// sampling frequency: 96000 Hz
     /// FIR filter designed with
     /// http://t-filter.appspot.com
-    /// 
+    ///
     /// sampling frequency: 96000 Hz
-    /// 
+    ///
     /// * 0 Hz - 14000 Hz
     ///   gain = 1
     ///   desired ripple = 0.1 dB
     ///   actual ripple = 0.06961131898846769 dB
-    /// 
+    ///
     /// * 18000 Hz - 48000 Hz
     ///   gain = 0
     ///   desired attenuation = -40 dB
-    ///   actual attenuation = -40.49955997353465 dB 
+    ///   actual attenuation = -40.49955997353465 dB
     /// </summary>
-    public class IlsLowPass: CicSincFilter
+    public class IlsLowPass : CicSincFilter
     {
-        private static readonly double[] Filter = {
+        private static readonly double[] Filter =
+        {
             -0.0030798555587518033,
             0.0037075816841102963,
             0.003676054946094021,
@@ -154,19 +151,17 @@
             0.0011073819237426283,
             0.003676054946094021,
             0.0037075816841102963,
-            -0.0030798555587518033
+            -0.0030798555587518033,
         };
-        
-        public IlsLowPass():base(Filter)
-        {
-            
-        }
+
+        public IlsLowPass()
+            : base(Filter) { }
     }
-    
-    
-    public class IlsLowPass12400_R5: CicSincFilter
+
+    public class IlsLowPass12400_R5 : CicSincFilter
     {
-        private static readonly double[] Filter = {
+        private static readonly double[] Filter =
+        {
             0.008978412172658885,
             0.003975020628849444,
             -0.01640365862614382,
@@ -185,75 +180,73 @@
             -0.05067886373609084,
             -0.01640365862614382,
             0.003975020628849444,
-            0.008978412172658885
+            0.008978412172658885,
         };
-        
-        public IlsLowPass12400_R5():base(Filter)
-        {
-            
-        }
+
+        public IlsLowPass12400_R5()
+            : base(Filter) { }
     }
-    
+
     /// <summary>
     /// FIR filter designed with
     ///  http://t-filter.appspot.com
-    /// 
+    ///
     /// sampling frequency: 48000 Hz
-    /// 
+    ///
     /// * 0 Hz - 5000 Hz
     ///   gain = 0
     ///   desired attenuation = -40 dB
     ///   actual attenuation = -40.089989131512205 dB
-    /// 
+    ///
     /// * 9000 Hz - 11000 Hz
     ///   gain = 1
     ///   desired ripple = 5 dB
     ///   actual ripple = 2.3089711052878354 dB
-    /// 
+    ///
     /// * 15000 Hz - 24000 Hz
     ///   gain = 0
     ///   desired attenuation = -40 dB
     ///   actual attenuation = -40.089989131512205 dB
-    /// 
+    ///
     /// </summary>
     public class Vor9960SincFilter : CicSincFilter
     {
-        public Vor9960SincFilter() : base(new[]
-        {
-            -0.008477192482657929,
-            -0.031303288439231886,
-            0.004128078504796253,
-            0.07982415720817815,
-            0.052088192050652925,
-            -0.10105255314509162,
-            -0.13976173688287996,
-            0.04758321886488338,
-            0.18404531762017742,
-            0.04758321886488338,
-            -0.13976173688287996,
-            -0.10105255314509162,
-            0.052088192050652925,
-            0.07982415720817815,
-            0.004128078504796253,
-            -0.031303288439231886,
-            -0.008477192482657929
-        })
-        {
-
-        }
+        public Vor9960SincFilter()
+            : base(
+                new[]
+                {
+                    -0.008477192482657929,
+                    -0.031303288439231886,
+                    0.004128078504796253,
+                    0.07982415720817815,
+                    0.052088192050652925,
+                    -0.10105255314509162,
+                    -0.13976173688287996,
+                    0.04758321886488338,
+                    0.18404531762017742,
+                    0.04758321886488338,
+                    -0.13976173688287996,
+                    -0.10105255314509162,
+                    0.052088192050652925,
+                    0.07982415720817815,
+                    0.004128078504796253,
+                    -0.031303288439231886,
+                    -0.008477192482657929,
+                }
+            ) { }
     }
 
     /// <summary>
     /// FIR filter designed with
     ///  http://t-filter.appspot.com
-    /// 
+    ///
     /// sampling frequency: 48000 Hz
-    /// 
+    ///
     /// * 0 Hz - 100 Hz
     ///   gain = 1
     ///   desired ripple = 5 dB
     ///   actual ripple = 27.790982847628403 dB
-    /// 
+    ///
     /// * 300 Hz - 24000 Hz
     ///   gain = 0
     ///   desired attenuation = -40 dB
@@ -261,20 +254,20 @@
     /// </summary>
     public class Vor100SincFilter : CicSincFilter
     {
-        public Vor100SincFilter() : base(new[]
-        {
-            0.020357476196127,
-            0.00003138975273936362,
-            0.000016566914336187123,
-            0.00003138975273936362,
-            0.020357476196127
-        })
-        {
-
-        }
+        public Vor100SincFilter()
+            : base(
+                new[]
+                {
+                    0.020357476196127,
+                    0.00003138975273936362,
+                    0.000016566914336187123,
+                    0.00003138975273936362,
+                    0.020357476196127,
+                }
+            ) { }
     }
 
-    public class CicSincFilter:IDspFilter
+    public class CicSincFilter : IDspFilter
     {
         private readonly double[] _filterTaps;
         private readonly double[] history;
@@ -292,17 +285,20 @@
         {
             history[_lastIndex++] = input;
             if (_lastIndex == _sampleFilterTapNum)
+            {
                 _lastIndex = 0;
+            }
+
             double acc = 0;
-            int index = _lastIndex, i;
+            int index = _lastIndex,
+                i;
             for (i = 0; i < _sampleFilterTapNum; ++i)
             {
                 index = index != 0 ? index - 1 : _sampleFilterTapNum - 1;
                 acc += history[index] * _filterTaps[i];
-            };
+            }
+
             return acc;
         }
     }
-
-
 }

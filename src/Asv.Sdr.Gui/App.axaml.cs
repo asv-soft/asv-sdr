@@ -13,7 +13,7 @@ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace Asv.Sdr.Gui;
 
-public partial class App : Application,IApp
+public partial class App : Application, IApp
 {
     public App()
     {
@@ -26,17 +26,30 @@ public partial class App : Application,IApp
                 options.OutputEncodingToUtf8 = false; // !!! Important for GUI applications
                 options.UsePlainTextFormatter(formatter =>
                 {
-                    formatter.SetPrefixFormatter($"{0:HH:mm:ss.fff}|{1:short}|{2,-40}|", (in MessageTemplate template, in LogInfo info) => template.Format(info.Timestamp, info.LogLevel,info.Category));
-                    formatter.SetExceptionFormatter((writer, ex) => Utf8StringInterpolation.Utf8String.Format(writer, $"{ex.Message}"));
+                    formatter.SetPrefixFormatter(
+                        $"{0:HH:mm:ss.fff}|{1:short}|{2, -40}|",
+                        (in MessageTemplate template, in LogInfo info) =>
+                            template.Format(info.Timestamp, info.LogLevel, info.Category)
+                    );
+                    formatter.SetExceptionFormatter(
+                        (writer, ex) =>
+                            Utf8StringInterpolation.Utf8String.Format(writer, $"{ex.Message}")
+                    );
                 });
-                
             });
-            builder.AddZLoggerRollingFile((dt, index) => $"logs/{dt:yyyy-MM-dd}_{index}.logs", 1024 * 1024);
+            builder.AddZLoggerRollingFile(
+                (dt, index) => $"logs/{dt:yyyy-MM-dd}_{index}.logs",
+                1024 * 1024
+            );
             builder.SetMinimumLevel(LogLevel.Trace);
         });
         LmsLogManager.SetLoggerFactory(factory); // this is for static logging LMS devices
-        
-        Configuration = new JsonOneFileConfiguration("config.json", true, TimeSpan.FromMilliseconds(100));
+
+        Configuration = new JsonOneFileConfiguration(
+            "config.json",
+            true,
+            TimeSpan.FromMilliseconds(100)
+        );
         var conventions = new ConventionBuilder();
         var containerCfg = new ContainerConfiguration()
             .WithAssembly(GetType().Assembly)
@@ -45,7 +58,7 @@ public partial class App : Application,IApp
             .WithExport(typeof(IConfiguration), Configuration)
             .WithExport(typeof(ILoggerFactory), factory)
             .WithDefaultConventions(conventions);
-        
+
         Container = containerCfg.CreateContainer();
         DataTemplates.Add(new ViewLocator(Container));
     }
@@ -63,16 +76,13 @@ public partial class App : Application,IApp
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = Container.GetExport<IShell>()
-            };
+            desktop.MainWindow = new MainWindow { DataContext = Container.GetExport<IShell>() };
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
             singleViewPlatform.MainView = new ShellView
             {
-                DataContext = Container.GetExport<IShell>()
+                DataContext = Container.GetExport<IShell>(),
             };
         }
 

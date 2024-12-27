@@ -17,6 +17,9 @@ public static class LmsLogManager
     public static ILogger Logger => _globalLogger;
 
     // standard LoggerFactory caches logger per category so no need to cache in this manager
-    public static ILogger<T> GetLogger<T>() where T : class => _loggerFactory.CreateLogger<T>();
-    public static ILogger GetLogger(string categoryName) => _loggerFactory.CreateLogger(categoryName);
+    public static ILogger<T> GetLogger<T>()
+        where T : class => _loggerFactory.CreateLogger<T>();
+
+    public static ILogger GetLogger(string categoryName) =>
+        _loggerFactory.CreateLogger(categoryName);
 }

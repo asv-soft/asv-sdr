@@ -3,10 +3,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Asv.Sdr.Gui;
 
-public interface IShell
-{
-    
-}
+public interface IShell { }
 
 public interface IShellPage
 {
@@ -21,11 +18,12 @@ public class ShellPage : DisposableReactiveObjectWithValidation, IShellPage
     {
         Id = id;
     }
+
     public string Id { get; }
-    
+
     [Reactive]
     public MaterialIconKind Icon { get; set; }
+
     [Reactive]
     public string Title { get; set; }
-   
 }

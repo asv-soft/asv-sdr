@@ -15,7 +15,13 @@ namespace Asv.Sdr.Gui
             : base(null, typeof(Control))
         {
             if (viewModelType.IsSubclassOf(typeof(Control)))
-                throw new ArgumentException("ViewModelType cannot be a View type", nameof(viewModelType));
+            {
+                throw new ArgumentException(
+                    @"ViewModelType cannot be a View type",
+                    nameof(viewModelType)
+                );
+            }
+
             this.ViewModelType = viewModelType;
         }
 

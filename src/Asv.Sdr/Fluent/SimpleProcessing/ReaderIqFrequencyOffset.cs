@@ -7,10 +7,14 @@ namespace Asv.Sdr
     {
         private readonly int _readSamples;
 
-        public ReaderIqFrequencyOffsetFloatSubject(IReaderIqSubject<float> input) : base(input)
+        public ReaderIqFrequencyOffsetFloatSubject(IReaderIqSubject<float> input)
+            : base(input)
         {
             _readSamples = input.OutputBufferSize / 2;
-            if (_readSamples == 1) throw new ArgumentException("Input buffer size must be greater than 2");
+            if (_readSamples == 1)
+            {
+                throw new ArgumentException("Input buffer size must be greater than 2");
+            }
         }
 
         protected override double Process(ReadOnlySpan<float> input, out bool selfPublish)
@@ -27,21 +31,26 @@ namespace Asv.Sdr
                 sumX += Math.Cos(dist);
                 sumY += Math.Sin(dist);
             }
-            sumX /= (_readSamples - 1);
-            sumY /= (_readSamples - 1);
+
+            sumX /= _readSamples - 1;
+            sumY /= _readSamples - 1;
             var offset = -Math.Atan2(sumY, sumX) * _readSamples;
             return offset;
         }
     }
-    
+
     public class ReaderIqFrequencyOffsetDoubleSubject : ReaderIqSimpleSubject<double, double>
     {
         private readonly int _readSamples;
 
-        public ReaderIqFrequencyOffsetDoubleSubject(IReaderIqSubject<double> input) : base(input)
+        public ReaderIqFrequencyOffsetDoubleSubject(IReaderIqSubject<double> input)
+            : base(input)
         {
             _readSamples = input.OutputBufferSize / 2;
-            if (_readSamples == 1) throw new ArgumentException("Input buffer size must be greater than 2");
+            if (_readSamples == 1)
+            {
+                throw new ArgumentException("Input buffer size must be greater than 2");
+            }
         }
 
         protected override double Process(ReadOnlySpan<double> input, out bool selfPublish)
@@ -58,8 +67,9 @@ namespace Asv.Sdr
                 sumX += Math.Cos(dist);
                 sumY += Math.Sin(dist);
             }
-            sumX /= (_readSamples - 1);
-            sumY /= (_readSamples - 1);
+
+            sumX /= _readSamples - 1;
+            sumY /= _readSamples - 1;
             var offset = -Math.Atan2(sumY, sumX) * _readSamples;
             return offset;
         }

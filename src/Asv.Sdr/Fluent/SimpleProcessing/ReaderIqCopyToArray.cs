@@ -24,8 +24,9 @@ namespace Asv.Sdr
             for (var i = 0; i < _size; i++)
             {
                 dataI[i] = span[i * 2];
-                dataQ[i] = span[i * 2 + 1];
+                dataQ[i] = span[(i * 2) + 1];
             }
+
             _subject.OnNext((dataI, dataQ));
         }
 

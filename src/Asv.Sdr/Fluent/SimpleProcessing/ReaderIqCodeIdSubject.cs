@@ -2,223 +2,69 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive.Subjects;
-using System.Text;
-using System.Threading;
 using Asv.Common;
 
 namespace Asv.Sdr
 {
-
-    public class ReaderIqCodeIdSubject:DisposableOnce, IObservable<string>
+    public class ReaderIqCodeIdSubject : DisposableOnce, IObservable<string>
     {
-
-        private static ReadOnlyDictionary<string, char> AlphabetData { get; } = new(new Dictionary<string, char>()
-        {
-            {
-                ".-",
-                'A'
-            },
-            {
-                "-...",
-                'B'
-            },
-            {
-                "-.-.",
-                'C'
-            },
-            {
-                "-..",
-                'D'
-            },
-            {
-                ".",
-                'E'
-            },
-            {
-                "..-.",
-                'F'
-            },
-            {
-                "--.",
-                'G'
-            },
-            {
-                "....",
-                'H'
-            },
-            {
-                "..",
-                'I'
-            },
-            {
-                ".---",
-                'J'
-            },
-            {
-                "-.-",
-                'K'
-            },
-            {
-                ".-..",
-                'L'
-            },
-            {
-                "--",
-                'M'
-            },
-            {
-                "-.",
-                'N'
-            },
-            {
-                "---",
-                'O'
-            },
-            {
-                ".--.",
-                'P'
-            },
-            {
-                "--.-",
-                'Q'
-            },
-            {
-                ".-.",
-                'R'
-            },
-            {
-                "...",
-                'S'
-            },
-            {
-                "-",
-                'T'
-            },
-            {
-                "..-",
-                'U'
-            },
-            {
-                "...-",
-                'V'
-            },
-            {
-                ".--",
-                'W'
-            },
-            {
-                "-..-",
-                'X'
-            },
-            {
-                "-.--",
-                'Y'
-            },
-            {
-                "--..",
-                'Z'
-            },
-            {
-                ".----",
-                '1'
-            },
-            {
-                "..---",
-                '2'
-            },
-            {
-                "...--",
-                '3'
-            },
-            {
-                "....-",
-                '4'
-            },
-            {
-                ".....",
-                '5'
-            },
-            {
-                "-....",
-                '6'
-            },
-            {
-                "--...",
-                '7'
-            },
-            {
-                "---..",
-                '8'
-            },
-            {
-                "----.",
-                '9'
-            },
-            {
-                "-----",
-                '0'
-            },
-            {
-                "--..--",
-                ','
-            },
-            {
-                "..--..",
-                '?'
-            },
-            {
-                "---...",
-                ':'
-            },
-            {
-                "-....-",
-                '-'
-            },
-            {
-                ".-..-.",
-                '"'
-            },
-            {
-                "-.--.",
-                '('
-            },
-            {
-                "-...-",
-                '='
-            },
-            {
-                ".-.-.-",
-                '.'
-            },
-            {
-                "-.-.-.",
-                ';'
-            },
-            {
-                "-..-.",
-                '/'
-            },
-            {
-                ".----.",
-                '\''
-            },
-            {
-                "_.__._",
-                ')'
-            },
-            {
-                ".-.-.",
-                '+'
-            },
-            {
-                ".__._.",
-                '@'
-            },
-            {
-                " ",
-                ' '
-            }
-        });
+        private static ReadOnlyDictionary<string, char> AlphabetData { get; } =
+            new(
+                new Dictionary<string, char>()
+                {
+                    { ".-", 'A' },
+                    { "-...", 'B' },
+                    { "-.-.", 'C' },
+                    { "-..", 'D' },
+                    { ".", 'E' },
+                    { "..-.", 'F' },
+                    { "--.", 'G' },
+                    { "....", 'H' },
+                    { "..", 'I' },
+                    { ".---", 'J' },
+                    { "-.-", 'K' },
+                    { ".-..", 'L' },
+                    { "--", 'M' },
+                    { "-.", 'N' },
+                    { "---", 'O' },
+                    { ".--.", 'P' },
+                    { "--.-", 'Q' },
+                    { ".-.", 'R' },
+                    { "...", 'S' },
+                    { "-", 'T' },
+                    { "..-", 'U' },
+                    { "...-", 'V' },
+                    { ".--", 'W' },
+                    { "-..-", 'X' },
+                    { "-.--", 'Y' },
+                    { "--..", 'Z' },
+                    { ".----", '1' },
+                    { "..---", '2' },
+                    { "...--", '3' },
+                    { "....-", '4' },
+                    { ".....", '5' },
+                    { "-....", '6' },
+                    { "--...", '7' },
+                    { "---..", '8' },
+                    { "----.", '9' },
+                    { "-----", '0' },
+                    { "--..--", ',' },
+                    { "..--..", '?' },
+                    { "---...", ':' },
+                    { "-....-", '-' },
+                    { ".-..-.", '"' },
+                    { "-.--.", '(' },
+                    { "-...-", '=' },
+                    { ".-.-.-", '.' },
+                    { "-.-.-.", ';' },
+                    { "-..-.", '/' },
+                    { ".----.", '\'' },
+                    { "_.__._", ')' },
+                    { ".-.-.", '+' },
+                    { ".__._.", '@' },
+                    { " ", ' ' },
+                }
+            );
 
         private readonly double _amMin;
         private readonly double _amMax;
@@ -240,22 +86,25 @@ namespace Asv.Sdr
         private double _statCharPause;
         private int _statCharPauseCound;
         private double _statSymbolPause;
-        private int _statSymbolPauseCound;
 
-
-
-        public ReaderIqCodeIdSubject(IObservable<double> amSubject, double amMin, double amMax, int fftBufferSize, int sampleRate)
+        public ReaderIqCodeIdSubject(
+            IObservable<double> amSubject,
+            double amMin,
+            double amMax,
+            int fftBufferSize,
+            int sampleRate
+        )
         {
             _amMin = amMin;
             _amMax = amMax;
             _subscribe = amSubject.Subscribe(OnNext);
-            _oneSampleTimeMs = (fftBufferSize * 1000.0 / sampleRate);
+            _oneSampleTimeMs = fftBufferSize * 1000.0 / sampleRate;
         }
 
         private enum State
         {
             SignalUp,
-            SignalDown
+            SignalDown,
         }
 
         private void OnNext(double am)
@@ -267,7 +116,7 @@ namespace Asv.Sdr
                     {
                         _signalTime = _oneSampleTimeMs;
                         _state = State.SignalUp;
-                        var delay = (int)Math.Round(_noSignalTime / DotTimeTime,0);
+                        var delay = (int)Math.Round(_noSignalTime / DotTimeTime, 0);
                         switch (delay)
                         {
                             case <= 2:
@@ -282,6 +131,7 @@ namespace Asv.Sdr
                                 _statCharPause += _noSignalTime;
                                 break;
                             }
+
                             default:
                             {
                                 var str = new string(_symbols.ToArray());
@@ -300,6 +150,7 @@ namespace Asv.Sdr
                                     _statSymbolPause = 0;
                                     _statCharPause = 0;
                                 }
+
                                 break;
                             }
                         }
@@ -308,6 +159,7 @@ namespace Asv.Sdr
                     {
                         _noSignalTime += _oneSampleTimeMs;
                     }
+
                     break;
                 case State.SignalUp:
                     if (am > _amMin && am < _amMax)
@@ -322,7 +174,7 @@ namespace Asv.Sdr
                         if (delay <= 2)
                         {
                             _symbols.Add('.');
-                            _statDotTimeMs +=(int)_signalTime;
+                            _statDotTimeMs += (int)_signalTime;
                             ++_statDotCount;
                         }
                         else
@@ -332,8 +184,8 @@ namespace Asv.Sdr
                             ++_statDashCount;
                         }
                     }
-                    break;
 
+                    break;
             }
         }
 

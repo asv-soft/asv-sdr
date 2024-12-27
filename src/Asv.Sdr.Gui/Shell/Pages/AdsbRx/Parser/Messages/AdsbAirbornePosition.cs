@@ -5,7 +5,7 @@ namespace Asv.Sdr.Gui;
 
 public abstract class AdsbAirbornePosition : AdsbExtendedSquitterBase
 {
-    public override ushort Id  => (ushort)((17 << 8) | ((ushort)MessageType << 3));
+    public override ushort Id => (ushort)((17 << 8) | ((ushort)MessageType << 3));
     public uint NCprLat { get; set; }
     public uint NCprLon { get; set; }
 
@@ -31,7 +31,10 @@ public abstract class AdsbAirbornePosition : AdsbExtendedSquitterBase
         var alt = SpanBitHelper.GetBitU(buffer, ref bitIndex, 12);
         Altitude = GetAltitude(alt);
         Time = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1);
-        CprFormat = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) == 0 ? CprFormatEnum.Even : CprFormatEnum.Odd;
+        CprFormat =
+            SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) == 0
+                ? CprFormatEnum.Even
+                : CprFormatEnum.Odd;
         NCprLat = SpanBitHelper.GetBitU(buffer, ref bitIndex, 17);
         NCprLon = SpanBitHelper.GetBitU(buffer, ref bitIndex, 17);
         buffer = buffer[(bitIndex / 8)..];
@@ -53,6 +56,7 @@ public abstract class AdsbAirbornePosition : AdsbExtendedSquitterBase
             NCprLat = pos.Lat;
             NCprLon = pos.Lon;
         }
+
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 17, NCprLat);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 17, NCprLon);
         buffer = buffer[(bitIndex / 8)..];
@@ -60,19 +64,34 @@ public abstract class AdsbAirbornePosition : AdsbExtendedSquitterBase
 
     public void CalculatePosition(AdsbAirbornePosition prevPosition)
     {
-        if (CprFormat == prevPosition.CprFormat) return;
+        if (CprFormat == prevPosition.CprFormat)
+        {
+            return;
+        }
 
         if (CprFormat == CprFormatEnum.Even)
         {
-            var pos = AdsbHelper.GloballyUnambiguousPositionDecoding(NCprLat, NCprLon, prevPosition.NCprLat,
-                prevPosition.NCprLon, DateTime.Now, DateTime.Now.AddSeconds(-1));
+            var pos = AdsbHelper.GloballyUnambiguousPositionDecoding(
+                NCprLat,
+                NCprLon,
+                prevPosition.NCprLat,
+                prevPosition.NCprLon,
+                DateTime.Now,
+                DateTime.Now.AddSeconds(-1)
+            );
             Latitude = pos.Lat;
             Longitude = pos.Lon;
         }
         else
         {
-            var pos = AdsbHelper.GloballyUnambiguousPositionDecoding(prevPosition.NCprLat, prevPosition.NCprLon,
-                NCprLat, NCprLon, DateTime.Now.AddSeconds(-1), DateTime.Now);
+            var pos = AdsbHelper.GloballyUnambiguousPositionDecoding(
+                prevPosition.NCprLat,
+                prevPosition.NCprLon,
+                NCprLat,
+                NCprLon,
+                DateTime.Now.AddSeconds(-1),
+                DateTime.Now
+            );
             Latitude = pos.Lat;
             Longitude = pos.Lon;
         }
@@ -82,23 +101,23 @@ public abstract class AdsbAirbornePosition : AdsbExtendedSquitterBase
 
     protected abstract double GetAltitude(uint nAlt);
     protected abstract uint SetAltitude(double alt);
-    
+
     protected abstract void SetAirbornePositionType(uint nMsgType);
     protected abstract uint GetAirbornePositionType();
-    
 
     #endregion
-    
 }
 
 public class AdsbAirbornePositionWithBaroAlt : AdsbAirbornePosition
 {
-    public override AdsbMessageTypeEnum MessageType => AdsbMessageTypeEnum.AirborneBarometricPosition;
-    
+    public override AdsbMessageTypeEnum MessageType =>
+        AdsbMessageTypeEnum.AirborneBarometricPosition;
+
     /// <summary>
     /// When Type Code is from 9 to 18, the encoded altitude represents the barometric altitude of the aircraft.
     /// </summary>
-    public AirbornePositionBaroAltTypeCode AirbornePositionType { get; set; } = AirbornePositionBaroAltTypeCode.BasicPositionHighUpdateRate;
+    public AirbornePositionBaroAltTypeCode AirbornePositionType { get; set; } =
+        AirbornePositionBaroAltTypeCode.BasicPositionHighUpdateRate;
 
     protected override void SetAirbornePositionType(uint nMsgType)
     {
@@ -112,26 +131,34 @@ public class AdsbAirbornePositionWithBaroAlt : AdsbAirbornePosition
 
     protected override double GetAltitude(uint nAlt)
     {
-        if (nAlt == 0) return double.NaN;
+        if (nAlt == 0)
+        {
+            return double.NaN;
+        }
+
         var q = (nAlt & 0x10) != 0 ? 1 : 0;
         nAlt = ((nAlt & 0xFE0) >> 1) | (nAlt & 0xF);
         if (q == 1)
         {
-            return (nAlt * 25.0 - 1000.0) / 3.28084;
+            return ((nAlt * 25.0) - 1000.0) / 3.28084;
         }
+
         return GrayToBinary((int)nAlt) * 100.0 / 3.28084;
     }
 
     protected override uint SetAltitude(double alt)
     {
-        if (double.IsNaN(alt)) return 0;
+        if (double.IsNaN(alt))
+        {
+            return 0;
+        }
 
         alt *= 3.28084;
         var altNorm = alt switch
         {
             > 50187.5 => (int)Math.Round(alt / 100.0, 0) * 100,
             < -1000.0 => -1000,
-            _ => (int)Math.Round(alt / 25.0) * 25
+            _ => (int)Math.Round(alt / 25.0) * 25,
         };
 
         if (altNorm > 50175)
@@ -163,9 +190,9 @@ public class AdsbAirbornePositionWithBaroAlt : AdsbAirbornePosition
             binary ^= gray >> shift;
             shift++;
         }
+
         return binary;
     }
-    
 
     #endregion
 }
@@ -173,12 +200,13 @@ public class AdsbAirbornePositionWithBaroAlt : AdsbAirbornePosition
 public class AdsbAirbornePositionWithGnssAlt : AdsbAirbornePosition
 {
     public override AdsbMessageTypeEnum MessageType => AdsbMessageTypeEnum.AirborneGnssPosition;
-    
+
     /// <summary>
     /// When the Type Code is from 20 to 22, the encoded altitude contains the GNSS altitude of the aircraft.
     /// </summary>
-    public AirbornePositionGnssAltTypeCode AirbornePositionType { get; set; } = AirbornePositionGnssAltTypeCode.BasicGnssPosition;
-    
+    public AirbornePositionGnssAltTypeCode AirbornePositionType { get; set; } =
+        AirbornePositionGnssAltTypeCode.BasicGnssPosition;
+
     protected override void SetAirbornePositionType(uint nMsgType)
     {
         AirbornePositionType = (AirbornePositionGnssAltTypeCode)nMsgType;
@@ -191,16 +219,21 @@ public class AdsbAirbornePositionWithGnssAlt : AdsbAirbornePosition
 
     protected override double GetAltitude(uint nAlt)
     {
-        return nAlt * 6.25 - 1000.0;
+        return (nAlt * 6.25) - 1000.0;
     }
 
     protected override uint SetAltitude(double alt)
     {
-        if (alt > 24593.75) alt = 24593.75;
-        if (alt < -1000.0) alt = -1000.0;
+        if (alt > 24593.75)
+        {
+            alt = 24593.75;
+        }
+
+        if (alt < -1000.0)
+        {
+            alt = -1000.0;
+        }
 
         return (uint)Math.Round((alt + 1000.0) / 6.25, 0);
     }
 }
-
-

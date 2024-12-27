@@ -7,13 +7,12 @@ namespace Asv.Sdr.SignalHound
 {
     public static class LibHelper
     {
-
         public enum OperatingSystem
         {
             Undefined,
             Windows,
             Linux,
-            MacOsX
+            MacOsX,
         }
 
         public static void CheckLibraryFiles()
@@ -31,15 +30,23 @@ namespace Asv.Sdr.SignalHound
                         var dllDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "lib");
                         Console.WriteLine($"Dll directory: {dllDir}");
                         if (!SetDllDirectory(dllDir))
-                            throw new Win32Exception($"Error to execute kernel32.dll:SetDllDirectory({dllDir})");
-                        if (!Directory.Exists(dllDir)) Directory.CreateDirectory(dllDir);
+                        {
+                            throw new Win32Exception(
+                                $"Error to execute kernel32.dll:SetDllDirectory({dllDir})"
+                            );
+                        }
+
+                        if (!Directory.Exists(dllDir))
+                        {
+                            Directory.CreateDirectory(dllDir);
+                        }
+
                         CheckFile(Path.Combine(dllDir, "bb_api.dll"), Libs.bb_api_dll);
                         CheckFile(Path.Combine(dllDir, "bb_api.lib"), Libs.bb_api_lib);
                         CheckFile(Path.Combine(dllDir, "sa_api.dll"), Libs.sa_api_dll);
                         CheckFile(Path.Combine(dllDir, "sa_api.lib"), Libs.sa_api_lib);
                         CheckFile(Path.Combine(dllDir, "sg_api.dll"), Libs.sg_api);
                         CheckFile(Path.Combine(dllDir, "ftd2xx.dll"), Libs.ftd2xx_dll);
-                        return;
                     }
 
                     break;
@@ -54,9 +61,11 @@ namespace Asv.Sdr.SignalHound
 
         private static void CheckFile(string path, byte[] data)
         {
-            if (!File.Exists(path)) File.WriteAllBytes(path, data);
+            if (!File.Exists(path))
+            {
+                File.WriteAllBytes(path, data);
+            }
         }
-
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool SetDllDirectory(string path);
@@ -64,7 +73,10 @@ namespace Asv.Sdr.SignalHound
         private static OperatingSystem DetectPlatform()
         {
             var windir = Environment.GetEnvironmentVariable("windir");
-            if (!string.IsNullOrEmpty(windir) && windir.Contains(@"\") && Directory.Exists(windir)) return OperatingSystem.Windows;
+            if (!string.IsNullOrEmpty(windir) && windir.Contains(@"\") && Directory.Exists(windir))
+            {
+                return OperatingSystem.Windows;
+            }
 
             if (File.Exists(@"/proc/sys/kernel/ostype"))
             {
@@ -78,6 +90,5 @@ namespace Asv.Sdr.SignalHound
                 ? OperatingSystem.MacOsX
                 : OperatingSystem.Undefined;
         }
-
     }
 }

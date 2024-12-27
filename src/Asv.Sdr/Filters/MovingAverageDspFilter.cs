@@ -34,5 +34,4 @@ namespace Asv.Sdr
             return DspMathEx.GetAvgAngleRad(_window);
         }
     }
-
 }

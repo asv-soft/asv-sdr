@@ -15,9 +15,9 @@ namespace Asv.Sdr
     public static class ZScore
     {
         /// <summary>
-        /// Robust peak detection algorithm (using z-scores)
+        /// Robust peak detection algorithm (using z-scores).
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="input">input.</param>
         /// <param name="lag">the lag parameter determines how much your data will be smoothed and how adaptive the algorithm
         /// is to changes in the long-term average of the data. The more stationary your data is, the more lags you should include
         /// (this should improve the robustness of the algorithm). If your data contains time-varying trends, you should consider
@@ -42,8 +42,13 @@ namespace Asv.Sdr
         /// between 0 and 1, depending on the extent to which signals can systematically influence the time-varying trend of the data.
         /// E.g., if signals lead to a structural break of the long-term average of the time series, the influence parameter should
         /// be put high (close to 1) so the threshold can react to structural breaks quickly.</param>
-        /// <returns></returns>
-        public static ZScoreOutput StartAlgo(List<double> input, int lag, double threshold, double influence)
+        /// <returns>.</returns>
+        public static ZScoreOutput StartAlgo(
+            List<double> input,
+            int lag,
+            double threshold,
+            double influence
+        )
         {
             // init variables!
             int[] signals = new int[input.Count];
@@ -61,7 +66,7 @@ namespace Asv.Sdr
                 if (Math.Abs(input[i] - avgFilter[i - 1]) > threshold * stdFilter[i - 1])
                 {
                     signals[i] = (input[i] > avgFilter[i - 1]) ? 1 : -1;
-                    filteredY[i] = influence * input[i] + (1 - influence) * filteredY[i - 1];
+                    filteredY[i] = (influence * input[i]) + ((1 - influence) * filteredY[i - 1]);
                 }
                 else
                 {
@@ -70,7 +75,10 @@ namespace Asv.Sdr
                 }
 
                 // Update rolling average and deviation
-                var slidingWindow = new List<double>(filteredY).Skip(i - lag).Take(lag + 1).ToList();
+                var slidingWindow = new List<double>(filteredY)
+                    .Skip(i - lag)
+                    .Take(lag + 1)
+                    .ToList();
 
                 var tmpMean = Mean(slidingWindow);
                 var tmpStdDev = StdDev(slidingWindow);
@@ -79,13 +87,13 @@ namespace Asv.Sdr
                 stdFilter[i] = StdDev(slidingWindow);
             }
 
-            // Copy to convenience class 
+            // Copy to convenience class
             var result = new ZScoreOutput
             {
                 input = input,
                 avgFilter = new List<double>(avgFilter),
                 signals = new List<int>(signals),
-                filtered_stddev = new List<double>(stdFilter)
+                filtered_stddev = new List<double>(stdFilter),
             };
 
             return result;
@@ -93,19 +101,22 @@ namespace Asv.Sdr
 
         private static double Mean(List<double> list)
         {
-            // Simple helper function! 
+            // Simple helper function!
             return list.Average();
         }
 
         private static double StdDev(List<double> values)
         {
             double ret = 0;
-            if (values.Count() > 0)
+            if (values.Count <= 0)
             {
-                double avg = values.Average();
-                double sum = values.Sum(d => Math.Pow(d - avg, 2));
-                ret = Math.Sqrt((sum) / (values.Count() - 1));
+                return ret;
             }
+
+            double avg = values.Average();
+            double sum = values.Sum(d => Math.Pow(d - avg, 2));
+            ret = Math.Sqrt(sum / (values.Count - 1));
+
             return ret;
         }
     }

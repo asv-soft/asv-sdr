@@ -5,40 +5,48 @@ namespace Asv.Sdr
     /// <summary>
     /// Represents a biquad-filter.
     /// </summary>
-    public abstract class BiQuad:IDspFilter
+    public abstract class BiQuad : IDspFilter
     {
         /// <summary>
         /// The a0 value.
         /// </summary>
         protected double A0;
+
         /// <summary>
         /// The a1 value.
         /// </summary>
         protected double A1;
+
         /// <summary>
         /// The a2 value.
         /// </summary>
         protected double A2;
+
         /// <summary>
         /// The b1 value.
         /// </summary>
         protected double B1;
+
         /// <summary>
         /// The b2 value.
         /// </summary>
         protected double B2;
+
         /// <summary>
         /// The q value.
         /// </summary>
         private double _q;
+
         /// <summary>
         /// The gain value in dB.
         /// </summary>
         private double _gainDB;
+
         /// <summary>
         /// The z1 value.
         /// </summary>
         protected double Z1;
+
         /// <summary>
         /// The z2 value.
         /// </summary>
@@ -57,8 +65,12 @@ namespace Asv.Sdr
             {
                 if (SampleRate < value * 2)
                 {
-                    throw new ArgumentOutOfRangeException("value", "The samplerate has to be bigger than 2 * frequency.");
+                    throw new ArgumentOutOfRangeException(
+                        "value",
+                        "The samplerate has to be bigger than 2 * frequency."
+                    );
                 }
+
                 _frequency = value;
                 CalculateBiQuadCoefficients();
             }
@@ -77,10 +89,8 @@ namespace Asv.Sdr
             get { return _q; }
             set
             {
-                if (value <= 0)
-                {
-                    throw new ArgumentOutOfRangeException("value");
-                }
+                ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value);
+
                 _q = value;
                 CalculateBiQuadCoefficients();
             }
@@ -109,12 +119,10 @@ namespace Asv.Sdr
         /// or
         /// frequency
         /// or
-        /// q
+        /// q.
         /// </exception>
         protected BiQuad(int sampleRate, double frequency)
-            : this(sampleRate, frequency, 1.0 / Math.Sqrt(2))
-        {
-        }
+            : this(sampleRate, frequency, 1.0 / Math.Sqrt(2)) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BiQuad"/> class.
@@ -131,12 +139,12 @@ namespace Asv.Sdr
         /// </exception>
         protected BiQuad(int sampleRate, double frequency, double q)
         {
-            if (sampleRate <= 0)
-                throw new ArgumentOutOfRangeException("sampleRate");
-            if (frequency <= 0)
-                throw new ArgumentOutOfRangeException("frequency");
-            if (q <= 0)
-                throw new ArgumentOutOfRangeException("q");
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(sampleRate);
+
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(frequency);
+
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(q);
+
             SampleRate = sampleRate;
             Frequency = frequency;
             Q = q;
@@ -150,13 +158,11 @@ namespace Asv.Sdr
         /// <returns>The result of the processed <paramref name="input"/> sample.</returns>
         public double Process(double input)
         {
-            double o = input * A0 + Z1;
-            Z1 = input * A1 + Z2 - B1 * o;
-            Z2 = input * A2 - B2 * o;
+            double o = (input * A0) + Z1;
+            Z1 = (input * A1) + Z2 - (B1 * o);
+            Z2 = (input * A2) - (B2 * o);
             return o;
         }
-
-        
 
         /// <summary>
         /// Calculates all coefficients.

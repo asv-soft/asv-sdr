@@ -1,6 +1,3 @@
 namespace Asv.Sdr.Gui;
 
-public interface IApp
-{
-    
-}
+public interface IApp { }

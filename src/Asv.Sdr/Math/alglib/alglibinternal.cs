@@ -5,7 +5,7 @@ Copyright (c) Sergey Bochkanov (ALGLIB project).
 >>> SOURCE LICENSE >>>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation (www.fsf.org); either version 2 of the 
+the Free Software Foundation (www.fsf.org); either version 2 of the
 License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -20,19 +20,16 @@ http://www.fsf.org/licensing/licenses
 #pragma warning disable 162
 #pragma warning disable 164
 #pragma warning disable 219
+#pragma warning disable
 using System;
 
-public partial class alglib
-{
+public partial class Alglib { }
 
-
-
-}
-public partial class alglib
+public partial class Alglib
 {
     public class scodes
     {
-        public static int getrdfserializationcode(alglib.xparams _params)
+        public static int getrdfserializationcode(Alglib.xparams _params)
         {
             int result = 0;
 
@@ -40,8 +37,7 @@ public partial class alglib
             return result;
         }
 
-
-        public static int getkdtreeserializationcode(alglib.xparams _params)
+        public static int getkdtreeserializationcode(Alglib.xparams _params)
         {
             int result = 0;
 
@@ -49,8 +45,7 @@ public partial class alglib
             return result;
         }
 
-
-        public static int getmlpserializationcode(alglib.xparams _params)
+        public static int getmlpserializationcode(Alglib.xparams _params)
         {
             int result = 0;
 
@@ -58,8 +53,7 @@ public partial class alglib
             return result;
         }
 
-
-        public static int getmlpeserializationcode(alglib.xparams _params)
+        public static int getmlpeserializationcode(Alglib.xparams _params)
         {
             int result = 0;
 
@@ -67,8 +61,7 @@ public partial class alglib
             return result;
         }
 
-
-        public static int getrbfserializationcode(alglib.xparams _params)
+        public static int getrbfserializationcode(Alglib.xparams _params)
         {
             int result = 0;
 
@@ -76,8 +69,7 @@ public partial class alglib
             return result;
         }
 
-
-        public static int getspline2dserializationcode(alglib.xparams _params)
+        public static int getspline2dserializationcode(Alglib.xparams _params)
         {
             int result = 0;
 
@@ -85,8 +77,7 @@ public partial class alglib
             return result;
         }
 
-
-        public static int getidwserializationcode(alglib.xparams _params)
+        public static int getidwserializationcode(Alglib.xparams _params)
         {
             int result = 0;
 
@@ -94,17 +85,15 @@ public partial class alglib
             return result;
         }
 
-
-        public static int getknnserializationcode(alglib.xparams _params)
+        public static int getknnserializationcode(Alglib.xparams _params)
         {
             int result = 0;
 
             result = 108;
             return result;
         }
-
-
     }
+
     public class apserv
     {
         /*************************************************************************
@@ -131,10 +120,12 @@ public partial class alglib
             public double[] ra3;
             public double[,] rm0;
             public double[,] rm1;
+
             public apbuffers()
             {
                 init();
             }
+
             public override void init()
             {
                 ba0 = new bool[0];
@@ -146,10 +137,11 @@ public partial class alglib
                 ra1 = new double[0];
                 ra2 = new double[0];
                 ra3 = new double[0];
-                rm0 = new double[0,0];
-                rm1 = new double[0,0];
+                rm0 = new double[0, 0];
+                rm1 = new double[0, 0];
             }
-            public override alglib.apobject make_copy()
+
+            public override Alglib.apobject make_copy()
             {
                 apbuffers _result = new apbuffers();
                 _result.ba0 = (bool[])ba0.Clone();
@@ -167,7 +159,6 @@ public partial class alglib
             }
         };
 
-
         /*************************************************************************
         Structure which is used to workaround limitations of ALGLIB parallellization
         environment.
@@ -178,21 +169,21 @@ public partial class alglib
         public class sboolean : apobject
         {
             public bool val;
+
             public sboolean()
             {
                 init();
             }
-            public override void init()
-            {
-            }
-            public override alglib.apobject make_copy()
+
+            public override void init() { }
+
+            public override Alglib.apobject make_copy()
             {
                 sboolean _result = new sboolean();
                 _result.val = val;
                 return _result;
             }
         };
-
 
         /*************************************************************************
         Structure which is used to workaround limitations of ALGLIB parallellization
@@ -204,22 +195,24 @@ public partial class alglib
         public class sbooleanarray : apobject
         {
             public bool[] val;
+
             public sbooleanarray()
             {
                 init();
             }
+
             public override void init()
             {
                 val = new bool[0];
             }
-            public override alglib.apobject make_copy()
+
+            public override Alglib.apobject make_copy()
             {
                 sbooleanarray _result = new sbooleanarray();
                 _result.val = (bool[])val.Clone();
                 return _result;
             }
         };
-
 
         /*************************************************************************
         Structure which is used to workaround limitations of ALGLIB parallellization
@@ -231,21 +224,21 @@ public partial class alglib
         public class sinteger : apobject
         {
             public int val;
+
             public sinteger()
             {
                 init();
             }
-            public override void init()
-            {
-            }
-            public override alglib.apobject make_copy()
+
+            public override void init() { }
+
+            public override Alglib.apobject make_copy()
             {
                 sinteger _result = new sinteger();
                 _result.val = val;
                 return _result;
             }
         };
-
 
         /*************************************************************************
         Structure which is used to workaround limitations of ALGLIB parallellization
@@ -257,22 +250,24 @@ public partial class alglib
         public class sintegerarray : apobject
         {
             public int[] val;
+
             public sintegerarray()
             {
                 init();
             }
+
             public override void init()
             {
                 val = new int[0];
             }
-            public override alglib.apobject make_copy()
+
+            public override Alglib.apobject make_copy()
             {
                 sintegerarray _result = new sintegerarray();
                 _result.val = (int[])val.Clone();
                 return _result;
             }
         };
-
 
         /*************************************************************************
         Structure which is used to workaround limitations of ALGLIB parallellization
@@ -284,21 +279,21 @@ public partial class alglib
         public class sreal : apobject
         {
             public double val;
+
             public sreal()
             {
                 init();
             }
-            public override void init()
-            {
-            }
-            public override alglib.apobject make_copy()
+
+            public override void init() { }
+
+            public override Alglib.apobject make_copy()
             {
                 sreal _result = new sreal();
                 _result.val = val;
                 return _result;
             }
         };
-
 
         /*************************************************************************
         Structure which is used to workaround limitations of ALGLIB parallellization
@@ -310,22 +305,24 @@ public partial class alglib
         public class srealarray : apobject
         {
             public double[] val;
+
             public srealarray()
             {
                 init();
             }
+
             public override void init()
             {
                 val = new double[0];
             }
-            public override alglib.apobject make_copy()
+
+            public override Alglib.apobject make_copy()
             {
                 srealarray _result = new srealarray();
                 _result.val = (double[])val.Clone();
                 return _result;
             }
         };
-
 
         /*************************************************************************
         Structure which is used to workaround limitations of ALGLIB parallellization
@@ -337,21 +334,21 @@ public partial class alglib
         public class scomplex : apobject
         {
             public complex val;
+
             public scomplex()
             {
                 init();
             }
-            public override void init()
-            {
-            }
-            public override alglib.apobject make_copy()
+
+            public override void init() { }
+
+            public override Alglib.apobject make_copy()
             {
                 scomplex _result = new scomplex();
                 _result.val = val;
                 return _result;
             }
         };
-
 
         /*************************************************************************
         Structure which is used to workaround limitations of ALGLIB parallellization
@@ -363,24 +360,24 @@ public partial class alglib
         public class scomplexarray : apobject
         {
             public complex[] val;
+
             public scomplexarray()
             {
                 init();
             }
+
             public override void init()
             {
                 val = new complex[0];
             }
-            public override alglib.apobject make_copy()
+
+            public override Alglib.apobject make_copy()
             {
                 scomplexarray _result = new scomplexarray();
-                _result.val = (alglib.complex[])val.Clone();
+                _result.val = (Alglib.complex[])val.Clone();
                 return _result;
             }
         };
-
-
-
 
         /*************************************************************************
         Internally calls SetErrorFlag() with condition:
@@ -393,16 +390,21 @@ public partial class alglib
 
         This function returns value of COND.
         *************************************************************************/
-        public static void seterrorflagdiff(ref bool flag,
+        public static void seterrorflagdiff(
+            ref bool flag,
             double val,
             double refval,
             double tol,
             double s,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
-            alglib.ap.seterrorflag(ref flag, (double)(Math.Abs(val-refval))>(double)(tol*Math.Max(Math.Abs(refval), s)), "apserv.ap:162");
+            Alglib.ap.seterrorflag(
+                ref flag,
+                (double)(Math.Abs(val - refval)) > (double)(tol * Math.Max(Math.Abs(refval), s)),
+                "apserv.ap:162"
+            );
         }
-
 
         /*************************************************************************
         The function always returns False.
@@ -411,14 +413,13 @@ public partial class alglib
           -- ALGLIB --
              Copyright 17.09.2012 by Bochkanov Sergey
         *************************************************************************/
-        public static bool alwaysfalse(alglib.xparams _params)
+        public static bool alwaysfalse(Alglib.xparams _params)
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         The function "touches" integer - it is used  to  avoid  compiler  messages
@@ -428,11 +429,7 @@ public partial class alglib
           -- ALGLIB --
              Copyright 17.09.2012 by Bochkanov Sergey
         *************************************************************************/
-        public static void touchint(ref int a,
-            alglib.xparams _params)
-        {
-        }
-
+        public static void touchint(ref int a, Alglib.xparams _params) { }
 
         /*************************************************************************
         The function "touches" real   -  it is used  to  avoid  compiler  messages
@@ -442,11 +439,7 @@ public partial class alglib
           -- ALGLIB --
              Copyright 17.09.2012 by Bochkanov Sergey
         *************************************************************************/
-        public static void touchreal(ref double a,
-            alglib.xparams _params)
-        {
-        }
-
+        public static void touchreal(ref double a, Alglib.xparams _params) { }
 
         /*************************************************************************
         The function performs zero-coalescing on real value.
@@ -456,20 +449,17 @@ public partial class alglib
           -- ALGLIB --
              Copyright 18.05.2015 by Bochkanov Sergey
         *************************************************************************/
-        public static double coalesce(double a,
-            double b,
-            alglib.xparams _params)
+        public static double coalesce(double a, double b, Alglib.xparams _params)
         {
             double result = 0;
 
             result = a;
-            if( (double)(a)==(double)(0.0) )
+            if ((double)(a) == (double)(0.0))
             {
                 result = b;
             }
             return result;
         }
-
 
         /*************************************************************************
         The function performs zero-coalescing on integer value.
@@ -479,20 +469,17 @@ public partial class alglib
           -- ALGLIB --
              Copyright 18.05.2015 by Bochkanov Sergey
         *************************************************************************/
-        public static int coalescei(int a,
-            int b,
-            alglib.xparams _params)
+        public static int coalescei(int a, int b, Alglib.xparams _params)
         {
             int result = 0;
 
             result = a;
-            if( a==0 )
+            if (a == 0)
             {
                 result = b;
             }
             return result;
         }
-
 
         /*************************************************************************
         The function convert integer value to real value.
@@ -500,15 +487,13 @@ public partial class alglib
           -- ALGLIB --
              Copyright 17.09.2012 by Bochkanov Sergey
         *************************************************************************/
-        public static double inttoreal(int a,
-            alglib.xparams _params)
+        public static double inttoreal(int a, Alglib.xparams _params)
         {
             double result = 0;
 
             result = a;
             return result;
         }
-
 
         /*************************************************************************
         The function calculates binary logarithm.
@@ -518,15 +503,13 @@ public partial class alglib
           -- ALGLIB --
              Copyright 17.09.2012 by Bochkanov Sergey
         *************************************************************************/
-        public static double logbase2(double x,
-            alglib.xparams _params)
+        public static double logbase2(double x, Alglib.xparams _params)
         {
             double result = 0;
 
-            result = Math.Log(x)/Math.Log(2);
+            result = Math.Log(x) / Math.Log(2);
             return result;
         }
-
 
         /*************************************************************************
         This function compares two numbers for approximate equality, with tolerance
@@ -536,17 +519,13 @@ public partial class alglib
           -- ALGLIB --
              Copyright 02.12.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static bool approxequal(double a,
-            double b,
-            double tol,
-            alglib.xparams _params)
+        public static bool approxequal(double a, double b, double tol, Alglib.xparams _params)
         {
             bool result = new bool();
 
-            result = (double)(Math.Abs(a-b))<=(double)(tol);
+            result = (double)(Math.Abs(a - b)) <= (double)(tol);
             return result;
         }
-
 
         /*************************************************************************
         This function compares two numbers for approximate equality, with tolerance
@@ -556,17 +535,14 @@ public partial class alglib
           -- ALGLIB --
              Copyright 02.12.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static bool approxequalrel(double a,
-            double b,
-            double tol,
-            alglib.xparams _params)
+        public static bool approxequalrel(double a, double b, double tol, Alglib.xparams _params)
         {
             bool result = new bool();
 
-            result = (double)(Math.Abs(a-b))<=(double)(Math.Max(Math.Abs(a), Math.Abs(b))*tol);
+            result =
+                (double)(Math.Abs(a - b)) <= (double)(Math.Max(Math.Abs(a), Math.Abs(b)) * tol);
             return result;
         }
-
 
         /*************************************************************************
         This  function  generates  1-dimensional  general  interpolation task with
@@ -577,12 +553,14 @@ public partial class alglib
           -- ALGLIB --
              Copyright 02.12.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void taskgenint1d(double a,
+        public static void taskgenint1d(
+            double a,
             double b,
             int n,
             ref double[] x,
             ref double[] y,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             double h = 0;
@@ -590,34 +568,33 @@ public partial class alglib
             x = new double[0];
             y = new double[0];
 
-            alglib.ap.assert(n>=1, "TaskGenInterpolationEqdist1D: N<1!");
+            Alglib.ap.assert(n >= 1, "TaskGenInterpolationEqdist1D: N<1!");
             x = new double[n];
             y = new double[n];
-            if( n>1 )
+            if (n > 1)
             {
                 x[0] = a;
-                y[0] = 2*math.randomreal()-1;
-                h = (b-a)/(n-1);
-                for(i=1; i<=n-1; i++)
+                y[0] = 2 * math.randomreal() - 1;
+                h = (b - a) / (n - 1);
+                for (i = 1; i <= n - 1; i++)
                 {
-                    if( i!=n-1 )
+                    if (i != n - 1)
                     {
-                        x[i] = a+(i+0.2*(2*math.randomreal()-1))*h;
+                        x[i] = a + (i + 0.2 * (2 * math.randomreal() - 1)) * h;
                     }
                     else
                     {
                         x[i] = b;
                     }
-                    y[i] = y[i-1]+(2*math.randomreal()-1)*(x[i]-x[i-1]);
+                    y[i] = y[i - 1] + (2 * math.randomreal() - 1) * (x[i] - x[i - 1]);
                 }
             }
             else
             {
-                x[0] = 0.5*(a+b);
-                y[0] = 2*math.randomreal()-1;
+                x[0] = 0.5 * (a + b);
+                y[0] = 2 * math.randomreal() - 1;
             }
         }
-
 
         /*************************************************************************
         This function generates  1-dimensional equidistant interpolation task with
@@ -628,12 +605,14 @@ public partial class alglib
           -- ALGLIB --
              Copyright 02.12.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void taskgenint1dequidist(double a,
+        public static void taskgenint1dequidist(
+            double a,
             double b,
             int n,
             ref double[] x,
             ref double[] y,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             double h = 0;
@@ -641,27 +620,26 @@ public partial class alglib
             x = new double[0];
             y = new double[0];
 
-            alglib.ap.assert(n>=1, "TaskGenInterpolationEqdist1D: N<1!");
+            Alglib.ap.assert(n >= 1, "TaskGenInterpolationEqdist1D: N<1!");
             x = new double[n];
             y = new double[n];
-            if( n>1 )
+            if (n > 1)
             {
                 x[0] = a;
-                y[0] = 2*math.randomreal()-1;
-                h = (b-a)/(n-1);
-                for(i=1; i<=n-1; i++)
+                y[0] = 2 * math.randomreal() - 1;
+                h = (b - a) / (n - 1);
+                for (i = 1; i <= n - 1; i++)
                 {
-                    x[i] = a+i*h;
-                    y[i] = y[i-1]+(2*math.randomreal()-1)*h;
+                    x[i] = a + i * h;
+                    y[i] = y[i - 1] + (2 * math.randomreal() - 1) * h;
                 }
             }
             else
             {
-                x[0] = 0.5*(a+b);
-                y[0] = 2*math.randomreal()-1;
+                x[0] = 0.5 * (a + b);
+                y[0] = 2 * math.randomreal() - 1;
             }
         }
-
 
         /*************************************************************************
         This function generates  1-dimensional Chebyshev-1 interpolation task with
@@ -672,43 +650,45 @@ public partial class alglib
           -- ALGLIB --
              Copyright 02.12.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void taskgenint1dcheb1(double a,
+        public static void taskgenint1dcheb1(
+            double a,
             double b,
             int n,
             ref double[] x,
             ref double[] y,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
 
             x = new double[0];
             y = new double[0];
 
-            alglib.ap.assert(n>=1, "TaskGenInterpolation1DCheb1: N<1!");
+            Alglib.ap.assert(n >= 1, "TaskGenInterpolation1DCheb1: N<1!");
             x = new double[n];
             y = new double[n];
-            if( n>1 )
+            if (n > 1)
             {
-                for(i=0; i<=n-1; i++)
+                for (i = 0; i <= n - 1; i++)
                 {
-                    x[i] = 0.5*(b+a)+0.5*(b-a)*Math.Cos(Math.PI*(2*i+1)/(2*n));
-                    if( i==0 )
+                    x[i] =
+                        0.5 * (b + a) + 0.5 * (b - a) * Math.Cos(Math.PI * (2 * i + 1) / (2 * n));
+                    if (i == 0)
                     {
-                        y[i] = 2*math.randomreal()-1;
+                        y[i] = 2 * math.randomreal() - 1;
                     }
                     else
                     {
-                        y[i] = y[i-1]+(2*math.randomreal()-1)*(x[i]-x[i-1]);
+                        y[i] = y[i - 1] + (2 * math.randomreal() - 1) * (x[i] - x[i - 1]);
                     }
                 }
             }
             else
             {
-                x[0] = 0.5*(a+b);
-                y[0] = 2*math.randomreal()-1;
+                x[0] = 0.5 * (a + b);
+                y[0] = 2 * math.randomreal() - 1;
             }
         }
-
 
         /*************************************************************************
         This function generates  1-dimensional Chebyshev-2 interpolation task with
@@ -719,43 +699,44 @@ public partial class alglib
           -- ALGLIB --
              Copyright 02.12.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void taskgenint1dcheb2(double a,
+        public static void taskgenint1dcheb2(
+            double a,
             double b,
             int n,
             ref double[] x,
             ref double[] y,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
 
             x = new double[0];
             y = new double[0];
 
-            alglib.ap.assert(n>=1, "TaskGenInterpolation1DCheb2: N<1!");
+            Alglib.ap.assert(n >= 1, "TaskGenInterpolation1DCheb2: N<1!");
             x = new double[n];
             y = new double[n];
-            if( n>1 )
+            if (n > 1)
             {
-                for(i=0; i<=n-1; i++)
+                for (i = 0; i <= n - 1; i++)
                 {
-                    x[i] = 0.5*(b+a)+0.5*(b-a)*Math.Cos(Math.PI*i/(n-1));
-                    if( i==0 )
+                    x[i] = 0.5 * (b + a) + 0.5 * (b - a) * Math.Cos(Math.PI * i / (n - 1));
+                    if (i == 0)
                     {
-                        y[i] = 2*math.randomreal()-1;
+                        y[i] = 2 * math.randomreal() - 1;
                     }
                     else
                     {
-                        y[i] = y[i-1]+(2*math.randomreal()-1)*(x[i]-x[i-1]);
+                        y[i] = y[i - 1] + (2 * math.randomreal() - 1) * (x[i] - x[i - 1]);
                     }
                 }
             }
             else
             {
-                x[0] = 0.5*(a+b);
-                y[0] = 2*math.randomreal()-1;
+                x[0] = 0.5 * (a + b);
+                y[0] = 2 * math.randomreal() - 1;
             }
         }
-
 
         /*************************************************************************
         This function checks that all values from X[] are distinct. It does more
@@ -773,9 +754,7 @@ public partial class alglib
           -- ALGLIB --
              Copyright 02.12.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static bool aredistinct(double[] x,
-            int n,
-            alglib.xparams _params)
+        public static bool aredistinct(double[] x, int n, Alglib.xparams _params)
         {
             bool result = new bool();
             double a = 0;
@@ -783,10 +762,9 @@ public partial class alglib
             int i = 0;
             bool nonsorted = new bool();
 
-            alglib.ap.assert(n>=1, "APSERVAreDistinct: internal error (N<1)");
-            if( n==1 )
+            Alglib.ap.assert(n >= 1, "APSERVAreDistinct: internal error (N<1)");
+            if (n == 1)
             {
-                
                 //
                 // everything is alright, it is up to caller to decide whether it
                 // can interpolate something with just one point
@@ -797,16 +775,16 @@ public partial class alglib
             a = x[0];
             b = x[0];
             nonsorted = false;
-            for(i=1; i<=n-1; i++)
+            for (i = 1; i <= n - 1; i++)
             {
                 a = Math.Min(a, x[i]);
                 b = Math.Max(b, x[i]);
-                nonsorted = nonsorted || (double)(x[i-1])>=(double)(x[i]);
+                nonsorted = nonsorted || (double)(x[i - 1]) >= (double)(x[i]);
             }
-            alglib.ap.assert(!nonsorted, "APSERVAreDistinct: internal error (not sorted)");
-            for(i=1; i<=n-1; i++)
+            Alglib.ap.assert(!nonsorted, "APSERVAreDistinct: internal error (not sorted)");
+            for (i = 1; i <= n - 1; i++)
             {
-                if( (double)((x[i]-a)/(b-a)+1)==(double)((x[i-1]-a)/(b-a)+1) )
+                if ((double)((x[i] - a) / (b - a) + 1) == (double)((x[i - 1] - a) / (b - a) + 1))
                 {
                     result = false;
                     return result;
@@ -816,17 +794,14 @@ public partial class alglib
             return result;
         }
 
-
         /*************************************************************************
-        This function checks that two boolean values are the same (both  are  True 
+        This function checks that two boolean values are the same (both  are  True
         or both are False).
 
           -- ALGLIB --
              Copyright 02.12.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static bool aresameboolean(bool v1,
-            bool v2,
-            alglib.xparams _params)
+        public static bool aresameboolean(bool v1, bool v2, Alglib.xparams _params)
         {
             bool result = new bool();
 
@@ -834,78 +809,65 @@ public partial class alglib
             return result;
         }
 
-
         /*************************************************************************
         Resizes X and fills by zeros
 
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void setlengthzero(ref double[] x,
-            int n,
-            alglib.xparams _params)
+        public static void setlengthzero(ref double[] x, int n, Alglib.xparams _params)
         {
             int i = 0;
 
-            alglib.ap.assert(n>=0, "SetLengthZero: N<0");
+            Alglib.ap.assert(n >= 0, "SetLengthZero: N<0");
             x = new double[n];
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 x[i] = 0;
             }
         }
 
-
         /*************************************************************************
         If Length(X)<N, resizes X
 
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void bvectorsetlengthatleast(ref bool[] x,
-            int n,
-            alglib.xparams _params)
+        public static void bvectorsetlengthatleast(ref bool[] x, int n, Alglib.xparams _params)
         {
-            if( alglib.ap.len(x)<n )
+            if (Alglib.ap.len(x) < n)
             {
                 x = new bool[n];
             }
         }
 
-
         /*************************************************************************
         If Length(X)<N, resizes X
 
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void ivectorsetlengthatleast(ref int[] x,
-            int n,
-            alglib.xparams _params)
+        public static void ivectorsetlengthatleast(ref int[] x, int n, Alglib.xparams _params)
         {
-            if( alglib.ap.len(x)<n )
+            if (Alglib.ap.len(x) < n)
             {
                 x = new int[n];
             }
         }
 
-
         /*************************************************************************
         If Length(X)<N, resizes X
 
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void rvectorsetlengthatleast(ref double[] x,
-            int n,
-            alglib.xparams _params)
+        public static void rvectorsetlengthatleast(ref double[] x, int n, Alglib.xparams _params)
         {
-            if( alglib.ap.len(x)<n )
+            if (Alglib.ap.len(x) < n)
             {
                 x = new double[n];
             }
         }
-
 
         /*************************************************************************
         If Cols(X)<N or Rows(X)<M, resizes X
@@ -913,41 +875,43 @@ public partial class alglib
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void rmatrixsetlengthatleast(ref double[,] x,
+        public static void rmatrixsetlengthatleast(
+            ref double[,] x,
             int m,
             int n,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
-            if( m>0 && n>0 )
+            if (m > 0 && n > 0)
             {
-                if( alglib.ap.rows(x)<m || alglib.ap.cols(x)<n )
+                if (Alglib.ap.rows(x) < m || Alglib.ap.cols(x) < n)
                 {
                     x = new double[m, n];
                 }
             }
         }
 
-
         /*************************************************************************
         If Cols(X)<N or Rows(X)<M, resizes X
 
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void bmatrixsetlengthatleast(ref bool[,] x,
+        public static void bmatrixsetlengthatleast(
+            ref bool[,] x,
             int m,
             int n,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
-            if( m>0 && n>0 )
+            if (m > 0 && n > 0)
             {
-                if( alglib.ap.rows(x)<m || alglib.ap.cols(x)<n )
+                if (Alglib.ap.rows(x) < m || Alglib.ap.cols(x) < n)
                 {
                     x = new bool[m, n];
                 }
             }
         }
-
 
         /*************************************************************************
         Grows X, i.e. changes its size in such a way that:
@@ -959,37 +923,34 @@ public partial class alglib
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void bvectorgrowto(ref bool[] x,
-            int n,
-            alglib.xparams _params)
+        public static void bvectorgrowto(ref bool[] x, int n, Alglib.xparams _params)
         {
             bool[] oldx = new bool[0];
             int i = 0;
             int n2 = 0;
 
-            
             //
             // Enough place
             //
-            if( alglib.ap.len(x)>=n )
+            if (Alglib.ap.len(x) >= n)
             {
                 return;
             }
-            
+
             //
             // Choose new size
             //
-            n = Math.Max(n, (int)Math.Round(1.8*alglib.ap.len(x)+1));
-            
+            n = Math.Max(n, (int)Math.Round(1.8 * Alglib.ap.len(x) + 1));
+
             //
             // Grow
             //
-            n2 = alglib.ap.len(x);
-            alglib.ap.swap(ref x, ref oldx);
+            n2 = Alglib.ap.len(x);
+            Alglib.ap.swap(ref x, ref oldx);
             x = new bool[n];
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
-                if( i<n2 )
+                if (i < n2)
                 {
                     x[i] = oldx[i];
                 }
@@ -1000,7 +961,6 @@ public partial class alglib
             }
         }
 
-
         /*************************************************************************
         Grows X, i.e. changes its size in such a way that:
         a) contents is preserved
@@ -1011,37 +971,34 @@ public partial class alglib
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void ivectorgrowto(ref int[] x,
-            int n,
-            alglib.xparams _params)
+        public static void ivectorgrowto(ref int[] x, int n, Alglib.xparams _params)
         {
             int[] oldx = new int[0];
             int i = 0;
             int n2 = 0;
 
-            
             //
             // Enough place
             //
-            if( alglib.ap.len(x)>=n )
+            if (Alglib.ap.len(x) >= n)
             {
                 return;
             }
-            
+
             //
             // Choose new size
             //
-            n = Math.Max(n, (int)Math.Round(1.8*alglib.ap.len(x)+1));
-            
+            n = Math.Max(n, (int)Math.Round(1.8 * Alglib.ap.len(x) + 1));
+
             //
             // Grow
             //
-            n2 = alglib.ap.len(x);
-            alglib.ap.swap(ref x, ref oldx);
+            n2 = Alglib.ap.len(x);
+            Alglib.ap.swap(ref x, ref oldx);
             x = new int[n];
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
-                if( i<n2 )
+                if (i < n2)
                 {
                     x[i] = oldx[i];
                 }
@@ -1051,7 +1008,6 @@ public partial class alglib
                 }
             }
         }
-
 
         /*************************************************************************
         Grows X, i.e. appends rows in such a way that:
@@ -1066,50 +1022,50 @@ public partial class alglib
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void rmatrixgrowrowsto(ref double[,] a,
+        public static void rmatrixgrowrowsto(
+            ref double[,] a,
             int n,
             int mincols,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
-            double[,] olda = new double[0,0];
+            double[,] olda = new double[0, 0];
             int i = 0;
             int j = 0;
             int n2 = 0;
             int m = 0;
 
-            
             //
             // Enough place?
             //
-            if( alglib.ap.rows(a)>=n && alglib.ap.cols(a)>=mincols )
+            if (Alglib.ap.rows(a) >= n && Alglib.ap.cols(a) >= mincols)
             {
                 return;
             }
-            
+
             //
             // Sizes and metrics
             //
-            if( alglib.ap.rows(a)<n )
+            if (Alglib.ap.rows(a) < n)
             {
-                n = Math.Max(n, (int)Math.Round(1.8*alglib.ap.rows(a)+1));
+                n = Math.Max(n, (int)Math.Round(1.8 * Alglib.ap.rows(a) + 1));
             }
-            n2 = Math.Min(alglib.ap.rows(a), n);
-            m = alglib.ap.cols(a);
-            
+            n2 = Math.Min(Alglib.ap.rows(a), n);
+            m = Alglib.ap.cols(a);
+
             //
             // Grow
             //
-            alglib.ap.swap(ref a, ref olda);
+            Alglib.ap.swap(ref a, ref olda);
             a = new double[n, Math.Max(m, mincols)];
-            for(i=0; i<=n2-1; i++)
+            for (i = 0; i <= n2 - 1; i++)
             {
-                for(j=0; j<=m-1; j++)
+                for (j = 0; j <= m - 1; j++)
                 {
-                    a[i,j] = olda[i,j];
+                    a[i, j] = olda[i, j];
                 }
             }
         }
-
 
         /*************************************************************************
         Grows X, i.e. appends cols in such a way that:
@@ -1124,50 +1080,50 @@ public partial class alglib
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void rmatrixgrowcolsto(ref double[,] a,
+        public static void rmatrixgrowcolsto(
+            ref double[,] a,
             int n,
             int minrows,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
-            double[,] olda = new double[0,0];
+            double[,] olda = new double[0, 0];
             int i = 0;
             int j = 0;
             int n2 = 0;
             int m = 0;
 
-            
             //
             // Enough place?
             //
-            if( alglib.ap.cols(a)>=n && alglib.ap.rows(a)>=minrows )
+            if (Alglib.ap.cols(a) >= n && Alglib.ap.rows(a) >= minrows)
             {
                 return;
             }
-            
+
             //
             // Sizes and metrics
             //
-            if( alglib.ap.cols(a)<n )
+            if (Alglib.ap.cols(a) < n)
             {
-                n = Math.Max(n, (int)Math.Round(1.8*alglib.ap.cols(a)+1));
+                n = Math.Max(n, (int)Math.Round(1.8 * Alglib.ap.cols(a) + 1));
             }
-            n2 = Math.Min(alglib.ap.cols(a), n);
-            m = alglib.ap.rows(a);
-            
+            n2 = Math.Min(Alglib.ap.cols(a), n);
+            m = Alglib.ap.rows(a);
+
             //
             // Grow
             //
-            alglib.ap.swap(ref a, ref olda);
+            Alglib.ap.swap(ref a, ref olda);
             a = new double[Math.Max(m, minrows), n];
-            for(i=0; i<=m-1; i++)
+            for (i = 0; i <= m - 1; i++)
             {
-                for(j=0; j<=n2-1; j++)
+                for (j = 0; j <= n2 - 1; j++)
                 {
-                    a[i,j] = olda[i,j];
+                    a[i, j] = olda[i, j];
                 }
             }
         }
-
 
         /*************************************************************************
         Grows X, i.e. changes its size in such a way that:
@@ -1179,37 +1135,34 @@ public partial class alglib
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void rvectorgrowto(ref double[] x,
-            int n,
-            alglib.xparams _params)
+        public static void rvectorgrowto(ref double[] x, int n, Alglib.xparams _params)
         {
             double[] oldx = new double[0];
             int i = 0;
             int n2 = 0;
 
-            
             //
             // Enough place
             //
-            if( alglib.ap.len(x)>=n )
+            if (Alglib.ap.len(x) >= n)
             {
                 return;
             }
-            
+
             //
             // Choose new size
             //
-            n = Math.Max(n, (int)Math.Round(1.8*alglib.ap.len(x)+1));
-            
+            n = Math.Max(n, (int)Math.Round(1.8 * Alglib.ap.len(x) + 1));
+
             //
             // Grow
             //
-            n2 = alglib.ap.len(x);
-            alglib.ap.swap(ref x, ref oldx);
+            n2 = Alglib.ap.len(x);
+            Alglib.ap.swap(ref x, ref oldx);
             x = new double[n];
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
-                if( i<n2 )
+                if (i < n2)
                 {
                     x[i] = oldx[i];
                 }
@@ -1220,7 +1173,6 @@ public partial class alglib
             }
         }
 
-
         /*************************************************************************
         Resizes X and:
         * preserves old contents of X
@@ -1229,20 +1181,18 @@ public partial class alglib
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void ivectorresize(ref int[] x,
-            int n,
-            alglib.xparams _params)
+        public static void ivectorresize(ref int[] x, int n, Alglib.xparams _params)
         {
             int[] oldx = new int[0];
             int i = 0;
             int n2 = 0;
 
-            n2 = alglib.ap.len(x);
-            alglib.ap.swap(ref x, ref oldx);
+            n2 = Alglib.ap.len(x);
+            Alglib.ap.swap(ref x, ref oldx);
             x = new int[n];
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
-                if( i<n2 )
+                if (i < n2)
                 {
                     x[i] = oldx[i];
                 }
@@ -1253,7 +1203,6 @@ public partial class alglib
             }
         }
 
-
         /*************************************************************************
         Resizes X and:
         * preserves old contents of X
@@ -1262,20 +1211,18 @@ public partial class alglib
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void rvectorresize(ref double[] x,
-            int n,
-            alglib.xparams _params)
+        public static void rvectorresize(ref double[] x, int n, Alglib.xparams _params)
         {
             double[] oldx = new double[0];
             int i = 0;
             int n2 = 0;
 
-            n2 = alglib.ap.len(x);
-            alglib.ap.swap(ref x, ref oldx);
+            n2 = Alglib.ap.len(x);
+            Alglib.ap.swap(ref x, ref oldx);
             x = new double[n];
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
-                if( i<n2 )
+                if (i < n2)
                 {
                     x[i] = oldx[i];
                 }
@@ -1286,7 +1233,6 @@ public partial class alglib
             }
         }
 
-
         /*************************************************************************
         Resizes X and:
         * preserves old contents of X
@@ -1295,37 +1241,33 @@ public partial class alglib
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void rmatrixresize(ref double[,] x,
-            int m,
-            int n,
-            alglib.xparams _params)
+        public static void rmatrixresize(ref double[,] x, int m, int n, Alglib.xparams _params)
         {
-            double[,] oldx = new double[0,0];
+            double[,] oldx = new double[0, 0];
             int i = 0;
             int j = 0;
             int m2 = 0;
             int n2 = 0;
 
-            m2 = alglib.ap.rows(x);
-            n2 = alglib.ap.cols(x);
-            alglib.ap.swap(ref x, ref oldx);
+            m2 = Alglib.ap.rows(x);
+            n2 = Alglib.ap.cols(x);
+            Alglib.ap.swap(ref x, ref oldx);
             x = new double[m, n];
-            for(i=0; i<=m-1; i++)
+            for (i = 0; i <= m - 1; i++)
             {
-                for(j=0; j<=n-1; j++)
+                for (j = 0; j <= n - 1; j++)
                 {
-                    if( i<m2 && j<n2 )
+                    if (i < m2 && j < n2)
                     {
-                        x[i,j] = oldx[i,j];
+                        x[i, j] = oldx[i, j];
                     }
                     else
                     {
-                        x[i,j] = 0.0;
+                        x[i, j] = 0.0;
                     }
                 }
             }
         }
-
 
         /*************************************************************************
         Resizes X and:
@@ -1335,37 +1277,33 @@ public partial class alglib
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void imatrixresize(ref int[,] x,
-            int m,
-            int n,
-            alglib.xparams _params)
+        public static void imatrixresize(ref int[,] x, int m, int n, Alglib.xparams _params)
         {
-            int[,] oldx = new int[0,0];
+            int[,] oldx = new int[0, 0];
             int i = 0;
             int j = 0;
             int m2 = 0;
             int n2 = 0;
 
-            m2 = alglib.ap.rows(x);
-            n2 = alglib.ap.cols(x);
-            alglib.ap.swap(ref x, ref oldx);
+            m2 = Alglib.ap.rows(x);
+            n2 = Alglib.ap.cols(x);
+            Alglib.ap.swap(ref x, ref oldx);
             x = new int[m, n];
-            for(i=0; i<=m-1; i++)
+            for (i = 0; i <= m - 1; i++)
             {
-                for(j=0; j<=n-1; j++)
+                for (j = 0; j <= n - 1; j++)
                 {
-                    if( i<m2 && j<n2 )
+                    if (i < m2 && j < n2)
                     {
-                        x[i,j] = oldx[i,j];
+                        x[i, j] = oldx[i, j];
                     }
                     else
                     {
-                        x[i,j] = 0;
+                        x[i, j] = 0;
                     }
                 }
             }
         }
-
 
         /*************************************************************************
         appends element to X
@@ -1373,24 +1311,21 @@ public partial class alglib
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void ivectorappend(ref int[] x,
-            int v,
-            alglib.xparams _params)
+        public static void ivectorappend(ref int[] x, int v, Alglib.xparams _params)
         {
             int[] oldx = new int[0];
             int i = 0;
             int n = 0;
 
-            n = alglib.ap.len(x);
-            alglib.ap.swap(ref x, ref oldx);
-            x = new int[n+1];
-            for(i=0; i<=n-1; i++)
+            n = Alglib.ap.len(x);
+            Alglib.ap.swap(ref x, ref oldx);
+            x = new int[n + 1];
+            for (i = 0; i <= n - 1; i++)
             {
                 x[i] = oldx[i];
             }
             x[n] = v;
         }
-
 
         /*************************************************************************
         This function checks that length(X) is at least N and first N values  from
@@ -1399,34 +1334,31 @@ public partial class alglib
           -- ALGLIB --
              Copyright 18.06.2010 by Bochkanov Sergey
         *************************************************************************/
-        public static bool isfinitevector(double[] x,
-            int n,
-            alglib.xparams _params)
+        public static bool isfinitevector(double[] x, int n, Alglib.xparams _params)
         {
             bool result = new bool();
             int i = 0;
             double v = 0;
 
-            alglib.ap.assert(n>=0, "APSERVIsFiniteVector: internal error (N<0)");
-            if( n==0 )
+            Alglib.ap.assert(n >= 0, "APSERVIsFiniteVector: internal error (N<0)");
+            if (n == 0)
             {
                 result = true;
                 return result;
             }
-            if( alglib.ap.len(x)<n )
+            if (Alglib.ap.len(x) < n)
             {
                 result = false;
                 return result;
             }
             v = 0;
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
-                v = 0.01*v+x[i];
+                v = 0.01 * v + x[i];
             }
             result = math.isfinite(v);
             return result;
         }
-
 
         /*************************************************************************
         This function checks that first N values from X[] are finite
@@ -1434,17 +1366,15 @@ public partial class alglib
           -- ALGLIB --
              Copyright 18.06.2010 by Bochkanov Sergey
         *************************************************************************/
-        public static bool isfinitecvector(complex[] z,
-            int n,
-            alglib.xparams _params)
+        public static bool isfinitecvector(complex[] z, int n, Alglib.xparams _params)
         {
             bool result = new bool();
             int i = 0;
 
-            alglib.ap.assert(n>=0, "APSERVIsFiniteCVector: internal error (N<0)");
-            for(i=0; i<=n-1; i++)
+            Alglib.ap.assert(n >= 0, "APSERVIsFiniteCVector: internal error (N<0)");
+            for (i = 0; i <= n - 1; i++)
             {
-                if( !math.isfinite(z[i].x) || !math.isfinite(z[i].y) )
+                if (!math.isfinite(z[i].x) || !math.isfinite(z[i].y))
                 {
                     result = false;
                     return result;
@@ -1454,7 +1384,6 @@ public partial class alglib
             return result;
         }
 
-
         /*************************************************************************
         This function checks that size of X is at least MxN and values from
         X[0..M-1,0..N-1] are finite.
@@ -1462,32 +1391,29 @@ public partial class alglib
           -- ALGLIB --
              Copyright 18.06.2010 by Bochkanov Sergey
         *************************************************************************/
-        public static bool apservisfinitematrix(double[,] x,
-            int m,
-            int n,
-            alglib.xparams _params)
+        public static bool apservisfinitematrix(double[,] x, int m, int n, Alglib.xparams _params)
         {
             bool result = new bool();
             int i = 0;
             int j = 0;
 
-            alglib.ap.assert(n>=0, "APSERVIsFiniteMatrix: internal error (N<0)");
-            alglib.ap.assert(m>=0, "APSERVIsFiniteMatrix: internal error (M<0)");
-            if( m==0 || n==0 )
+            Alglib.ap.assert(n >= 0, "APSERVIsFiniteMatrix: internal error (N<0)");
+            Alglib.ap.assert(m >= 0, "APSERVIsFiniteMatrix: internal error (M<0)");
+            if (m == 0 || n == 0)
             {
                 result = true;
                 return result;
             }
-            if( alglib.ap.rows(x)<m || alglib.ap.cols(x)<n )
+            if (Alglib.ap.rows(x) < m || Alglib.ap.cols(x) < n)
             {
                 result = false;
                 return result;
             }
-            for(i=0; i<=m-1; i++)
+            for (i = 0; i <= m - 1; i++)
             {
-                for(j=0; j<=n-1; j++)
+                for (j = 0; j <= n - 1; j++)
                 {
-                    if( !math.isfinite(x[i,j]) )
+                    if (!math.isfinite(x[i, j]))
                     {
                         result = false;
                         return result;
@@ -1497,7 +1423,6 @@ public partial class alglib
             result = true;
             return result;
         }
-
 
         /*************************************************************************
         This function checks that all values from X[0..M-1,0..N-1] are finite
@@ -1505,22 +1430,19 @@ public partial class alglib
           -- ALGLIB --
              Copyright 18.06.2010 by Bochkanov Sergey
         *************************************************************************/
-        public static bool apservisfinitecmatrix(complex[,] x,
-            int m,
-            int n,
-            alglib.xparams _params)
+        public static bool apservisfinitecmatrix(complex[,] x, int m, int n, Alglib.xparams _params)
         {
             bool result = new bool();
             int i = 0;
             int j = 0;
 
-            alglib.ap.assert(n>=0, "APSERVIsFiniteCMatrix: internal error (N<0)");
-            alglib.ap.assert(m>=0, "APSERVIsFiniteCMatrix: internal error (M<0)");
-            for(i=0; i<=m-1; i++)
+            Alglib.ap.assert(n >= 0, "APSERVIsFiniteCMatrix: internal error (N<0)");
+            Alglib.ap.assert(m >= 0, "APSERVIsFiniteCMatrix: internal error (M<0)");
+            for (i = 0; i <= m - 1; i++)
             {
-                for(j=0; j<=n-1; j++)
+                for (j = 0; j <= n - 1; j++)
                 {
-                    if( !math.isfinite(x[i,j].x) || !math.isfinite(x[i,j].y) )
+                    if (!math.isfinite(x[i, j].x) || !math.isfinite(x[i, j].y))
                     {
                         result = false;
                         return result;
@@ -1530,7 +1452,6 @@ public partial class alglib
             result = true;
             return result;
         }
-
 
         /*************************************************************************
         This function checks that size of X is at least NxN and all values from
@@ -1539,10 +1460,12 @@ public partial class alglib
           -- ALGLIB --
              Copyright 18.06.2010 by Bochkanov Sergey
         *************************************************************************/
-        public static bool isfinitertrmatrix(double[,] x,
+        public static bool isfinitertrmatrix(
+            double[,] x,
             int n,
             bool isupper,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
             int i = 0;
@@ -1550,32 +1473,32 @@ public partial class alglib
             int j2 = 0;
             int j = 0;
 
-            alglib.ap.assert(n>=0, "APSERVIsFiniteRTRMatrix: internal error (N<0)");
-            if( n==0 )
+            Alglib.ap.assert(n >= 0, "APSERVIsFiniteRTRMatrix: internal error (N<0)");
+            if (n == 0)
             {
                 result = true;
                 return result;
             }
-            if( alglib.ap.rows(x)<n || alglib.ap.cols(x)<n )
+            if (Alglib.ap.rows(x) < n || Alglib.ap.cols(x) < n)
             {
                 result = false;
                 return result;
             }
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
-                if( isupper )
+                if (isupper)
                 {
                     j1 = i;
-                    j2 = n-1;
+                    j2 = n - 1;
                 }
                 else
                 {
                     j1 = 0;
                     j2 = i;
                 }
-                for(j=j1; j<=j2; j++)
+                for (j = j1; j <= j2; j++)
                 {
-                    if( !math.isfinite(x[i,j]) )
+                    if (!math.isfinite(x[i, j]))
                     {
                         result = false;
                         return result;
@@ -1585,7 +1508,6 @@ public partial class alglib
             result = true;
             return result;
         }
-
 
         /*************************************************************************
         This function checks that all values from upper/lower triangle of
@@ -1594,10 +1516,12 @@ public partial class alglib
           -- ALGLIB --
              Copyright 18.06.2010 by Bochkanov Sergey
         *************************************************************************/
-        public static bool apservisfinitectrmatrix(complex[,] x,
+        public static bool apservisfinitectrmatrix(
+            complex[,] x,
             int n,
             bool isupper,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
             int i = 0;
@@ -1605,22 +1529,22 @@ public partial class alglib
             int j2 = 0;
             int j = 0;
 
-            alglib.ap.assert(n>=0, "APSERVIsFiniteCTRMatrix: internal error (N<0)");
-            for(i=0; i<=n-1; i++)
+            Alglib.ap.assert(n >= 0, "APSERVIsFiniteCTRMatrix: internal error (N<0)");
+            for (i = 0; i <= n - 1; i++)
             {
-                if( isupper )
+                if (isupper)
                 {
                     j1 = i;
-                    j2 = n-1;
+                    j2 = n - 1;
                 }
                 else
                 {
                     j1 = 0;
                     j2 = i;
                 }
-                for(j=j1; j<=j2; j++)
+                for (j = j1; j <= j2; j++)
                 {
-                    if( !math.isfinite(x[i,j].x) || !math.isfinite(x[i,j].y) )
+                    if (!math.isfinite(x[i, j].x) || !math.isfinite(x[i, j].y))
                     {
                         result = false;
                         return result;
@@ -1630,7 +1554,6 @@ public partial class alglib
             result = true;
             return result;
         }
-
 
         /*************************************************************************
         This function checks that all values from X[0..M-1,0..N-1] are  finite  or
@@ -1639,22 +1562,24 @@ public partial class alglib
           -- ALGLIB --
              Copyright 18.06.2010 by Bochkanov Sergey
         *************************************************************************/
-        public static bool apservisfiniteornanmatrix(double[,] x,
+        public static bool apservisfiniteornanmatrix(
+            double[,] x,
             int m,
             int n,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
             int i = 0;
             int j = 0;
 
-            alglib.ap.assert(n>=0, "APSERVIsFiniteOrNaNMatrix: internal error (N<0)");
-            alglib.ap.assert(m>=0, "APSERVIsFiniteOrNaNMatrix: internal error (M<0)");
-            for(i=0; i<=m-1; i++)
+            Alglib.ap.assert(n >= 0, "APSERVIsFiniteOrNaNMatrix: internal error (N<0)");
+            Alglib.ap.assert(m >= 0, "APSERVIsFiniteOrNaNMatrix: internal error (M<0)");
+            for (i = 0; i <= m - 1; i++)
             {
-                for(j=0; j<=n-1; j++)
+                for (j = 0; j <= n - 1; j++)
                 {
-                    if( !(math.isfinite(x[i,j]) || Double.IsNaN(x[i,j])) )
+                    if (!(math.isfinite(x[i, j]) || Double.IsNaN(x[i, j])))
                     {
                         result = false;
                         return result;
@@ -1665,16 +1590,13 @@ public partial class alglib
             return result;
         }
 
-
         /*************************************************************************
         Safe sqrt(x^2+y^2)
 
           -- ALGLIB --
              Copyright by Bochkanov Sergey
         *************************************************************************/
-        public static double safepythag2(double x,
-            double y,
-            alglib.xparams _params)
+        public static double safepythag2(double x, double y, Alglib.xparams _params)
         {
             double result = 0;
             double w = 0;
@@ -1686,17 +1608,16 @@ public partial class alglib
             yabs = Math.Abs(y);
             w = Math.Max(xabs, yabs);
             z = Math.Min(xabs, yabs);
-            if( (double)(z)==(double)(0) )
+            if ((double)(z) == (double)(0))
             {
                 result = w;
             }
             else
             {
-                result = w*Math.Sqrt(1+math.sqr(z/w));
+                result = w * Math.Sqrt(1 + math.sqr(z / w));
             }
             return result;
         }
-
 
         /*************************************************************************
         Safe sqrt(x^2+y^2)
@@ -1704,27 +1625,23 @@ public partial class alglib
           -- ALGLIB --
              Copyright by Bochkanov Sergey
         *************************************************************************/
-        public static double safepythag3(double x,
-            double y,
-            double z,
-            alglib.xparams _params)
+        public static double safepythag3(double x, double y, double z, Alglib.xparams _params)
         {
             double result = 0;
             double w = 0;
 
             w = Math.Max(Math.Abs(x), Math.Max(Math.Abs(y), Math.Abs(z)));
-            if( (double)(w)==(double)(0) )
+            if ((double)(w) == (double)(0))
             {
                 result = 0;
                 return result;
             }
-            x = x/w;
-            y = y/w;
-            z = z/w;
-            result = w*Math.Sqrt(math.sqr(x)+math.sqr(y)+math.sqr(z));
+            x = x / w;
+            y = y / w;
+            z = z / w;
+            result = w * Math.Sqrt(math.sqr(x) + math.sqr(y) + math.sqr(z));
             return result;
         }
-
 
         /*************************************************************************
         Safe division.
@@ -1744,61 +1661,57 @@ public partial class alglib
           -- ALGLIB --
              Copyright by Bochkanov Sergey
         *************************************************************************/
-        public static int saferdiv(double x,
-            double y,
-            ref double r,
-            alglib.xparams _params)
+        public static int saferdiv(double x, double y, ref double r, Alglib.xparams _params)
         {
             int result = 0;
 
             r = 0;
 
-            
             //
             // Two special cases:
             // * Y=0
             // * X=0 and Y<>0
             //
-            if( (double)(y)==(double)(0) )
+            if ((double)(y) == (double)(0))
             {
                 result = 1;
-                if( (double)(x)==(double)(0) )
+                if ((double)(x) == (double)(0))
                 {
                     r = Double.NaN;
                 }
-                if( (double)(x)>(double)(0) )
+                if ((double)(x) > (double)(0))
                 {
                     r = Double.PositiveInfinity;
                 }
-                if( (double)(x)<(double)(0) )
+                if ((double)(x) < (double)(0))
                 {
                     r = Double.NegativeInfinity;
                 }
                 return result;
             }
-            if( (double)(x)==(double)(0) )
+            if ((double)(x) == (double)(0))
             {
                 r = 0;
                 result = 0;
                 return result;
             }
-            
+
             //
             // make Y>0
             //
-            if( (double)(y)<(double)(0) )
+            if ((double)(y) < (double)(0))
             {
                 x = -x;
                 y = -y;
             }
-            
+
             //
             //
             //
-            if( (double)(y)>=(double)(1) )
+            if ((double)(y) >= (double)(1))
             {
-                r = x/y;
-                if( (double)(Math.Abs(r))<=(double)(math.minrealnumber) )
+                r = x / y;
+                if ((double)(Math.Abs(r)) <= (double)(math.minrealnumber))
                 {
                     result = -1;
                     r = 0;
@@ -1810,9 +1723,9 @@ public partial class alglib
             }
             else
             {
-                if( (double)(Math.Abs(x))>=(double)(math.maxrealnumber*y) )
+                if ((double)(Math.Abs(x)) >= (double)(math.maxrealnumber * y))
                 {
-                    if( (double)(x)>(double)(0) )
+                    if ((double)(x) > (double)(0))
                     {
                         r = Double.PositiveInfinity;
                     }
@@ -1824,13 +1737,12 @@ public partial class alglib
                 }
                 else
                 {
-                    r = x/y;
+                    r = x / y;
                     result = 0;
                 }
             }
             return result;
         }
-
 
         /*************************************************************************
         This function calculates "safe" min(X/Y,V) for positive finite X, Y, V.
@@ -1839,23 +1751,19 @@ public partial class alglib
           -- ALGLIB --
              Copyright by Bochkanov Sergey
         *************************************************************************/
-        public static double safeminposrv(double x,
-            double y,
-            double v,
-            alglib.xparams _params)
+        public static double safeminposrv(double x, double y, double v, Alglib.xparams _params)
         {
             double result = 0;
             double r = 0;
 
-            if( (double)(y)>=(double)(1) )
+            if ((double)(y) >= (double)(1))
             {
-                
                 //
                 // Y>=1, we can safely divide by Y
                 //
-                r = x/y;
+                r = x / y;
                 result = v;
-                if( (double)(v)>(double)(r) )
+                if ((double)(v) > (double)(r))
                 {
                     result = r;
                 }
@@ -1866,13 +1774,12 @@ public partial class alglib
             }
             else
             {
-                
                 //
                 // Y<1, we can safely multiply by Y
                 //
-                if( (double)(x)<(double)(v*y) )
+                if ((double)(x) < (double)(v * y))
                 {
-                    result = x/y;
+                    result = x / y;
                 }
                 else
                 {
@@ -1881,7 +1788,6 @@ public partial class alglib
             }
             return result;
         }
-
 
         /*************************************************************************
         This function makes periodic mapping of X to [A,B].
@@ -1897,31 +1803,32 @@ public partial class alglib
           -- ALGLIB --
              Copyright by Bochkanov Sergey
         *************************************************************************/
-        public static void apperiodicmap(ref double x,
+        public static void apperiodicmap(
+            ref double x,
             double a,
             double b,
             ref double k,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             k = 0;
 
-            alglib.ap.assert((double)(a)<(double)(b), "APPeriodicMap: internal error!");
-            k = (int)Math.Floor((x-a)/(b-a));
-            x = x-k*(b-a);
-            while( (double)(x)<(double)(a) )
+            Alglib.ap.assert((double)(a) < (double)(b), "APPeriodicMap: internal error!");
+            k = (int)Math.Floor((x - a) / (b - a));
+            x = x - k * (b - a);
+            while ((double)(x) < (double)(a))
             {
-                x = x+(b-a);
-                k = k-1;
+                x = x + (b - a);
+                k = k - 1;
             }
-            while( (double)(x)>(double)(b) )
+            while ((double)(x) > (double)(b))
             {
-                x = x-(b-a);
-                k = k+1;
+                x = x - (b - a);
+                k = k + 1;
             }
             x = Math.Max(x, a);
             x = Math.Min(x, b);
         }
-
 
         /*************************************************************************
         Returns random normal number using low-quality system-provided generator
@@ -1929,33 +1836,31 @@ public partial class alglib
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static double randomnormal(alglib.xparams _params)
+        public static double randomnormal(Alglib.xparams _params)
         {
             double result = 0;
             double u = 0;
             double v = 0;
             double s = 0;
 
-            while( true )
+            while (true)
             {
-                u = 2*math.randomreal()-1;
-                v = 2*math.randomreal()-1;
-                s = math.sqr(u)+math.sqr(v);
-                if( (double)(s)>(double)(0) && (double)(s)<(double)(1) )
+                u = 2 * math.randomreal() - 1;
+                v = 2 * math.randomreal() - 1;
+                s = math.sqr(u) + math.sqr(v);
+                if ((double)(s) > (double)(0) && (double)(s) < (double)(1))
                 {
-                    
                     //
                     // two Sqrt's instead of one to
                     // avoid overflow when S is too small
                     //
-                    s = Math.Sqrt(-(2*Math.Log(s)))/Math.Sqrt(s);
-                    result = u*s;
+                    s = Math.Sqrt(-(2 * Math.Log(s))) / Math.Sqrt(s);
+                    result = u * s;
                     break;
                 }
             }
             return result;
         }
-
 
         /*************************************************************************
         Generates random unit vector using low-quality system-provided generator.
@@ -1964,44 +1869,38 @@ public partial class alglib
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void randomunit(int n,
-            ref double[] x,
-            alglib.xparams _params)
+        public static void randomunit(int n, ref double[] x, Alglib.xparams _params)
         {
             int i = 0;
             double v = 0;
             double vv = 0;
 
-            alglib.ap.assert(n>0, "RandomUnit: N<=0");
-            if( alglib.ap.len(x)<n )
+            Alglib.ap.assert(n > 0, "RandomUnit: N<=0");
+            if (Alglib.ap.len(x) < n)
             {
                 x = new double[n];
             }
             do
             {
                 v = 0.0;
-                for(i=0; i<=n-1; i++)
+                for (i = 0; i <= n - 1; i++)
                 {
                     vv = randomnormal(_params);
                     x[i] = vv;
-                    v = v+vv*vv;
+                    v = v + vv * vv;
                 }
-            }
-            while( (double)(v)<=(double)(0) );
-            v = 1/Math.Sqrt(v);
-            for(i=0; i<=n-1; i++)
+            } while ((double)(v) <= (double)(0));
+            v = 1 / Math.Sqrt(v);
+            for (i = 0; i <= n - 1; i++)
             {
-                x[i] = x[i]*v;
+                x[i] = x[i] * v;
             }
         }
-
 
         /*************************************************************************
         This function is used to swap two integer values
         *************************************************************************/
-        public static void swapi(ref int v0,
-            ref int v1,
-            alglib.xparams _params)
+        public static void swapi(ref int v0, ref int v1, Alglib.xparams _params)
         {
             int v = 0;
 
@@ -2010,13 +1909,10 @@ public partial class alglib
             v1 = v;
         }
 
-
         /*************************************************************************
         This function is used to swap two real values
         *************************************************************************/
-        public static void swapr(ref double v0,
-            ref double v1,
-            alglib.xparams _params)
+        public static void swapr(ref double v0, ref double v1, Alglib.xparams _params)
         {
             double v = 0;
 
@@ -2025,108 +1921,95 @@ public partial class alglib
             v1 = v;
         }
 
-
         /*************************************************************************
         This function is used to swap two rows of the matrix; if NCols<0, automatically
         determined from the matrix size.
         *************************************************************************/
-        public static void swaprows(double[,] a,
-            int i0,
-            int i1,
-            int ncols,
-            alglib.xparams _params)
+        public static void swaprows(double[,] a, int i0, int i1, int ncols, Alglib.xparams _params)
         {
             int j = 0;
             double v = 0;
 
-            if( i0==i1 )
+            if (i0 == i1)
             {
                 return;
             }
-            if( ncols<0 )
+            if (ncols < 0)
             {
-                ncols = alglib.ap.cols(a);
+                ncols = Alglib.ap.cols(a);
             }
-            for(j=0; j<=ncols-1; j++)
+            for (j = 0; j <= ncols - 1; j++)
             {
-                v = a[i0,j];
-                a[i0,j] = a[i1,j];
-                a[i1,j] = v;
+                v = a[i0, j];
+                a[i0, j] = a[i1, j];
+                a[i1, j] = v;
             }
         }
-
 
         /*************************************************************************
         This function is used to swap two cols of the matrix; if NRows<0, automatically
         determined from the matrix size.
         *************************************************************************/
-        public static void swapcols(double[,] a,
-            int j0,
-            int j1,
-            int nrows,
-            alglib.xparams _params)
+        public static void swapcols(double[,] a, int j0, int j1, int nrows, Alglib.xparams _params)
         {
             int i = 0;
             double v = 0;
 
-            if( j0==j1 )
+            if (j0 == j1)
             {
                 return;
             }
-            if( nrows<0 )
+            if (nrows < 0)
             {
-                nrows = alglib.ap.rows(a);
+                nrows = Alglib.ap.rows(a);
             }
-            for(i=0; i<=nrows-1; i++)
+            for (i = 0; i <= nrows - 1; i++)
             {
-                v = a[i,j0];
-                a[i,j0] = a[i,j1];
-                a[i,j1] = v;
+                v = a[i, j0];
+                a[i, j0] = a[i, j1];
+                a[i, j1] = v;
             }
         }
-
 
         /*************************************************************************
         This function is used to swap two "entries" in 1-dimensional array composed
         from D-element entries
         *************************************************************************/
-        public static void swapentries(double[] a,
+        public static void swapentries(
+            double[] a,
             int i0,
             int i1,
             int entrywidth,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int offs0 = 0;
             int offs1 = 0;
             int j = 0;
             double v = 0;
 
-            if( i0==i1 )
+            if (i0 == i1)
             {
                 return;
             }
-            offs0 = i0*entrywidth;
-            offs1 = i1*entrywidth;
-            for(j=0; j<=entrywidth-1; j++)
+            offs0 = i0 * entrywidth;
+            offs1 = i1 * entrywidth;
+            for (j = 0; j <= entrywidth - 1; j++)
             {
-                v = a[offs0+j];
-                a[offs0+j] = a[offs1+j];
-                a[offs1+j] = v;
+                v = a[offs0 + j];
+                a[offs0 + j] = a[offs1 + j];
+                a[offs1 + j] = v;
             }
         }
-
 
         /*************************************************************************
         This function is used to swap two elements of the vector
         *************************************************************************/
-        public static void swapelements(double[] a,
-            int i0,
-            int i1,
-            alglib.xparams _params)
+        public static void swapelements(double[] a, int i0, int i1, Alglib.xparams _params)
         {
             double v = 0;
 
-            if( i0==i1 )
+            if (i0 == i1)
             {
                 return;
             }
@@ -2134,19 +2017,15 @@ public partial class alglib
             a[i0] = a[i1];
             a[i1] = v;
         }
-
 
         /*************************************************************************
         This function is used to swap two elements of the vector
         *************************************************************************/
-        public static void swapelementsi(int[] a,
-            int i0,
-            int i1,
-            alglib.xparams _params)
+        public static void swapelementsi(int[] a, int i0, int i1, Alglib.xparams _params)
         {
             int v = 0;
 
-            if( i0==i1 )
+            if (i0 == i1)
             {
                 return;
             }
@@ -2154,50 +2033,41 @@ public partial class alglib
             a[i0] = a[i1];
             a[i1] = v;
         }
-
 
         /*************************************************************************
         This function is used to return maximum of three real values
         *************************************************************************/
-        public static double maxreal3(double v0,
-            double v1,
-            double v2,
-            alglib.xparams _params)
+        public static double maxreal3(double v0, double v1, double v2, Alglib.xparams _params)
         {
             double result = 0;
 
             result = v0;
-            if( (double)(result)<(double)(v1) )
+            if ((double)(result) < (double)(v1))
             {
                 result = v1;
             }
-            if( (double)(result)<(double)(v2) )
+            if ((double)(result) < (double)(v2))
             {
                 result = v2;
             }
             return result;
         }
 
-
         /*************************************************************************
         This function is used to increment value of integer variable
         *************************************************************************/
-        public static void inc(ref int v,
-            alglib.xparams _params)
+        public static void inc(ref int v, Alglib.xparams _params)
         {
-            v = v+1;
+            v = v + 1;
         }
-
 
         /*************************************************************************
         This function is used to decrement value of integer variable
         *************************************************************************/
-        public static void dec(ref int v,
-            alglib.xparams _params)
+        public static void dec(ref int v, Alglib.xparams _params)
         {
-            v = v-1;
+            v = v - 1;
         }
-
 
         /*************************************************************************
         This function is used to increment value of integer variable; name of  the
@@ -2205,12 +2075,10 @@ public partial class alglib
         thread-unsafe manner (optional progress reports which do not need guaranteed
         correctness)
         *************************************************************************/
-        public static void threadunsafeinc(ref int v,
-            alglib.xparams _params)
+        public static void threadunsafeinc(ref int v, Alglib.xparams _params)
         {
-            v = v+1;
+            v = v + 1;
         }
-
 
         /*************************************************************************
         This function is used to increment value of integer variable; name of  the
@@ -2218,13 +2086,10 @@ public partial class alglib
         thread-unsafe manner (optional progress reports which do not need guaranteed
         correctness)
         *************************************************************************/
-        public static void threadunsafeincby(ref int v,
-            int k,
-            alglib.xparams _params)
+        public static void threadunsafeincby(ref int v, int k, Alglib.xparams _params)
         {
-            v = v+k;
+            v = v + k;
         }
-
 
         /*************************************************************************
         This function performs two operations:
@@ -2232,12 +2097,11 @@ public partial class alglib
         2. explicitly sets variable to zero if it is non-positive
         It is used by some algorithms to decrease value of internal counters.
         *************************************************************************/
-        public static void countdown(ref int v,
-            alglib.xparams _params)
+        public static void countdown(ref int v, Alglib.xparams _params)
         {
-            if( v>0 )
+            if (v > 0)
             {
-                v = v-1;
+                v = v - 1;
             }
             else
             {
@@ -2245,17 +2109,15 @@ public partial class alglib
             }
         }
 
-
         /*************************************************************************
         This function returns +1 or -1 depending on sign of X.
         x=0 results in +1 being returned.
         *************************************************************************/
-        public static double possign(double x,
-            alglib.xparams _params)
+        public static double possign(double x, Alglib.xparams _params)
         {
             double result = 0;
 
-            if( (double)(x)>=(double)(0) )
+            if ((double)(x) >= (double)(0))
             {
                 result = 1;
             }
@@ -2266,169 +2128,137 @@ public partial class alglib
             return result;
         }
 
-
         /*************************************************************************
         This function returns product of two real numbers. It is convenient when
         you have to perform typecast-and-product of two INTEGERS.
         *************************************************************************/
-        public static double rmul2(double v0,
-            double v1,
-            alglib.xparams _params)
+        public static double rmul2(double v0, double v1, Alglib.xparams _params)
         {
             double result = 0;
 
-            result = v0*v1;
+            result = v0 * v1;
             return result;
         }
-
 
         /*************************************************************************
         This function returns product of three real numbers. It is convenient when
         you have to perform typecast-and-product of two INTEGERS.
         *************************************************************************/
-        public static double rmul3(double v0,
-            double v1,
-            double v2,
-            alglib.xparams _params)
+        public static double rmul3(double v0, double v1, double v2, Alglib.xparams _params)
         {
             double result = 0;
 
-            result = v0*v1*v2;
+            result = v0 * v1 * v2;
             return result;
         }
-
 
         /*************************************************************************
         This function returns (A div B) rounded up; it expects that A>0, B>0, but
         does not check it.
         *************************************************************************/
-        public static int idivup(int a,
-            int b,
-            alglib.xparams _params)
+        public static int idivup(int a, int b, Alglib.xparams _params)
         {
             int result = 0;
 
-            result = a/b;
-            if( a%b>0 )
+            result = a / b;
+            if (a % b > 0)
             {
-                result = result+1;
+                result = result + 1;
             }
             return result;
         }
-
 
         /*************************************************************************
         This function returns min(i0,i1)
         *************************************************************************/
-        public static int imin2(int i0,
-            int i1,
-            alglib.xparams _params)
+        public static int imin2(int i0, int i1, Alglib.xparams _params)
         {
             int result = 0;
 
             result = i0;
-            if( i1<result )
+            if (i1 < result)
             {
                 result = i1;
             }
             return result;
         }
-
 
         /*************************************************************************
         This function returns min(i0,i1,i2)
         *************************************************************************/
-        public static int imin3(int i0,
-            int i1,
-            int i2,
-            alglib.xparams _params)
+        public static int imin3(int i0, int i1, int i2, Alglib.xparams _params)
         {
             int result = 0;
 
             result = i0;
-            if( i1<result )
+            if (i1 < result)
             {
                 result = i1;
             }
-            if( i2<result )
+            if (i2 < result)
             {
                 result = i2;
             }
             return result;
         }
-
 
         /*************************************************************************
         This function returns max(i0,i1)
         *************************************************************************/
-        public static int imax2(int i0,
-            int i1,
-            alglib.xparams _params)
+        public static int imax2(int i0, int i1, Alglib.xparams _params)
         {
             int result = 0;
 
             result = i0;
-            if( i1>result )
+            if (i1 > result)
             {
                 result = i1;
             }
             return result;
         }
 
-
         /*************************************************************************
         This function returns max(i0,i1,i2)
         *************************************************************************/
-        public static int imax3(int i0,
-            int i1,
-            int i2,
-            alglib.xparams _params)
+        public static int imax3(int i0, int i1, int i2, Alglib.xparams _params)
         {
             int result = 0;
 
             result = i0;
-            if( i1>result )
+            if (i1 > result)
             {
                 result = i1;
             }
-            if( i2>result )
+            if (i2 > result)
             {
                 result = i2;
             }
             return result;
         }
 
-
         /*************************************************************************
         This function returns max(r0,r1,r2)
         *************************************************************************/
-        public static double rmax3(double r0,
-            double r1,
-            double r2,
-            alglib.xparams _params)
+        public static double rmax3(double r0, double r1, double r2, Alglib.xparams _params)
         {
             double result = 0;
 
             result = r0;
-            if( (double)(r1)>(double)(result) )
+            if ((double)(r1) > (double)(result))
             {
                 result = r1;
             }
-            if( (double)(r2)>(double)(result) )
+            if ((double)(r2) > (double)(result))
             {
                 result = r2;
             }
             return result;
         }
 
-
         /*************************************************************************
         This function returns max(|r0|,|r1|,|r2|)
         *************************************************************************/
-        public static double rmaxabs3(double r0,
-            double r1,
-            double r2,
-            alglib.xparams _params)
+        public static double rmaxabs3(double r0, double r1, double r2, Alglib.xparams _params)
         {
             double result = 0;
 
@@ -2436,37 +2266,33 @@ public partial class alglib
             r1 = Math.Abs(r1);
             r2 = Math.Abs(r2);
             result = r0;
-            if( (double)(r1)>(double)(result) )
+            if ((double)(r1) > (double)(result))
             {
                 result = r1;
             }
-            if( (double)(r2)>(double)(result) )
+            if ((double)(r2) > (double)(result))
             {
                 result = r2;
             }
             return result;
         }
 
-
         /*************************************************************************
         'bounds' value: maps X to [B1,B2]
 
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static double boundval(double x,
-            double b1,
-            double b2,
-            alglib.xparams _params)
+        public static double boundval(double x, double b1, double b2, Alglib.xparams _params)
         {
             double result = 0;
 
-            if( (double)(x)<=(double)(b1) )
+            if ((double)(x) <= (double)(b1))
             {
                 result = b1;
                 return result;
             }
-            if( (double)(x)>=(double)(b2) )
+            if ((double)(x) >= (double)(b2))
             {
                 result = b2;
                 return result;
@@ -2475,26 +2301,22 @@ public partial class alglib
             return result;
         }
 
-
         /*************************************************************************
         'bounds' value: maps X to [B1,B2]
 
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static int iboundval(int x,
-            int b1,
-            int b2,
-            alglib.xparams _params)
+        public static int iboundval(int x, int b1, int b2, Alglib.xparams _params)
         {
             int result = 0;
 
-            if( x<=b1 )
+            if (x <= b1)
             {
                 result = b1;
                 return result;
             }
-            if( x>=b2 )
+            if (x >= b2)
             {
                 result = b2;
                 return result;
@@ -2502,7 +2324,6 @@ public partial class alglib
             result = x;
             return result;
         }
-
 
         /*************************************************************************
         'bounds' value: maps X to [B1,B2]
@@ -2510,19 +2331,16 @@ public partial class alglib
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static double rboundval(double x,
-            double b1,
-            double b2,
-            alglib.xparams _params)
+        public static double rboundval(double x, double b1, double b2, Alglib.xparams _params)
         {
             double result = 0;
 
-            if( (double)(x)<=(double)(b1) )
+            if ((double)(x) <= (double)(b1))
             {
                 result = b1;
                 return result;
             }
-            if( (double)(x)>=(double)(b2) )
+            if ((double)(x) >= (double)(b2))
             {
                 result = b2;
                 return result;
@@ -2530,86 +2348,71 @@ public partial class alglib
             result = x;
             return result;
         }
-
 
         /*************************************************************************
         Returns number of non-zeros
         *************************************************************************/
-        public static int countnz1(double[] v,
-            int n,
-            alglib.xparams _params)
+        public static int countnz1(double[] v, int n, Alglib.xparams _params)
         {
             int result = 0;
             int i = 0;
 
             result = 0;
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
-                if( !(v[i]==0) )
+                if (!(v[i] == 0))
                 {
-                    result = result+1;
+                    result = result + 1;
                 }
             }
             return result;
         }
 
-
         /*************************************************************************
         Returns number of non-zeros
         *************************************************************************/
-        public static int countnz2(double[,] v,
-            int m,
-            int n,
-            alglib.xparams _params)
+        public static int countnz2(double[,] v, int m, int n, Alglib.xparams _params)
         {
             int result = 0;
             int i = 0;
             int j = 0;
 
             result = 0;
-            for(i=0; i<=m-1; i++)
+            for (i = 0; i <= m - 1; i++)
             {
-                for(j=0; j<=n-1; j++)
+                for (j = 0; j <= n - 1; j++)
                 {
-                    if( !(v[i,j]==0) )
+                    if (!(v[i, j] == 0))
                     {
-                        result = result+1;
+                        result = result + 1;
                     }
                 }
             }
             return result;
         }
 
-
         /*************************************************************************
         Allocation of serializer: complex value
         *************************************************************************/
-        public static void alloccomplex(alglib.serializer s,
-            complex v,
-            alglib.xparams _params)
+        public static void alloccomplex(Alglib.serializer s, complex v, Alglib.xparams _params)
         {
             s.alloc_entry();
             s.alloc_entry();
         }
 
-
         /*************************************************************************
         Serialization: complex value
         *************************************************************************/
-        public static void serializecomplex(alglib.serializer s,
-            complex v,
-            alglib.xparams _params)
+        public static void serializecomplex(Alglib.serializer s, complex v, Alglib.xparams _params)
         {
             s.serialize_double(v.x);
             s.serialize_double(v.y);
         }
 
-
         /*************************************************************************
         Unserialization: complex value
         *************************************************************************/
-        public static complex unserializecomplex(alglib.serializer s,
-            alglib.xparams _params)
+        public static complex unserializecomplex(Alglib.serializer s, Alglib.xparams _params)
         {
             complex result = 0;
 
@@ -2618,57 +2421,60 @@ public partial class alglib
             return result;
         }
 
-
         /*************************************************************************
         Allocation of serializer: real array
         *************************************************************************/
-        public static void allocrealarray(alglib.serializer s,
+        public static void allocrealarray(
+            Alglib.serializer s,
             double[] v,
             int n,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
 
-            if( n<0 )
+            if (n < 0)
             {
-                n = alglib.ap.len(v);
+                n = Alglib.ap.len(v);
             }
             s.alloc_entry();
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 s.alloc_entry();
             }
         }
 
-
         /*************************************************************************
         Serialization: complex value
         *************************************************************************/
-        public static void serializerealarray(alglib.serializer s,
+        public static void serializerealarray(
+            Alglib.serializer s,
             double[] v,
             int n,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
 
-            if( n<0 )
+            if (n < 0)
             {
-                n = alglib.ap.len(v);
+                n = Alglib.ap.len(v);
             }
             s.serialize_int(n);
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 s.serialize_double(v[i]);
             }
         }
 
-
         /*************************************************************************
         Unserialization: complex value
         *************************************************************************/
-        public static void unserializerealarray(alglib.serializer s,
+        public static void unserializerealarray(
+            Alglib.serializer s,
             ref double[] v,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int n = 0;
             int i = 0;
@@ -2677,69 +2483,72 @@ public partial class alglib
             v = new double[0];
 
             n = s.unserialize_int();
-            if( n==0 )
+            if (n == 0)
             {
                 return;
             }
             v = new double[n];
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 t = s.unserialize_double();
                 v[i] = t;
             }
         }
 
-
         /*************************************************************************
         Allocation of serializer: Integer array
         *************************************************************************/
-        public static void allocintegerarray(alglib.serializer s,
+        public static void allocintegerarray(
+            Alglib.serializer s,
             int[] v,
             int n,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
 
-            if( n<0 )
+            if (n < 0)
             {
-                n = alglib.ap.len(v);
+                n = Alglib.ap.len(v);
             }
             s.alloc_entry();
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 s.alloc_entry();
             }
         }
 
-
         /*************************************************************************
         Serialization: Integer array
         *************************************************************************/
-        public static void serializeintegerarray(alglib.serializer s,
+        public static void serializeintegerarray(
+            Alglib.serializer s,
             int[] v,
             int n,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
 
-            if( n<0 )
+            if (n < 0)
             {
-                n = alglib.ap.len(v);
+                n = Alglib.ap.len(v);
             }
             s.serialize_int(n);
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 s.serialize_int(v[i]);
             }
         }
 
-
         /*************************************************************************
         Unserialization: complex value
         *************************************************************************/
-        public static void unserializeintegerarray(alglib.serializer s,
+        public static void unserializeintegerarray(
+            Alglib.serializer s,
             ref int[] v,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int n = 0;
             int i = 0;
@@ -2748,89 +2557,92 @@ public partial class alglib
             v = new int[0];
 
             n = s.unserialize_int();
-            if( n==0 )
+            if (n == 0)
             {
                 return;
             }
             v = new int[n];
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 t = s.unserialize_int();
                 v[i] = t;
             }
         }
 
-
         /*************************************************************************
         Allocation of serializer: real matrix
         *************************************************************************/
-        public static void allocrealmatrix(alglib.serializer s,
+        public static void allocrealmatrix(
+            Alglib.serializer s,
             double[,] v,
             int n0,
             int n1,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
 
-            if( n0<0 )
+            if (n0 < 0)
             {
-                n0 = alglib.ap.rows(v);
+                n0 = Alglib.ap.rows(v);
             }
-            if( n1<0 )
+            if (n1 < 0)
             {
-                n1 = alglib.ap.cols(v);
+                n1 = Alglib.ap.cols(v);
             }
             s.alloc_entry();
             s.alloc_entry();
-            for(i=0; i<=n0-1; i++)
+            for (i = 0; i <= n0 - 1; i++)
             {
-                for(j=0; j<=n1-1; j++)
+                for (j = 0; j <= n1 - 1; j++)
                 {
                     s.alloc_entry();
                 }
             }
         }
 
-
         /*************************************************************************
         Serialization: complex value
         *************************************************************************/
-        public static void serializerealmatrix(alglib.serializer s,
+        public static void serializerealmatrix(
+            Alglib.serializer s,
             double[,] v,
             int n0,
             int n1,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
 
-            if( n0<0 )
+            if (n0 < 0)
             {
-                n0 = alglib.ap.rows(v);
+                n0 = Alglib.ap.rows(v);
             }
-            if( n1<0 )
+            if (n1 < 0)
             {
-                n1 = alglib.ap.cols(v);
+                n1 = Alglib.ap.cols(v);
             }
             s.serialize_int(n0);
             s.serialize_int(n1);
-            for(i=0; i<=n0-1; i++)
+            for (i = 0; i <= n0 - 1; i++)
             {
-                for(j=0; j<=n1-1; j++)
+                for (j = 0; j <= n1 - 1; j++)
                 {
-                    s.serialize_double(v[i,j]);
+                    s.serialize_double(v[i, j]);
                 }
             }
         }
 
-
         /*************************************************************************
         Unserialization: complex value
         *************************************************************************/
-        public static void unserializerealmatrix(alglib.serializer s,
+        public static void unserializerealmatrix(
+            Alglib.serializer s,
             ref double[,] v,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
@@ -2838,150 +2650,128 @@ public partial class alglib
             int n1 = 0;
             double t = 0;
 
-            v = new double[0,0];
+            v = new double[0, 0];
 
             n0 = s.unserialize_int();
             n1 = s.unserialize_int();
-            if( n0==0 || n1==0 )
+            if (n0 == 0 || n1 == 0)
             {
                 return;
             }
             v = new double[n0, n1];
-            for(i=0; i<=n0-1; i++)
+            for (i = 0; i <= n0 - 1; i++)
             {
-                for(j=0; j<=n1-1; j++)
+                for (j = 0; j <= n1 - 1; j++)
                 {
                     t = s.unserialize_double();
-                    v[i,j] = t;
+                    v[i, j] = t;
                 }
             }
         }
 
-
         /*************************************************************************
         Copy boolean array
         *************************************************************************/
-        public static void copybooleanarray(bool[] src,
-            ref bool[] dst,
-            alglib.xparams _params)
+        public static void copybooleanarray(bool[] src, ref bool[] dst, Alglib.xparams _params)
         {
             int i = 0;
 
             dst = new bool[0];
 
-            if( alglib.ap.len(src)>0 )
+            if (Alglib.ap.len(src) > 0)
             {
-                dst = new bool[alglib.ap.len(src)];
-                for(i=0; i<=alglib.ap.len(src)-1; i++)
+                dst = new bool[Alglib.ap.len(src)];
+                for (i = 0; i <= Alglib.ap.len(src) - 1; i++)
                 {
                     dst[i] = src[i];
                 }
             }
         }
 
-
         /*************************************************************************
         Copy integer array
         *************************************************************************/
-        public static void copyintegerarray(int[] src,
-            ref int[] dst,
-            alglib.xparams _params)
+        public static void copyintegerarray(int[] src, ref int[] dst, Alglib.xparams _params)
         {
             int i = 0;
 
             dst = new int[0];
 
-            if( alglib.ap.len(src)>0 )
+            if (Alglib.ap.len(src) > 0)
             {
-                dst = new int[alglib.ap.len(src)];
-                for(i=0; i<=alglib.ap.len(src)-1; i++)
+                dst = new int[Alglib.ap.len(src)];
+                for (i = 0; i <= Alglib.ap.len(src) - 1; i++)
                 {
                     dst[i] = src[i];
                 }
             }
         }
 
-
         /*************************************************************************
         Copy real array
         *************************************************************************/
-        public static void copyrealarray(double[] src,
-            ref double[] dst,
-            alglib.xparams _params)
+        public static void copyrealarray(double[] src, ref double[] dst, Alglib.xparams _params)
         {
             int i = 0;
 
             dst = new double[0];
 
-            if( alglib.ap.len(src)>0 )
+            if (Alglib.ap.len(src) > 0)
             {
-                dst = new double[alglib.ap.len(src)];
-                for(i=0; i<=alglib.ap.len(src)-1; i++)
+                dst = new double[Alglib.ap.len(src)];
+                for (i = 0; i <= Alglib.ap.len(src) - 1; i++)
                 {
                     dst[i] = src[i];
                 }
             }
         }
 
-
         /*************************************************************************
         Copy real matrix
         *************************************************************************/
-        public static void copyrealmatrix(double[,] src,
-            ref double[,] dst,
-            alglib.xparams _params)
+        public static void copyrealmatrix(double[,] src, ref double[,] dst, Alglib.xparams _params)
         {
             int i = 0;
             int j = 0;
 
-            dst = new double[0,0];
+            dst = new double[0, 0];
 
-            if( alglib.ap.rows(src)>0 && alglib.ap.cols(src)>0 )
+            if (Alglib.ap.rows(src) > 0 && Alglib.ap.cols(src) > 0)
             {
-                dst = new double[alglib.ap.rows(src), alglib.ap.cols(src)];
-                for(i=0; i<=alglib.ap.rows(src)-1; i++)
+                dst = new double[Alglib.ap.rows(src), Alglib.ap.cols(src)];
+                for (i = 0; i <= Alglib.ap.rows(src) - 1; i++)
                 {
-                    for(j=0; j<=alglib.ap.cols(src)-1; j++)
+                    for (j = 0; j <= Alglib.ap.cols(src) - 1; j++)
                     {
-                        dst[i,j] = src[i,j];
+                        dst[i, j] = src[i, j];
                     }
                 }
             }
         }
 
-
         /*************************************************************************
         Clears integer array
         *************************************************************************/
-        public static void unsetintegerarray(ref int[] a,
-            alglib.xparams _params)
+        public static void unsetintegerarray(ref int[] a, Alglib.xparams _params)
         {
             a = new int[0];
-
         }
-
 
         /*************************************************************************
         Clears real array
         *************************************************************************/
-        public static void unsetrealarray(ref double[] a,
-            alglib.xparams _params)
+        public static void unsetrealarray(ref double[] a, Alglib.xparams _params)
         {
             a = new double[0];
-
         }
-
 
         /*************************************************************************
         Clears real matrix
         *************************************************************************/
-        public static void unsetrealmatrix(ref double[,] a,
-            alglib.xparams _params)
+        public static void unsetrealmatrix(ref double[,] a, Alglib.xparams _params)
         {
-            a = new double[0,0];
-
+            a = new double[0, 0];
         }
-
 
         /*************************************************************************
         This function is used in parallel functions for recurrent division of large
@@ -2997,29 +2787,30 @@ public partial class alglib
           -- ALGLIB --
              Copyright 07.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        public static void tiledsplit(int tasksize,
+        public static void tiledsplit(
+            int tasksize,
             int tilesize,
             ref int task0,
             ref int task1,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int cc = 0;
 
             task0 = 0;
             task1 = 0;
 
-            alglib.ap.assert(tasksize>=2, "TiledSplit: TaskSize<2");
-            alglib.ap.assert(tasksize>tilesize, "TiledSplit: TaskSize<=TileSize");
+            Alglib.ap.assert(tasksize >= 2, "TiledSplit: TaskSize<2");
+            Alglib.ap.assert(tasksize > tilesize, "TiledSplit: TaskSize<=TileSize");
             cc = chunkscount(tasksize, tilesize, _params);
-            alglib.ap.assert(cc>=2, "TiledSplit: integrity check failed");
-            task0 = idivup(cc, 2, _params)*tilesize;
-            task1 = tasksize-task0;
-            alglib.ap.assert(task0>=1, "TiledSplit: internal error");
-            alglib.ap.assert(task1>=1, "TiledSplit: internal error");
-            alglib.ap.assert(task0%tilesize==0, "TiledSplit: internal error");
-            alglib.ap.assert(task0>=task1, "TiledSplit: internal error");
+            Alglib.ap.assert(cc >= 2, "TiledSplit: integrity check failed");
+            task0 = idivup(cc, 2, _params) * tilesize;
+            task1 = tasksize - task0;
+            Alglib.ap.assert(task0 >= 1, "TiledSplit: internal error");
+            Alglib.ap.assert(task1 >= 1, "TiledSplit: internal error");
+            Alglib.ap.assert(task0 % tilesize == 0, "TiledSplit: internal error");
+            Alglib.ap.assert(task0 >= task1, "TiledSplit: internal error");
         }
-
 
         /*************************************************************************
         This function searches integer array. Elements in this array are actually
@@ -3035,13 +2826,15 @@ public partial class alglib
           -- ALGLIB --
              Copyright 28.03.2011 by Bochkanov Sergey
         *************************************************************************/
-        public static int recsearch(ref int[] a,
+        public static int recsearch(
+            ref int[] a,
             int nrec,
             int nheader,
             int i0,
             int i1,
             int[] b,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int result = 0;
             int mididx = 0;
@@ -3050,36 +2843,36 @@ public partial class alglib
             int offs = 0;
 
             result = -1;
-            while( true )
+            while (true)
             {
-                if( i0>=i1 )
+                if (i0 >= i1)
                 {
                     break;
                 }
-                mididx = (i0+i1)/2;
-                offs = nrec*mididx;
+                mididx = (i0 + i1) / 2;
+                offs = nrec * mididx;
                 cflag = 0;
-                for(k=0; k<=nheader-1; k++)
+                for (k = 0; k <= nheader - 1; k++)
                 {
-                    if( a[offs+k]<b[k] )
+                    if (a[offs + k] < b[k])
                     {
                         cflag = -1;
                         break;
                     }
-                    if( a[offs+k]>b[k] )
+                    if (a[offs + k] > b[k])
                     {
                         cflag = 1;
                         break;
                     }
                 }
-                if( cflag==0 )
+                if (cflag == 0)
                 {
                     result = mididx;
                     return result;
                 }
-                if( cflag<0 )
+                if (cflag < 0)
                 {
-                    i0 = mididx+1;
+                    i0 = mididx + 1;
                 }
                 else
                 {
@@ -3088,7 +2881,6 @@ public partial class alglib
             }
             return result;
         }
-
 
         /*************************************************************************
         This function is used in parallel functions for recurrent division of large
@@ -3104,48 +2896,47 @@ public partial class alglib
           -- ALGLIB --
              Copyright 07.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        public static void splitlengtheven(int tasksize,
+        public static void splitlengtheven(
+            int tasksize,
             ref int task0,
             ref int task1,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             task0 = 0;
             task1 = 0;
 
-            alglib.ap.assert(tasksize>=2, "SplitLengthEven: TaskSize<2");
-            if( tasksize==2 )
+            Alglib.ap.assert(tasksize >= 2, "SplitLengthEven: TaskSize<2");
+            if (tasksize == 2)
             {
                 task0 = 1;
                 task1 = 1;
                 return;
             }
-            if( tasksize%2==0 )
+            if (tasksize % 2 == 0)
             {
-                
                 //
                 // Even division
                 //
-                task0 = tasksize/2;
-                task1 = tasksize/2;
-                if( task0%2!=0 )
+                task0 = tasksize / 2;
+                task1 = tasksize / 2;
+                if (task0 % 2 != 0)
                 {
-                    task0 = task0+1;
-                    task1 = task1-1;
+                    task0 = task0 + 1;
+                    task1 = task1 - 1;
                 }
             }
             else
             {
-                
                 //
                 // Odd task size, split trailing odd part from it.
                 //
-                task0 = tasksize-1;
+                task0 = tasksize - 1;
                 task1 = 1;
             }
-            alglib.ap.assert(task0>=1, "SplitLengthEven: internal error");
-            alglib.ap.assert(task1>=1, "SplitLengthEven: internal error");
+            Alglib.ap.assert(task0 >= 1, "SplitLengthEven: internal error");
+            Alglib.ap.assert(task1 >= 1, "SplitLengthEven: internal error");
         }
-
 
         /*************************************************************************
         This function is used to calculate number of chunks (including partial,
@@ -3158,22 +2949,19 @@ public partial class alglib
           -- ALGLIB --
              Copyright 21.01.2015 by Bochkanov Sergey
         *************************************************************************/
-        public static int chunkscount(int tasksize,
-            int chunksize,
-            alglib.xparams _params)
+        public static int chunkscount(int tasksize, int chunksize, Alglib.xparams _params)
         {
             int result = 0;
 
-            alglib.ap.assert(tasksize>=0, "ChunksCount: TaskSize<0");
-            alglib.ap.assert(chunksize>=1, "ChunksCount: ChunkSize<1");
-            result = tasksize/chunksize;
-            if( tasksize%chunksize!=0 )
+            Alglib.ap.assert(tasksize >= 0, "ChunksCount: TaskSize<0");
+            Alglib.ap.assert(chunksize >= 1, "ChunksCount: ChunkSize<1");
+            result = tasksize / chunksize;
+            if (tasksize % chunksize != 0)
             {
-                result = result+1;
+                result = result + 1;
             }
             return result;
         }
-
 
         /*************************************************************************
         Returns maximum density for level 2 sparse/dense functions. Density values
@@ -3184,14 +2972,13 @@ public partial class alglib
              10.01.2019
              Bochkanov Sergey
         *************************************************************************/
-        public static double sparselevel2density(alglib.xparams _params)
+        public static double sparselevel2density(Alglib.xparams _params)
         {
             double result = 0;
 
             result = 0.1;
             return result;
         }
-
 
         /*************************************************************************
         Returns A-tile size for a matrix.
@@ -3203,14 +2990,13 @@ public partial class alglib
              10.01.2019
              Bochkanov Sergey
         *************************************************************************/
-        public static int matrixtilesizea(alglib.xparams _params)
+        public static int matrixtilesizea(Alglib.xparams _params)
         {
             int result = 0;
 
             result = 32;
             return result;
         }
-
 
         /*************************************************************************
         Returns B-tile size for a matrix.
@@ -3222,14 +3008,13 @@ public partial class alglib
              10.01.2019
              Bochkanov Sergey
         *************************************************************************/
-        public static int matrixtilesizeb(alglib.xparams _params)
+        public static int matrixtilesizeb(Alglib.xparams _params)
         {
             int result = 0;
 
             result = 64;
             return result;
         }
-
 
         /*************************************************************************
         This function returns minimum cost of task which is feasible for
@@ -3239,16 +3024,15 @@ public partial class alglib
           -- ALGLIB --
              Copyright 10.01.2018 by Bochkanov Sergey
         *************************************************************************/
-        public static double smpactivationlevel(alglib.xparams _params)
+        public static double smpactivationlevel(Alglib.xparams _params)
         {
             double result = 0;
             double nn = 0;
 
-            nn = 2*matrixtilesizeb(_params);
-            result = Math.Max(0.95*2*nn*nn*nn, 1.0E7);
+            nn = 2 * matrixtilesizeb(_params);
+            result = Math.Max(0.95 * 2 * nn * nn * nn, 1.0E7);
             return result;
         }
-
 
         /*************************************************************************
         This function returns minimum cost of task which is feasible for
@@ -3259,19 +3043,18 @@ public partial class alglib
           -- ALGLIB --
              Copyright 10.01.2018 by Bochkanov Sergey
         *************************************************************************/
-        public static double spawnlevel(alglib.xparams _params)
+        public static double spawnlevel(Alglib.xparams _params)
         {
             double result = 0;
             double nn = 0;
 
-            nn = 2*matrixtilesizea(_params);
-            result = 0.95*2*nn*nn*nn;
+            nn = 2 * matrixtilesizea(_params);
+            result = 0.95 * 2 * nn * nn * nn;
             return result;
         }
 
-
         /*************************************************************************
-        --- OBSOLETE FUNCTION, USE TILED SPLIT INSTEAD --- 
+        --- OBSOLETE FUNCTION, USE TILED SPLIT INSTEAD ---
 
         This function is used in parallel functions for recurrent division of large
         task into two smaller tasks.
@@ -3286,27 +3069,28 @@ public partial class alglib
           -- ALGLIB --
              Copyright 07.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        public static void splitlength(int tasksize,
+        public static void splitlength(
+            int tasksize,
             int chunksize,
             ref int task0,
             ref int task1,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             task0 = 0;
             task1 = 0;
 
-            alglib.ap.assert(chunksize>=2, "SplitLength: ChunkSize<2");
-            alglib.ap.assert(tasksize>=2, "SplitLength: TaskSize<2");
-            task0 = tasksize/2;
-            if( task0>chunksize && task0%chunksize!=0 )
+            Alglib.ap.assert(chunksize >= 2, "SplitLength: ChunkSize<2");
+            Alglib.ap.assert(tasksize >= 2, "SplitLength: TaskSize<2");
+            task0 = tasksize / 2;
+            if (task0 > chunksize && task0 % chunksize != 0)
             {
-                task0 = task0-task0%chunksize;
+                task0 = task0 - task0 % chunksize;
             }
-            task1 = tasksize-task0;
-            alglib.ap.assert(task0>=1, "SplitLength: internal error");
-            alglib.ap.assert(task1>=1, "SplitLength: internal error");
+            task1 = tasksize - task0;
+            Alglib.ap.assert(task0 >= 1, "SplitLength: internal error");
+            Alglib.ap.assert(task1 >= 1, "SplitLength: internal error");
         }
-
 
         /*************************************************************************
         Outputs vector A[I0,I1-1] to trace log using either:
@@ -3316,54 +3100,49 @@ public partial class alglib
 
         This function checks trace flags every time it is called.
         *************************************************************************/
-        public static void tracevectorautoprec(double[] a,
-            int i0,
-            int i1,
-            alglib.xparams _params)
+        public static void tracevectorautoprec(double[] a, int i0, int i1, Alglib.xparams _params)
         {
             int i = 0;
             int prectouse = 0;
 
-            
             //
             // Determine precision to use
             //
             prectouse = 0;
-            if( ap.istraceenabled("PREC.E15", _params) )
+            if (ap.istraceenabled("PREC.E15", _params))
             {
                 prectouse = 1;
             }
-            if( ap.istraceenabled("PREC.F6", _params) )
+            if (ap.istraceenabled("PREC.F6", _params))
             {
                 prectouse = 2;
             }
-            
+
             //
             // Output
             //
-            alglib.ap.trace("[ ");
-            for(i=i0; i<=i1-1; i++)
+            Alglib.ap.trace("[ ");
+            for (i = i0; i <= i1 - 1; i++)
             {
-                if( prectouse==0 )
+                if (prectouse == 0)
                 {
-                    alglib.ap.trace(System.String.Format("{0,14:E6}", a[i]));
+                    Alglib.ap.trace(System.String.Format("{0,14:E6}", a[i]));
                 }
-                if( prectouse==1 )
+                if (prectouse == 1)
                 {
-                    alglib.ap.trace(System.String.Format("{0,23:E15}", a[i]));
+                    Alglib.ap.trace(System.String.Format("{0,23:E15}", a[i]));
                 }
-                if( prectouse==2 )
+                if (prectouse == 2)
                 {
-                    alglib.ap.trace(System.String.Format("{0,13:F6}", a[i]));
+                    Alglib.ap.trace(System.String.Format("{0,13:F6}", a[i]));
                 }
-                if( i<i1-1 )
+                if (i < i1 - 1)
                 {
-                    alglib.ap.trace(" ");
+                    Alglib.ap.trace(" ");
                 }
             }
-            alglib.ap.trace(" ]");
+            Alglib.ap.trace(" ]");
         }
-
 
         /*************************************************************************
         Unscales/unshifts vector A[N] by computing A*Scl+Sft and outputs result to
@@ -3375,67 +3154,67 @@ public partial class alglib
         This function checks trace flags every time it is called.
         Both Scl and Sft can be omitted.
         *************************************************************************/
-        public static void tracevectorunscaledunshiftedautoprec(double[] x,
+        public static void tracevectorunscaledunshiftedautoprec(
+            double[] x,
             int n,
             double[] scl,
             bool applyscl,
             double[] sft,
             bool applysft,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int prectouse = 0;
             double v = 0;
 
-            
             //
             // Determine precision to use
             //
             prectouse = 0;
-            if( ap.istraceenabled("PREC.E15", _params) )
+            if (ap.istraceenabled("PREC.E15", _params))
             {
                 prectouse = 1;
             }
-            if( ap.istraceenabled("PREC.F6", _params) )
+            if (ap.istraceenabled("PREC.F6", _params))
             {
                 prectouse = 2;
             }
-            
+
             //
             // Output
             //
-            alglib.ap.trace("[ ");
-            for(i=0; i<=n-1; i++)
+            Alglib.ap.trace("[ ");
+            for (i = 0; i <= n - 1; i++)
             {
                 v = x[i];
-                if( applyscl )
+                if (applyscl)
                 {
-                    v = v*scl[i];
+                    v = v * scl[i];
                 }
-                if( applysft )
+                if (applysft)
                 {
-                    v = v+sft[i];
+                    v = v + sft[i];
                 }
-                if( prectouse==0 )
+                if (prectouse == 0)
                 {
-                    alglib.ap.trace(System.String.Format("{0,14:E6}", v));
+                    Alglib.ap.trace(System.String.Format("{0,14:E6}", v));
                 }
-                if( prectouse==1 )
+                if (prectouse == 1)
                 {
-                    alglib.ap.trace(System.String.Format("{0,23:E15}", v));
+                    Alglib.ap.trace(System.String.Format("{0,23:E15}", v));
                 }
-                if( prectouse==2 )
+                if (prectouse == 2)
                 {
-                    alglib.ap.trace(System.String.Format("{0,13:F6}", v));
+                    Alglib.ap.trace(System.String.Format("{0,13:F6}", v));
                 }
-                if( i<n-1 )
+                if (i < n - 1)
                 {
-                    alglib.ap.trace(" ");
+                    Alglib.ap.trace(" ");
                 }
             }
-            alglib.ap.trace(" ]");
+            Alglib.ap.trace(" ]");
         }
-
 
         /*************************************************************************
         Outputs vector of 1-norms of rows [I0,I1-1] of A[I0...I1-1,J0...J1-1]   to
@@ -3446,152 +3225,150 @@ public partial class alglib
 
         This function checks trace flags every time it is called.
         *************************************************************************/
-        public static void tracerownrm1autoprec(double[,] a,
+        public static void tracerownrm1autoprec(
+            double[,] a,
             int i0,
             int i1,
             int j0,
             int j1,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
             double v = 0;
             int prectouse = 0;
 
-            
             //
             // Determine precision to use
             //
             prectouse = 0;
-            if( ap.istraceenabled("PREC.E15", _params) )
+            if (ap.istraceenabled("PREC.E15", _params))
             {
                 prectouse = 1;
             }
-            if( ap.istraceenabled("PREC.F6", _params) )
+            if (ap.istraceenabled("PREC.F6", _params))
             {
                 prectouse = 2;
             }
-            
+
             //
             // Output
             //
-            alglib.ap.trace("[ ");
-            for(i=i0; i<=i1-1; i++)
+            Alglib.ap.trace("[ ");
+            for (i = i0; i <= i1 - 1; i++)
             {
                 v = 0;
-                for(j=j0; j<=j1-1; j++)
+                for (j = j0; j <= j1 - 1; j++)
                 {
-                    v = Math.Max(v, Math.Abs(a[i,j]));
+                    v = Math.Max(v, Math.Abs(a[i, j]));
                 }
-                if( prectouse==0 )
+                if (prectouse == 0)
                 {
-                    alglib.ap.trace(System.String.Format("{0,14:E6}", v));
+                    Alglib.ap.trace(System.String.Format("{0,14:E6}", v));
                 }
-                if( prectouse==1 )
+                if (prectouse == 1)
                 {
-                    alglib.ap.trace(System.String.Format("{0,23:E15}", v));
+                    Alglib.ap.trace(System.String.Format("{0,23:E15}", v));
                 }
-                if( prectouse==2 )
+                if (prectouse == 2)
                 {
-                    alglib.ap.trace(System.String.Format("{0,13:F6}", v));
+                    Alglib.ap.trace(System.String.Format("{0,13:F6}", v));
                 }
-                if( i<i1-1 )
+                if (i < i1 - 1)
                 {
-                    alglib.ap.trace(" ");
+                    Alglib.ap.trace(" ");
                 }
             }
-            alglib.ap.trace(" ]");
+            Alglib.ap.trace(" ]");
         }
-
 
         /*************************************************************************
         Outputs vector A[I0,I1-1] to trace log using E8 precision
         *************************************************************************/
-        public static void tracevectore6(double[] a,
-            int i0,
-            int i1,
-            alglib.xparams _params)
+        public static void tracevectore6(double[] a, int i0, int i1, Alglib.xparams _params)
         {
             int i = 0;
 
-            alglib.ap.trace("[ ");
-            for(i=i0; i<=i1-1; i++)
+            Alglib.ap.trace("[ ");
+            for (i = i0; i <= i1 - 1; i++)
             {
-                alglib.ap.trace(System.String.Format("{0,14:E6}", a[i]));
-                if( i<i1-1 )
+                Alglib.ap.trace(System.String.Format("{0,14:E6}", a[i]));
+                if (i < i1 - 1)
                 {
-                    alglib.ap.trace(" ");
+                    Alglib.ap.trace(" ");
                 }
             }
-            alglib.ap.trace(" ]");
+            Alglib.ap.trace(" ]");
         }
-
 
         /*************************************************************************
         Outputs vector A[I0,I1-1] to trace log using E8 or E15 precision
         *************************************************************************/
-        public static void tracevectore615(double[] a,
+        public static void tracevectore615(
+            double[] a,
             int i0,
             int i1,
             bool usee15,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
 
-            alglib.ap.trace("[ ");
-            for(i=i0; i<=i1-1; i++)
+            Alglib.ap.trace("[ ");
+            for (i = i0; i <= i1 - 1; i++)
             {
-                if( usee15 )
+                if (usee15)
                 {
-                    alglib.ap.trace(System.String.Format("{0,23:E15}", a[i]));
+                    Alglib.ap.trace(System.String.Format("{0,23:E15}", a[i]));
                 }
                 else
                 {
-                    alglib.ap.trace(System.String.Format("{0,14:E6}", a[i]));
+                    Alglib.ap.trace(System.String.Format("{0,14:E6}", a[i]));
                 }
-                if( i<i1-1 )
+                if (i < i1 - 1)
                 {
-                    alglib.ap.trace(" ");
+                    Alglib.ap.trace(" ");
                 }
             }
-            alglib.ap.trace(" ]");
+            Alglib.ap.trace(" ]");
         }
-
 
         /*************************************************************************
         Outputs vector of 1-norms of rows [I0,I1-1] of A[I0...I1-1,J0...J1-1]   to
         trace log using E8 precision
         *************************************************************************/
-        public static void tracerownrm1e6(double[,] a,
+        public static void tracerownrm1e6(
+            double[,] a,
             int i0,
             int i1,
             int j0,
             int j1,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
             double v = 0;
 
-            alglib.ap.trace("[ ");
-            for(i=i0; i<=i1-1; i++)
+            Alglib.ap.trace("[ ");
+            for (i = i0; i <= i1 - 1; i++)
             {
                 v = 0;
-                for(j=j0; j<=j1-1; j++)
+                for (j = j0; j <= j1 - 1; j++)
                 {
-                    v = Math.Max(v, Math.Abs(a[i,j]));
+                    v = Math.Max(v, Math.Abs(a[i, j]));
                 }
-                alglib.ap.trace(System.String.Format("{0,14:E6}", v));
-                if( i<i1-1 )
+                Alglib.ap.trace(System.String.Format("{0,14:E6}", v));
+                if (i < i1 - 1)
                 {
-                    alglib.ap.trace(" ");
+                    Alglib.ap.trace(" ");
                 }
             }
-            alglib.ap.trace(" ]");
+            Alglib.ap.trace(" ]");
         }
-
-
     }
+
     public class tsort
     {
         /*************************************************************************
@@ -3623,11 +3400,13 @@ public partial class alglib
           -- ALGLIB --
              Copyright 14.05.2008 by Bochkanov Sergey
         *************************************************************************/
-        public static void tagsort(ref double[] a,
+        public static void tagsort(
+            ref double[] a,
             int n,
             ref int[] p1,
             ref int[] p2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             apserv.apbuffers buf = new apserv.apbuffers();
 
@@ -3636,7 +3415,6 @@ public partial class alglib
 
             tagsortbuf(ref a, n, ref p1, ref p2, buf, _params);
         }
-
 
         /*************************************************************************
         Buffered variant of TagSort, which accepts preallocated output arrays as
@@ -3650,12 +3428,14 @@ public partial class alglib
           -- ALGLIB --
              Copyright 14.05.2008 by Bochkanov Sergey
         *************************************************************************/
-        public static void tagsortbuf(ref double[] a,
+        public static void tagsortbuf(
+            ref double[] a,
             int n,
             ref int[] p1,
             ref int[] p2,
             apserv.apbuffers buf,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int lv = 0;
@@ -3663,15 +3443,14 @@ public partial class alglib
             int rv = 0;
             int rp = 0;
 
-            
             //
             // Special cases
             //
-            if( n<=0 )
+            if (n <= 0)
             {
                 return;
             }
-            if( n==1 )
+            if (n == 1)
             {
                 apserv.ivectorsetlengthatleast(ref p1, 1, _params);
                 apserv.ivectorsetlengthatleast(ref p2, 1, _params);
@@ -3679,23 +3458,23 @@ public partial class alglib
                 p2[0] = 0;
                 return;
             }
-            
+
             //
             // General case, N>1: prepare permutations table P1
             //
             apserv.ivectorsetlengthatleast(ref p1, n, _params);
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 p1[i] = i;
             }
-            
+
             //
             // General case, N>1: sort, update P1
             //
             apserv.rvectorsetlengthatleast(ref buf.ra0, n, _params);
             apserv.ivectorsetlengthatleast(ref buf.ia0, n, _params);
             tagsortfasti(ref a, ref p1, ref buf.ra0, ref buf.ia0, n, _params);
-            
+
             //
             // General case, N>1: fill permutations table P2
             //
@@ -3711,14 +3490,13 @@ public partial class alglib
             apserv.ivectorsetlengthatleast(ref buf.ia0, n, _params);
             apserv.ivectorsetlengthatleast(ref buf.ia1, n, _params);
             apserv.ivectorsetlengthatleast(ref p2, n, _params);
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 buf.ia0[i] = i;
                 buf.ia1[i] = i;
             }
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
-                
                 //
                 // calculate LP, LV, RP, RV
                 //
@@ -3726,12 +3504,12 @@ public partial class alglib
                 lv = buf.ia1[lp];
                 rv = p1[i];
                 rp = buf.ia0[rv];
-                
+
                 //
                 // Fill P2
                 //
                 p2[i] = rp;
-                
+
                 //
                 // update PV and VP
                 //
@@ -3741,7 +3519,6 @@ public partial class alglib
                 buf.ia0[rv] = lp;
             }
         }
-
 
         /*************************************************************************
         Same as TagSort, but optimized for real keys and integer labels.
@@ -3759,12 +3536,14 @@ public partial class alglib
           -- ALGLIB --
              Copyright 11.12.2008 by Bochkanov Sergey
         *************************************************************************/
-        public static void tagsortfasti(ref double[] a,
+        public static void tagsortfasti(
+            ref double[] a,
             ref int[] b,
             ref double[] bufa,
             ref int[] bufb,
             int n,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
@@ -3773,35 +3552,34 @@ public partial class alglib
             double tmpr = 0;
             int tmpi = 0;
 
-            
             //
             // Special case
             //
-            if( n<=1 )
+            if (n <= 1)
             {
                 return;
             }
-            
+
             //
             // Test for already sorted set
             //
             isascending = true;
             isdescending = true;
-            for(i=1; i<=n-1; i++)
+            for (i = 1; i <= n - 1; i++)
             {
-                isascending = isascending && a[i]>=a[i-1];
-                isdescending = isdescending && a[i]<=a[i-1];
+                isascending = isascending && a[i] >= a[i - 1];
+                isdescending = isdescending && a[i] <= a[i - 1];
             }
-            if( isascending )
+            if (isascending)
             {
                 return;
             }
-            if( isdescending )
+            if (isdescending)
             {
-                for(i=0; i<=n-1; i++)
+                for (i = 0; i <= n - 1; i++)
                 {
-                    j = n-1-i;
-                    if( j<=i )
+                    j = n - 1 - i;
+                    if (j <= i)
                     {
                         break;
                     }
@@ -3814,21 +3592,20 @@ public partial class alglib
                 }
                 return;
             }
-            
+
             //
             // General case
             //
-            if( alglib.ap.len(bufa)<n )
+            if (Alglib.ap.len(bufa) < n)
             {
                 bufa = new double[n];
             }
-            if( alglib.ap.len(bufb)<n )
+            if (Alglib.ap.len(bufb) < n)
             {
                 bufb = new int[n];
             }
-            tagsortfastirec(ref a, ref b, ref bufa, ref bufb, 0, n-1, _params);
+            tagsortfastirec(ref a, ref b, ref bufa, ref bufb, 0, n - 1, _params);
         }
-
 
         /*************************************************************************
         Same as TagSort, but optimized for real keys and real labels.
@@ -3846,12 +3623,14 @@ public partial class alglib
           -- ALGLIB --
              Copyright 11.12.2008 by Bochkanov Sergey
         *************************************************************************/
-        public static void tagsortfastr(ref double[] a,
+        public static void tagsortfastr(
+            ref double[] a,
             ref double[] b,
             ref double[] bufa,
             ref double[] bufb,
             int n,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
@@ -3859,35 +3638,34 @@ public partial class alglib
             bool isdescending = new bool();
             double tmpr = 0;
 
-            
             //
             // Special case
             //
-            if( n<=1 )
+            if (n <= 1)
             {
                 return;
             }
-            
+
             //
             // Test for already sorted set
             //
             isascending = true;
             isdescending = true;
-            for(i=1; i<=n-1; i++)
+            for (i = 1; i <= n - 1; i++)
             {
-                isascending = isascending && a[i]>=a[i-1];
-                isdescending = isdescending && a[i]<=a[i-1];
+                isascending = isascending && a[i] >= a[i - 1];
+                isdescending = isdescending && a[i] <= a[i - 1];
             }
-            if( isascending )
+            if (isascending)
             {
                 return;
             }
-            if( isdescending )
+            if (isdescending)
             {
-                for(i=0; i<=n-1; i++)
+                for (i = 0; i <= n - 1; i++)
                 {
-                    j = n-1-i;
-                    if( j<=i )
+                    j = n - 1 - i;
+                    if (j <= i)
                     {
                         break;
                     }
@@ -3900,21 +3678,20 @@ public partial class alglib
                 }
                 return;
             }
-            
+
             //
             // General case
             //
-            if( alglib.ap.len(bufa)<n )
+            if (Alglib.ap.len(bufa) < n)
             {
                 bufa = new double[n];
             }
-            if( alglib.ap.len(bufb)<n )
+            if (Alglib.ap.len(bufb) < n)
             {
                 bufb = new double[n];
             }
-            tagsortfastrrec(ref a, ref b, ref bufa, ref bufb, 0, n-1, _params);
+            tagsortfastrrec(ref a, ref b, ref bufa, ref bufb, 0, n - 1, _params);
         }
-
 
         /*************************************************************************
         Same as TagSort, but optimized for real keys without labels.
@@ -3932,10 +3709,12 @@ public partial class alglib
           -- ALGLIB --
              Copyright 11.12.2008 by Bochkanov Sergey
         *************************************************************************/
-        public static void tagsortfast(ref double[] a,
+        public static void tagsortfast(
+            ref double[] a,
             ref double[] bufa,
             int n,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
@@ -3943,35 +3722,34 @@ public partial class alglib
             bool isdescending = new bool();
             double tmpr = 0;
 
-            
             //
             // Special case
             //
-            if( n<=1 )
+            if (n <= 1)
             {
                 return;
             }
-            
+
             //
             // Test for already sorted set
             //
             isascending = true;
             isdescending = true;
-            for(i=1; i<=n-1; i++)
+            for (i = 1; i <= n - 1; i++)
             {
-                isascending = isascending && a[i]>=a[i-1];
-                isdescending = isdescending && a[i]<=a[i-1];
+                isascending = isascending && a[i] >= a[i - 1];
+                isdescending = isdescending && a[i] <= a[i - 1];
             }
-            if( isascending )
+            if (isascending)
             {
                 return;
             }
-            if( isdescending )
+            if (isdescending)
             {
-                for(i=0; i<=n-1; i++)
+                for (i = 0; i <= n - 1; i++)
                 {
-                    j = n-1-i;
-                    if( j<=i )
+                    j = n - 1 - i;
+                    if (j <= i)
                     {
                         break;
                     }
@@ -3981,17 +3759,16 @@ public partial class alglib
                 }
                 return;
             }
-            
+
             //
             // General case
             //
-            if( alglib.ap.len(bufa)<n )
+            if (Alglib.ap.len(bufa) < n)
             {
                 bufa = new double[n];
             }
-            tagsortfastrec(ref a, ref bufa, 0, n-1, _params);
+            tagsortfastrec(ref a, ref bufa, 0, n - 1, _params);
         }
-
 
         /*************************************************************************
         Sorting function optimized for integer keys and real labels, can be used
@@ -4007,11 +3784,13 @@ public partial class alglib
           -- ALGLIB --
              Copyright 11.12.2008 by Bochkanov Sergey
         *************************************************************************/
-        public static void tagsortmiddleir(ref int[] a,
+        public static void tagsortmiddleir(
+            ref int[] a,
             ref double[] b,
             int offset,
             int n,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int k = 0;
@@ -4025,29 +3804,28 @@ public partial class alglib
             int ak1 = 0;
             double bt = 0;
 
-            
             //
             // Special cases
             //
-            if( n<=1 )
+            if (n <= 1)
             {
                 return;
             }
-            
+
             //
             // General case, N>1: sort, update B
             //
-            for(i=2; i<=n; i++)
+            for (i = 2; i <= n; i++)
             {
                 t = i;
-                while( t!=1 )
+                while (t != 1)
                 {
-                    k = t/2;
-                    p0 = offset+k-1;
-                    p1 = offset+t-1;
+                    k = t / 2;
+                    p0 = offset + k - 1;
+                    p1 = offset + t - 1;
                     ak = a[p0];
                     at = a[p1];
-                    if( ak>=at )
+                    if (ak >= at)
                     {
                         break;
                     }
@@ -4059,10 +3837,10 @@ public partial class alglib
                     t = k;
                 }
             }
-            for(i=n-1; i>=1; i--)
+            for (i = n - 1; i >= 1; i--)
             {
-                p0 = offset+0;
-                p1 = offset+i;
+                p0 = offset + 0;
+                p1 = offset + i;
                 tmp = a[p1];
                 a[p1] = a[p0];
                 a[p0] = tmp;
@@ -4072,27 +3850,27 @@ public partial class alglib
                 b[p0] = tmpr;
                 bt = tmpr;
                 t = 0;
-                while( true )
+                while (true)
                 {
-                    k = 2*t+1;
-                    if( k+1>i )
+                    k = 2 * t + 1;
+                    if (k + 1 > i)
                     {
                         break;
                     }
-                    p0 = offset+t;
-                    p1 = offset+k;
+                    p0 = offset + t;
+                    p1 = offset + k;
                     ak = a[p1];
-                    if( k+1<i )
+                    if (k + 1 < i)
                     {
-                        ak1 = a[p1+1];
-                        if( ak1>ak )
+                        ak1 = a[p1 + 1];
+                        if (ak1 > ak)
                         {
                             ak = ak1;
-                            p1 = p1+1;
-                            k = k+1;
+                            p1 = p1 + 1;
+                            k = k + 1;
                         }
                     }
-                    if( at>=ak )
+                    if (at >= ak)
                     {
                         break;
                     }
@@ -4105,7 +3883,6 @@ public partial class alglib
             }
         }
 
-
         /*************************************************************************
         Sorting function optimized for integer values (only keys, no labels),  can
         be used to sort middle of the array
@@ -4113,10 +3890,7 @@ public partial class alglib
           -- ALGLIB --
              Copyright 11.12.2008 by Bochkanov Sergey
         *************************************************************************/
-        public static void sortmiddlei(int[] a,
-            int offset,
-            int n,
-            alglib.xparams _params)
+        public static void sortmiddlei(int[] a, int offset, int n, Alglib.xparams _params)
         {
             int i = 0;
             int k = 0;
@@ -4128,29 +3902,28 @@ public partial class alglib
             int ak = 0;
             int ak1 = 0;
 
-            
             //
             // Special cases
             //
-            if( n<=1 )
+            if (n <= 1)
             {
                 return;
             }
-            
+
             //
             // General case, N>1: sort, update B
             //
-            for(i=2; i<=n; i++)
+            for (i = 2; i <= n; i++)
             {
                 t = i;
-                while( t!=1 )
+                while (t != 1)
                 {
-                    k = t/2;
-                    p0 = offset+k-1;
-                    p1 = offset+t-1;
+                    k = t / 2;
+                    p0 = offset + k - 1;
+                    p1 = offset + t - 1;
                     ak = a[p0];
                     at = a[p1];
-                    if( ak>=at )
+                    if (ak >= at)
                     {
                         break;
                     }
@@ -4159,36 +3932,36 @@ public partial class alglib
                     t = k;
                 }
             }
-            for(i=n-1; i>=1; i--)
+            for (i = n - 1; i >= 1; i--)
             {
-                p0 = offset+0;
-                p1 = offset+i;
+                p0 = offset + 0;
+                p1 = offset + i;
                 tmp = a[p1];
                 a[p1] = a[p0];
                 a[p0] = tmp;
                 at = tmp;
                 t = 0;
-                while( true )
+                while (true)
                 {
-                    k = 2*t+1;
-                    if( k+1>i )
+                    k = 2 * t + 1;
+                    if (k + 1 > i)
                     {
                         break;
                     }
-                    p0 = offset+t;
-                    p1 = offset+k;
+                    p0 = offset + t;
+                    p1 = offset + k;
                     ak = a[p1];
-                    if( k+1<i )
+                    if (k + 1 < i)
                     {
-                        ak1 = a[p1+1];
-                        if( ak1>ak )
+                        ak1 = a[p1 + 1];
+                        if (ak1 > ak)
                         {
                             ak = ak1;
-                            p1 = p1+1;
-                            k = k+1;
+                            p1 = p1 + 1;
+                            k = k + 1;
                         }
                     }
-                    if( at>=ak )
+                    if (at >= ak)
                     {
                         break;
                     }
@@ -4198,7 +3971,6 @@ public partial class alglib
                 }
             }
         }
-
 
         /*************************************************************************
         Heap operations: adds element to the heap
@@ -4215,33 +3987,35 @@ public partial class alglib
           -- ALGLIB --
              Copyright 28.02.2010 by Bochkanov Sergey
         *************************************************************************/
-        public static void tagheappushi(ref double[] a,
+        public static void tagheappushi(
+            ref double[] a,
             ref int[] b,
             ref int n,
             double va,
             int vb,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int j = 0;
             int k = 0;
             double v = 0;
 
-            if( n<0 )
+            if (n < 0)
             {
                 return;
             }
-            
+
             //
             // N=0 is a special case
             //
-            if( n==0 )
+            if (n == 0)
             {
                 a[0] = va;
                 b[0] = vb;
-                n = n+1;
+                n = n + 1;
                 return;
             }
-            
+
             //
             // add current point to the heap
             // (add to the bottom, then move up)
@@ -4251,14 +4025,13 @@ public partial class alglib
             // (it allow us to reduce number of array access operations)
             //
             j = n;
-            n = n+1;
-            while( j>0 )
+            n = n + 1;
+            while (j > 0)
             {
-                k = (j-1)/2;
+                k = (j - 1) / 2;
                 v = a[k];
-                if( v<va )
+                if (v < va)
                 {
-                    
                     //
                     // swap with higher element
                     //
@@ -4268,7 +4041,6 @@ public partial class alglib
                 }
                 else
                 {
-                    
                     //
                     // element in its place. terminate.
                     //
@@ -4278,7 +4050,6 @@ public partial class alglib
             a[j] = va;
             b[j] = vb;
         }
-
 
         /*************************************************************************
         Heap operations: replaces top element with new element
@@ -4295,12 +4066,14 @@ public partial class alglib
           -- ALGLIB --
              Copyright 28.02.2010 by Bochkanov Sergey
         *************************************************************************/
-        public static void tagheapreplacetopi(ref double[] a,
+        public static void tagheapreplacetopi(
+            ref double[] a,
             ref int[] b,
             int n,
             double va,
             int vb,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int j = 0;
             int k1 = 0;
@@ -4309,21 +4082,21 @@ public partial class alglib
             double v1 = 0;
             double v2 = 0;
 
-            if( n<1 )
+            if (n < 1)
             {
                 return;
             }
-            
+
             //
             // N=1 is a special case
             //
-            if( n==1 )
+            if (n == 1)
             {
                 a[0] = va;
                 b[0] = vb;
                 return;
             }
-            
+
             //
             // move down through heap:
             // * J  -   current element
@@ -4337,11 +4110,10 @@ public partial class alglib
             j = 0;
             k1 = 1;
             k2 = 2;
-            while( k1<n )
+            while (k1 < n)
             {
-                if( k2>=n )
+                if (k2 >= n)
                 {
-                    
                     //
                     // only one child.
                     //
@@ -4349,7 +4121,7 @@ public partial class alglib
                     // have no siblings due to heap structure)
                     //
                     v = a[k1];
-                    if( v>va )
+                    if (v > va)
                     {
                         a[j] = v;
                         b[j] = b[k1];
@@ -4359,15 +4131,14 @@ public partial class alglib
                 }
                 else
                 {
-                    
                     //
                     // two childs
                     //
                     v1 = a[k1];
                     v2 = a[k2];
-                    if( v1>v2 )
+                    if (v1 > v2)
                     {
-                        if( va<v1 )
+                        if (va < v1)
                         {
                             a[j] = v1;
                             b[j] = b[k1];
@@ -4380,7 +4151,7 @@ public partial class alglib
                     }
                     else
                     {
-                        if( va<v2 )
+                        if (va < v2)
                         {
                             a[j] = v2;
                             b[j] = b[k2];
@@ -4391,14 +4162,13 @@ public partial class alglib
                             break;
                         }
                     }
-                    k1 = 2*j+1;
-                    k2 = 2*j+2;
+                    k1 = 2 * j + 1;
+                    k2 = 2 * j + 2;
                 }
             }
             a[j] = va;
             b[j] = vb;
         }
-
 
         /*************************************************************************
         Heap operations: pops top element from the heap
@@ -4415,40 +4185,41 @@ public partial class alglib
           -- ALGLIB --
              Copyright 28.02.2010 by Bochkanov Sergey
         *************************************************************************/
-        public static void tagheappopi(ref double[] a,
+        public static void tagheappopi(
+            ref double[] a,
             ref int[] b,
             ref int n,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             double va = 0;
             int vb = 0;
 
-            if( n<1 )
+            if (n < 1)
             {
                 return;
             }
-            
+
             //
             // N=1 is a special case
             //
-            if( n==1 )
+            if (n == 1)
             {
                 n = 0;
                 return;
             }
-            
+
             //
             // swap top element and last element,
             // then reorder heap
             //
-            va = a[n-1];
-            vb = b[n-1];
-            a[n-1] = a[0];
-            b[n-1] = b[0];
-            n = n-1;
+            va = a[n - 1];
+            vb = b[n - 1];
+            a[n - 1] = a[0];
+            b[n - 1] = b[0];
+            n = n - 1;
             tagheapreplacetopi(ref a, ref b, n, va, vb, _params);
         }
-
 
         /*************************************************************************
         Search first element less than T in sorted array.
@@ -4462,10 +4233,7 @@ public partial class alglib
             The very first element's index, which isn't less than T.
         In the case when there aren't such elements, returns N.
         *************************************************************************/
-        public static int lowerbound(double[] a,
-            int n,
-            double t,
-            alglib.xparams _params)
+        public static int lowerbound(double[] a, int n, double t, Alglib.xparams _params)
         {
             int result = 0;
             int l = 0;
@@ -4475,14 +4243,14 @@ public partial class alglib
 
             l = n;
             first = 0;
-            while( l>0 )
+            while (l > 0)
             {
-                half = l/2;
-                middle = first+half;
-                if( (double)(a[middle])<(double)(t) )
+                half = l / 2;
+                middle = first + half;
+                if ((double)(a[middle]) < (double)(t))
                 {
-                    first = middle+1;
-                    l = l-half-1;
+                    first = middle + 1;
+                    l = l - half - 1;
                 }
                 else
                 {
@@ -4492,7 +4260,6 @@ public partial class alglib
             result = first;
             return result;
         }
-
 
         /*************************************************************************
         Search first element more than T in sorted array.
@@ -4506,10 +4273,7 @@ public partial class alglib
             The very first element's index, which more than T.
         In the case when there aren't such elements, returns N.
         *************************************************************************/
-        public static int upperbound(double[] a,
-            int n,
-            double t,
-            alglib.xparams _params)
+        public static int upperbound(double[] a, int n, double t, Alglib.xparams _params)
         {
             int result = 0;
             int l = 0;
@@ -4519,24 +4283,23 @@ public partial class alglib
 
             l = n;
             first = 0;
-            while( l>0 )
+            while (l > 0)
             {
-                half = l/2;
-                middle = first+half;
-                if( (double)(t)<(double)(a[middle]) )
+                half = l / 2;
+                middle = first + half;
+                if ((double)(t) < (double)(a[middle]))
                 {
                     l = half;
                 }
                 else
                 {
-                    first = middle+1;
-                    l = l-half-1;
+                    first = middle + 1;
+                    l = l - half - 1;
                 }
             }
             result = first;
             return result;
         }
-
 
         /*************************************************************************
         Internal TagSortFastI: sorts A[I1...I2] (both bounds are included),
@@ -4545,13 +4308,15 @@ public partial class alglib
           -- ALGLIB --
              Copyright 06.09.2010 by Bochkanov Sergey
         *************************************************************************/
-        private static void tagsortfastirec(ref double[] a,
+        private static void tagsortfastirec(
+            ref double[] a,
             ref int[] b,
             ref double[] bufa,
             ref int[] bufb,
             int i1,
             int i2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
@@ -4566,23 +4331,21 @@ public partial class alglib
             double v2 = 0;
             double vp = 0;
 
-            
             //
             // Fast exit
             //
-            if( i2<=i1 )
+            if (i2 <= i1)
             {
                 return;
             }
-            
+
             //
             // Non-recursive sort for small arrays
             //
-            if( i2-i1<=16 )
+            if (i2 - i1 <= 16)
             {
-                for(j=i1+1; j<=i2; j++)
+                for (j = i1 + 1; j <= i2; j++)
                 {
-                    
                     //
                     // Search elements [I1..J-1] for place to insert Jth element.
                     //
@@ -4591,27 +4354,27 @@ public partial class alglib
                     //
                     tmpr = a[j];
                     tmpi = j;
-                    for(k=j-1; k>=i1; k--)
+                    for (k = j - 1; k >= i1; k--)
                     {
-                        if( a[k]<=tmpr )
+                        if (a[k] <= tmpr)
                         {
                             break;
                         }
                         tmpi = k;
                     }
                     k = tmpi;
-                    
+
                     //
                     // Insert Jth element into Kth position
                     //
-                    if( k!=j )
+                    if (k != j)
                     {
                         tmpr = a[j];
                         tmpi = b[j];
-                        for(i=j-1; i>=k; i--)
+                        for (i = j - 1; i >= k; i--)
                         {
-                            a[i+1] = a[i];
-                            b[i+1] = b[i];
+                            a[i + 1] = a[i];
+                            b[i + 1] = b[i];
                         }
                         a[k] = tmpr;
                         b[k] = tmpi;
@@ -4619,34 +4382,34 @@ public partial class alglib
                 }
                 return;
             }
-            
+
             //
             // Quicksort: choose pivot
             // Here we assume that I2-I1>=2
             //
             v0 = a[i1];
-            v1 = a[i1+(i2-i1)/2];
+            v1 = a[i1 + (i2 - i1) / 2];
             v2 = a[i2];
-            if( v0>v1 )
+            if (v0 > v1)
             {
                 tmpr = v1;
                 v1 = v0;
                 v0 = tmpr;
             }
-            if( v1>v2 )
+            if (v1 > v2)
             {
                 tmpr = v2;
                 v2 = v1;
                 v1 = tmpr;
             }
-            if( v0>v1 )
+            if (v0 > v1)
             {
                 tmpr = v1;
                 v1 = v0;
                 v0 = tmpr;
             }
             vp = v1;
-            
+
             //
             // now pass through A/B and:
             // * move elements that are LESS than VP to the left of A/B
@@ -4658,67 +4421,64 @@ public partial class alglib
             cntless = 0;
             cnteq = 0;
             cntgreater = 0;
-            for(i=i1; i<=i2; i++)
+            for (i = i1; i <= i2; i++)
             {
                 v0 = a[i];
-                if( v0<vp )
+                if (v0 < vp)
                 {
-                    
                     //
                     // LESS
                     //
-                    k = i1+cntless;
-                    if( i!=k )
+                    k = i1 + cntless;
+                    if (i != k)
                     {
                         a[k] = v0;
                         b[k] = b[i];
                     }
-                    cntless = cntless+1;
+                    cntless = cntless + 1;
                     continue;
                 }
-                if( v0==vp )
+                if (v0 == vp)
                 {
-                    
                     //
                     // EQUAL
                     //
-                    k = i2-cnteq;
+                    k = i2 - cnteq;
                     bufa[k] = v0;
                     bufb[k] = b[i];
-                    cnteq = cnteq+1;
+                    cnteq = cnteq + 1;
                     continue;
                 }
-                
+
                 //
                 // GREATER
                 //
-                k = i1+cntgreater;
+                k = i1 + cntgreater;
                 bufa[k] = v0;
                 bufb[k] = b[i];
-                cntgreater = cntgreater+1;
+                cntgreater = cntgreater + 1;
             }
-            for(i=0; i<=cnteq-1; i++)
+            for (i = 0; i <= cnteq - 1; i++)
             {
-                j = i1+cntless+cnteq-1-i;
-                k = i2+i-(cnteq-1);
+                j = i1 + cntless + cnteq - 1 - i;
+                k = i2 + i - (cnteq - 1);
                 a[j] = bufa[k];
                 b[j] = bufb[k];
             }
-            for(i=0; i<=cntgreater-1; i++)
+            for (i = 0; i <= cntgreater - 1; i++)
             {
-                j = i1+cntless+cnteq+i;
-                k = i1+i;
+                j = i1 + cntless + cnteq + i;
+                k = i1 + i;
                 a[j] = bufa[k];
                 b[j] = bufb[k];
             }
-            
+
             //
             // Sort left and right parts of the array (ignoring middle part)
             //
-            tagsortfastirec(ref a, ref b, ref bufa, ref bufb, i1, i1+cntless-1, _params);
-            tagsortfastirec(ref a, ref b, ref bufa, ref bufb, i1+cntless+cnteq, i2, _params);
+            tagsortfastirec(ref a, ref b, ref bufa, ref bufb, i1, i1 + cntless - 1, _params);
+            tagsortfastirec(ref a, ref b, ref bufa, ref bufb, i1 + cntless + cnteq, i2, _params);
         }
-
 
         /*************************************************************************
         Internal TagSortFastR: sorts A[I1...I2] (both bounds are included),
@@ -4727,13 +4487,15 @@ public partial class alglib
           -- ALGLIB --
              Copyright 06.09.2010 by Bochkanov Sergey
         *************************************************************************/
-        private static void tagsortfastrrec(ref double[] a,
+        private static void tagsortfastrrec(
+            ref double[] a,
             ref double[] b,
             ref double[] bufa,
             ref double[] bufb,
             int i1,
             int i2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
@@ -4749,23 +4511,21 @@ public partial class alglib
             double v2 = 0;
             double vp = 0;
 
-            
             //
             // Fast exit
             //
-            if( i2<=i1 )
+            if (i2 <= i1)
             {
                 return;
             }
-            
+
             //
             // Non-recursive sort for small arrays
             //
-            if( i2-i1<=16 )
+            if (i2 - i1 <= 16)
             {
-                for(j=i1+1; j<=i2; j++)
+                for (j = i1 + 1; j <= i2; j++)
                 {
-                    
                     //
                     // Search elements [I1..J-1] for place to insert Jth element.
                     //
@@ -4774,27 +4534,27 @@ public partial class alglib
                     //
                     tmpr = a[j];
                     tmpi = j;
-                    for(k=j-1; k>=i1; k--)
+                    for (k = j - 1; k >= i1; k--)
                     {
-                        if( a[k]<=tmpr )
+                        if (a[k] <= tmpr)
                         {
                             break;
                         }
                         tmpi = k;
                     }
                     k = tmpi;
-                    
+
                     //
                     // Insert Jth element into Kth position
                     //
-                    if( k!=j )
+                    if (k != j)
                     {
                         tmpr = a[j];
                         tmpr2 = b[j];
-                        for(i=j-1; i>=k; i--)
+                        for (i = j - 1; i >= k; i--)
                         {
-                            a[i+1] = a[i];
-                            b[i+1] = b[i];
+                            a[i + 1] = a[i];
+                            b[i + 1] = b[i];
                         }
                         a[k] = tmpr;
                         b[k] = tmpr2;
@@ -4802,34 +4562,34 @@ public partial class alglib
                 }
                 return;
             }
-            
+
             //
             // Quicksort: choose pivot
             // Here we assume that I2-I1>=16
             //
             v0 = a[i1];
-            v1 = a[i1+(i2-i1)/2];
+            v1 = a[i1 + (i2 - i1) / 2];
             v2 = a[i2];
-            if( v0>v1 )
+            if (v0 > v1)
             {
                 tmpr = v1;
                 v1 = v0;
                 v0 = tmpr;
             }
-            if( v1>v2 )
+            if (v1 > v2)
             {
                 tmpr = v2;
                 v2 = v1;
                 v1 = tmpr;
             }
-            if( v0>v1 )
+            if (v0 > v1)
             {
                 tmpr = v1;
                 v1 = v0;
                 v0 = tmpr;
             }
             vp = v1;
-            
+
             //
             // now pass through A/B and:
             // * move elements that are LESS than VP to the left of A/B
@@ -4841,67 +4601,64 @@ public partial class alglib
             cntless = 0;
             cnteq = 0;
             cntgreater = 0;
-            for(i=i1; i<=i2; i++)
+            for (i = i1; i <= i2; i++)
             {
                 v0 = a[i];
-                if( v0<vp )
+                if (v0 < vp)
                 {
-                    
                     //
                     // LESS
                     //
-                    k = i1+cntless;
-                    if( i!=k )
+                    k = i1 + cntless;
+                    if (i != k)
                     {
                         a[k] = v0;
                         b[k] = b[i];
                     }
-                    cntless = cntless+1;
+                    cntless = cntless + 1;
                     continue;
                 }
-                if( v0==vp )
+                if (v0 == vp)
                 {
-                    
                     //
                     // EQUAL
                     //
-                    k = i2-cnteq;
+                    k = i2 - cnteq;
                     bufa[k] = v0;
                     bufb[k] = b[i];
-                    cnteq = cnteq+1;
+                    cnteq = cnteq + 1;
                     continue;
                 }
-                
+
                 //
                 // GREATER
                 //
-                k = i1+cntgreater;
+                k = i1 + cntgreater;
                 bufa[k] = v0;
                 bufb[k] = b[i];
-                cntgreater = cntgreater+1;
+                cntgreater = cntgreater + 1;
             }
-            for(i=0; i<=cnteq-1; i++)
+            for (i = 0; i <= cnteq - 1; i++)
             {
-                j = i1+cntless+cnteq-1-i;
-                k = i2+i-(cnteq-1);
+                j = i1 + cntless + cnteq - 1 - i;
+                k = i2 + i - (cnteq - 1);
                 a[j] = bufa[k];
                 b[j] = bufb[k];
             }
-            for(i=0; i<=cntgreater-1; i++)
+            for (i = 0; i <= cntgreater - 1; i++)
             {
-                j = i1+cntless+cnteq+i;
-                k = i1+i;
+                j = i1 + cntless + cnteq + i;
+                k = i1 + i;
                 a[j] = bufa[k];
                 b[j] = bufb[k];
             }
-            
+
             //
             // Sort left and right parts of the array (ignoring middle part)
             //
-            tagsortfastrrec(ref a, ref b, ref bufa, ref bufb, i1, i1+cntless-1, _params);
-            tagsortfastrrec(ref a, ref b, ref bufa, ref bufb, i1+cntless+cnteq, i2, _params);
+            tagsortfastrrec(ref a, ref b, ref bufa, ref bufb, i1, i1 + cntless - 1, _params);
+            tagsortfastrrec(ref a, ref b, ref bufa, ref bufb, i1 + cntless + cnteq, i2, _params);
         }
-
 
         /*************************************************************************
         Internal TagSortFastI: sorts A[I1...I2] (both bounds are included),
@@ -4910,11 +4667,13 @@ public partial class alglib
           -- ALGLIB --
              Copyright 06.09.2010 by Bochkanov Sergey
         *************************************************************************/
-        private static void tagsortfastrec(ref double[] a,
+        private static void tagsortfastrec(
+            ref double[] a,
             ref double[] bufa,
             int i1,
             int i2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int cntless = 0;
             int cnteq = 0;
@@ -4929,23 +4688,21 @@ public partial class alglib
             double v2 = 0;
             double vp = 0;
 
-            
             //
             // Fast exit
             //
-            if( i2<=i1 )
+            if (i2 <= i1)
             {
                 return;
             }
-            
+
             //
             // Non-recursive sort for small arrays
             //
-            if( i2-i1<=16 )
+            if (i2 - i1 <= 16)
             {
-                for(j=i1+1; j<=i2; j++)
+                for (j = i1 + 1; j <= i2; j++)
                 {
-                    
                     //
                     // Search elements [I1..J-1] for place to insert Jth element.
                     //
@@ -4954,59 +4711,59 @@ public partial class alglib
                     //
                     tmpr = a[j];
                     tmpi = j;
-                    for(k=j-1; k>=i1; k--)
+                    for (k = j - 1; k >= i1; k--)
                     {
-                        if( a[k]<=tmpr )
+                        if (a[k] <= tmpr)
                         {
                             break;
                         }
                         tmpi = k;
                     }
                     k = tmpi;
-                    
+
                     //
                     // Insert Jth element into Kth position
                     //
-                    if( k!=j )
+                    if (k != j)
                     {
                         tmpr = a[j];
-                        for(i=j-1; i>=k; i--)
+                        for (i = j - 1; i >= k; i--)
                         {
-                            a[i+1] = a[i];
+                            a[i + 1] = a[i];
                         }
                         a[k] = tmpr;
                     }
                 }
                 return;
             }
-            
+
             //
             // Quicksort: choose pivot
             // Here we assume that I2-I1>=16
             //
             v0 = a[i1];
-            v1 = a[i1+(i2-i1)/2];
+            v1 = a[i1 + (i2 - i1) / 2];
             v2 = a[i2];
-            if( v0>v1 )
+            if (v0 > v1)
             {
                 tmpr = v1;
                 v1 = v0;
                 v0 = tmpr;
             }
-            if( v1>v2 )
+            if (v1 > v2)
             {
                 tmpr = v2;
                 v2 = v1;
                 v1 = tmpr;
             }
-            if( v0>v1 )
+            if (v0 > v1)
             {
                 tmpr = v1;
                 v1 = v0;
                 v0 = tmpr;
             }
             vp = v1;
-            
+
             //
             // now pass through A/B and:
             // * move elements that are LESS than VP to the left of A/B
@@ -5018,64 +4775,61 @@ public partial class alglib
             cntless = 0;
             cnteq = 0;
             cntgreater = 0;
-            for(i=i1; i<=i2; i++)
+            for (i = i1; i <= i2; i++)
             {
                 v0 = a[i];
-                if( v0<vp )
+                if (v0 < vp)
                 {
-                    
                     //
                     // LESS
                     //
-                    k = i1+cntless;
-                    if( i!=k )
+                    k = i1 + cntless;
+                    if (i != k)
                     {
                         a[k] = v0;
                     }
-                    cntless = cntless+1;
+                    cntless = cntless + 1;
                     continue;
                 }
-                if( v0==vp )
+                if (v0 == vp)
                 {
-                    
                     //
                     // EQUAL
                     //
-                    k = i2-cnteq;
+                    k = i2 - cnteq;
                     bufa[k] = v0;
-                    cnteq = cnteq+1;
+                    cnteq = cnteq + 1;
                     continue;
                 }
-                
+
                 //
                 // GREATER
                 //
-                k = i1+cntgreater;
+                k = i1 + cntgreater;
                 bufa[k] = v0;
-                cntgreater = cntgreater+1;
+                cntgreater = cntgreater + 1;
             }
-            for(i=0; i<=cnteq-1; i++)
+            for (i = 0; i <= cnteq - 1; i++)
             {
-                j = i1+cntless+cnteq-1-i;
-                k = i2+i-(cnteq-1);
+                j = i1 + cntless + cnteq - 1 - i;
+                k = i2 + i - (cnteq - 1);
                 a[j] = bufa[k];
             }
-            for(i=0; i<=cntgreater-1; i++)
+            for (i = 0; i <= cntgreater - 1; i++)
             {
-                j = i1+cntless+cnteq+i;
-                k = i1+i;
+                j = i1 + cntless + cnteq + i;
+                k = i1 + i;
                 a[j] = bufa[k];
             }
-            
+
             //
             // Sort left and right parts of the array (ignoring middle part)
             //
-            tagsortfastrec(ref a, ref bufa, i1, i1+cntless-1, _params);
-            tagsortfastrec(ref a, ref bufa, i1+cntless+cnteq, i2, _params);
+            tagsortfastrec(ref a, ref bufa, i1, i1 + cntless - 1, _params);
+            tagsortfastrec(ref a, ref bufa, i1 + cntless + cnteq, i2, _params);
         }
-
-
     }
+
     public class ablasmkl
     {
         /*************************************************************************
@@ -5085,7 +4839,8 @@ public partial class alglib
              12.10.2017
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixgermkl(int m,
+        public static bool rmatrixgermkl(
+            int m,
             int n,
             double[,] a,
             int ia,
@@ -5095,14 +4850,14 @@ public partial class alglib
             int iu,
             double[] v,
             int iv,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel
@@ -5111,7 +4866,8 @@ public partial class alglib
              12.10.2017
              Bochkanov Sergey
         *************************************************************************/
-        public static bool cmatrixrank1mkl(int m,
+        public static bool cmatrixrank1mkl(
+            int m,
             int n,
             ref complex[,] a,
             int ia,
@@ -5120,14 +4876,14 @@ public partial class alglib
             int iu,
             ref complex[] v,
             int iv,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel
@@ -5136,7 +4892,8 @@ public partial class alglib
              12.10.2017
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixrank1mkl(int m,
+        public static bool rmatrixrank1mkl(
+            int m,
             int n,
             double[,] a,
             int ia,
@@ -5145,14 +4902,14 @@ public partial class alglib
             int iu,
             double[] v,
             int iv,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel
@@ -5161,7 +4918,8 @@ public partial class alglib
              12.10.2017
              Bochkanov Sergey
         *************************************************************************/
-        public static bool cmatrixmvmkl(int m,
+        public static bool cmatrixmvmkl(
+            int m,
             int n,
             complex[,] a,
             int ia,
@@ -5171,14 +4929,14 @@ public partial class alglib
             int ix,
             ref complex[] y,
             int iy,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel
@@ -5187,7 +4945,8 @@ public partial class alglib
              12.10.2017
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixmvmkl(int m,
+        public static bool rmatrixmvmkl(
+            int m,
             int n,
             double[,] a,
             int ia,
@@ -5197,14 +4956,14 @@ public partial class alglib
             int ix,
             double[] y,
             int iy,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel
@@ -5213,7 +4972,8 @@ public partial class alglib
              12.10.2017
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixgemvmkl(int m,
+        public static bool rmatrixgemvmkl(
+            int m,
             int n,
             double alpha,
             double[,] a,
@@ -5225,14 +4985,14 @@ public partial class alglib
             double beta,
             double[] y,
             int iy,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel
@@ -5241,7 +5001,8 @@ public partial class alglib
              12.10.2017
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixtrsvmkl(int n,
+        public static bool rmatrixtrsvmkl(
+            int n,
             double[,] a,
             int ia,
             int ja,
@@ -5250,14 +5011,14 @@ public partial class alglib
             int optype,
             double[] x,
             int ix,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel
@@ -5266,7 +5027,8 @@ public partial class alglib
              01.10.2013
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixsyrkmkl(int n,
+        public static bool rmatrixsyrkmkl(
+            int n,
             int k,
             double alpha,
             double[,] a,
@@ -5278,14 +5040,14 @@ public partial class alglib
             int ic,
             int jc,
             bool isupper,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel
@@ -5294,7 +5056,8 @@ public partial class alglib
              01.10.2013
              Bochkanov Sergey
         *************************************************************************/
-        public static bool cmatrixherkmkl(int n,
+        public static bool cmatrixherkmkl(
+            int n,
             int k,
             double alpha,
             complex[,] a,
@@ -5306,14 +5069,14 @@ public partial class alglib
             int ic,
             int jc,
             bool isupper,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel
@@ -5322,7 +5085,8 @@ public partial class alglib
              01.10.2013
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixgemmmkl(int m,
+        public static bool rmatrixgemmmkl(
+            int m,
             int n,
             int k,
             double alpha,
@@ -5338,14 +5102,14 @@ public partial class alglib
             double[,] c,
             int ic,
             int jc,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel
@@ -5354,7 +5118,8 @@ public partial class alglib
              01.10.2017
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixsymvmkl(int n,
+        public static bool rmatrixsymvmkl(
+            int n,
             double alpha,
             double[,] a,
             int ia,
@@ -5365,14 +5130,14 @@ public partial class alglib
             double beta,
             double[] y,
             int iy,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel
@@ -5381,7 +5146,8 @@ public partial class alglib
              16.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool cmatrixgemmmkl(int m,
+        public static bool cmatrixgemmmkl(
+            int m,
             int n,
             int k,
             complex alpha,
@@ -5397,14 +5163,14 @@ public partial class alglib
             complex[,] c,
             int ic,
             int jc,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel
@@ -5413,7 +5179,8 @@ public partial class alglib
              16.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool cmatrixlefttrsmmkl(int m,
+        public static bool cmatrixlefttrsmmkl(
+            int m,
             int n,
             complex[,] a,
             int i1,
@@ -5424,14 +5191,14 @@ public partial class alglib
             complex[,] x,
             int i2,
             int j2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel
@@ -5440,7 +5207,8 @@ public partial class alglib
              16.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool cmatrixrighttrsmmkl(int m,
+        public static bool cmatrixrighttrsmmkl(
+            int m,
             int n,
             complex[,] a,
             int i1,
@@ -5451,14 +5219,14 @@ public partial class alglib
             complex[,] x,
             int i2,
             int j2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel
@@ -5467,7 +5235,8 @@ public partial class alglib
              16.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixlefttrsmmkl(int m,
+        public static bool rmatrixlefttrsmmkl(
+            int m,
             int n,
             double[,] a,
             int i1,
@@ -5478,14 +5247,14 @@ public partial class alglib
             double[,] x,
             int i2,
             int j2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel
@@ -5494,7 +5263,8 @@ public partial class alglib
              16.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixrighttrsmmkl(int m,
+        public static bool rmatrixrighttrsmmkl(
+            int m,
             int n,
             double[,] a,
             int i1,
@@ -5505,14 +5275,14 @@ public partial class alglib
             double[,] x,
             int i2,
             int j2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel.
@@ -5527,19 +5297,20 @@ public partial class alglib
              16.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool spdmatrixcholeskymkl(double[,] a,
+        public static bool spdmatrixcholeskymkl(
+            double[,] a,
             int offs,
             int n,
             bool isupper,
             ref bool cholresult,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel.
@@ -5548,19 +5319,20 @@ public partial class alglib
              20.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixplumkl(ref double[,] a,
+        public static bool rmatrixplumkl(
+            ref double[,] a,
             int offs,
             int m,
             int n,
             ref int[] pivots,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel.
@@ -5572,21 +5344,22 @@ public partial class alglib
              20.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixbdmkl(double[,] a,
+        public static bool rmatrixbdmkl(
+            double[,] a,
             int m,
             int n,
             double[] d,
             double[] e,
             double[] tauq,
             double[] taup,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel.
@@ -5598,7 +5371,8 @@ public partial class alglib
              20.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixbdmultiplybymkl(double[,] qp,
+        public static bool rmatrixbdmultiplybymkl(
+            double[,] qp,
             int m,
             int n,
             double[] tauq,
@@ -5609,14 +5383,14 @@ public partial class alglib
             bool byq,
             bool fromtheright,
             bool dotranspose,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel.
@@ -5627,17 +5401,18 @@ public partial class alglib
              20.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixhessenbergmkl(double[,] a,
+        public static bool rmatrixhessenbergmkl(
+            double[,] a,
             int n,
             double[] tau,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel.
@@ -5648,18 +5423,19 @@ public partial class alglib
              20.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixhessenbergunpackqmkl(double[,] a,
+        public static bool rmatrixhessenbergunpackqmkl(
+            double[,] a,
             int n,
             double[] tau,
             double[,] q,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel.
@@ -5672,20 +5448,21 @@ public partial class alglib
              20.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool smatrixtdmkl(double[,] a,
+        public static bool smatrixtdmkl(
+            double[,] a,
             int n,
             bool isupper,
             double[] tau,
             double[] d,
             double[] e,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel.
@@ -5696,19 +5473,20 @@ public partial class alglib
              20.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool smatrixtdunpackqmkl(double[,] a,
+        public static bool smatrixtdunpackqmkl(
+            double[,] a,
             int n,
             bool isupper,
             double[] tau,
             double[,] q,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel.
@@ -5721,20 +5499,21 @@ public partial class alglib
              20.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool hmatrixtdmkl(complex[,] a,
+        public static bool hmatrixtdmkl(
+            complex[,] a,
             int n,
             bool isupper,
             complex[] tau,
             double[] d,
             double[] e,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel.
@@ -5745,19 +5524,20 @@ public partial class alglib
              20.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool hmatrixtdunpackqmkl(complex[,] a,
+        public static bool hmatrixtdunpackqmkl(
+            complex[,] a,
             int n,
             bool isupper,
             complex[] tau,
             complex[,] q,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel.
@@ -5774,7 +5554,8 @@ public partial class alglib
              20.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixbdsvdmkl(double[] d,
+        public static bool rmatrixbdsvdmkl(
+            double[] d,
             double[] e,
             int n,
             bool isupper,
@@ -5785,14 +5566,14 @@ public partial class alglib
             double[,] vt,
             int ncvt,
             ref bool svdresult,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based DHSEQR kernel.
@@ -5806,7 +5587,8 @@ public partial class alglib
              20.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixinternalschurdecompositionmkl(double[,] h,
+        public static bool rmatrixinternalschurdecompositionmkl(
+            double[,] h,
             int n,
             int tneeded,
             int zneeded,
@@ -5814,14 +5596,14 @@ public partial class alglib
             double[] wi,
             double[,] z,
             ref int info,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based DTREVC kernel.
@@ -5837,7 +5619,8 @@ public partial class alglib
              20.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixinternaltrevcmkl(double[,] t,
+        public static bool rmatrixinternaltrevcmkl(
+            double[,] t,
             int n,
             int side,
             int howmny,
@@ -5845,14 +5628,14 @@ public partial class alglib
             double[,] vr,
             ref int m,
             ref int info,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel.
@@ -5871,20 +5654,21 @@ public partial class alglib
              20.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool smatrixtdevdmkl(double[] d,
+        public static bool smatrixtdevdmkl(
+            double[] d,
             double[] e,
             int n,
             int zneeded,
             double[,] z,
             ref bool evdresult,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         MKL-based kernel.
@@ -5903,7 +5687,8 @@ public partial class alglib
              20.10.2014
              Bochkanov Sergey
         *************************************************************************/
-        public static bool sparsegemvcrsmkl(int opa,
+        public static bool sparsegemvcrsmkl(
+            int opa,
             int arows,
             int acols,
             double alpha,
@@ -5915,16 +5700,16 @@ public partial class alglib
             double beta,
             double[] y,
             int iy,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
-
     }
+
     public class ablasf
     {
         /*************************************************************************
@@ -5934,7 +5719,8 @@ public partial class alglib
              19.01.2010
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixgerf(int m,
+        public static bool rmatrixgerf(
+            int m,
             int n,
             double[,] a,
             int ia,
@@ -5944,14 +5730,14 @@ public partial class alglib
             int iu,
             double[] v,
             int iv,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         Fast kernel
@@ -5960,7 +5746,8 @@ public partial class alglib
              19.01.2010
              Bochkanov Sergey
         *************************************************************************/
-        public static bool cmatrixrank1f(int m,
+        public static bool cmatrixrank1f(
+            int m,
             int n,
             ref complex[,] a,
             int ia,
@@ -5969,14 +5756,14 @@ public partial class alglib
             int iu,
             ref complex[] v,
             int iv,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         Fast kernel
@@ -5985,7 +5772,8 @@ public partial class alglib
              19.01.2010
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixrank1f(int m,
+        public static bool rmatrixrank1f(
+            int m,
             int n,
             ref double[,] a,
             int ia,
@@ -5994,14 +5782,14 @@ public partial class alglib
             int iu,
             ref double[] v,
             int iv,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         Fast kernel
@@ -6010,7 +5798,8 @@ public partial class alglib
              19.01.2010
              Bochkanov Sergey
         *************************************************************************/
-        public static bool cmatrixrighttrsmf(int m,
+        public static bool cmatrixrighttrsmf(
+            int m,
             int n,
             complex[,] a,
             int i1,
@@ -6021,14 +5810,14 @@ public partial class alglib
             complex[,] x,
             int i2,
             int j2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         Fast kernel
@@ -6037,7 +5826,8 @@ public partial class alglib
              19.01.2010
              Bochkanov Sergey
         *************************************************************************/
-        public static bool cmatrixlefttrsmf(int m,
+        public static bool cmatrixlefttrsmf(
+            int m,
             int n,
             complex[,] a,
             int i1,
@@ -6048,14 +5838,14 @@ public partial class alglib
             complex[,] x,
             int i2,
             int j2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         Fast kernel
@@ -6064,7 +5854,8 @@ public partial class alglib
              19.01.2010
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixrighttrsmf(int m,
+        public static bool rmatrixrighttrsmf(
+            int m,
             int n,
             double[,] a,
             int i1,
@@ -6075,14 +5866,14 @@ public partial class alglib
             double[,] x,
             int i2,
             int j2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         Fast kernel
@@ -6091,7 +5882,8 @@ public partial class alglib
              19.01.2010
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixlefttrsmf(int m,
+        public static bool rmatrixlefttrsmf(
+            int m,
             int n,
             double[,] a,
             int i1,
@@ -6102,14 +5894,14 @@ public partial class alglib
             double[,] x,
             int i2,
             int j2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         Fast kernel
@@ -6118,7 +5910,8 @@ public partial class alglib
              19.01.2010
              Bochkanov Sergey
         *************************************************************************/
-        public static bool cmatrixherkf(int n,
+        public static bool cmatrixherkf(
+            int n,
             int k,
             double alpha,
             complex[,] a,
@@ -6130,14 +5923,14 @@ public partial class alglib
             int ic,
             int jc,
             bool isupper,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         Fast kernel
@@ -6146,7 +5939,8 @@ public partial class alglib
              19.01.2010
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixsyrkf(int n,
+        public static bool rmatrixsyrkf(
+            int n,
             int k,
             double alpha,
             double[,] a,
@@ -6158,14 +5952,14 @@ public partial class alglib
             int ic,
             int jc,
             bool isupper,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         Fast kernel
@@ -6174,7 +5968,8 @@ public partial class alglib
              19.01.2010
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixgemmf(int m,
+        public static bool rmatrixgemmf(
+            int m,
             int n,
             int k,
             double alpha,
@@ -6190,14 +5985,14 @@ public partial class alglib
             double[,] c,
             int ic,
             int jc,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         Fast kernel
@@ -6206,7 +6001,8 @@ public partial class alglib
              19.01.2010
              Bochkanov Sergey
         *************************************************************************/
-        public static bool cmatrixgemmf(int m,
+        public static bool cmatrixgemmf(
+            int m,
             int n,
             int k,
             complex alpha,
@@ -6222,14 +6018,14 @@ public partial class alglib
             complex[,] c,
             int ic,
             int jc,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         CMatrixGEMM kernel, basecase code for CMatrixGEMM.
@@ -6280,7 +6076,8 @@ public partial class alglib
              27.03.2013
              Bochkanov Sergey
         *************************************************************************/
-        public static void cmatrixgemmk(int m,
+        public static void cmatrixgemmk(
+            int m,
             int n,
             int k,
             complex alpha,
@@ -6296,7 +6093,8 @@ public partial class alglib
             complex[,] c,
             int ic,
             int jc,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
@@ -6337,54 +6135,73 @@ public partial class alglib
             int i_ = 0;
             int i1_ = 0;
 
-            
             //
             // if matrix size is zero
             //
-            if( m==0 || n==0 )
+            if (m == 0 || n == 0)
             {
                 return;
             }
-            
+
             //
             // Try optimized code
             //
-            if( cmatrixgemmf(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc, _params) )
+            if (
+                cmatrixgemmf(
+                    m,
+                    n,
+                    k,
+                    alpha,
+                    a,
+                    ia,
+                    ja,
+                    optypea,
+                    b,
+                    ib,
+                    jb,
+                    optypeb,
+                    beta,
+                    c,
+                    ic,
+                    jc,
+                    _params
+                )
+            )
             {
                 return;
             }
-            
+
             //
             // if K=0 or Alpha=0, then C=Beta*C
             //
-            if( k==0 || alpha==0 )
+            if (k == 0 || alpha == 0)
             {
-                if( beta!=1 )
+                if (beta != 1)
                 {
-                    if( beta!=0 )
+                    if (beta != 0)
                     {
-                        for(i=0; i<=m-1; i++)
+                        for (i = 0; i <= m - 1; i++)
                         {
-                            for(j=0; j<=n-1; j++)
+                            for (j = 0; j <= n - 1; j++)
                             {
-                                c[ic+i,jc+j] = beta*c[ic+i,jc+j];
+                                c[ic + i, jc + j] = beta * c[ic + i, jc + j];
                             }
                         }
                     }
                     else
                     {
-                        for(i=0; i<=m-1; i++)
+                        for (i = 0; i <= m - 1; i++)
                         {
-                            for(j=0; j<=n-1; j++)
+                            for (j = 0; j <= n - 1; j++)
                             {
-                                c[ic+i,jc+j] = 0;
+                                c[ic + i, jc + j] = 0;
                             }
                         }
                     }
                 }
                 return;
             }
-            
+
             //
             // This phase is not really necessary, but compiler complains
             // about "possibly uninitialized variables"
@@ -6397,23 +6214,21 @@ public partial class alglib
             b0y = 0;
             b1x = 0;
             b1y = 0;
-            
+
             //
             // General case
             //
             i = 0;
-            while( i<m )
+            while (i < m)
             {
                 j = 0;
-                while( j<n )
+                while (j < n)
                 {
-                    
                     //
                     // Choose between specialized 4x4 code and general code
                     //
-                    if( i+2<=m && j+2<=n )
+                    if (i + 2 <= m && j + 2 <= n)
                     {
-                        
                         //
                         // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
                         //
@@ -6429,84 +6244,84 @@ public partial class alglib
                         v10y = 0.0;
                         v11x = 0.0;
                         v11y = 0.0;
-                        if( optypea==0 )
+                        if (optypea == 0)
                         {
-                            idxa0 = ia+i+0;
-                            idxa1 = ia+i+1;
+                            idxa0 = ia + i + 0;
+                            idxa1 = ia + i + 1;
                             offsa = ja;
                         }
                         else
                         {
-                            idxa0 = ja+i+0;
-                            idxa1 = ja+i+1;
+                            idxa0 = ja + i + 0;
+                            idxa1 = ja + i + 1;
                             offsa = ia;
                         }
-                        if( optypeb==0 )
+                        if (optypeb == 0)
                         {
-                            idxb0 = jb+j+0;
-                            idxb1 = jb+j+1;
+                            idxb0 = jb + j + 0;
+                            idxb1 = jb + j + 1;
                             offsb = ib;
                         }
                         else
                         {
-                            idxb0 = ib+j+0;
-                            idxb1 = ib+j+1;
+                            idxb0 = ib + j + 0;
+                            idxb1 = ib + j + 1;
                             offsb = jb;
                         }
-                        for(t=0; t<=k-1; t++)
+                        for (t = 0; t <= k - 1; t++)
                         {
-                            if( optypea==0 )
+                            if (optypea == 0)
                             {
-                                a0x = a[idxa0,offsa].x;
-                                a0y = a[idxa0,offsa].y;
-                                a1x = a[idxa1,offsa].x;
-                                a1y = a[idxa1,offsa].y;
+                                a0x = a[idxa0, offsa].x;
+                                a0y = a[idxa0, offsa].y;
+                                a1x = a[idxa1, offsa].x;
+                                a1y = a[idxa1, offsa].y;
                             }
-                            if( optypea==1 )
+                            if (optypea == 1)
                             {
-                                a0x = a[offsa,idxa0].x;
-                                a0y = a[offsa,idxa0].y;
-                                a1x = a[offsa,idxa1].x;
-                                a1y = a[offsa,idxa1].y;
+                                a0x = a[offsa, idxa0].x;
+                                a0y = a[offsa, idxa0].y;
+                                a1x = a[offsa, idxa1].x;
+                                a1y = a[offsa, idxa1].y;
                             }
-                            if( optypea==2 )
+                            if (optypea == 2)
                             {
-                                a0x = a[offsa,idxa0].x;
-                                a0y = -a[offsa,idxa0].y;
-                                a1x = a[offsa,idxa1].x;
-                                a1y = -a[offsa,idxa1].y;
+                                a0x = a[offsa, idxa0].x;
+                                a0y = -a[offsa, idxa0].y;
+                                a1x = a[offsa, idxa1].x;
+                                a1y = -a[offsa, idxa1].y;
                             }
-                            if( optypeb==0 )
+                            if (optypeb == 0)
                             {
-                                b0x = b[offsb,idxb0].x;
-                                b0y = b[offsb,idxb0].y;
-                                b1x = b[offsb,idxb1].x;
-                                b1y = b[offsb,idxb1].y;
+                                b0x = b[offsb, idxb0].x;
+                                b0y = b[offsb, idxb0].y;
+                                b1x = b[offsb, idxb1].x;
+                                b1y = b[offsb, idxb1].y;
                             }
-                            if( optypeb==1 )
+                            if (optypeb == 1)
                             {
-                                b0x = b[idxb0,offsb].x;
-                                b0y = b[idxb0,offsb].y;
-                                b1x = b[idxb1,offsb].x;
-                                b1y = b[idxb1,offsb].y;
+                                b0x = b[idxb0, offsb].x;
+                                b0y = b[idxb0, offsb].y;
+                                b1x = b[idxb1, offsb].x;
+                                b1y = b[idxb1, offsb].y;
                             }
-                            if( optypeb==2 )
+                            if (optypeb == 2)
                             {
-                                b0x = b[idxb0,offsb].x;
-                                b0y = -b[idxb0,offsb].y;
-                                b1x = b[idxb1,offsb].x;
-                                b1y = -b[idxb1,offsb].y;
+                                b0x = b[idxb0, offsb].x;
+                                b0y = -b[idxb0, offsb].y;
+                                b1x = b[idxb1, offsb].x;
+                                b1y = -b[idxb1, offsb].y;
                             }
-                            v00x = v00x+a0x*b0x-a0y*b0y;
-                            v00y = v00y+a0x*b0y+a0y*b0x;
-                            v01x = v01x+a0x*b1x-a0y*b1y;
-                            v01y = v01y+a0x*b1y+a0y*b1x;
-                            v10x = v10x+a1x*b0x-a1y*b0y;
-                            v10y = v10y+a1x*b0y+a1y*b0x;
-                            v11x = v11x+a1x*b1x-a1y*b1y;
-                            v11y = v11y+a1x*b1y+a1y*b1x;
-                            offsa = offsa+1;
-                            offsb = offsb+1;
+                            v00x = v00x + a0x * b0x - a0y * b0y;
+                            v00y = v00y + a0x * b0y + a0y * b0x;
+                            v01x = v01x + a0x * b1x - a0y * b1y;
+                            v01y = v01y + a0x * b1y + a0y * b1x;
+                            v10x = v10x + a1x * b0x - a1y * b0y;
+                            v10y = v10y + a1x * b0y + a1y * b0x;
+                            v11x = v11x + a1x * b1x - a1y * b1y;
+                            v11y = v11y + a1x * b1y + a1y * b1x;
+                            offsa = offsa + 1;
+                            offsb = offsb + 1;
                         }
                         v00.x = v00x;
                         v00.y = v00y;
@@ -6516,145 +6331,149 @@ public partial class alglib
                         v01.y = v01y;
                         v11.x = v11x;
                         v11.y = v11y;
-                        if( beta==0 )
+                        if (beta == 0)
                         {
-                            c[ic+i+0,jc+j+0] = alpha*v00;
-                            c[ic+i+0,jc+j+1] = alpha*v01;
-                            c[ic+i+1,jc+j+0] = alpha*v10;
-                            c[ic+i+1,jc+j+1] = alpha*v11;
+                            c[ic + i + 0, jc + j + 0] = alpha * v00;
+                            c[ic + i + 0, jc + j + 1] = alpha * v01;
+                            c[ic + i + 1, jc + j + 0] = alpha * v10;
+                            c[ic + i + 1, jc + j + 1] = alpha * v11;
                         }
                         else
                         {
-                            c[ic+i+0,jc+j+0] = beta*c[ic+i+0,jc+j+0]+alpha*v00;
-                            c[ic+i+0,jc+j+1] = beta*c[ic+i+0,jc+j+1]+alpha*v01;
-                            c[ic+i+1,jc+j+0] = beta*c[ic+i+1,jc+j+0]+alpha*v10;
-                            c[ic+i+1,jc+j+1] = beta*c[ic+i+1,jc+j+1]+alpha*v11;
+                            c[ic + i + 0, jc + j + 0] =
+                                beta * c[ic + i + 0, jc + j + 0] + alpha * v00;
+                            c[ic + i + 0, jc + j + 1] =
+                                beta * c[ic + i + 0, jc + j + 1] + alpha * v01;
+                            c[ic + i + 1, jc + j + 0] =
+                                beta * c[ic + i + 1, jc + j + 0] + alpha * v10;
+                            c[ic + i + 1, jc + j + 1] =
+                                beta * c[ic + i + 1, jc + j + 1] + alpha * v11;
                         }
                     }
                     else
                     {
-                        
                         //
                         // Determine submatrix [I0..I1]x[J0..J1] to process
                         //
                         i0 = i;
-                        i1 = Math.Min(i+1, m-1);
+                        i1 = Math.Min(i + 1, m - 1);
                         j0 = j;
-                        j1 = Math.Min(j+1, n-1);
-                        
+                        j1 = Math.Min(j + 1, n - 1);
+
                         //
                         // Process submatrix
                         //
-                        for(ik=i0; ik<=i1; ik++)
+                        for (ik = i0; ik <= i1; ik++)
                         {
-                            for(jk=j0; jk<=j1; jk++)
+                            for (jk = j0; jk <= j1; jk++)
                             {
-                                if( k==0 || alpha==0 )
+                                if (k == 0 || alpha == 0)
                                 {
                                     v = 0;
                                 }
                                 else
                                 {
                                     v = 0.0;
-                                    if( optypea==0 && optypeb==0 )
+                                    if (optypea == 0 && optypeb == 0)
                                     {
-                                        i1_ = (ib)-(ja);
+                                        i1_ = (ib) - (ja);
                                         v = 0.0;
-                                        for(i_=ja; i_<=ja+k-1;i_++)
+                                        for (i_ = ja; i_ <= ja + k - 1; i_++)
                                         {
-                                            v += a[ia+ik,i_]*b[i_+i1_,jb+jk];
+                                            v += a[ia + ik, i_] * b[i_ + i1_, jb + jk];
                                         }
                                     }
-                                    if( optypea==0 && optypeb==1 )
+                                    if (optypea == 0 && optypeb == 1)
                                     {
-                                        i1_ = (jb)-(ja);
+                                        i1_ = (jb) - (ja);
                                         v = 0.0;
-                                        for(i_=ja; i_<=ja+k-1;i_++)
+                                        for (i_ = ja; i_ <= ja + k - 1; i_++)
                                         {
-                                            v += a[ia+ik,i_]*b[ib+jk,i_+i1_];
+                                            v += a[ia + ik, i_] * b[ib + jk, i_ + i1_];
                                         }
                                     }
-                                    if( optypea==0 && optypeb==2 )
+                                    if (optypea == 0 && optypeb == 2)
                                     {
-                                        i1_ = (jb)-(ja);
+                                        i1_ = (jb) - (ja);
                                         v = 0.0;
-                                        for(i_=ja; i_<=ja+k-1;i_++)
+                                        for (i_ = ja; i_ <= ja + k - 1; i_++)
                                         {
-                                            v += a[ia+ik,i_]*math.conj(b[ib+jk,i_+i1_]);
+                                            v += a[ia + ik, i_] * math.conj(b[ib + jk, i_ + i1_]);
                                         }
                                     }
-                                    if( optypea==1 && optypeb==0 )
+                                    if (optypea == 1 && optypeb == 0)
                                     {
-                                        i1_ = (ib)-(ia);
+                                        i1_ = (ib) - (ia);
                                         v = 0.0;
-                                        for(i_=ia; i_<=ia+k-1;i_++)
+                                        for (i_ = ia; i_ <= ia + k - 1; i_++)
                                         {
-                                            v += a[i_,ja+ik]*b[i_+i1_,jb+jk];
+                                            v += a[i_, ja + ik] * b[i_ + i1_, jb + jk];
                                         }
                                     }
-                                    if( optypea==1 && optypeb==1 )
+                                    if (optypea == 1 && optypeb == 1)
                                     {
-                                        i1_ = (jb)-(ia);
+                                        i1_ = (jb) - (ia);
                                         v = 0.0;
-                                        for(i_=ia; i_<=ia+k-1;i_++)
+                                        for (i_ = ia; i_ <= ia + k - 1; i_++)
                                         {
-                                            v += a[i_,ja+ik]*b[ib+jk,i_+i1_];
+                                            v += a[i_, ja + ik] * b[ib + jk, i_ + i1_];
                                         }
                                     }
-                                    if( optypea==1 && optypeb==2 )
+                                    if (optypea == 1 && optypeb == 2)
                                     {
-                                        i1_ = (jb)-(ia);
+                                        i1_ = (jb) - (ia);
                                         v = 0.0;
-                                        for(i_=ia; i_<=ia+k-1;i_++)
+                                        for (i_ = ia; i_ <= ia + k - 1; i_++)
                                         {
-                                            v += a[i_,ja+ik]*math.conj(b[ib+jk,i_+i1_]);
+                                            v += a[i_, ja + ik] * math.conj(b[ib + jk, i_ + i1_]);
                                         }
                                     }
-                                    if( optypea==2 && optypeb==0 )
+                                    if (optypea == 2 && optypeb == 0)
                                     {
-                                        i1_ = (ib)-(ia);
+                                        i1_ = (ib) - (ia);
                                         v = 0.0;
-                                        for(i_=ia; i_<=ia+k-1;i_++)
+                                        for (i_ = ia; i_ <= ia + k - 1; i_++)
                                         {
-                                            v += math.conj(a[i_,ja+ik])*b[i_+i1_,jb+jk];
+                                            v += math.conj(a[i_, ja + ik]) * b[i_ + i1_, jb + jk];
                                         }
                                     }
-                                    if( optypea==2 && optypeb==1 )
+                                    if (optypea == 2 && optypeb == 1)
                                     {
-                                        i1_ = (jb)-(ia);
+                                        i1_ = (jb) - (ia);
                                         v = 0.0;
-                                        for(i_=ia; i_<=ia+k-1;i_++)
+                                        for (i_ = ia; i_ <= ia + k - 1; i_++)
                                         {
-                                            v += math.conj(a[i_,ja+ik])*b[ib+jk,i_+i1_];
+                                            v += math.conj(a[i_, ja + ik]) * b[ib + jk, i_ + i1_];
                                         }
                                     }
-                                    if( optypea==2 && optypeb==2 )
+                                    if (optypea == 2 && optypeb == 2)
                                     {
-                                        i1_ = (jb)-(ia);
+                                        i1_ = (jb) - (ia);
                                         v = 0.0;
-                                        for(i_=ia; i_<=ia+k-1;i_++)
+                                        for (i_ = ia; i_ <= ia + k - 1; i_++)
                                         {
-                                            v += math.conj(a[i_,ja+ik])*math.conj(b[ib+jk,i_+i1_]);
+                                            v +=
+                                                math.conj(a[i_, ja + ik])
+                                                * math.conj(b[ib + jk, i_ + i1_]);
                                         }
                                     }
                                 }
-                                if( beta==0 )
+                                if (beta == 0)
                                 {
-                                    c[ic+ik,jc+jk] = alpha*v;
+                                    c[ic + ik, jc + jk] = alpha * v;
                                 }
                                 else
                                 {
-                                    c[ic+ik,jc+jk] = beta*c[ic+ik,jc+jk]+alpha*v;
+                                    c[ic + ik, jc + jk] = beta * c[ic + ik, jc + jk] + alpha * v;
                                 }
                             }
                         }
                     }
-                    j = j+2;
+                    j = j + 2;
                 }
-                i = i+2;
+                i = i + 2;
             }
         }
-
 
         /*************************************************************************
         RMatrixGEMM kernel, basecase code for RMatrixGEMM.
@@ -6703,7 +6522,8 @@ public partial class alglib
              27.03.2013
              Bochkanov Sergey
         *************************************************************************/
-        public static void rmatrixgemmk(int m,
+        public static void rmatrixgemmk(
+            int m,
             int n,
             int k,
             double alpha,
@@ -6719,59 +6539,79 @@ public partial class alglib
             double[,] c,
             int ic,
             int jc,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
 
-            
             //
             // if matrix size is zero
             //
-            if( m==0 || n==0 )
+            if (m == 0 || n == 0)
             {
                 return;
             }
-            
+
             //
             // Try optimized code
             //
-            if( rmatrixgemmf(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc, _params) )
+            if (
+                rmatrixgemmf(
+                    m,
+                    n,
+                    k,
+                    alpha,
+                    a,
+                    ia,
+                    ja,
+                    optypea,
+                    b,
+                    ib,
+                    jb,
+                    optypeb,
+                    beta,
+                    c,
+                    ic,
+                    jc,
+                    _params
+                )
+            )
             {
                 return;
             }
-            
+
             //
             // if K=0 or Alpha=0, then C=Beta*C
             //
-            if( k==0 || (double)(alpha)==(double)(0) )
+            if (k == 0 || (double)(alpha) == (double)(0))
             {
-                if( (double)(beta)!=(double)(1) )
+                if ((double)(beta) != (double)(1))
                 {
-                    if( (double)(beta)!=(double)(0) )
+                    if ((double)(beta) != (double)(0))
                     {
-                        for(i=0; i<=m-1; i++)
+                        for (i = 0; i <= m - 1; i++)
                         {
-                            for(j=0; j<=n-1; j++)
+                            for (j = 0; j <= n - 1; j++)
                             {
-                                c[ic+i,jc+j] = beta*c[ic+i,jc+j];
+                                c[ic + i, jc + j] = beta * c[ic + i, jc + j];
                             }
                         }
                     }
                     else
                     {
-                        for(i=0; i<=m-1; i++)
+                        for (i = 0; i <= m - 1; i++)
                         {
-                            for(j=0; j<=n-1; j++)
+                            for (j = 0; j <= n - 1; j++)
                             {
-                                c[ic+i,jc+j] = 0;
+                                c[ic + i, jc + j] = 0;
                             }
                         }
                     }
                 }
                 return;
             }
-            
+
             //
             // Call specialized code.
             //
@@ -6779,24 +6619,23 @@ public partial class alglib
             //       issues with instructions cache on some systems; Having too long
             //       functions significantly slows down internal loop of the algorithm.
             //
-            if( optypea==0 && optypeb==0 )
+            if (optypea == 0 && optypeb == 0)
             {
                 rmatrixgemmk44v00(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc, _params);
             }
-            if( optypea==0 && optypeb!=0 )
+            if (optypea == 0 && optypeb != 0)
             {
                 rmatrixgemmk44v01(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc, _params);
             }
-            if( optypea!=0 && optypeb==0 )
+            if (optypea != 0 && optypeb == 0)
             {
                 rmatrixgemmk44v10(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc, _params);
             }
-            if( optypea!=0 && optypeb!=0 )
+            if (optypea != 0 && optypeb != 0)
             {
                 rmatrixgemmk44v11(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc, _params);
             }
         }
-
 
         /*************************************************************************
         RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
@@ -6825,7 +6664,8 @@ public partial class alglib
              27.03.2013
              Bochkanov Sergey
         *************************************************************************/
-        public static void rmatrixgemmk44v00(int m,
+        public static void rmatrixgemmk44v00(
+            int m,
             int n,
             int k,
             double alpha,
@@ -6839,7 +6679,8 @@ public partial class alglib
             double[,] c,
             int ic,
             int jc,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
@@ -6888,32 +6729,33 @@ public partial class alglib
             int i_ = 0;
             int i1_ = 0;
 
-            alglib.ap.assert((double)(alpha)!=(double)(0), "RMatrixGEMMK44V00: internal error (Alpha=0)");
-            
+            Alglib.ap.assert(
+                (double)(alpha) != (double)(0),
+                "RMatrixGEMMK44V00: internal error (Alpha=0)"
+            );
+
             //
             // if matrix size is zero
             //
-            if( m==0 || n==0 )
+            if (m == 0 || n == 0)
             {
                 return;
             }
-            
+
             //
             // A*B
             //
             i = 0;
-            while( i<m )
+            while (i < m)
             {
                 j = 0;
-                while( j<n )
+                while (j < n)
                 {
-                    
                     //
                     // Choose between specialized 4x4 code and general code
                     //
-                    if( i+4<=m && j+4<=n )
+                    if (i + 4 <= m && j + 4 <= n)
                     {
-                        
                         //
                         // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
                         //
@@ -6921,15 +6763,15 @@ public partial class alglib
                         // with operands cached in local variables in order to speed
                         // up operations with arrays.
                         //
-                        idxa0 = ia+i+0;
-                        idxa1 = ia+i+1;
-                        idxa2 = ia+i+2;
-                        idxa3 = ia+i+3;
+                        idxa0 = ia + i + 0;
+                        idxa1 = ia + i + 1;
+                        idxa2 = ia + i + 2;
+                        idxa3 = ia + i + 3;
                         offsa = ja;
-                        idxb0 = jb+j+0;
-                        idxb1 = jb+j+1;
-                        idxb2 = jb+j+2;
-                        idxb3 = jb+j+3;
+                        idxb0 = jb + j + 0;
+                        idxb1 = jb + j + 1;
+                        idxb2 = jb + j + 2;
+                        idxb3 = jb + j + 3;
                         offsb = ib;
                         v00 = 0.0;
                         v01 = 0.0;
@@ -6947,126 +6789,140 @@ public partial class alglib
                         v31 = 0.0;
                         v32 = 0.0;
                         v33 = 0.0;
-                        
+
                         //
                         // Different variants of internal loop
                         //
-                        for(t=0; t<=k-1; t++)
+                        for (t = 0; t <= k - 1; t++)
                         {
-                            a0 = a[idxa0,offsa];
-                            a1 = a[idxa1,offsa];
-                            b0 = b[offsb,idxb0];
-                            b1 = b[offsb,idxb1];
-                            v00 = v00+a0*b0;
-                            v01 = v01+a0*b1;
-                            v10 = v10+a1*b0;
-                            v11 = v11+a1*b1;
-                            a2 = a[idxa2,offsa];
-                            a3 = a[idxa3,offsa];
-                            v20 = v20+a2*b0;
-                            v21 = v21+a2*b1;
-                            v30 = v30+a3*b0;
-                            v31 = v31+a3*b1;
-                            b2 = b[offsb,idxb2];
-                            b3 = b[offsb,idxb3];
-                            v22 = v22+a2*b2;
-                            v23 = v23+a2*b3;
-                            v32 = v32+a3*b2;
-                            v33 = v33+a3*b3;
-                            v02 = v02+a0*b2;
-                            v03 = v03+a0*b3;
-                            v12 = v12+a1*b2;
-                            v13 = v13+a1*b3;
-                            offsa = offsa+1;
-                            offsb = offsb+1;
+                            a0 = a[idxa0, offsa];
+                            a1 = a[idxa1, offsa];
+                            b0 = b[offsb, idxb0];
+                            b1 = b[offsb, idxb1];
+                            v00 = v00 + a0 * b0;
+                            v01 = v01 + a0 * b1;
+                            v10 = v10 + a1 * b0;
+                            v11 = v11 + a1 * b1;
+                            a2 = a[idxa2, offsa];
+                            a3 = a[idxa3, offsa];
+                            v20 = v20 + a2 * b0;
+                            v21 = v21 + a2 * b1;
+                            v30 = v30 + a3 * b0;
+                            v31 = v31 + a3 * b1;
+                            b2 = b[offsb, idxb2];
+                            b3 = b[offsb, idxb3];
+                            v22 = v22 + a2 * b2;
+                            v23 = v23 + a2 * b3;
+                            v32 = v32 + a3 * b2;
+                            v33 = v33 + a3 * b3;
+                            v02 = v02 + a0 * b2;
+                            v03 = v03 + a0 * b3;
+                            v12 = v12 + a1 * b2;
+                            v13 = v13 + a1 * b3;
+                            offsa = offsa + 1;
+                            offsb = offsb + 1;
                         }
-                        if( (double)(beta)==(double)(0) )
+                        if ((double)(beta) == (double)(0))
                         {
-                            c[ic+i+0,jc+j+0] = alpha*v00;
-                            c[ic+i+0,jc+j+1] = alpha*v01;
-                            c[ic+i+0,jc+j+2] = alpha*v02;
-                            c[ic+i+0,jc+j+3] = alpha*v03;
-                            c[ic+i+1,jc+j+0] = alpha*v10;
-                            c[ic+i+1,jc+j+1] = alpha*v11;
-                            c[ic+i+1,jc+j+2] = alpha*v12;
-                            c[ic+i+1,jc+j+3] = alpha*v13;
-                            c[ic+i+2,jc+j+0] = alpha*v20;
-                            c[ic+i+2,jc+j+1] = alpha*v21;
-                            c[ic+i+2,jc+j+2] = alpha*v22;
-                            c[ic+i+2,jc+j+3] = alpha*v23;
-                            c[ic+i+3,jc+j+0] = alpha*v30;
-                            c[ic+i+3,jc+j+1] = alpha*v31;
-                            c[ic+i+3,jc+j+2] = alpha*v32;
-                            c[ic+i+3,jc+j+3] = alpha*v33;
+                            c[ic + i + 0, jc + j + 0] = alpha * v00;
+                            c[ic + i + 0, jc + j + 1] = alpha * v01;
+                            c[ic + i + 0, jc + j + 2] = alpha * v02;
+                            c[ic + i + 0, jc + j + 3] = alpha * v03;
+                            c[ic + i + 1, jc + j + 0] = alpha * v10;
+                            c[ic + i + 1, jc + j + 1] = alpha * v11;
+                            c[ic + i + 1, jc + j + 2] = alpha * v12;
+                            c[ic + i + 1, jc + j + 3] = alpha * v13;
+                            c[ic + i + 2, jc + j + 0] = alpha * v20;
+                            c[ic + i + 2, jc + j + 1] = alpha * v21;
+                            c[ic + i + 2, jc + j + 2] = alpha * v22;
+                            c[ic + i + 2, jc + j + 3] = alpha * v23;
+                            c[ic + i + 3, jc + j + 0] = alpha * v30;
+                            c[ic + i + 3, jc + j + 1] = alpha * v31;
+                            c[ic + i + 3, jc + j + 2] = alpha * v32;
+                            c[ic + i + 3, jc + j + 3] = alpha * v33;
                         }
                         else
                         {
-                            c[ic+i+0,jc+j+0] = beta*c[ic+i+0,jc+j+0]+alpha*v00;
-                            c[ic+i+0,jc+j+1] = beta*c[ic+i+0,jc+j+1]+alpha*v01;
-                            c[ic+i+0,jc+j+2] = beta*c[ic+i+0,jc+j+2]+alpha*v02;
-                            c[ic+i+0,jc+j+3] = beta*c[ic+i+0,jc+j+3]+alpha*v03;
-                            c[ic+i+1,jc+j+0] = beta*c[ic+i+1,jc+j+0]+alpha*v10;
-                            c[ic+i+1,jc+j+1] = beta*c[ic+i+1,jc+j+1]+alpha*v11;
-                            c[ic+i+1,jc+j+2] = beta*c[ic+i+1,jc+j+2]+alpha*v12;
-                            c[ic+i+1,jc+j+3] = beta*c[ic+i+1,jc+j+3]+alpha*v13;
-                            c[ic+i+2,jc+j+0] = beta*c[ic+i+2,jc+j+0]+alpha*v20;
-                            c[ic+i+2,jc+j+1] = beta*c[ic+i+2,jc+j+1]+alpha*v21;
-                            c[ic+i+2,jc+j+2] = beta*c[ic+i+2,jc+j+2]+alpha*v22;
-                            c[ic+i+2,jc+j+3] = beta*c[ic+i+2,jc+j+3]+alpha*v23;
-                            c[ic+i+3,jc+j+0] = beta*c[ic+i+3,jc+j+0]+alpha*v30;
-                            c[ic+i+3,jc+j+1] = beta*c[ic+i+3,jc+j+1]+alpha*v31;
-                            c[ic+i+3,jc+j+2] = beta*c[ic+i+3,jc+j+2]+alpha*v32;
-                            c[ic+i+3,jc+j+3] = beta*c[ic+i+3,jc+j+3]+alpha*v33;
+                            c[ic + i + 0, jc + j + 0] =
+                                beta * c[ic + i + 0, jc + j + 0] + alpha * v00;
+                            c[ic + i + 0, jc + j + 1] =
+                                beta * c[ic + i + 0, jc + j + 1] + alpha * v01;
+                            c[ic + i + 0, jc + j + 2] =
+                                beta * c[ic + i + 0, jc + j + 2] + alpha * v02;
+                            c[ic + i + 0, jc + j + 3] =
+                                beta * c[ic + i + 0, jc + j + 3] + alpha * v03;
+                            c[ic + i + 1, jc + j + 0] =
+                                beta * c[ic + i + 1, jc + j + 0] + alpha * v10;
+                            c[ic + i + 1, jc + j + 1] =
+                                beta * c[ic + i + 1, jc + j + 1] + alpha * v11;
+                            c[ic + i + 1, jc + j + 2] =
+                                beta * c[ic + i + 1, jc + j + 2] + alpha * v12;
+                            c[ic + i + 1, jc + j + 3] =
+                                beta * c[ic + i + 1, jc + j + 3] + alpha * v13;
+                            c[ic + i + 2, jc + j + 0] =
+                                beta * c[ic + i + 2, jc + j + 0] + alpha * v20;
+                            c[ic + i + 2, jc + j + 1] =
+                                beta * c[ic + i + 2, jc + j + 1] + alpha * v21;
+                            c[ic + i + 2, jc + j + 2] =
+                                beta * c[ic + i + 2, jc + j + 2] + alpha * v22;
+                            c[ic + i + 2, jc + j + 3] =
+                                beta * c[ic + i + 2, jc + j + 3] + alpha * v23;
+                            c[ic + i + 3, jc + j + 0] =
+                                beta * c[ic + i + 3, jc + j + 0] + alpha * v30;
+                            c[ic + i + 3, jc + j + 1] =
+                                beta * c[ic + i + 3, jc + j + 1] + alpha * v31;
+                            c[ic + i + 3, jc + j + 2] =
+                                beta * c[ic + i + 3, jc + j + 2] + alpha * v32;
+                            c[ic + i + 3, jc + j + 3] =
+                                beta * c[ic + i + 3, jc + j + 3] + alpha * v33;
                         }
                     }
                     else
                     {
-                        
                         //
                         // Determine submatrix [I0..I1]x[J0..J1] to process
                         //
                         i0 = i;
-                        i1 = Math.Min(i+3, m-1);
+                        i1 = Math.Min(i + 3, m - 1);
                         j0 = j;
-                        j1 = Math.Min(j+3, n-1);
-                        
+                        j1 = Math.Min(j + 3, n - 1);
+
                         //
                         // Process submatrix
                         //
-                        for(ik=i0; ik<=i1; ik++)
+                        for (ik = i0; ik <= i1; ik++)
                         {
-                            for(jk=j0; jk<=j1; jk++)
+                            for (jk = j0; jk <= j1; jk++)
                             {
-                                if( k==0 || (double)(alpha)==(double)(0) )
+                                if (k == 0 || (double)(alpha) == (double)(0))
                                 {
                                     v = 0;
                                 }
                                 else
                                 {
-                                    i1_ = (ib)-(ja);
+                                    i1_ = (ib) - (ja);
                                     v = 0.0;
-                                    for(i_=ja; i_<=ja+k-1;i_++)
+                                    for (i_ = ja; i_ <= ja + k - 1; i_++)
                                     {
-                                        v += a[ia+ik,i_]*b[i_+i1_,jb+jk];
+                                        v += a[ia + ik, i_] * b[i_ + i1_, jb + jk];
                                     }
                                 }
-                                if( (double)(beta)==(double)(0) )
+                                if ((double)(beta) == (double)(0))
                                 {
-                                    c[ic+ik,jc+jk] = alpha*v;
+                                    c[ic + ik, jc + jk] = alpha * v;
                                 }
                                 else
                                 {
-                                    c[ic+ik,jc+jk] = beta*c[ic+ik,jc+jk]+alpha*v;
+                                    c[ic + ik, jc + jk] = beta * c[ic + ik, jc + jk] + alpha * v;
                                 }
                             }
                         }
                     }
-                    j = j+4;
+                    j = j + 4;
                 }
-                i = i+4;
+                i = i + 4;
             }
         }
-
 
         /*************************************************************************
         RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
@@ -7095,7 +6951,8 @@ public partial class alglib
              27.03.2013
              Bochkanov Sergey
         *************************************************************************/
-        public static void rmatrixgemmk44v01(int m,
+        public static void rmatrixgemmk44v01(
+            int m,
             int n,
             int k,
             double alpha,
@@ -7109,7 +6966,8 @@ public partial class alglib
             double[,] c,
             int ic,
             int jc,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
@@ -7158,32 +7016,33 @@ public partial class alglib
             int i_ = 0;
             int i1_ = 0;
 
-            alglib.ap.assert((double)(alpha)!=(double)(0), "RMatrixGEMMK44V00: internal error (Alpha=0)");
-            
+            Alglib.ap.assert(
+                (double)(alpha) != (double)(0),
+                "RMatrixGEMMK44V00: internal error (Alpha=0)"
+            );
+
             //
             // if matrix size is zero
             //
-            if( m==0 || n==0 )
+            if (m == 0 || n == 0)
             {
                 return;
             }
-            
+
             //
             // A*B'
             //
             i = 0;
-            while( i<m )
+            while (i < m)
             {
                 j = 0;
-                while( j<n )
+                while (j < n)
                 {
-                    
                     //
                     // Choose between specialized 4x4 code and general code
                     //
-                    if( i+4<=m && j+4<=n )
+                    if (i + 4 <= m && j + 4 <= n)
                     {
-                        
                         //
                         // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
                         //
@@ -7191,15 +7050,15 @@ public partial class alglib
                         // with operands cached in local variables in order to speed
                         // up operations with arrays.
                         //
-                        idxa0 = ia+i+0;
-                        idxa1 = ia+i+1;
-                        idxa2 = ia+i+2;
-                        idxa3 = ia+i+3;
+                        idxa0 = ia + i + 0;
+                        idxa1 = ia + i + 1;
+                        idxa2 = ia + i + 2;
+                        idxa3 = ia + i + 3;
                         offsa = ja;
-                        idxb0 = ib+j+0;
-                        idxb1 = ib+j+1;
-                        idxb2 = ib+j+2;
-                        idxb3 = ib+j+3;
+                        idxb0 = ib + j + 0;
+                        idxb1 = ib + j + 1;
+                        idxb2 = ib + j + 2;
+                        idxb3 = ib + j + 3;
                         offsb = jb;
                         v00 = 0.0;
                         v01 = 0.0;
@@ -7217,122 +7076,136 @@ public partial class alglib
                         v31 = 0.0;
                         v32 = 0.0;
                         v33 = 0.0;
-                        for(t=0; t<=k-1; t++)
+                        for (t = 0; t <= k - 1; t++)
                         {
-                            a0 = a[idxa0,offsa];
-                            a1 = a[idxa1,offsa];
-                            b0 = b[idxb0,offsb];
-                            b1 = b[idxb1,offsb];
-                            v00 = v00+a0*b0;
-                            v01 = v01+a0*b1;
-                            v10 = v10+a1*b0;
-                            v11 = v11+a1*b1;
-                            a2 = a[idxa2,offsa];
-                            a3 = a[idxa3,offsa];
-                            v20 = v20+a2*b0;
-                            v21 = v21+a2*b1;
-                            v30 = v30+a3*b0;
-                            v31 = v31+a3*b1;
-                            b2 = b[idxb2,offsb];
-                            b3 = b[idxb3,offsb];
-                            v22 = v22+a2*b2;
-                            v23 = v23+a2*b3;
-                            v32 = v32+a3*b2;
-                            v33 = v33+a3*b3;
-                            v02 = v02+a0*b2;
-                            v03 = v03+a0*b3;
-                            v12 = v12+a1*b2;
-                            v13 = v13+a1*b3;
-                            offsa = offsa+1;
-                            offsb = offsb+1;
+                            a0 = a[idxa0, offsa];
+                            a1 = a[idxa1, offsa];
+                            b0 = b[idxb0, offsb];
+                            b1 = b[idxb1, offsb];
+                            v00 = v00 + a0 * b0;
+                            v01 = v01 + a0 * b1;
+                            v10 = v10 + a1 * b0;
+                            v11 = v11 + a1 * b1;
+                            a2 = a[idxa2, offsa];
+                            a3 = a[idxa3, offsa];
+                            v20 = v20 + a2 * b0;
+                            v21 = v21 + a2 * b1;
+                            v30 = v30 + a3 * b0;
+                            v31 = v31 + a3 * b1;
+                            b2 = b[idxb2, offsb];
+                            b3 = b[idxb3, offsb];
+                            v22 = v22 + a2 * b2;
+                            v23 = v23 + a2 * b3;
+                            v32 = v32 + a3 * b2;
+                            v33 = v33 + a3 * b3;
+                            v02 = v02 + a0 * b2;
+                            v03 = v03 + a0 * b3;
+                            v12 = v12 + a1 * b2;
+                            v13 = v13 + a1 * b3;
+                            offsa = offsa + 1;
+                            offsb = offsb + 1;
                         }
-                        if( (double)(beta)==(double)(0) )
+                        if ((double)(beta) == (double)(0))
                         {
-                            c[ic+i+0,jc+j+0] = alpha*v00;
-                            c[ic+i+0,jc+j+1] = alpha*v01;
-                            c[ic+i+0,jc+j+2] = alpha*v02;
-                            c[ic+i+0,jc+j+3] = alpha*v03;
-                            c[ic+i+1,jc+j+0] = alpha*v10;
-                            c[ic+i+1,jc+j+1] = alpha*v11;
-                            c[ic+i+1,jc+j+2] = alpha*v12;
-                            c[ic+i+1,jc+j+3] = alpha*v13;
-                            c[ic+i+2,jc+j+0] = alpha*v20;
-                            c[ic+i+2,jc+j+1] = alpha*v21;
-                            c[ic+i+2,jc+j+2] = alpha*v22;
-                            c[ic+i+2,jc+j+3] = alpha*v23;
-                            c[ic+i+3,jc+j+0] = alpha*v30;
-                            c[ic+i+3,jc+j+1] = alpha*v31;
-                            c[ic+i+3,jc+j+2] = alpha*v32;
-                            c[ic+i+3,jc+j+3] = alpha*v33;
+                            c[ic + i + 0, jc + j + 0] = alpha * v00;
+                            c[ic + i + 0, jc + j + 1] = alpha * v01;
+                            c[ic + i + 0, jc + j + 2] = alpha * v02;
+                            c[ic + i + 0, jc + j + 3] = alpha * v03;
+                            c[ic + i + 1, jc + j + 0] = alpha * v10;
+                            c[ic + i + 1, jc + j + 1] = alpha * v11;
+                            c[ic + i + 1, jc + j + 2] = alpha * v12;
+                            c[ic + i + 1, jc + j + 3] = alpha * v13;
+                            c[ic + i + 2, jc + j + 0] = alpha * v20;
+                            c[ic + i + 2, jc + j + 1] = alpha * v21;
+                            c[ic + i + 2, jc + j + 2] = alpha * v22;
+                            c[ic + i + 2, jc + j + 3] = alpha * v23;
+                            c[ic + i + 3, jc + j + 0] = alpha * v30;
+                            c[ic + i + 3, jc + j + 1] = alpha * v31;
+                            c[ic + i + 3, jc + j + 2] = alpha * v32;
+                            c[ic + i + 3, jc + j + 3] = alpha * v33;
                         }
                         else
                         {
-                            c[ic+i+0,jc+j+0] = beta*c[ic+i+0,jc+j+0]+alpha*v00;
-                            c[ic+i+0,jc+j+1] = beta*c[ic+i+0,jc+j+1]+alpha*v01;
-                            c[ic+i+0,jc+j+2] = beta*c[ic+i+0,jc+j+2]+alpha*v02;
-                            c[ic+i+0,jc+j+3] = beta*c[ic+i+0,jc+j+3]+alpha*v03;
-                            c[ic+i+1,jc+j+0] = beta*c[ic+i+1,jc+j+0]+alpha*v10;
-                            c[ic+i+1,jc+j+1] = beta*c[ic+i+1,jc+j+1]+alpha*v11;
-                            c[ic+i+1,jc+j+2] = beta*c[ic+i+1,jc+j+2]+alpha*v12;
-                            c[ic+i+1,jc+j+3] = beta*c[ic+i+1,jc+j+3]+alpha*v13;
-                            c[ic+i+2,jc+j+0] = beta*c[ic+i+2,jc+j+0]+alpha*v20;
-                            c[ic+i+2,jc+j+1] = beta*c[ic+i+2,jc+j+1]+alpha*v21;
-                            c[ic+i+2,jc+j+2] = beta*c[ic+i+2,jc+j+2]+alpha*v22;
-                            c[ic+i+2,jc+j+3] = beta*c[ic+i+2,jc+j+3]+alpha*v23;
-                            c[ic+i+3,jc+j+0] = beta*c[ic+i+3,jc+j+0]+alpha*v30;
-                            c[ic+i+3,jc+j+1] = beta*c[ic+i+3,jc+j+1]+alpha*v31;
-                            c[ic+i+3,jc+j+2] = beta*c[ic+i+3,jc+j+2]+alpha*v32;
-                            c[ic+i+3,jc+j+3] = beta*c[ic+i+3,jc+j+3]+alpha*v33;
+                            c[ic + i + 0, jc + j + 0] =
+                                beta * c[ic + i + 0, jc + j + 0] + alpha * v00;
+                            c[ic + i + 0, jc + j + 1] =
+                                beta * c[ic + i + 0, jc + j + 1] + alpha * v01;
+                            c[ic + i + 0, jc + j + 2] =
+                                beta * c[ic + i + 0, jc + j + 2] + alpha * v02;
+                            c[ic + i + 0, jc + j + 3] =
+                                beta * c[ic + i + 0, jc + j + 3] + alpha * v03;
+                            c[ic + i + 1, jc + j + 0] =
+                                beta * c[ic + i + 1, jc + j + 0] + alpha * v10;
+                            c[ic + i + 1, jc + j + 1] =
+                                beta * c[ic + i + 1, jc + j + 1] + alpha * v11;
+                            c[ic + i + 1, jc + j + 2] =
+                                beta * c[ic + i + 1, jc + j + 2] + alpha * v12;
+                            c[ic + i + 1, jc + j + 3] =
+                                beta * c[ic + i + 1, jc + j + 3] + alpha * v13;
+                            c[ic + i + 2, jc + j + 0] =
+                                beta * c[ic + i + 2, jc + j + 0] + alpha * v20;
+                            c[ic + i + 2, jc + j + 1] =
+                                beta * c[ic + i + 2, jc + j + 1] + alpha * v21;
+                            c[ic + i + 2, jc + j + 2] =
+                                beta * c[ic + i + 2, jc + j + 2] + alpha * v22;
+                            c[ic + i + 2, jc + j + 3] =
+                                beta * c[ic + i + 2, jc + j + 3] + alpha * v23;
+                            c[ic + i + 3, jc + j + 0] =
+                                beta * c[ic + i + 3, jc + j + 0] + alpha * v30;
+                            c[ic + i + 3, jc + j + 1] =
+                                beta * c[ic + i + 3, jc + j + 1] + alpha * v31;
+                            c[ic + i + 3, jc + j + 2] =
+                                beta * c[ic + i + 3, jc + j + 2] + alpha * v32;
+                            c[ic + i + 3, jc + j + 3] =
+                                beta * c[ic + i + 3, jc + j + 3] + alpha * v33;
                         }
                     }
                     else
                     {
-                        
                         //
                         // Determine submatrix [I0..I1]x[J0..J1] to process
                         //
                         i0 = i;
-                        i1 = Math.Min(i+3, m-1);
+                        i1 = Math.Min(i + 3, m - 1);
                         j0 = j;
-                        j1 = Math.Min(j+3, n-1);
-                        
+                        j1 = Math.Min(j + 3, n - 1);
+
                         //
                         // Process submatrix
                         //
-                        for(ik=i0; ik<=i1; ik++)
+                        for (ik = i0; ik <= i1; ik++)
                         {
-                            for(jk=j0; jk<=j1; jk++)
+                            for (jk = j0; jk <= j1; jk++)
                             {
-                                if( k==0 || (double)(alpha)==(double)(0) )
+                                if (k == 0 || (double)(alpha) == (double)(0))
                                 {
                                     v = 0;
                                 }
                                 else
                                 {
-                                    i1_ = (jb)-(ja);
+                                    i1_ = (jb) - (ja);
                                     v = 0.0;
-                                    for(i_=ja; i_<=ja+k-1;i_++)
+                                    for (i_ = ja; i_ <= ja + k - 1; i_++)
                                     {
-                                        v += a[ia+ik,i_]*b[ib+jk,i_+i1_];
+                                        v += a[ia + ik, i_] * b[ib + jk, i_ + i1_];
                                     }
                                 }
-                                if( (double)(beta)==(double)(0) )
+                                if ((double)(beta) == (double)(0))
                                 {
-                                    c[ic+ik,jc+jk] = alpha*v;
+                                    c[ic + ik, jc + jk] = alpha * v;
                                 }
                                 else
                                 {
-                                    c[ic+ik,jc+jk] = beta*c[ic+ik,jc+jk]+alpha*v;
+                                    c[ic + ik, jc + jk] = beta * c[ic + ik, jc + jk] + alpha * v;
                                 }
                             }
                         }
                     }
-                    j = j+4;
+                    j = j + 4;
                 }
-                i = i+4;
+                i = i + 4;
             }
         }
-
 
         /*************************************************************************
         RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
@@ -7361,7 +7234,8 @@ public partial class alglib
              27.03.2013
              Bochkanov Sergey
         *************************************************************************/
-        public static void rmatrixgemmk44v10(int m,
+        public static void rmatrixgemmk44v10(
+            int m,
             int n,
             int k,
             double alpha,
@@ -7375,7 +7249,8 @@ public partial class alglib
             double[,] c,
             int ic,
             int jc,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
@@ -7424,32 +7299,33 @@ public partial class alglib
             int i_ = 0;
             int i1_ = 0;
 
-            alglib.ap.assert((double)(alpha)!=(double)(0), "RMatrixGEMMK44V00: internal error (Alpha=0)");
-            
+            Alglib.ap.assert(
+                (double)(alpha) != (double)(0),
+                "RMatrixGEMMK44V00: internal error (Alpha=0)"
+            );
+
             //
             // if matrix size is zero
             //
-            if( m==0 || n==0 )
+            if (m == 0 || n == 0)
             {
                 return;
             }
-            
+
             //
             // A'*B
             //
             i = 0;
-            while( i<m )
+            while (i < m)
             {
                 j = 0;
-                while( j<n )
+                while (j < n)
                 {
-                    
                     //
                     // Choose between specialized 4x4 code and general code
                     //
-                    if( i+4<=m && j+4<=n )
+                    if (i + 4 <= m && j + 4 <= n)
                     {
-                        
                         //
                         // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
                         //
@@ -7457,15 +7333,15 @@ public partial class alglib
                         // with operands cached in local variables in order to speed
                         // up operations with arrays.
                         //
-                        idxa0 = ja+i+0;
-                        idxa1 = ja+i+1;
-                        idxa2 = ja+i+2;
-                        idxa3 = ja+i+3;
+                        idxa0 = ja + i + 0;
+                        idxa1 = ja + i + 1;
+                        idxa2 = ja + i + 2;
+                        idxa3 = ja + i + 3;
                         offsa = ia;
-                        idxb0 = jb+j+0;
-                        idxb1 = jb+j+1;
-                        idxb2 = jb+j+2;
-                        idxb3 = jb+j+3;
+                        idxb0 = jb + j + 0;
+                        idxb1 = jb + j + 1;
+                        idxb2 = jb + j + 2;
+                        idxb3 = jb + j + 3;
                         offsb = ib;
                         v00 = 0.0;
                         v01 = 0.0;
@@ -7483,123 +7359,137 @@ public partial class alglib
                         v31 = 0.0;
                         v32 = 0.0;
                         v33 = 0.0;
-                        for(t=0; t<=k-1; t++)
+                        for (t = 0; t <= k - 1; t++)
                         {
-                            a0 = a[offsa,idxa0];
-                            a1 = a[offsa,idxa1];
-                            b0 = b[offsb,idxb0];
-                            b1 = b[offsb,idxb1];
-                            v00 = v00+a0*b0;
-                            v01 = v01+a0*b1;
-                            v10 = v10+a1*b0;
-                            v11 = v11+a1*b1;
-                            a2 = a[offsa,idxa2];
-                            a3 = a[offsa,idxa3];
-                            v20 = v20+a2*b0;
-                            v21 = v21+a2*b1;
-                            v30 = v30+a3*b0;
-                            v31 = v31+a3*b1;
-                            b2 = b[offsb,idxb2];
-                            b3 = b[offsb,idxb3];
-                            v22 = v22+a2*b2;
-                            v23 = v23+a2*b3;
-                            v32 = v32+a3*b2;
-                            v33 = v33+a3*b3;
-                            v02 = v02+a0*b2;
-                            v03 = v03+a0*b3;
-                            v12 = v12+a1*b2;
-                            v13 = v13+a1*b3;
-                            offsa = offsa+1;
-                            offsb = offsb+1;
+                            a0 = a[offsa, idxa0];
+                            a1 = a[offsa, idxa1];
+                            b0 = b[offsb, idxb0];
+                            b1 = b[offsb, idxb1];
+                            v00 = v00 + a0 * b0;
+                            v01 = v01 + a0 * b1;
+                            v10 = v10 + a1 * b0;
+                            v11 = v11 + a1 * b1;
+                            a2 = a[offsa, idxa2];
+                            a3 = a[offsa, idxa3];
+                            v20 = v20 + a2 * b0;
+                            v21 = v21 + a2 * b1;
+                            v30 = v30 + a3 * b0;
+                            v31 = v31 + a3 * b1;
+                            b2 = b[offsb, idxb2];
+                            b3 = b[offsb, idxb3];
+                            v22 = v22 + a2 * b2;
+                            v23 = v23 + a2 * b3;
+                            v32 = v32 + a3 * b2;
+                            v33 = v33 + a3 * b3;
+                            v02 = v02 + a0 * b2;
+                            v03 = v03 + a0 * b3;
+                            v12 = v12 + a1 * b2;
+                            v13 = v13 + a1 * b3;
+                            offsa = offsa + 1;
+                            offsb = offsb + 1;
                         }
-                        if( (double)(beta)==(double)(0) )
+                        if ((double)(beta) == (double)(0))
                         {
-                            c[ic+i+0,jc+j+0] = alpha*v00;
-                            c[ic+i+0,jc+j+1] = alpha*v01;
-                            c[ic+i+0,jc+j+2] = alpha*v02;
-                            c[ic+i+0,jc+j+3] = alpha*v03;
-                            c[ic+i+1,jc+j+0] = alpha*v10;
-                            c[ic+i+1,jc+j+1] = alpha*v11;
-                            c[ic+i+1,jc+j+2] = alpha*v12;
-                            c[ic+i+1,jc+j+3] = alpha*v13;
-                            c[ic+i+2,jc+j+0] = alpha*v20;
-                            c[ic+i+2,jc+j+1] = alpha*v21;
-                            c[ic+i+2,jc+j+2] = alpha*v22;
-                            c[ic+i+2,jc+j+3] = alpha*v23;
-                            c[ic+i+3,jc+j+0] = alpha*v30;
-                            c[ic+i+3,jc+j+1] = alpha*v31;
-                            c[ic+i+3,jc+j+2] = alpha*v32;
-                            c[ic+i+3,jc+j+3] = alpha*v33;
+                            c[ic + i + 0, jc + j + 0] = alpha * v00;
+                            c[ic + i + 0, jc + j + 1] = alpha * v01;
+                            c[ic + i + 0, jc + j + 2] = alpha * v02;
+                            c[ic + i + 0, jc + j + 3] = alpha * v03;
+                            c[ic + i + 1, jc + j + 0] = alpha * v10;
+                            c[ic + i + 1, jc + j + 1] = alpha * v11;
+                            c[ic + i + 1, jc + j + 2] = alpha * v12;
+                            c[ic + i + 1, jc + j + 3] = alpha * v13;
+                            c[ic + i + 2, jc + j + 0] = alpha * v20;
+                            c[ic + i + 2, jc + j + 1] = alpha * v21;
+                            c[ic + i + 2, jc + j + 2] = alpha * v22;
+                            c[ic + i + 2, jc + j + 3] = alpha * v23;
+                            c[ic + i + 3, jc + j + 0] = alpha * v30;
+                            c[ic + i + 3, jc + j + 1] = alpha * v31;
+                            c[ic + i + 3, jc + j + 2] = alpha * v32;
+                            c[ic + i + 3, jc + j + 3] = alpha * v33;
                         }
                         else
                         {
-                            c[ic+i+0,jc+j+0] = beta*c[ic+i+0,jc+j+0]+alpha*v00;
-                            c[ic+i+0,jc+j+1] = beta*c[ic+i+0,jc+j+1]+alpha*v01;
-                            c[ic+i+0,jc+j+2] = beta*c[ic+i+0,jc+j+2]+alpha*v02;
-                            c[ic+i+0,jc+j+3] = beta*c[ic+i+0,jc+j+3]+alpha*v03;
-                            c[ic+i+1,jc+j+0] = beta*c[ic+i+1,jc+j+0]+alpha*v10;
-                            c[ic+i+1,jc+j+1] = beta*c[ic+i+1,jc+j+1]+alpha*v11;
-                            c[ic+i+1,jc+j+2] = beta*c[ic+i+1,jc+j+2]+alpha*v12;
-                            c[ic+i+1,jc+j+3] = beta*c[ic+i+1,jc+j+3]+alpha*v13;
-                            c[ic+i+2,jc+j+0] = beta*c[ic+i+2,jc+j+0]+alpha*v20;
-                            c[ic+i+2,jc+j+1] = beta*c[ic+i+2,jc+j+1]+alpha*v21;
-                            c[ic+i+2,jc+j+2] = beta*c[ic+i+2,jc+j+2]+alpha*v22;
-                            c[ic+i+2,jc+j+3] = beta*c[ic+i+2,jc+j+3]+alpha*v23;
-                            c[ic+i+3,jc+j+0] = beta*c[ic+i+3,jc+j+0]+alpha*v30;
-                            c[ic+i+3,jc+j+1] = beta*c[ic+i+3,jc+j+1]+alpha*v31;
-                            c[ic+i+3,jc+j+2] = beta*c[ic+i+3,jc+j+2]+alpha*v32;
-                            c[ic+i+3,jc+j+3] = beta*c[ic+i+3,jc+j+3]+alpha*v33;
+                            c[ic + i + 0, jc + j + 0] =
+                                beta * c[ic + i + 0, jc + j + 0] + alpha * v00;
+                            c[ic + i + 0, jc + j + 1] =
+                                beta * c[ic + i + 0, jc + j + 1] + alpha * v01;
+                            c[ic + i + 0, jc + j + 2] =
+                                beta * c[ic + i + 0, jc + j + 2] + alpha * v02;
+                            c[ic + i + 0, jc + j + 3] =
+                                beta * c[ic + i + 0, jc + j + 3] + alpha * v03;
+                            c[ic + i + 1, jc + j + 0] =
+                                beta * c[ic + i + 1, jc + j + 0] + alpha * v10;
+                            c[ic + i + 1, jc + j + 1] =
+                                beta * c[ic + i + 1, jc + j + 1] + alpha * v11;
+                            c[ic + i + 1, jc + j + 2] =
+                                beta * c[ic + i + 1, jc + j + 2] + alpha * v12;
+                            c[ic + i + 1, jc + j + 3] =
+                                beta * c[ic + i + 1, jc + j + 3] + alpha * v13;
+                            c[ic + i + 2, jc + j + 0] =
+                                beta * c[ic + i + 2, jc + j + 0] + alpha * v20;
+                            c[ic + i + 2, jc + j + 1] =
+                                beta * c[ic + i + 2, jc + j + 1] + alpha * v21;
+                            c[ic + i + 2, jc + j + 2] =
+                                beta * c[ic + i + 2, jc + j + 2] + alpha * v22;
+                            c[ic + i + 2, jc + j + 3] =
+                                beta * c[ic + i + 2, jc + j + 3] + alpha * v23;
+                            c[ic + i + 3, jc + j + 0] =
+                                beta * c[ic + i + 3, jc + j + 0] + alpha * v30;
+                            c[ic + i + 3, jc + j + 1] =
+                                beta * c[ic + i + 3, jc + j + 1] + alpha * v31;
+                            c[ic + i + 3, jc + j + 2] =
+                                beta * c[ic + i + 3, jc + j + 2] + alpha * v32;
+                            c[ic + i + 3, jc + j + 3] =
+                                beta * c[ic + i + 3, jc + j + 3] + alpha * v33;
                         }
                     }
                     else
                     {
-                        
                         //
                         // Determine submatrix [I0..I1]x[J0..J1] to process
                         //
                         i0 = i;
-                        i1 = Math.Min(i+3, m-1);
+                        i1 = Math.Min(i + 3, m - 1);
                         j0 = j;
-                        j1 = Math.Min(j+3, n-1);
-                        
+                        j1 = Math.Min(j + 3, n - 1);
+
                         //
                         // Process submatrix
                         //
-                        for(ik=i0; ik<=i1; ik++)
+                        for (ik = i0; ik <= i1; ik++)
                         {
-                            for(jk=j0; jk<=j1; jk++)
+                            for (jk = j0; jk <= j1; jk++)
                             {
-                                if( k==0 || (double)(alpha)==(double)(0) )
+                                if (k == 0 || (double)(alpha) == (double)(0))
                                 {
                                     v = 0;
                                 }
                                 else
                                 {
                                     v = 0.0;
-                                    i1_ = (ib)-(ia);
+                                    i1_ = (ib) - (ia);
                                     v = 0.0;
-                                    for(i_=ia; i_<=ia+k-1;i_++)
+                                    for (i_ = ia; i_ <= ia + k - 1; i_++)
                                     {
-                                        v += a[i_,ja+ik]*b[i_+i1_,jb+jk];
+                                        v += a[i_, ja + ik] * b[i_ + i1_, jb + jk];
                                     }
                                 }
-                                if( (double)(beta)==(double)(0) )
+                                if ((double)(beta) == (double)(0))
                                 {
-                                    c[ic+ik,jc+jk] = alpha*v;
+                                    c[ic + ik, jc + jk] = alpha * v;
                                 }
                                 else
                                 {
-                                    c[ic+ik,jc+jk] = beta*c[ic+ik,jc+jk]+alpha*v;
+                                    c[ic + ik, jc + jk] = beta * c[ic + ik, jc + jk] + alpha * v;
                                 }
                             }
                         }
                     }
-                    j = j+4;
+                    j = j + 4;
                 }
-                i = i+4;
+                i = i + 4;
             }
         }
-
 
         /*************************************************************************
         RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
@@ -7628,7 +7518,8 @@ public partial class alglib
              27.03.2013
              Bochkanov Sergey
         *************************************************************************/
-        public static void rmatrixgemmk44v11(int m,
+        public static void rmatrixgemmk44v11(
+            int m,
             int n,
             int k,
             double alpha,
@@ -7642,7 +7533,8 @@ public partial class alglib
             double[,] c,
             int ic,
             int jc,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
@@ -7691,32 +7583,33 @@ public partial class alglib
             int i_ = 0;
             int i1_ = 0;
 
-            alglib.ap.assert((double)(alpha)!=(double)(0), "RMatrixGEMMK44V00: internal error (Alpha=0)");
-            
+            Alglib.ap.assert(
+                (double)(alpha) != (double)(0),
+                "RMatrixGEMMK44V00: internal error (Alpha=0)"
+            );
+
             //
             // if matrix size is zero
             //
-            if( m==0 || n==0 )
+            if (m == 0 || n == 0)
             {
                 return;
             }
-            
+
             //
             // A'*B'
             //
             i = 0;
-            while( i<m )
+            while (i < m)
             {
                 j = 0;
-                while( j<n )
+                while (j < n)
                 {
-                    
                     //
                     // Choose between specialized 4x4 code and general code
                     //
-                    if( i+4<=m && j+4<=n )
+                    if (i + 4 <= m && j + 4 <= n)
                     {
-                        
                         //
                         // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
                         //
@@ -7724,15 +7617,15 @@ public partial class alglib
                         // with operands cached in local variables in order to speed
                         // up operations with arrays.
                         //
-                        idxa0 = ja+i+0;
-                        idxa1 = ja+i+1;
-                        idxa2 = ja+i+2;
-                        idxa3 = ja+i+3;
+                        idxa0 = ja + i + 0;
+                        idxa1 = ja + i + 1;
+                        idxa2 = ja + i + 2;
+                        idxa3 = ja + i + 3;
                         offsa = ia;
-                        idxb0 = ib+j+0;
-                        idxb1 = ib+j+1;
-                        idxb2 = ib+j+2;
-                        idxb3 = ib+j+3;
+                        idxb0 = ib + j + 0;
+                        idxb1 = ib + j + 1;
+                        idxb2 = ib + j + 2;
+                        idxb3 = ib + j + 3;
                         offsb = jb;
                         v00 = 0.0;
                         v01 = 0.0;
@@ -7750,125 +7643,139 @@ public partial class alglib
                         v31 = 0.0;
                         v32 = 0.0;
                         v33 = 0.0;
-                        for(t=0; t<=k-1; t++)
+                        for (t = 0; t <= k - 1; t++)
                         {
-                            a0 = a[offsa,idxa0];
-                            a1 = a[offsa,idxa1];
-                            b0 = b[idxb0,offsb];
-                            b1 = b[idxb1,offsb];
-                            v00 = v00+a0*b0;
-                            v01 = v01+a0*b1;
-                            v10 = v10+a1*b0;
-                            v11 = v11+a1*b1;
-                            a2 = a[offsa,idxa2];
-                            a3 = a[offsa,idxa3];
-                            v20 = v20+a2*b0;
-                            v21 = v21+a2*b1;
-                            v30 = v30+a3*b0;
-                            v31 = v31+a3*b1;
-                            b2 = b[idxb2,offsb];
-                            b3 = b[idxb3,offsb];
-                            v22 = v22+a2*b2;
-                            v23 = v23+a2*b3;
-                            v32 = v32+a3*b2;
-                            v33 = v33+a3*b3;
-                            v02 = v02+a0*b2;
-                            v03 = v03+a0*b3;
-                            v12 = v12+a1*b2;
-                            v13 = v13+a1*b3;
-                            offsa = offsa+1;
-                            offsb = offsb+1;
+                            a0 = a[offsa, idxa0];
+                            a1 = a[offsa, idxa1];
+                            b0 = b[idxb0, offsb];
+                            b1 = b[idxb1, offsb];
+                            v00 = v00 + a0 * b0;
+                            v01 = v01 + a0 * b1;
+                            v10 = v10 + a1 * b0;
+                            v11 = v11 + a1 * b1;
+                            a2 = a[offsa, idxa2];
+                            a3 = a[offsa, idxa3];
+                            v20 = v20 + a2 * b0;
+                            v21 = v21 + a2 * b1;
+                            v30 = v30 + a3 * b0;
+                            v31 = v31 + a3 * b1;
+                            b2 = b[idxb2, offsb];
+                            b3 = b[idxb3, offsb];
+                            v22 = v22 + a2 * b2;
+                            v23 = v23 + a2 * b3;
+                            v32 = v32 + a3 * b2;
+                            v33 = v33 + a3 * b3;
+                            v02 = v02 + a0 * b2;
+                            v03 = v03 + a0 * b3;
+                            v12 = v12 + a1 * b2;
+                            v13 = v13 + a1 * b3;
+                            offsa = offsa + 1;
+                            offsb = offsb + 1;
                         }
-                        if( (double)(beta)==(double)(0) )
+                        if ((double)(beta) == (double)(0))
                         {
-                            c[ic+i+0,jc+j+0] = alpha*v00;
-                            c[ic+i+0,jc+j+1] = alpha*v01;
-                            c[ic+i+0,jc+j+2] = alpha*v02;
-                            c[ic+i+0,jc+j+3] = alpha*v03;
-                            c[ic+i+1,jc+j+0] = alpha*v10;
-                            c[ic+i+1,jc+j+1] = alpha*v11;
-                            c[ic+i+1,jc+j+2] = alpha*v12;
-                            c[ic+i+1,jc+j+3] = alpha*v13;
-                            c[ic+i+2,jc+j+0] = alpha*v20;
-                            c[ic+i+2,jc+j+1] = alpha*v21;
-                            c[ic+i+2,jc+j+2] = alpha*v22;
-                            c[ic+i+2,jc+j+3] = alpha*v23;
-                            c[ic+i+3,jc+j+0] = alpha*v30;
-                            c[ic+i+3,jc+j+1] = alpha*v31;
-                            c[ic+i+3,jc+j+2] = alpha*v32;
-                            c[ic+i+3,jc+j+3] = alpha*v33;
+                            c[ic + i + 0, jc + j + 0] = alpha * v00;
+                            c[ic + i + 0, jc + j + 1] = alpha * v01;
+                            c[ic + i + 0, jc + j + 2] = alpha * v02;
+                            c[ic + i + 0, jc + j + 3] = alpha * v03;
+                            c[ic + i + 1, jc + j + 0] = alpha * v10;
+                            c[ic + i + 1, jc + j + 1] = alpha * v11;
+                            c[ic + i + 1, jc + j + 2] = alpha * v12;
+                            c[ic + i + 1, jc + j + 3] = alpha * v13;
+                            c[ic + i + 2, jc + j + 0] = alpha * v20;
+                            c[ic + i + 2, jc + j + 1] = alpha * v21;
+                            c[ic + i + 2, jc + j + 2] = alpha * v22;
+                            c[ic + i + 2, jc + j + 3] = alpha * v23;
+                            c[ic + i + 3, jc + j + 0] = alpha * v30;
+                            c[ic + i + 3, jc + j + 1] = alpha * v31;
+                            c[ic + i + 3, jc + j + 2] = alpha * v32;
+                            c[ic + i + 3, jc + j + 3] = alpha * v33;
                         }
                         else
                         {
-                            c[ic+i+0,jc+j+0] = beta*c[ic+i+0,jc+j+0]+alpha*v00;
-                            c[ic+i+0,jc+j+1] = beta*c[ic+i+0,jc+j+1]+alpha*v01;
-                            c[ic+i+0,jc+j+2] = beta*c[ic+i+0,jc+j+2]+alpha*v02;
-                            c[ic+i+0,jc+j+3] = beta*c[ic+i+0,jc+j+3]+alpha*v03;
-                            c[ic+i+1,jc+j+0] = beta*c[ic+i+1,jc+j+0]+alpha*v10;
-                            c[ic+i+1,jc+j+1] = beta*c[ic+i+1,jc+j+1]+alpha*v11;
-                            c[ic+i+1,jc+j+2] = beta*c[ic+i+1,jc+j+2]+alpha*v12;
-                            c[ic+i+1,jc+j+3] = beta*c[ic+i+1,jc+j+3]+alpha*v13;
-                            c[ic+i+2,jc+j+0] = beta*c[ic+i+2,jc+j+0]+alpha*v20;
-                            c[ic+i+2,jc+j+1] = beta*c[ic+i+2,jc+j+1]+alpha*v21;
-                            c[ic+i+2,jc+j+2] = beta*c[ic+i+2,jc+j+2]+alpha*v22;
-                            c[ic+i+2,jc+j+3] = beta*c[ic+i+2,jc+j+3]+alpha*v23;
-                            c[ic+i+3,jc+j+0] = beta*c[ic+i+3,jc+j+0]+alpha*v30;
-                            c[ic+i+3,jc+j+1] = beta*c[ic+i+3,jc+j+1]+alpha*v31;
-                            c[ic+i+3,jc+j+2] = beta*c[ic+i+3,jc+j+2]+alpha*v32;
-                            c[ic+i+3,jc+j+3] = beta*c[ic+i+3,jc+j+3]+alpha*v33;
+                            c[ic + i + 0, jc + j + 0] =
+                                beta * c[ic + i + 0, jc + j + 0] + alpha * v00;
+                            c[ic + i + 0, jc + j + 1] =
+                                beta * c[ic + i + 0, jc + j + 1] + alpha * v01;
+                            c[ic + i + 0, jc + j + 2] =
+                                beta * c[ic + i + 0, jc + j + 2] + alpha * v02;
+                            c[ic + i + 0, jc + j + 3] =
+                                beta * c[ic + i + 0, jc + j + 3] + alpha * v03;
+                            c[ic + i + 1, jc + j + 0] =
+                                beta * c[ic + i + 1, jc + j + 0] + alpha * v10;
+                            c[ic + i + 1, jc + j + 1] =
+                                beta * c[ic + i + 1, jc + j + 1] + alpha * v11;
+                            c[ic + i + 1, jc + j + 2] =
+                                beta * c[ic + i + 1, jc + j + 2] + alpha * v12;
+                            c[ic + i + 1, jc + j + 3] =
+                                beta * c[ic + i + 1, jc + j + 3] + alpha * v13;
+                            c[ic + i + 2, jc + j + 0] =
+                                beta * c[ic + i + 2, jc + j + 0] + alpha * v20;
+                            c[ic + i + 2, jc + j + 1] =
+                                beta * c[ic + i + 2, jc + j + 1] + alpha * v21;
+                            c[ic + i + 2, jc + j + 2] =
+                                beta * c[ic + i + 2, jc + j + 2] + alpha * v22;
+                            c[ic + i + 2, jc + j + 3] =
+                                beta * c[ic + i + 2, jc + j + 3] + alpha * v23;
+                            c[ic + i + 3, jc + j + 0] =
+                                beta * c[ic + i + 3, jc + j + 0] + alpha * v30;
+                            c[ic + i + 3, jc + j + 1] =
+                                beta * c[ic + i + 3, jc + j + 1] + alpha * v31;
+                            c[ic + i + 3, jc + j + 2] =
+                                beta * c[ic + i + 3, jc + j + 2] + alpha * v32;
+                            c[ic + i + 3, jc + j + 3] =
+                                beta * c[ic + i + 3, jc + j + 3] + alpha * v33;
                         }
                     }
                     else
                     {
-                        
                         //
                         // Determine submatrix [I0..I1]x[J0..J1] to process
                         //
                         i0 = i;
-                        i1 = Math.Min(i+3, m-1);
+                        i1 = Math.Min(i + 3, m - 1);
                         j0 = j;
-                        j1 = Math.Min(j+3, n-1);
-                        
+                        j1 = Math.Min(j + 3, n - 1);
+
                         //
                         // Process submatrix
                         //
-                        for(ik=i0; ik<=i1; ik++)
+                        for (ik = i0; ik <= i1; ik++)
                         {
-                            for(jk=j0; jk<=j1; jk++)
+                            for (jk = j0; jk <= j1; jk++)
                             {
-                                if( k==0 || (double)(alpha)==(double)(0) )
+                                if (k == 0 || (double)(alpha) == (double)(0))
                                 {
                                     v = 0;
                                 }
                                 else
                                 {
                                     v = 0.0;
-                                    i1_ = (jb)-(ia);
+                                    i1_ = (jb) - (ia);
                                     v = 0.0;
-                                    for(i_=ia; i_<=ia+k-1;i_++)
+                                    for (i_ = ia; i_ <= ia + k - 1; i_++)
                                     {
-                                        v += a[i_,ja+ik]*b[ib+jk,i_+i1_];
+                                        v += a[i_, ja + ik] * b[ib + jk, i_ + i1_];
                                     }
                                 }
-                                if( (double)(beta)==(double)(0) )
+                                if ((double)(beta) == (double)(0))
                                 {
-                                    c[ic+ik,jc+jk] = alpha*v;
+                                    c[ic + ik, jc + jk] = alpha * v;
                                 }
                                 else
                                 {
-                                    c[ic+ik,jc+jk] = beta*c[ic+ik,jc+jk]+alpha*v;
+                                    c[ic + ik, jc + jk] = beta * c[ic + ik, jc + jk] + alpha * v;
                                 }
                             }
                         }
                     }
-                    j = j+4;
+                    j = j + 4;
                 }
-                i = i+4;
+                i = i + 4;
             }
         }
-
-
     }
+
     public class creflections
     {
         /*************************************************************************
@@ -7907,10 +7814,12 @@ public partial class alglib
              Courant Institute, Argonne National Lab, and Rice University
              September 30, 1994
         *************************************************************************/
-        public static void complexgeneratereflection(ref complex[] x,
+        public static void complexgeneratereflection(
+            ref complex[] x,
             int n,
             ref complex tau,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int j = 0;
             complex alpha = 0;
@@ -7926,97 +7835,98 @@ public partial class alglib
 
             tau = 0;
 
-            if( n<=0 )
+            if (n <= 0)
             {
                 tau = 0;
                 return;
             }
-            
+
             //
             // Scale if needed (to avoid overflow/underflow during intermediate
             // calculations).
             //
             mx = 0;
-            for(j=1; j<=n; j++)
+            for (j = 1; j <= n; j++)
             {
                 mx = Math.Max(math.abscomplex(x[j]), mx);
             }
             s = 1;
-            if( (double)(mx)!=(double)(0) )
+            if ((double)(mx) != (double)(0))
             {
-                if( (double)(mx)<(double)(1) )
+                if ((double)(mx) < (double)(1))
                 {
                     s = Math.Sqrt(math.minrealnumber);
-                    v = 1/s;
-                    for(i_=1; i_<=n;i_++)
+                    v = 1 / s;
+                    for (i_ = 1; i_ <= n; i_++)
                     {
-                        x[i_] = v*x[i_];
+                        x[i_] = v * x[i_];
                     }
                 }
                 else
                 {
                     s = Math.Sqrt(math.maxrealnumber);
-                    v = 1/s;
-                    for(i_=1; i_<=n;i_++)
+                    v = 1 / s;
+                    for (i_ = 1; i_ <= n; i_++)
                     {
-                        x[i_] = v*x[i_];
+                        x[i_] = v * x[i_];
                     }
                 }
             }
-            
+
             //
             // calculate
             //
             alpha = x[1];
             mx = 0;
-            for(j=2; j<=n; j++)
+            for (j = 2; j <= n; j++)
             {
                 mx = Math.Max(math.abscomplex(x[j]), mx);
             }
             xnorm = 0;
-            if( (double)(mx)!=(double)(0) )
+            if ((double)(mx) != (double)(0))
             {
-                for(j=2; j<=n; j++)
+                for (j = 2; j <= n; j++)
                 {
-                    t = x[j]/mx;
-                    xnorm = xnorm+(t*math.conj(t)).x;
+                    t = x[j] / mx;
+                    xnorm = xnorm + (t * math.conj(t)).x;
                 }
-                xnorm = Math.Sqrt(xnorm)*mx;
+                xnorm = Math.Sqrt(xnorm) * mx;
             }
             alphr = alpha.x;
             alphi = alpha.y;
-            if( (double)(xnorm)==(double)(0) && (double)(alphi)==(double)(0) )
+            if ((double)(xnorm) == (double)(0) && (double)(alphi) == (double)(0))
             {
                 tau = 0;
-                x[1] = x[1]*s;
+                x[1] = x[1] * s;
                 return;
             }
             mx = Math.Max(Math.Abs(alphr), Math.Abs(alphi));
             mx = Math.Max(mx, Math.Abs(xnorm));
-            beta = -(mx*Math.Sqrt(math.sqr(alphr/mx)+math.sqr(alphi/mx)+math.sqr(xnorm/mx)));
-            if( (double)(alphr)<(double)(0) )
+            beta = -(
+                mx * Math.Sqrt(math.sqr(alphr / mx) + math.sqr(alphi / mx) + math.sqr(xnorm / mx))
+            );
+            if ((double)(alphr) < (double)(0))
             {
                 beta = -beta;
             }
-            tau.x = (beta-alphr)/beta;
-            tau.y = -(alphi/beta);
-            alpha = 1/(alpha-beta);
-            if( n>1 )
+            tau.x = (beta - alphr) / beta;
+            tau.y = -(alphi / beta);
+            alpha = 1 / (alpha - beta);
+            if (n > 1)
             {
-                for(i_=2; i_<=n;i_++)
+                for (i_ = 2; i_ <= n; i_++)
                 {
-                    x[i_] = alpha*x[i_];
+                    x[i_] = alpha * x[i_];
                 }
             }
             alpha = beta;
             x[1] = alpha;
-            
+
             //
             // Scale back
             //
-            x[1] = x[1]*s;
+            x[1] = x[1] * s;
         }
-
 
         /*************************************************************************
         Application of an elementary reflection to a rectangular matrix of size MxN
@@ -8049,7 +7959,8 @@ public partial class alglib
              Courant Institute, Argonne National Lab, and Rice University
              September 30, 1994
         *************************************************************************/
-        public static void complexapplyreflectionfromtheleft(ref complex[,] c,
+        public static void complexapplyreflectionfromtheleft(
+            ref complex[,] c,
             complex tau,
             complex[] v,
             int m1,
@@ -8057,46 +7968,46 @@ public partial class alglib
             int n1,
             int n2,
             ref complex[] work,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             complex t = 0;
             int i = 0;
             int i_ = 0;
 
-            if( (tau==0 || n1>n2) || m1>m2 )
+            if ((tau == 0 || n1 > n2) || m1 > m2)
             {
                 return;
             }
-            
+
             //
             // w := C^T * conj(v)
             //
-            for(i=n1; i<=n2; i++)
+            for (i = n1; i <= n2; i++)
             {
                 work[i] = 0;
             }
-            for(i=m1; i<=m2; i++)
+            for (i = m1; i <= m2; i++)
             {
-                t = math.conj(v[i+1-m1]);
-                for(i_=n1; i_<=n2;i_++)
+                t = math.conj(v[i + 1 - m1]);
+                for (i_ = n1; i_ <= n2; i_++)
                 {
-                    work[i_] = work[i_] + t*c[i,i_];
+                    work[i_] = work[i_] + t * c[i, i_];
                 }
             }
-            
+
             //
             // C := C - tau * v * w^T
             //
-            for(i=m1; i<=m2; i++)
+            for (i = m1; i <= m2; i++)
             {
-                t = v[i-m1+1]*tau;
-                for(i_=n1; i_<=n2;i_++)
+                t = v[i - m1 + 1] * tau;
+                for (i_ = n1; i_ <= n2; i_++)
                 {
-                    c[i,i_] = c[i,i_] - t*work[i_];
+                    c[i, i_] = c[i, i_] - t * work[i_];
                 }
             }
         }
-
 
         /*************************************************************************
         Application of an elementary reflection to a rectangular matrix of size MxN
@@ -8126,7 +8037,8 @@ public partial class alglib
              Courant Institute, Argonne National Lab, and Rice University
              September 30, 1994
         *************************************************************************/
-        public static void complexapplyreflectionfromtheright(ref complex[,] c,
+        public static void complexapplyreflectionfromtheright(
+            ref complex[,] c,
             complex tau,
             ref complex[] v,
             int m1,
@@ -8134,7 +8046,8 @@ public partial class alglib
             int n1,
             int n2,
             ref complex[] work,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             complex t = 0;
             int i = 0;
@@ -8142,50 +8055,49 @@ public partial class alglib
             int i_ = 0;
             int i1_ = 0;
 
-            if( (tau==0 || n1>n2) || m1>m2 )
+            if ((tau == 0 || n1 > n2) || m1 > m2)
             {
                 return;
             }
-            
+
             //
             // w := C * v
             //
-            vm = n2-n1+1;
-            for(i=m1; i<=m2; i++)
+            vm = n2 - n1 + 1;
+            for (i = m1; i <= m2; i++)
             {
-                i1_ = (1)-(n1);
+                i1_ = (1) - (n1);
                 t = 0.0;
-                for(i_=n1; i_<=n2;i_++)
+                for (i_ = n1; i_ <= n2; i_++)
                 {
-                    t += c[i,i_]*v[i_+i1_];
+                    t += c[i, i_] * v[i_ + i1_];
                 }
                 work[i] = t;
             }
-            
+
             //
             // C := C - w * conj(v^T)
             //
-            for(i_=1; i_<=vm;i_++)
+            for (i_ = 1; i_ <= vm; i_++)
             {
                 v[i_] = math.conj(v[i_]);
             }
-            for(i=m1; i<=m2; i++)
+            for (i = m1; i <= m2; i++)
             {
-                t = work[i]*tau;
+                t = work[i] * tau;
                 i1_ = (1) - (n1);
-                for(i_=n1; i_<=n2;i_++)
+                for (i_ = n1; i_ <= n2; i_++)
                 {
-                    c[i,i_] = c[i,i_] - t*v[i_+i1_];
+                    c[i, i_] = c[i, i_] - t * v[i_ + i1_];
                 }
             }
-            for(i_=1; i_<=vm;i_++)
+            for (i_ = 1; i_ <= vm; i_++)
             {
                 v[i_] = math.conj(v[i_]);
             }
         }
-
-
     }
+
     public class rotations
     {
         /*************************************************************************
@@ -8213,7 +8125,8 @@ public partial class alglib
 
         Utility subroutine.
         *************************************************************************/
-        public static void applyrotationsfromtheleft(bool isforward,
+        public static void applyrotationsfromtheleft(
+            bool isforward,
             int m1,
             int m2,
             int n1,
@@ -8222,7 +8135,8 @@ public partial class alglib
             double[] s,
             double[,] a,
             double[] work,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int j = 0;
             int jp1 = 0;
@@ -8231,130 +8145,125 @@ public partial class alglib
             double temp = 0;
             int i_ = 0;
 
-            if( m1>m2 || n1>n2 )
+            if (m1 > m2 || n1 > n2)
             {
                 return;
             }
-            
+
             //
             // Form  P * A
             //
-            if( isforward )
+            if (isforward)
             {
-                if( n1!=n2 )
+                if (n1 != n2)
                 {
-                    
                     //
                     // Common case: N1<>N2
                     //
-                    for(j=m1; j<=m2-1; j++)
+                    for (j = m1; j <= m2 - 1; j++)
                     {
-                        ctemp = c[j-m1+1];
-                        stemp = s[j-m1+1];
-                        if( (double)(ctemp)!=(double)(1) || (double)(stemp)!=(double)(0) )
+                        ctemp = c[j - m1 + 1];
+                        stemp = s[j - m1 + 1];
+                        if ((double)(ctemp) != (double)(1) || (double)(stemp) != (double)(0))
                         {
-                            jp1 = j+1;
-                            for(i_=n1; i_<=n2;i_++)
+                            jp1 = j + 1;
+                            for (i_ = n1; i_ <= n2; i_++)
                             {
-                                work[i_] = ctemp*a[jp1,i_];
+                                work[i_] = ctemp * a[jp1, i_];
                             }
-                            for(i_=n1; i_<=n2;i_++)
+                            for (i_ = n1; i_ <= n2; i_++)
                             {
-                                work[i_] = work[i_] - stemp*a[j,i_];
+                                work[i_] = work[i_] - stemp * a[j, i_];
                             }
-                            for(i_=n1; i_<=n2;i_++)
+                            for (i_ = n1; i_ <= n2; i_++)
                             {
-                                a[j,i_] = ctemp*a[j,i_];
+                                a[j, i_] = ctemp * a[j, i_];
                             }
-                            for(i_=n1; i_<=n2;i_++)
+                            for (i_ = n1; i_ <= n2; i_++)
                             {
-                                a[j,i_] = a[j,i_] + stemp*a[jp1,i_];
+                                a[j, i_] = a[j, i_] + stemp * a[jp1, i_];
                             }
-                            for(i_=n1; i_<=n2;i_++)
+                            for (i_ = n1; i_ <= n2; i_++)
                             {
-                                a[jp1,i_] = work[i_];
+                                a[jp1, i_] = work[i_];
                             }
                         }
                     }
                 }
                 else
                 {
-                    
                     //
                     // Special case: N1=N2
                     //
-                    for(j=m1; j<=m2-1; j++)
+                    for (j = m1; j <= m2 - 1; j++)
                     {
-                        ctemp = c[j-m1+1];
-                        stemp = s[j-m1+1];
-                        if( (double)(ctemp)!=(double)(1) || (double)(stemp)!=(double)(0) )
+                        ctemp = c[j - m1 + 1];
+                        stemp = s[j - m1 + 1];
+                        if ((double)(ctemp) != (double)(1) || (double)(stemp) != (double)(0))
                         {
-                            temp = a[j+1,n1];
-                            a[j+1,n1] = ctemp*temp-stemp*a[j,n1];
-                            a[j,n1] = stemp*temp+ctemp*a[j,n1];
+                            temp = a[j + 1, n1];
+                            a[j + 1, n1] = ctemp * temp - stemp * a[j, n1];
+                            a[j, n1] = stemp * temp + ctemp * a[j, n1];
                         }
                     }
                 }
             }
             else
             {
-                if( n1!=n2 )
+                if (n1 != n2)
                 {
-                    
                     //
                     // Common case: N1<>N2
                     //
-                    for(j=m2-1; j>=m1; j--)
+                    for (j = m2 - 1; j >= m1; j--)
                     {
-                        ctemp = c[j-m1+1];
-                        stemp = s[j-m1+1];
-                        if( (double)(ctemp)!=(double)(1) || (double)(stemp)!=(double)(0) )
+                        ctemp = c[j - m1 + 1];
+                        stemp = s[j - m1 + 1];
+                        if ((double)(ctemp) != (double)(1) || (double)(stemp) != (double)(0))
                         {
-                            jp1 = j+1;
-                            for(i_=n1; i_<=n2;i_++)
+                            jp1 = j + 1;
+                            for (i_ = n1; i_ <= n2; i_++)
                             {
-                                work[i_] = ctemp*a[jp1,i_];
+                                work[i_] = ctemp * a[jp1, i_];
                             }
-                            for(i_=n1; i_<=n2;i_++)
+                            for (i_ = n1; i_ <= n2; i_++)
                             {
-                                work[i_] = work[i_] - stemp*a[j,i_];
+                                work[i_] = work[i_] - stemp * a[j, i_];
                             }
-                            for(i_=n1; i_<=n2;i_++)
+                            for (i_ = n1; i_ <= n2; i_++)
                             {
-                                a[j,i_] = ctemp*a[j,i_];
+                                a[j, i_] = ctemp * a[j, i_];
                             }
-                            for(i_=n1; i_<=n2;i_++)
+                            for (i_ = n1; i_ <= n2; i_++)
                             {
-                                a[j,i_] = a[j,i_] + stemp*a[jp1,i_];
+                                a[j, i_] = a[j, i_] + stemp * a[jp1, i_];
                             }
-                            for(i_=n1; i_<=n2;i_++)
+                            for (i_ = n1; i_ <= n2; i_++)
                             {
-                                a[jp1,i_] = work[i_];
+                                a[jp1, i_] = work[i_];
                             }
                         }
                     }
                 }
                 else
                 {
-                    
                     //
                     // Special case: N1=N2
                     //
-                    for(j=m2-1; j>=m1; j--)
+                    for (j = m2 - 1; j >= m1; j--)
                     {
-                        ctemp = c[j-m1+1];
-                        stemp = s[j-m1+1];
-                        if( (double)(ctemp)!=(double)(1) || (double)(stemp)!=(double)(0) )
+                        ctemp = c[j - m1 + 1];
+                        stemp = s[j - m1 + 1];
+                        if ((double)(ctemp) != (double)(1) || (double)(stemp) != (double)(0))
                         {
-                            temp = a[j+1,n1];
-                            a[j+1,n1] = ctemp*temp-stemp*a[j,n1];
-                            a[j,n1] = stemp*temp+ctemp*a[j,n1];
+                            temp = a[j + 1, n1];
+                            a[j + 1, n1] = ctemp * temp - stemp * a[j, n1];
+                            a[j, n1] = stemp * temp + ctemp * a[j, n1];
                         }
                     }
                 }
             }
         }
-
 
         /*************************************************************************
         Application of a sequence of  elementary rotations to a matrix
@@ -8381,7 +8290,8 @@ public partial class alglib
 
         Utility subroutine.
         *************************************************************************/
-        public static void applyrotationsfromtheright(bool isforward,
+        public static void applyrotationsfromtheright(
+            bool isforward,
             int m1,
             int m2,
             int n1,
@@ -8390,7 +8300,8 @@ public partial class alglib
             double[] s,
             double[,] a,
             double[] work,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int j = 0;
             int jp1 = 0;
@@ -8399,126 +8310,120 @@ public partial class alglib
             double temp = 0;
             int i_ = 0;
 
-            
             //
             // Form A * P'
             //
-            if( isforward )
+            if (isforward)
             {
-                if( m1!=m2 )
+                if (m1 != m2)
                 {
-                    
                     //
                     // Common case: M1<>M2
                     //
-                    for(j=n1; j<=n2-1; j++)
+                    for (j = n1; j <= n2 - 1; j++)
                     {
-                        ctemp = c[j-n1+1];
-                        stemp = s[j-n1+1];
-                        if( (double)(ctemp)!=(double)(1) || (double)(stemp)!=(double)(0) )
+                        ctemp = c[j - n1 + 1];
+                        stemp = s[j - n1 + 1];
+                        if ((double)(ctemp) != (double)(1) || (double)(stemp) != (double)(0))
                         {
-                            jp1 = j+1;
-                            for(i_=m1; i_<=m2;i_++)
+                            jp1 = j + 1;
+                            for (i_ = m1; i_ <= m2; i_++)
                             {
-                                work[i_] = ctemp*a[i_,jp1];
+                                work[i_] = ctemp * a[i_, jp1];
                             }
-                            for(i_=m1; i_<=m2;i_++)
+                            for (i_ = m1; i_ <= m2; i_++)
                             {
-                                work[i_] = work[i_] - stemp*a[i_,j];
+                                work[i_] = work[i_] - stemp * a[i_, j];
                             }
-                            for(i_=m1; i_<=m2;i_++)
+                            for (i_ = m1; i_ <= m2; i_++)
                             {
-                                a[i_,j] = ctemp*a[i_,j];
+                                a[i_, j] = ctemp * a[i_, j];
                             }
-                            for(i_=m1; i_<=m2;i_++)
+                            for (i_ = m1; i_ <= m2; i_++)
                             {
-                                a[i_,j] = a[i_,j] + stemp*a[i_,jp1];
+                                a[i_, j] = a[i_, j] + stemp * a[i_, jp1];
                             }
-                            for(i_=m1; i_<=m2;i_++)
+                            for (i_ = m1; i_ <= m2; i_++)
                             {
-                                a[i_,jp1] = work[i_];
+                                a[i_, jp1] = work[i_];
                             }
                         }
                     }
                 }
                 else
                 {
-                    
                     //
                     // Special case: M1=M2
                     //
-                    for(j=n1; j<=n2-1; j++)
+                    for (j = n1; j <= n2 - 1; j++)
                     {
-                        ctemp = c[j-n1+1];
-                        stemp = s[j-n1+1];
-                        if( (double)(ctemp)!=(double)(1) || (double)(stemp)!=(double)(0) )
+                        ctemp = c[j - n1 + 1];
+                        stemp = s[j - n1 + 1];
+                        if ((double)(ctemp) != (double)(1) || (double)(stemp) != (double)(0))
                         {
-                            temp = a[m1,j+1];
-                            a[m1,j+1] = ctemp*temp-stemp*a[m1,j];
-                            a[m1,j] = stemp*temp+ctemp*a[m1,j];
+                            temp = a[m1, j + 1];
+                            a[m1, j + 1] = ctemp * temp - stemp * a[m1, j];
+                            a[m1, j] = stemp * temp + ctemp * a[m1, j];
                         }
                     }
                 }
             }
             else
             {
-                if( m1!=m2 )
+                if (m1 != m2)
                 {
-                    
                     //
                     // Common case: M1<>M2
                     //
-                    for(j=n2-1; j>=n1; j--)
+                    for (j = n2 - 1; j >= n1; j--)
                     {
-                        ctemp = c[j-n1+1];
-                        stemp = s[j-n1+1];
-                        if( (double)(ctemp)!=(double)(1) || (double)(stemp)!=(double)(0) )
+                        ctemp = c[j - n1 + 1];
+                        stemp = s[j - n1 + 1];
+                        if ((double)(ctemp) != (double)(1) || (double)(stemp) != (double)(0))
                         {
-                            jp1 = j+1;
-                            for(i_=m1; i_<=m2;i_++)
+                            jp1 = j + 1;
+                            for (i_ = m1; i_ <= m2; i_++)
                             {
-                                work[i_] = ctemp*a[i_,jp1];
+                                work[i_] = ctemp * a[i_, jp1];
                             }
-                            for(i_=m1; i_<=m2;i_++)
+                            for (i_ = m1; i_ <= m2; i_++)
                             {
-                                work[i_] = work[i_] - stemp*a[i_,j];
+                                work[i_] = work[i_] - stemp * a[i_, j];
                             }
-                            for(i_=m1; i_<=m2;i_++)
+                            for (i_ = m1; i_ <= m2; i_++)
                             {
-                                a[i_,j] = ctemp*a[i_,j];
+                                a[i_, j] = ctemp * a[i_, j];
                             }
-                            for(i_=m1; i_<=m2;i_++)
+                            for (i_ = m1; i_ <= m2; i_++)
                             {
-                                a[i_,j] = a[i_,j] + stemp*a[i_,jp1];
+                                a[i_, j] = a[i_, j] + stemp * a[i_, jp1];
                             }
-                            for(i_=m1; i_<=m2;i_++)
+                            for (i_ = m1; i_ <= m2; i_++)
                             {
-                                a[i_,jp1] = work[i_];
+                                a[i_, jp1] = work[i_];
                             }
                         }
                     }
                 }
                 else
                 {
-                    
                     //
                     // Special case: M1=M2
                     //
-                    for(j=n2-1; j>=n1; j--)
+                    for (j = n2 - 1; j >= n1; j--)
                     {
-                        ctemp = c[j-n1+1];
-                        stemp = s[j-n1+1];
-                        if( (double)(ctemp)!=(double)(1) || (double)(stemp)!=(double)(0) )
+                        ctemp = c[j - n1 + 1];
+                        stemp = s[j - n1 + 1];
+                        if ((double)(ctemp) != (double)(1) || (double)(stemp) != (double)(0))
                         {
-                            temp = a[m1,j+1];
-                            a[m1,j+1] = ctemp*temp-stemp*a[m1,j];
-                            a[m1,j] = stemp*temp+ctemp*a[m1,j];
+                            temp = a[m1, j + 1];
+                            a[m1, j + 1] = ctemp * temp - stemp * a[m1, j];
+                            a[m1, j] = stemp * temp + ctemp * a[m1, j];
                         }
                     }
                 }
             }
         }
-
 
         /*************************************************************************
         The subroutine generates the elementary rotation, so that:
@@ -8528,12 +8433,14 @@ public partial class alglib
 
         CS**2 + SN**2 = 1
         *************************************************************************/
-        public static void generaterotation(double f,
+        public static void generaterotation(
+            double f,
             double g,
             ref double cs,
             ref double sn,
             ref double r,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             double f1 = 0;
             double g1 = 0;
@@ -8542,7 +8449,7 @@ public partial class alglib
             sn = 0;
             r = 0;
 
-            if( (double)(g)==(double)(0) )
+            if ((double)(g) == (double)(0))
             {
                 cs = 1;
                 sn = 0;
@@ -8550,7 +8457,7 @@ public partial class alglib
             }
             else
             {
-                if( (double)(f)==(double)(0) )
+                if ((double)(f) == (double)(0))
                 {
                     cs = 0;
                     sn = 1;
@@ -8560,17 +8467,17 @@ public partial class alglib
                 {
                     f1 = f;
                     g1 = g;
-                    if( (double)(Math.Abs(f1))>(double)(Math.Abs(g1)) )
+                    if ((double)(Math.Abs(f1)) > (double)(Math.Abs(g1)))
                     {
-                        r = Math.Abs(f1)*Math.Sqrt(1+math.sqr(g1/f1));
+                        r = Math.Abs(f1) * Math.Sqrt(1 + math.sqr(g1 / f1));
                     }
                     else
                     {
-                        r = Math.Abs(g1)*Math.Sqrt(1+math.sqr(f1/g1));
+                        r = Math.Abs(g1) * Math.Sqrt(1 + math.sqr(f1 / g1));
                     }
-                    cs = f1/r;
-                    sn = g1/r;
-                    if( (double)(Math.Abs(f))>(double)(Math.Abs(g)) && (double)(cs)<(double)(0) )
+                    cs = f1 / r;
+                    sn = g1 / r;
+                    if ((double)(Math.Abs(f)) > (double)(Math.Abs(g)) && (double)(cs) < (double)(0))
                     {
                         cs = -cs;
                         sn = -sn;
@@ -8579,9 +8486,8 @@ public partial class alglib
                 }
             }
         }
-
-
     }
+
     public class trlinsolve
     {
         /*************************************************************************
@@ -8625,18 +8531,20 @@ public partial class alglib
              Courant Institute, Argonne National Lab, and Rice University
              June 30, 1992
         *************************************************************************/
-        public static void rmatrixtrsafesolve(double[,] a,
+        public static void rmatrixtrsafesolve(
+            double[,] a,
             int n,
             ref double[] x,
             ref double s,
             bool isupper,
             bool istrans,
             bool isunit,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool normin = new bool();
             double[] cnorm = new double[0];
-            double[,] a1 = new double[0,0];
+            double[,] a1 = new double[0, 0];
             double[] x1 = new double[0];
             int i = 0;
             int i_ = 0;
@@ -8644,48 +8552,58 @@ public partial class alglib
 
             s = 0;
 
-            
             //
             // From 0-based to 1-based
             //
             normin = false;
-            a1 = new double[n+1, n+1];
-            x1 = new double[n+1];
-            for(i=1; i<=n; i++)
+            a1 = new double[n + 1, n + 1];
+            x1 = new double[n + 1];
+            for (i = 1; i <= n; i++)
             {
                 i1_ = (0) - (1);
-                for(i_=1; i_<=n;i_++)
+                for (i_ = 1; i_ <= n; i_++)
                 {
-                    a1[i,i_] = a[i-1,i_+i1_];
+                    a1[i, i_] = a[i - 1, i_ + i1_];
                 }
             }
             i1_ = (0) - (1);
-            for(i_=1; i_<=n;i_++)
+            for (i_ = 1; i_ <= n; i_++)
             {
-                x1[i_] = x[i_+i1_];
+                x1[i_] = x[i_ + i1_];
             }
-            
+
             //
             // Solve 1-based
             //
-            safesolvetriangular(a1, n, ref x1, ref s, isupper, istrans, isunit, normin, ref cnorm, _params);
-            
+            safesolvetriangular(
+                a1,
+                n,
+                ref x1,
+                ref s,
+                isupper,
+                istrans,
+                isunit,
+                normin,
+                ref cnorm,
+                _params
+            );
+
             //
             // From 1-based to 0-based
             //
             i1_ = (1) - (0);
-            for(i_=0; i_<=n-1;i_++)
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
-                x[i_] = x1[i_+i1_];
+                x[i_] = x1[i_ + i1_];
             }
         }
-
 
         /*************************************************************************
         Obsolete 1-based subroutine.
         See RMatrixTRSafeSolve for 0-based replacement.
         *************************************************************************/
-        public static void safesolvetriangular(double[,] a,
+        public static void safesolvetriangular(
+            double[,] a,
             int n,
             ref double[] x,
             ref double s,
@@ -8694,7 +8612,8 @@ public partial class alglib
             bool isunit,
             bool normin,
             ref double[] cnorm,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int imax = 0;
@@ -8733,116 +8652,113 @@ public partial class alglib
             upper = isupper;
             notran = !istrans;
             nounit = !isunit;
-            
+
             //
             // these initializers are not really necessary,
             // but without them compiler complains about uninitialized locals
             //
             tjjs = 0;
-            
+
             //
             // Quick return if possible
             //
-            if( n==0 )
+            if (n == 0)
             {
                 return;
             }
-            
+
             //
             // Determine machine dependent parameters to control overflow.
             //
-            smlnum = math.minrealnumber/(math.machineepsilon*2);
-            bignum = 1/smlnum;
+            smlnum = math.minrealnumber / (math.machineepsilon * 2);
+            bignum = 1 / smlnum;
             s = 1;
-            if( !normin )
+            if (!normin)
             {
-                cnorm = new double[n+1];
-                
+                cnorm = new double[n + 1];
+
                 //
                 // Compute the 1-norm of each column, not including the diagonal.
                 //
-                if( upper )
+                if (upper)
                 {
-                    
                     //
                     // A is upper triangular.
                     //
-                    for(j=1; j<=n; j++)
+                    for (j = 1; j <= n; j++)
                     {
                         v = 0;
-                        for(k=1; k<=j-1; k++)
+                        for (k = 1; k <= j - 1; k++)
                         {
-                            v = v+Math.Abs(a[k,j]);
+                            v = v + Math.Abs(a[k, j]);
                         }
                         cnorm[j] = v;
                     }
                 }
                 else
                 {
-                    
                     //
                     // A is lower triangular.
                     //
-                    for(j=1; j<=n-1; j++)
+                    for (j = 1; j <= n - 1; j++)
                     {
                         v = 0;
-                        for(k=j+1; k<=n; k++)
+                        for (k = j + 1; k <= n; k++)
                         {
-                            v = v+Math.Abs(a[k,j]);
+                            v = v + Math.Abs(a[k, j]);
                         }
                         cnorm[j] = v;
                     }
                     cnorm[n] = 0;
                 }
             }
-            
+
             //
             // Scale the column norms by TSCAL if the maximum element in CNORM is
             // greater than BIGNUM.
             //
             imax = 1;
-            for(k=2; k<=n; k++)
+            for (k = 2; k <= n; k++)
             {
-                if( (double)(cnorm[k])>(double)(cnorm[imax]) )
+                if ((double)(cnorm[k]) > (double)(cnorm[imax]))
                 {
                     imax = k;
                 }
             }
             tmax = cnorm[imax];
-            if( (double)(tmax)<=(double)(bignum) )
+            if ((double)(tmax) <= (double)(bignum))
             {
                 tscal = 1;
             }
             else
             {
-                tscal = 1/(smlnum*tmax);
-                for(i_=1; i_<=n;i_++)
+                tscal = 1 / (smlnum * tmax);
+                for (i_ = 1; i_ <= n; i_++)
                 {
-                    cnorm[i_] = tscal*cnorm[i_];
+                    cnorm[i_] = tscal * cnorm[i_];
                 }
             }
-            
+
             //
             // Compute a bound on the computed solution vector to see if the
             // Level 2 BLAS routine DTRSV can be used.
             //
             j = 1;
-            for(k=2; k<=n; k++)
+            for (k = 2; k <= n; k++)
             {
-                if( (double)(Math.Abs(x[k]))>(double)(Math.Abs(x[j])) )
+                if ((double)(Math.Abs(x[k])) > (double)(Math.Abs(x[j])))
                 {
                     j = k;
                 }
             }
             xmax = Math.Abs(x[j]);
             xbnd = xmax;
-            if( notran )
+            if (notran)
             {
-                
                 //
                 // Compute the growth in A * x = b.
                 //
-                if( upper )
+                if (upper)
                 {
                     jfirst = n;
                     jlast = 1;
@@ -8854,100 +8770,93 @@ public partial class alglib
                     jlast = n;
                     jinc = 1;
                 }
-                if( (double)(tscal)!=(double)(1) )
+                if ((double)(tscal) != (double)(1))
                 {
                     grow = 0;
                 }
                 else
                 {
-                    if( nounit )
+                    if (nounit)
                     {
-                        
                         //
                         // A is non-unit triangular.
                         //
                         // Compute GROW = 1/G(j) and XBND = 1/M(j).
                         // Initially, G(0) = max{x(i), i=1,...,n}.
                         //
-                        grow = 1/Math.Max(xbnd, smlnum);
+                        grow = 1 / Math.Max(xbnd, smlnum);
                         xbnd = grow;
                         j = jfirst;
-                        while( (jinc>0 && j<=jlast) || (jinc<0 && j>=jlast) )
+                        while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast))
                         {
-                            
                             //
                             // Exit the loop if the growth factor is too small.
                             //
-                            if( (double)(grow)<=(double)(smlnum) )
+                            if ((double)(grow) <= (double)(smlnum))
                             {
                                 break;
                             }
-                            
+
                             //
                             // M(j) = G(j-1) / abs(A(j,j))
                             //
-                            tjj = Math.Abs(a[j,j]);
-                            xbnd = Math.Min(xbnd, Math.Min(1, tjj)*grow);
-                            if( (double)(tjj+cnorm[j])>=(double)(smlnum) )
+                            tjj = Math.Abs(a[j, j]);
+                            xbnd = Math.Min(xbnd, Math.Min(1, tjj) * grow);
+                            if ((double)(tjj + cnorm[j]) >= (double)(smlnum))
                             {
-                                
                                 //
                                 // G(j) = G(j-1)*( 1 + CNORM(j) / abs(A(j,j)) )
                                 //
-                                grow = grow*(tjj/(tjj+cnorm[j]));
+                                grow = grow * (tjj / (tjj + cnorm[j]));
                             }
                             else
                             {
-                                
                                 //
                                 // G(j) could overflow, set GROW to 0.
                                 //
                                 grow = 0;
                             }
-                            if( j==jlast )
+                            if (j == jlast)
                             {
                                 grow = xbnd;
                             }
-                            j = j+jinc;
+                            j = j + jinc;
                         }
                     }
                     else
                     {
-                        
                         //
                         // A is unit triangular.
                         //
                         // Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.
                         //
-                        grow = Math.Min(1, 1/Math.Max(xbnd, smlnum));
+                        grow = Math.Min(1, 1 / Math.Max(xbnd, smlnum));
                         j = jfirst;
-                        while( (jinc>0 && j<=jlast) || (jinc<0 && j>=jlast) )
+                        while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast))
                         {
-                            
                             //
                             // Exit the loop if the growth factor is too small.
                             //
-                            if( (double)(grow)<=(double)(smlnum) )
+                            if ((double)(grow) <= (double)(smlnum))
                             {
                                 break;
                             }
-                            
+
                             //
                             // G(j) = G(j-1)*( 1 + CNORM(j) )
                             //
-                            grow = grow*(1/(1+cnorm[j]));
-                            j = j+jinc;
+                            grow = grow * (1 / (1 + cnorm[j]));
+                            j = j + jinc;
                         }
                     }
                 }
             }
             else
             {
-                
                 //
                 // Compute the growth in A' * x = b.
                 //
-                if( upper )
+                if (upper)
                 {
                     jfirst = 1;
                     jlast = n;
@@ -8959,296 +8868,281 @@ public partial class alglib
                     jlast = 1;
                     jinc = -1;
                 }
-                if( (double)(tscal)!=(double)(1) )
+                if ((double)(tscal) != (double)(1))
                 {
                     grow = 0;
                 }
                 else
                 {
-                    if( nounit )
+                    if (nounit)
                     {
-                        
                         //
                         // A is non-unit triangular.
                         //
                         // Compute GROW = 1/G(j) and XBND = 1/M(j).
                         // Initially, M(0) = max{x(i), i=1,...,n}.
                         //
-                        grow = 1/Math.Max(xbnd, smlnum);
+                        grow = 1 / Math.Max(xbnd, smlnum);
                         xbnd = grow;
                         j = jfirst;
-                        while( (jinc>0 && j<=jlast) || (jinc<0 && j>=jlast) )
+                        while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast))
                         {
-                            
                             //
                             // Exit the loop if the growth factor is too small.
                             //
-                            if( (double)(grow)<=(double)(smlnum) )
+                            if ((double)(grow) <= (double)(smlnum))
                             {
                                 break;
                             }
-                            
+
                             //
                             // G(j) = max( G(j-1), M(j-1)*( 1 + CNORM(j) ) )
                             //
-                            xj = 1+cnorm[j];
-                            grow = Math.Min(grow, xbnd/xj);
-                            
+                            xj = 1 + cnorm[j];
+                            grow = Math.Min(grow, xbnd / xj);
+
                             //
                             // M(j) = M(j-1)*( 1 + CNORM(j) ) / abs(A(j,j))
                             //
-                            tjj = Math.Abs(a[j,j]);
-                            if( (double)(xj)>(double)(tjj) )
+                            tjj = Math.Abs(a[j, j]);
+                            if ((double)(xj) > (double)(tjj))
                             {
-                                xbnd = xbnd*(tjj/xj);
+                                xbnd = xbnd * (tjj / xj);
                             }
-                            if( j==jlast )
+                            if (j == jlast)
                             {
                                 grow = Math.Min(grow, xbnd);
                             }
-                            j = j+jinc;
+                            j = j + jinc;
                         }
                     }
                     else
                     {
-                        
                         //
                         // A is unit triangular.
                         //
                         // Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.
                         //
-                        grow = Math.Min(1, 1/Math.Max(xbnd, smlnum));
+                        grow = Math.Min(1, 1 / Math.Max(xbnd, smlnum));
                         j = jfirst;
-                        while( (jinc>0 && j<=jlast) || (jinc<0 && j>=jlast) )
+                        while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast))
                         {
-                            
                             //
                             // Exit the loop if the growth factor is too small.
                             //
-                            if( (double)(grow)<=(double)(smlnum) )
+                            if ((double)(grow) <= (double)(smlnum))
                             {
                                 break;
                             }
-                            
+
                             //
                             // G(j) = ( 1 + CNORM(j) )*G(j-1)
                             //
-                            xj = 1+cnorm[j];
-                            grow = grow/xj;
-                            j = j+jinc;
+                            xj = 1 + cnorm[j];
+                            grow = grow / xj;
+                            j = j + jinc;
                         }
                     }
                 }
             }
-            if( (double)(grow*tscal)>(double)(smlnum) )
+            if ((double)(grow * tscal) > (double)(smlnum))
             {
-                
                 //
                 // Use the Level 2 BLAS solve if the reciprocal of the bound on
                 // elements of X is not too small.
                 //
-                if( (upper && notran) || (!upper && !notran) )
+                if ((upper && notran) || (!upper && !notran))
                 {
-                    if( nounit )
+                    if (nounit)
                     {
-                        vd = a[n,n];
+                        vd = a[n, n];
                     }
                     else
                     {
                         vd = 1;
                     }
-                    x[n] = x[n]/vd;
-                    for(i=n-1; i>=1; i--)
+                    x[n] = x[n] / vd;
+                    for (i = n - 1; i >= 1; i--)
                     {
-                        ip1 = i+1;
-                        if( upper )
+                        ip1 = i + 1;
+                        if (upper)
                         {
                             v = 0.0;
-                            for(i_=ip1; i_<=n;i_++)
+                            for (i_ = ip1; i_ <= n; i_++)
                             {
-                                v += a[i,i_]*x[i_];
+                                v += a[i, i_] * x[i_];
                             }
                         }
                         else
                         {
                             v = 0.0;
-                            for(i_=ip1; i_<=n;i_++)
+                            for (i_ = ip1; i_ <= n; i_++)
                             {
-                                v += a[i_,i]*x[i_];
+                                v += a[i_, i] * x[i_];
                             }
                         }
-                        if( nounit )
+                        if (nounit)
                         {
-                            vd = a[i,i];
+                            vd = a[i, i];
                         }
                         else
                         {
                             vd = 1;
                         }
-                        x[i] = (x[i]-v)/vd;
+                        x[i] = (x[i] - v) / vd;
                     }
                 }
                 else
                 {
-                    if( nounit )
+                    if (nounit)
                     {
-                        vd = a[1,1];
+                        vd = a[1, 1];
                     }
                     else
                     {
                         vd = 1;
                     }
-                    x[1] = x[1]/vd;
-                    for(i=2; i<=n; i++)
+                    x[1] = x[1] / vd;
+                    for (i = 2; i <= n; i++)
                     {
-                        im1 = i-1;
-                        if( upper )
+                        im1 = i - 1;
+                        if (upper)
                         {
                             v = 0.0;
-                            for(i_=1; i_<=im1;i_++)
+                            for (i_ = 1; i_ <= im1; i_++)
                             {
-                                v += a[i_,i]*x[i_];
+                                v += a[i_, i] * x[i_];
                             }
                         }
                         else
                         {
                             v = 0.0;
-                            for(i_=1; i_<=im1;i_++)
+                            for (i_ = 1; i_ <= im1; i_++)
                             {
-                                v += a[i,i_]*x[i_];
+                                v += a[i, i_] * x[i_];
                             }
                         }
-                        if( nounit )
+                        if (nounit)
                         {
-                            vd = a[i,i];
+                            vd = a[i, i];
                         }
                         else
                         {
                             vd = 1;
                         }
-                        x[i] = (x[i]-v)/vd;
+                        x[i] = (x[i] - v) / vd;
                     }
                 }
             }
             else
             {
-                
                 //
                 // Use a Level 1 BLAS solve, scaling intermediate results.
                 //
-                if( (double)(xmax)>(double)(bignum) )
+                if ((double)(xmax) > (double)(bignum))
                 {
-                    
                     //
                     // Scale X so that its components are less than or equal to
                     // BIGNUM in absolute value.
                     //
-                    s = bignum/xmax;
-                    for(i_=1; i_<=n;i_++)
+                    s = bignum / xmax;
+                    for (i_ = 1; i_ <= n; i_++)
                     {
-                        x[i_] = s*x[i_];
+                        x[i_] = s * x[i_];
                     }
                     xmax = bignum;
                 }
-                if( notran )
+                if (notran)
                 {
-                    
                     //
                     // Solve A * x = b
                     //
                     j = jfirst;
-                    while( (jinc>0 && j<=jlast) || (jinc<0 && j>=jlast) )
+                    while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast))
                     {
-                        
                         //
                         // Compute x(j) = b(j) / A(j,j), scaling x if necessary.
                         //
                         xj = Math.Abs(x[j]);
                         flg = 0;
-                        if( nounit )
+                        if (nounit)
                         {
-                            tjjs = a[j,j]*tscal;
+                            tjjs = a[j, j] * tscal;
                         }
                         else
                         {
                             tjjs = tscal;
-                            if( (double)(tscal)==(double)(1) )
+                            if ((double)(tscal) == (double)(1))
                             {
                                 flg = 100;
                             }
                         }
-                        if( flg!=100 )
+                        if (flg != 100)
                         {
                             tjj = Math.Abs(tjjs);
-                            if( (double)(tjj)>(double)(smlnum) )
+                            if ((double)(tjj) > (double)(smlnum))
                             {
-                                
                                 //
                                 // abs(A(j,j)) > SMLNUM:
                                 //
-                                if( (double)(tjj)<(double)(1) )
+                                if ((double)(tjj) < (double)(1))
                                 {
-                                    if( (double)(xj)>(double)(tjj*bignum) )
+                                    if ((double)(xj) > (double)(tjj * bignum))
                                     {
-                                        
                                         //
                                         // Scale x by 1/b(j).
                                         //
-                                        rec = 1/xj;
-                                        for(i_=1; i_<=n;i_++)
+                                        rec = 1 / xj;
+                                        for (i_ = 1; i_ <= n; i_++)
                                         {
-                                            x[i_] = rec*x[i_];
+                                            x[i_] = rec * x[i_];
                                         }
-                                        s = s*rec;
-                                        xmax = xmax*rec;
+                                        s = s * rec;
+                                        xmax = xmax * rec;
                                     }
                                 }
-                                x[j] = x[j]/tjjs;
+                                x[j] = x[j] / tjjs;
                                 xj = Math.Abs(x[j]);
                             }
                             else
                             {
-                                if( (double)(tjj)>(double)(0) )
+                                if ((double)(tjj) > (double)(0))
                                 {
-                                    
                                     //
                                     // 0 < abs(A(j,j)) <= SMLNUM:
                                     //
-                                    if( (double)(xj)>(double)(tjj*bignum) )
+                                    if ((double)(xj) > (double)(tjj * bignum))
                                     {
-                                        
                                         //
                                         // Scale x by (1/abs(x(j)))*abs(A(j,j))*BIGNUM
                                         // to avoid overflow when dividing by A(j,j).
                                         //
-                                        rec = tjj*bignum/xj;
-                                        if( (double)(cnorm[j])>(double)(1) )
+                                        rec = tjj * bignum / xj;
+                                        if ((double)(cnorm[j]) > (double)(1))
                                         {
-                                            
                                             //
                                             // Scale by 1/CNORM(j) to avoid overflow when
                                             // multiplying x(j) times column j.
                                             //
-                                            rec = rec/cnorm[j];
+                                            rec = rec / cnorm[j];
                                         }
-                                        for(i_=1; i_<=n;i_++)
+                                        for (i_ = 1; i_ <= n; i_++)
                                         {
-                                            x[i_] = rec*x[i_];
+                                            x[i_] = rec * x[i_];
                                         }
-                                        s = s*rec;
-                                        xmax = xmax*rec;
+                                        s = s * rec;
+                                        xmax = xmax * rec;
                                     }
-                                    x[j] = x[j]/tjjs;
+                                    x[j] = x[j] / tjjs;
                                     xj = Math.Abs(x[j]);
                                 }
                                 else
                                 {
-                                    
                                     //
                                     // A(j,j) = 0:  Set x(1:n) = 0, x(j) = 1, and
                                     // scale = 0, and compute a solution to A*x = 0.
                                     //
-                                    for(i=1; i<=n; i++)
+                                    for (i = 1; i <= n; i++)
                                     {
                                         x[i] = 0;
                                     }
@@ -9259,62 +9153,59 @@ public partial class alglib
                                 }
                             }
                         }
-                        
+
                         //
                         // Scale x if necessary to avoid overflow when adding a
                         // multiple of column j of A.
                         //
-                        if( (double)(xj)>(double)(1) )
+                        if ((double)(xj) > (double)(1))
                         {
-                            rec = 1/xj;
-                            if( (double)(cnorm[j])>(double)((bignum-xmax)*rec) )
+                            rec = 1 / xj;
+                            if ((double)(cnorm[j]) > (double)((bignum - xmax) * rec))
                             {
-                                
                                 //
                                 // Scale x by 1/(2*abs(x(j))).
                                 //
-                                rec = rec*0.5;
-                                for(i_=1; i_<=n;i_++)
+                                rec = rec * 0.5;
+                                for (i_ = 1; i_ <= n; i_++)
                                 {
-                                    x[i_] = rec*x[i_];
+                                    x[i_] = rec * x[i_];
                                 }
-                                s = s*rec;
+                                s = s * rec;
                             }
                         }
                         else
                         {
-                            if( (double)(xj*cnorm[j])>(double)(bignum-xmax) )
+                            if ((double)(xj * cnorm[j]) > (double)(bignum - xmax))
                             {
-                                
                                 //
                                 // Scale x by 1/2.
                                 //
-                                for(i_=1; i_<=n;i_++)
+                                for (i_ = 1; i_ <= n; i_++)
                                 {
-                                    x[i_] = 0.5*x[i_];
+                                    x[i_] = 0.5 * x[i_];
                                 }
-                                s = s*0.5;
+                                s = s * 0.5;
                             }
                         }
-                        if( upper )
+                        if (upper)
                         {
-                            if( j>1 )
+                            if (j > 1)
                             {
-                                
                                 //
                                 // Compute the update
                                 // x(1:j-1) := x(1:j-1) - x(j) * A(1:j-1,j)
                                 //
-                                v = x[j]*tscal;
-                                jm1 = j-1;
-                                for(i_=1; i_<=jm1;i_++)
+                                v = x[j] * tscal;
+                                jm1 = j - 1;
+                                for (i_ = 1; i_ <= jm1; i_++)
                                 {
-                                    x[i_] = x[i_] - v*a[i_,j];
+                                    x[i_] = x[i_] - v * a[i_, j];
                                 }
                                 i = 1;
-                                for(k=2; k<=j-1; k++)
+                                for (k = 2; k <= j - 1; k++)
                                 {
-                                    if( (double)(Math.Abs(x[k]))>(double)(Math.Abs(x[i])) )
+                                    if ((double)(Math.Abs(x[k])) > (double)(Math.Abs(x[i])))
                                     {
                                         i = k;
                                     }
@@ -9324,23 +9215,22 @@ public partial class alglib
                         }
                         else
                         {
-                            if( j<n )
+                            if (j < n)
                             {
-                                
                                 //
                                 // Compute the update
                                 // x(j+1:n) := x(j+1:n) - x(j) * A(j+1:n,j)
                                 //
-                                jp1 = j+1;
-                                v = x[j]*tscal;
-                                for(i_=jp1; i_<=n;i_++)
+                                jp1 = j + 1;
+                                v = x[j] * tscal;
+                                for (i_ = jp1; i_ <= n; i_++)
                                 {
-                                    x[i_] = x[i_] - v*a[i_,j];
+                                    x[i_] = x[i_] - v * a[i_, j];
                                 }
-                                i = j+1;
-                                for(k=j+2; k<=n; k++)
+                                i = j + 1;
+                                for (k = j + 2; k <= n; k++)
                                 {
-                                    if( (double)(Math.Abs(x[k]))>(double)(Math.Abs(x[i])) )
+                                    if ((double)(Math.Abs(x[k])) > (double)(Math.Abs(x[i])))
                                     {
                                         i = k;
                                     }
@@ -9348,78 +9238,73 @@ public partial class alglib
                                 xmax = Math.Abs(x[i]);
                             }
                         }
-                        j = j+jinc;
+                        j = j + jinc;
                     }
                 }
                 else
                 {
-                    
                     //
                     // Solve A' * x = b
                     //
                     j = jfirst;
-                    while( (jinc>0 && j<=jlast) || (jinc<0 && j>=jlast) )
+                    while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast))
                     {
-                        
                         //
                         // Compute x(j) = b(j) - sum A(k,j)*x(k).
                         //   k<>j
                         //
                         xj = Math.Abs(x[j]);
                         uscal = tscal;
-                        rec = 1/Math.Max(xmax, 1);
-                        if( (double)(cnorm[j])>(double)((bignum-xj)*rec) )
+                        rec = 1 / Math.Max(xmax, 1);
+                        if ((double)(cnorm[j]) > (double)((bignum - xj) * rec))
                         {
-                            
                             //
                             // If x(j) could overflow, scale x by 1/(2*XMAX).
                             //
-                            rec = rec*0.5;
-                            if( nounit )
+                            rec = rec * 0.5;
+                            if (nounit)
                             {
-                                tjjs = a[j,j]*tscal;
+                                tjjs = a[j, j] * tscal;
                             }
                             else
                             {
                                 tjjs = tscal;
                             }
                             tjj = Math.Abs(tjjs);
-                            if( (double)(tjj)>(double)(1) )
+                            if ((double)(tjj) > (double)(1))
                             {
-                                
                                 //
                                 // Divide by A(j,j) when scaling x if A(j,j) > 1.
                                 //
-                                rec = Math.Min(1, rec*tjj);
-                                uscal = uscal/tjjs;
+                                rec = Math.Min(1, rec * tjj);
+                                uscal = uscal / tjjs;
                             }
-                            if( (double)(rec)<(double)(1) )
+                            if ((double)(rec) < (double)(1))
                             {
-                                for(i_=1; i_<=n;i_++)
+                                for (i_ = 1; i_ <= n; i_++)
                                 {
-                                    x[i_] = rec*x[i_];
+                                    x[i_] = rec * x[i_];
                                 }
-                                s = s*rec;
-                                xmax = xmax*rec;
+                                s = s * rec;
+                                xmax = xmax * rec;
                             }
                         }
                         sumj = 0;
-                        if( (double)(uscal)==(double)(1) )
+                        if ((double)(uscal) == (double)(1))
                         {
-                            
                             //
                             // If the scaling needed for A in the dot product is 1,
                             // call DDOT to perform the dot product.
                             //
-                            if( upper )
+                            if (upper)
                             {
-                                if( j>1 )
+                                if (j > 1)
                                 {
-                                    jm1 = j-1;
+                                    jm1 = j - 1;
                                     sumj = 0.0;
-                                    for(i_=1; i_<=jm1;i_++)
+                                    for (i_ = 1; i_ <= jm1; i_++)
                                     {
-                                        sumj += a[i_,j]*x[i_];
+                                        sumj += a[i_, j] * x[i_];
                                     }
                                 }
                                 else
@@ -9429,129 +9314,122 @@ public partial class alglib
                             }
                             else
                             {
-                                if( j<n )
+                                if (j < n)
                                 {
-                                    jp1 = j+1;
+                                    jp1 = j + 1;
                                     sumj = 0.0;
-                                    for(i_=jp1; i_<=n;i_++)
+                                    for (i_ = jp1; i_ <= n; i_++)
                                     {
-                                        sumj += a[i_,j]*x[i_];
+                                        sumj += a[i_, j] * x[i_];
                                     }
                                 }
                             }
                         }
                         else
                         {
-                            
                             //
                             // Otherwise, use in-line code for the dot product.
                             //
-                            if( upper )
+                            if (upper)
                             {
-                                for(i=1; i<=j-1; i++)
+                                for (i = 1; i <= j - 1; i++)
                                 {
-                                    v = a[i,j]*uscal;
-                                    sumj = sumj+v*x[i];
+                                    v = a[i, j] * uscal;
+                                    sumj = sumj + v * x[i];
                                 }
                             }
                             else
                             {
-                                if( j<n )
+                                if (j < n)
                                 {
-                                    for(i=j+1; i<=n; i++)
+                                    for (i = j + 1; i <= n; i++)
                                     {
-                                        v = a[i,j]*uscal;
-                                        sumj = sumj+v*x[i];
+                                        v = a[i, j] * uscal;
+                                        sumj = sumj + v * x[i];
                                     }
                                 }
                             }
                         }
-                        if( (double)(uscal)==(double)(tscal) )
+                        if ((double)(uscal) == (double)(tscal))
                         {
-                            
                             //
                             // Compute x(j) := ( x(j) - sumj ) / A(j,j) if 1/A(j,j)
                             // was not used to scale the dotproduct.
                             //
-                            x[j] = x[j]-sumj;
+                            x[j] = x[j] - sumj;
                             xj = Math.Abs(x[j]);
                             flg = 0;
-                            if( nounit )
+                            if (nounit)
                             {
-                                tjjs = a[j,j]*tscal;
+                                tjjs = a[j, j] * tscal;
                             }
                             else
                             {
                                 tjjs = tscal;
-                                if( (double)(tscal)==(double)(1) )
+                                if ((double)(tscal) == (double)(1))
                                 {
                                     flg = 150;
                                 }
                             }
-                            
+
                             //
                             // Compute x(j) = x(j) / A(j,j), scaling if necessary.
                             //
-                            if( flg!=150 )
+                            if (flg != 150)
                             {
                                 tjj = Math.Abs(tjjs);
-                                if( (double)(tjj)>(double)(smlnum) )
+                                if ((double)(tjj) > (double)(smlnum))
                                 {
-                                    
                                     //
                                     // abs(A(j,j)) > SMLNUM:
                                     //
-                                    if( (double)(tjj)<(double)(1) )
+                                    if ((double)(tjj) < (double)(1))
                                     {
-                                        if( (double)(xj)>(double)(tjj*bignum) )
+                                        if ((double)(xj) > (double)(tjj * bignum))
                                         {
-                                            
                                             //
                                             // Scale X by 1/abs(x(j)).
                                             //
-                                            rec = 1/xj;
-                                            for(i_=1; i_<=n;i_++)
+                                            rec = 1 / xj;
+                                            for (i_ = 1; i_ <= n; i_++)
                                             {
-                                                x[i_] = rec*x[i_];
+                                                x[i_] = rec * x[i_];
                                             }
-                                            s = s*rec;
-                                            xmax = xmax*rec;
+                                            s = s * rec;
+                                            xmax = xmax * rec;
                                         }
                                     }
-                                    x[j] = x[j]/tjjs;
+                                    x[j] = x[j] / tjjs;
                                 }
                                 else
                                 {
-                                    if( (double)(tjj)>(double)(0) )
+                                    if ((double)(tjj) > (double)(0))
                                     {
-                                        
                                         //
                                         // 0 < abs(A(j,j)) <= SMLNUM:
                                         //
-                                        if( (double)(xj)>(double)(tjj*bignum) )
+                                        if ((double)(xj) > (double)(tjj * bignum))
                                         {
-                                            
                                             //
                                             // Scale x by (1/abs(x(j)))*abs(A(j,j))*BIGNUM.
                                             //
-                                            rec = tjj*bignum/xj;
-                                            for(i_=1; i_<=n;i_++)
+                                            rec = tjj * bignum / xj;
+                                            for (i_ = 1; i_ <= n; i_++)
                                             {
-                                                x[i_] = rec*x[i_];
+                                                x[i_] = rec * x[i_];
                                             }
-                                            s = s*rec;
-                                            xmax = xmax*rec;
+                                            s = s * rec;
+                                            xmax = xmax * rec;
                                         }
-                                        x[j] = x[j]/tjjs;
+                                        x[j] = x[j] / tjjs;
                                     }
                                     else
                                     {
-                                        
                                         //
                                         // A(j,j) = 0:  Set x(1:n) = 0, x(j) = 1, and
                                         // scale = 0, and compute a solution to A'*x = 0.
                                         //
-                                        for(i=1; i<=n; i++)
+                                        for (i = 1; i <= n; i++)
                                         {
                                             x[i] = 0;
                                         }
@@ -9564,35 +9442,33 @@ public partial class alglib
                         }
                         else
                         {
-                            
                             //
                             // Compute x(j) := x(j) / A(j,j)  - sumj if the dot
                             // product has already been divided by 1/A(j,j).
                             //
-                            x[j] = x[j]/tjjs-sumj;
+                            x[j] = x[j] / tjjs - sumj;
                         }
                         xmax = Math.Max(xmax, Math.Abs(x[j]));
-                        j = j+jinc;
+                        j = j + jinc;
                     }
                 }
-                s = s/tscal;
+                s = s / tscal;
             }
-            
+
             //
             // Scale the column norms by 1/TSCAL for return.
             //
-            if( (double)(tscal)!=(double)(1) )
+            if ((double)(tscal) != (double)(1))
             {
-                v = 1/tscal;
-                for(i_=1; i_<=n;i_++)
+                v = 1 / tscal;
+                for (i_ = 1; i_ <= n; i_++)
                 {
-                    cnorm[i_] = v*cnorm[i_];
+                    cnorm[i_] = v * cnorm[i_];
                 }
             }
         }
-
-
     }
+
     public class safesolve
     {
         /*************************************************************************
@@ -9602,7 +9478,8 @@ public partial class alglib
              21.01.2010
              Bochkanov Sergey
         *************************************************************************/
-        public static bool rmatrixscaledtrsafesolve(double[,] a,
+        public static bool rmatrixscaledtrsafesolve(
+            double[,] a,
             double sa,
             int n,
             ref double[] x,
@@ -9610,7 +9487,8 @@ public partial class alglib
             int trans,
             bool isunit,
             double maxgrowth,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
             double lnmax = 0;
@@ -9624,77 +9502,84 @@ public partial class alglib
             double[] tmp = new double[0];
             int i_ = 0;
 
-            alglib.ap.assert(n>0, "RMatrixTRSafeSolve: incorrect N!");
-            alglib.ap.assert(trans==0 || trans==1, "RMatrixTRSafeSolve: incorrect Trans!");
+            Alglib.ap.assert(n > 0, "RMatrixTRSafeSolve: incorrect N!");
+            Alglib.ap.assert(trans == 0 || trans == 1, "RMatrixTRSafeSolve: incorrect Trans!");
             result = true;
             lnmax = Math.Log(math.maxrealnumber);
-            
+
             //
             // Quick return if possible
             //
-            if( n<=0 )
+            if (n <= 0)
             {
                 return result;
             }
-            
+
             //
             // Load norms: right part and X
             //
             nrmb = 0;
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 nrmb = Math.Max(nrmb, Math.Abs(x[i]));
             }
             nrmx = 0;
-            
+
             //
             // Solve
             //
             tmp = new double[n];
             result = true;
-            if( isupper && trans==0 )
+            if (isupper && trans == 0)
             {
-                
                 //
                 // U*x = b
                 //
-                for(i=n-1; i>=0; i--)
+                for (i = n - 1; i >= 0; i--)
                 {
-                    
                     //
                     // Task is reduced to alpha*x[i] = beta
                     //
-                    if( isunit )
+                    if (isunit)
                     {
                         alpha = sa;
                     }
                     else
                     {
-                        alpha = a[i,i]*sa;
+                        alpha = a[i, i] * sa;
                     }
-                    if( i<n-1 )
+                    if (i < n - 1)
                     {
-                        for(i_=i+1; i_<=n-1;i_++)
+                        for (i_ = i + 1; i_ <= n - 1; i_++)
                         {
-                            tmp[i_] = sa*a[i,i_];
+                            tmp[i_] = sa * a[i, i_];
                         }
                         vr = 0.0;
-                        for(i_=i+1; i_<=n-1;i_++)
+                        for (i_ = i + 1; i_ <= n - 1; i_++)
                         {
-                            vr += tmp[i_]*x[i_];
+                            vr += tmp[i_] * x[i_];
                         }
-                        beta = x[i]-vr;
+                        beta = x[i] - vr;
                     }
                     else
                     {
                         beta = x[i];
                     }
-                    
+
                     //
                     // solve alpha*x[i] = beta
                     //
-                    result = cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, ref nrmx, ref cx, _params);
-                    if( !result )
+                    result = cbasicsolveandupdate(
+                        alpha,
+                        beta,
+                        lnmax,
+                        nrmb,
+                        maxgrowth,
+                        ref nrmx,
+                        ref cx,
+                        _params
+                    );
+                    if (!result)
                     {
                         return result;
                     }
@@ -9702,49 +9587,56 @@ public partial class alglib
                 }
                 return result;
             }
-            if( !isupper && trans==0 )
+            if (!isupper && trans == 0)
             {
-                
                 //
                 // L*x = b
                 //
-                for(i=0; i<=n-1; i++)
+                for (i = 0; i <= n - 1; i++)
                 {
-                    
                     //
                     // Task is reduced to alpha*x[i] = beta
                     //
-                    if( isunit )
+                    if (isunit)
                     {
                         alpha = sa;
                     }
                     else
                     {
-                        alpha = a[i,i]*sa;
+                        alpha = a[i, i] * sa;
                     }
-                    if( i>0 )
+                    if (i > 0)
                     {
-                        for(i_=0; i_<=i-1;i_++)
+                        for (i_ = 0; i_ <= i - 1; i_++)
                         {
-                            tmp[i_] = sa*a[i,i_];
+                            tmp[i_] = sa * a[i, i_];
                         }
                         vr = 0.0;
-                        for(i_=0; i_<=i-1;i_++)
+                        for (i_ = 0; i_ <= i - 1; i_++)
                         {
-                            vr += tmp[i_]*x[i_];
+                            vr += tmp[i_] * x[i_];
                         }
-                        beta = x[i]-vr;
+                        beta = x[i] - vr;
                     }
                     else
                     {
                         beta = x[i];
                     }
-                    
+
                     //
                     // solve alpha*x[i] = beta
                     //
-                    result = cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, ref nrmx, ref cx, _params);
-                    if( !result )
+                    result = cbasicsolveandupdate(
+                        alpha,
+                        beta,
+                        lnmax,
+                        nrmb,
+                        maxgrowth,
+                        ref nrmx,
+                        ref cx,
+                        _params
+                    );
+                    if (!result)
                     {
                         return result;
                     }
@@ -9752,101 +9644,115 @@ public partial class alglib
                 }
                 return result;
             }
-            if( isupper && trans==1 )
+            if (isupper && trans == 1)
             {
-                
                 //
                 // U^T*x = b
                 //
-                for(i=0; i<=n-1; i++)
+                for (i = 0; i <= n - 1; i++)
                 {
-                    
                     //
                     // Task is reduced to alpha*x[i] = beta
                     //
-                    if( isunit )
+                    if (isunit)
                     {
                         alpha = sa;
                     }
                     else
                     {
-                        alpha = a[i,i]*sa;
+                        alpha = a[i, i] * sa;
                     }
                     beta = x[i];
-                    
+
                     //
                     // solve alpha*x[i] = beta
                     //
-                    result = cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, ref nrmx, ref cx, _params);
-                    if( !result )
+                    result = cbasicsolveandupdate(
+                        alpha,
+                        beta,
+                        lnmax,
+                        nrmb,
+                        maxgrowth,
+                        ref nrmx,
+                        ref cx,
+                        _params
+                    );
+                    if (!result)
                     {
                         return result;
                     }
                     x[i] = cx.x;
-                    
+
                     //
                     // update the rest of right part
                     //
-                    if( i<n-1 )
+                    if (i < n - 1)
                     {
                         vr = cx.x;
-                        for(i_=i+1; i_<=n-1;i_++)
+                        for (i_ = i + 1; i_ <= n - 1; i_++)
                         {
-                            tmp[i_] = sa*a[i,i_];
+                            tmp[i_] = sa * a[i, i_];
                         }
-                        for(i_=i+1; i_<=n-1;i_++)
+                        for (i_ = i + 1; i_ <= n - 1; i_++)
                         {
-                            x[i_] = x[i_] - vr*tmp[i_];
+                            x[i_] = x[i_] - vr * tmp[i_];
                         }
                     }
                 }
                 return result;
             }
-            if( !isupper && trans==1 )
+            if (!isupper && trans == 1)
             {
-                
                 //
                 // L^T*x = b
                 //
-                for(i=n-1; i>=0; i--)
+                for (i = n - 1; i >= 0; i--)
                 {
-                    
                     //
                     // Task is reduced to alpha*x[i] = beta
                     //
-                    if( isunit )
+                    if (isunit)
                     {
                         alpha = sa;
                     }
                     else
                     {
-                        alpha = a[i,i]*sa;
+                        alpha = a[i, i] * sa;
                     }
                     beta = x[i];
-                    
+
                     //
                     // solve alpha*x[i] = beta
                     //
-                    result = cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, ref nrmx, ref cx, _params);
-                    if( !result )
+                    result = cbasicsolveandupdate(
+                        alpha,
+                        beta,
+                        lnmax,
+                        nrmb,
+                        maxgrowth,
+                        ref nrmx,
+                        ref cx,
+                        _params
+                    );
+                    if (!result)
                     {
                         return result;
                     }
                     x[i] = cx.x;
-                    
+
                     //
                     // update the rest of right part
                     //
-                    if( i>0 )
+                    if (i > 0)
                     {
                         vr = cx.x;
-                        for(i_=0; i_<=i-1;i_++)
+                        for (i_ = 0; i_ <= i - 1; i_++)
                         {
-                            tmp[i_] = sa*a[i,i_];
+                            tmp[i_] = sa * a[i, i_];
                         }
-                        for(i_=0; i_<=i-1;i_++)
+                        for (i_ = 0; i_ <= i - 1; i_++)
                         {
-                            x[i_] = x[i_] - vr*tmp[i_];
+                            x[i_] = x[i_] - vr * tmp[i_];
                         }
                     }
                 }
@@ -9855,7 +9761,6 @@ public partial class alglib
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         Internal subroutine for safe solution of
@@ -9875,7 +9780,8 @@ public partial class alglib
              21.01.2010
              Bochkanov Sergey
         *************************************************************************/
-        public static bool cmatrixscaledtrsafesolve(complex[,] a,
+        public static bool cmatrixscaledtrsafesolve(
+            complex[,] a,
             double sa,
             int n,
             ref complex[] x,
@@ -9883,7 +9789,8 @@ public partial class alglib
             int trans,
             bool isunit,
             double maxgrowth,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
             double lnmax = 0;
@@ -9896,77 +9803,87 @@ public partial class alglib
             complex[] tmp = new complex[0];
             int i_ = 0;
 
-            alglib.ap.assert(n>0, "CMatrixTRSafeSolve: incorrect N!");
-            alglib.ap.assert((trans==0 || trans==1) || trans==2, "CMatrixTRSafeSolve: incorrect Trans!");
+            Alglib.ap.assert(n > 0, "CMatrixTRSafeSolve: incorrect N!");
+            Alglib.ap.assert(
+                (trans == 0 || trans == 1) || trans == 2,
+                "CMatrixTRSafeSolve: incorrect Trans!"
+            );
             result = true;
             lnmax = Math.Log(math.maxrealnumber);
-            
+
             //
             // Quick return if possible
             //
-            if( n<=0 )
+            if (n <= 0)
             {
                 return result;
             }
-            
+
             //
             // Load norms: right part and X
             //
             nrmb = 0;
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 nrmb = Math.Max(nrmb, math.abscomplex(x[i]));
             }
             nrmx = 0;
-            
+
             //
             // Solve
             //
             tmp = new complex[n];
             result = true;
-            if( isupper && trans==0 )
+            if (isupper && trans == 0)
             {
-                
                 //
                 // U*x = b
                 //
-                for(i=n-1; i>=0; i--)
+                for (i = n - 1; i >= 0; i--)
                 {
-                    
                     //
                     // Task is reduced to alpha*x[i] = beta
                     //
-                    if( isunit )
+                    if (isunit)
                     {
                         alpha = sa;
                     }
                     else
                     {
-                        alpha = a[i,i]*sa;
+                        alpha = a[i, i] * sa;
                     }
-                    if( i<n-1 )
+                    if (i < n - 1)
                     {
-                        for(i_=i+1; i_<=n-1;i_++)
+                        for (i_ = i + 1; i_ <= n - 1; i_++)
                         {
-                            tmp[i_] = sa*a[i,i_];
+                            tmp[i_] = sa * a[i, i_];
                         }
                         vc = 0.0;
-                        for(i_=i+1; i_<=n-1;i_++)
+                        for (i_ = i + 1; i_ <= n - 1; i_++)
                         {
-                            vc += tmp[i_]*x[i_];
+                            vc += tmp[i_] * x[i_];
                         }
-                        beta = x[i]-vc;
+                        beta = x[i] - vc;
                     }
                     else
                     {
                         beta = x[i];
                     }
-                    
+
                     //
                     // solve alpha*x[i] = beta
                     //
-                    result = cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, ref nrmx, ref vc, _params);
-                    if( !result )
+                    result = cbasicsolveandupdate(
+                        alpha,
+                        beta,
+                        lnmax,
+                        nrmb,
+                        maxgrowth,
+                        ref nrmx,
+                        ref vc,
+                        _params
+                    );
+                    if (!result)
                     {
                         return result;
                     }
@@ -9974,49 +9891,56 @@ public partial class alglib
                 }
                 return result;
             }
-            if( !isupper && trans==0 )
+            if (!isupper && trans == 0)
             {
-                
                 //
                 // L*x = b
                 //
-                for(i=0; i<=n-1; i++)
+                for (i = 0; i <= n - 1; i++)
                 {
-                    
                     //
                     // Task is reduced to alpha*x[i] = beta
                     //
-                    if( isunit )
+                    if (isunit)
                     {
                         alpha = sa;
                     }
                     else
                     {
-                        alpha = a[i,i]*sa;
+                        alpha = a[i, i] * sa;
                     }
-                    if( i>0 )
+                    if (i > 0)
                     {
-                        for(i_=0; i_<=i-1;i_++)
+                        for (i_ = 0; i_ <= i - 1; i_++)
                         {
-                            tmp[i_] = sa*a[i,i_];
+                            tmp[i_] = sa * a[i, i_];
                         }
                         vc = 0.0;
-                        for(i_=0; i_<=i-1;i_++)
+                        for (i_ = 0; i_ <= i - 1; i_++)
                         {
-                            vc += tmp[i_]*x[i_];
+                            vc += tmp[i_] * x[i_];
                         }
-                        beta = x[i]-vc;
+                        beta = x[i] - vc;
                     }
                     else
                     {
                         beta = x[i];
                     }
-                    
+
                     //
                     // solve alpha*x[i] = beta
                     //
-                    result = cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, ref nrmx, ref vc, _params);
-                    if( !result )
+                    result = cbasicsolveandupdate(
+                        alpha,
+                        beta,
+                        lnmax,
+                        nrmb,
+                        maxgrowth,
+                        ref nrmx,
+                        ref vc,
+                        _params
+                    );
+                    if (!result)
                     {
                         return result;
                     }
@@ -10024,197 +9948,225 @@ public partial class alglib
                 }
                 return result;
             }
-            if( isupper && trans==1 )
+            if (isupper && trans == 1)
             {
-                
                 //
                 // U^T*x = b
                 //
-                for(i=0; i<=n-1; i++)
+                for (i = 0; i <= n - 1; i++)
                 {
-                    
                     //
                     // Task is reduced to alpha*x[i] = beta
                     //
-                    if( isunit )
+                    if (isunit)
                     {
                         alpha = sa;
                     }
                     else
                     {
-                        alpha = a[i,i]*sa;
+                        alpha = a[i, i] * sa;
                     }
                     beta = x[i];
-                    
+
                     //
                     // solve alpha*x[i] = beta
                     //
-                    result = cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, ref nrmx, ref vc, _params);
-                    if( !result )
+                    result = cbasicsolveandupdate(
+                        alpha,
+                        beta,
+                        lnmax,
+                        nrmb,
+                        maxgrowth,
+                        ref nrmx,
+                        ref vc,
+                        _params
+                    );
+                    if (!result)
                     {
                         return result;
                     }
                     x[i] = vc;
-                    
+
                     //
                     // update the rest of right part
                     //
-                    if( i<n-1 )
+                    if (i < n - 1)
                     {
-                        for(i_=i+1; i_<=n-1;i_++)
+                        for (i_ = i + 1; i_ <= n - 1; i_++)
                         {
-                            tmp[i_] = sa*a[i,i_];
+                            tmp[i_] = sa * a[i, i_];
                         }
-                        for(i_=i+1; i_<=n-1;i_++)
+                        for (i_ = i + 1; i_ <= n - 1; i_++)
                         {
-                            x[i_] = x[i_] - vc*tmp[i_];
+                            x[i_] = x[i_] - vc * tmp[i_];
                         }
                     }
                 }
                 return result;
             }
-            if( !isupper && trans==1 )
+            if (!isupper && trans == 1)
             {
-                
                 //
                 // L^T*x = b
                 //
-                for(i=n-1; i>=0; i--)
+                for (i = n - 1; i >= 0; i--)
                 {
-                    
                     //
                     // Task is reduced to alpha*x[i] = beta
                     //
-                    if( isunit )
+                    if (isunit)
                     {
                         alpha = sa;
                     }
                     else
                     {
-                        alpha = a[i,i]*sa;
+                        alpha = a[i, i] * sa;
                     }
                     beta = x[i];
-                    
+
                     //
                     // solve alpha*x[i] = beta
                     //
-                    result = cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, ref nrmx, ref vc, _params);
-                    if( !result )
+                    result = cbasicsolveandupdate(
+                        alpha,
+                        beta,
+                        lnmax,
+                        nrmb,
+                        maxgrowth,
+                        ref nrmx,
+                        ref vc,
+                        _params
+                    );
+                    if (!result)
                     {
                         return result;
                     }
                     x[i] = vc;
-                    
+
                     //
                     // update the rest of right part
                     //
-                    if( i>0 )
+                    if (i > 0)
                     {
-                        for(i_=0; i_<=i-1;i_++)
+                        for (i_ = 0; i_ <= i - 1; i_++)
                         {
-                            tmp[i_] = sa*a[i,i_];
+                            tmp[i_] = sa * a[i, i_];
                         }
-                        for(i_=0; i_<=i-1;i_++)
+                        for (i_ = 0; i_ <= i - 1; i_++)
                         {
-                            x[i_] = x[i_] - vc*tmp[i_];
+                            x[i_] = x[i_] - vc * tmp[i_];
                         }
                     }
                 }
                 return result;
             }
-            if( isupper && trans==2 )
+            if (isupper && trans == 2)
             {
-                
                 //
                 // U^H*x = b
                 //
-                for(i=0; i<=n-1; i++)
+                for (i = 0; i <= n - 1; i++)
                 {
-                    
                     //
                     // Task is reduced to alpha*x[i] = beta
                     //
-                    if( isunit )
+                    if (isunit)
                     {
                         alpha = sa;
                     }
                     else
                     {
-                        alpha = math.conj(a[i,i])*sa;
+                        alpha = math.conj(a[i, i]) * sa;
                     }
                     beta = x[i];
-                    
+
                     //
                     // solve alpha*x[i] = beta
                     //
-                    result = cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, ref nrmx, ref vc, _params);
-                    if( !result )
+                    result = cbasicsolveandupdate(
+                        alpha,
+                        beta,
+                        lnmax,
+                        nrmb,
+                        maxgrowth,
+                        ref nrmx,
+                        ref vc,
+                        _params
+                    );
+                    if (!result)
                     {
                         return result;
                     }
                     x[i] = vc;
-                    
+
                     //
                     // update the rest of right part
                     //
-                    if( i<n-1 )
+                    if (i < n - 1)
                     {
-                        for(i_=i+1; i_<=n-1;i_++)
+                        for (i_ = i + 1; i_ <= n - 1; i_++)
                         {
-                            tmp[i_] = sa*math.conj(a[i,i_]);
+                            tmp[i_] = sa * math.conj(a[i, i_]);
                         }
-                        for(i_=i+1; i_<=n-1;i_++)
+                        for (i_ = i + 1; i_ <= n - 1; i_++)
                         {
-                            x[i_] = x[i_] - vc*tmp[i_];
+                            x[i_] = x[i_] - vc * tmp[i_];
                         }
                     }
                 }
                 return result;
             }
-            if( !isupper && trans==2 )
+            if (!isupper && trans == 2)
             {
-                
                 //
                 // L^T*x = b
                 //
-                for(i=n-1; i>=0; i--)
+                for (i = n - 1; i >= 0; i--)
                 {
-                    
                     //
                     // Task is reduced to alpha*x[i] = beta
                     //
-                    if( isunit )
+                    if (isunit)
                     {
                         alpha = sa;
                     }
                     else
                     {
-                        alpha = math.conj(a[i,i])*sa;
+                        alpha = math.conj(a[i, i]) * sa;
                     }
                     beta = x[i];
-                    
+
                     //
                     // solve alpha*x[i] = beta
                     //
-                    result = cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, ref nrmx, ref vc, _params);
-                    if( !result )
+                    result = cbasicsolveandupdate(
+                        alpha,
+                        beta,
+                        lnmax,
+                        nrmb,
+                        maxgrowth,
+                        ref nrmx,
+                        ref vc,
+                        _params
+                    );
+                    if (!result)
                     {
                         return result;
                     }
                     x[i] = vc;
-                    
+
                     //
                     // update the rest of right part
                     //
-                    if( i>0 )
+                    if (i > 0)
                     {
-                        for(i_=0; i_<=i-1;i_++)
+                        for (i_ = 0; i_ <= i - 1; i_++)
                         {
-                            tmp[i_] = sa*math.conj(a[i,i_]);
+                            tmp[i_] = sa * math.conj(a[i, i_]);
                         }
-                        for(i_=0; i_<=i-1;i_++)
+                        for (i_ = 0; i_ <= i - 1; i_++)
                         {
-                            x[i_] = x[i_] - vc*tmp[i_];
+                            x[i_] = x[i_] - vc * tmp[i_];
                         }
                     }
                 }
@@ -10223,7 +10175,6 @@ public partial class alglib
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         complex basic solver-updater for reduced linear system
@@ -10247,14 +10198,16 @@ public partial class alglib
              26.01.2009
              Bochkanov Sergey
         *************************************************************************/
-        private static bool cbasicsolveandupdate(complex alpha,
+        private static bool cbasicsolveandupdate(
+            complex alpha,
             complex beta,
             double lnmax,
             double bnorm,
             double maxgrowth,
             ref double xnorm,
             ref complex x,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
             double v = 0;
@@ -10262,56 +10215,55 @@ public partial class alglib
             x = 0;
 
             result = false;
-            if( alpha==0 )
+            if (alpha == 0)
             {
                 return result;
             }
-            if( beta!=0 )
+            if (beta != 0)
             {
-                
                 //
                 // alpha*x[i]=beta
                 //
-                v = Math.Log(math.abscomplex(beta))-Math.Log(math.abscomplex(alpha));
-                if( (double)(v)>(double)(lnmax) )
+                v = Math.Log(math.abscomplex(beta)) - Math.Log(math.abscomplex(alpha));
+                if ((double)(v) > (double)(lnmax))
                 {
                     return result;
                 }
-                x = beta/alpha;
+                x = beta / alpha;
             }
             else
             {
-                
                 //
                 // alpha*x[i]=0
                 //
                 x = 0;
             }
-            
+
             //
             // update NrmX, test growth limit
             //
             xnorm = Math.Max(xnorm, math.abscomplex(x));
-            if( (double)(xnorm)>(double)(maxgrowth*bnorm) )
+            if ((double)(xnorm) > (double)(maxgrowth * bnorm))
             {
                 return result;
             }
             result = true;
             return result;
         }
-
-
     }
+
     public class hblas
     {
-        public static void hermitianmatrixvectormultiply(complex[,] a,
+        public static void hermitianmatrixvectormultiply(
+            complex[,] a,
             bool isupper,
             int i1,
             int i2,
             complex[] x,
             complex alpha,
             ref complex[] y,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int ba1 = 0;
@@ -10324,12 +10276,12 @@ public partial class alglib
             int i_ = 0;
             int i1_ = 0;
 
-            n = i2-i1+1;
-            if( n<=0 )
+            n = i2 - i1 + 1;
+            if (n <= 0)
             {
                 return;
             }
-            
+
             //
             // Let A = L + D + U, where
             //  L is strictly lower triangular (main diagonal is zero)
@@ -10340,88 +10292,86 @@ public partial class alglib
             //
             // Calculate D*x first
             //
-            for(i=i1; i<=i2; i++)
+            for (i = i1; i <= i2; i++)
             {
-                y[i-i1+1] = a[i,i]*x[i-i1+1];
+                y[i - i1 + 1] = a[i, i] * x[i - i1 + 1];
             }
-            
+
             //
             // Add L*x + U*x
             //
-            if( isupper )
+            if (isupper)
             {
-                for(i=i1; i<=i2-1; i++)
+                for (i = i1; i <= i2 - 1; i++)
                 {
-                    
                     //
                     // Add L*x to the result
                     //
-                    v = x[i-i1+1];
-                    by1 = i-i1+2;
+                    v = x[i - i1 + 1];
+                    by1 = i - i1 + 2;
                     by2 = n;
-                    ba1 = i+1;
+                    ba1 = i + 1;
                     i1_ = (ba1) - (by1);
-                    for(i_=by1; i_<=by2;i_++)
+                    for (i_ = by1; i_ <= by2; i_++)
                     {
-                        y[i_] = y[i_] + v*math.conj(a[i,i_+i1_]);
+                        y[i_] = y[i_] + v * math.conj(a[i, i_ + i1_]);
                     }
-                    
+
                     //
                     // Add U*x to the result
                     //
-                    bx1 = i-i1+2;
+                    bx1 = i - i1 + 2;
                     bx2 = n;
-                    ba1 = i+1;
-                    i1_ = (ba1)-(bx1);
+                    ba1 = i + 1;
+                    i1_ = (ba1) - (bx1);
                     v = 0.0;
-                    for(i_=bx1; i_<=bx2;i_++)
+                    for (i_ = bx1; i_ <= bx2; i_++)
                     {
-                        v += x[i_]*a[i,i_+i1_];
+                        v += x[i_] * a[i, i_ + i1_];
                     }
-                    y[i-i1+1] = y[i-i1+1]+v;
+                    y[i - i1 + 1] = y[i - i1 + 1] + v;
                 }
             }
             else
             {
-                for(i=i1+1; i<=i2; i++)
+                for (i = i1 + 1; i <= i2; i++)
                 {
-                    
                     //
                     // Add L*x to the result
                     //
                     bx1 = 1;
-                    bx2 = i-i1;
+                    bx2 = i - i1;
                     ba1 = i1;
-                    i1_ = (ba1)-(bx1);
+                    i1_ = (ba1) - (bx1);
                     v = 0.0;
-                    for(i_=bx1; i_<=bx2;i_++)
+                    for (i_ = bx1; i_ <= bx2; i_++)
                     {
-                        v += x[i_]*a[i,i_+i1_];
+                        v += x[i_] * a[i, i_ + i1_];
                     }
-                    y[i-i1+1] = y[i-i1+1]+v;
-                    
+                    y[i - i1 + 1] = y[i - i1 + 1] + v;
+
                     //
                     // Add U*x to the result
                     //
-                    v = x[i-i1+1];
+                    v = x[i - i1 + 1];
                     by1 = 1;
-                    by2 = i-i1;
+                    by2 = i - i1;
                     ba1 = i1;
                     i1_ = (ba1) - (by1);
-                    for(i_=by1; i_<=by2;i_++)
+                    for (i_ = by1; i_ <= by2; i_++)
                     {
-                        y[i_] = y[i_] + v*math.conj(a[i,i_+i1_]);
+                        y[i_] = y[i_] + v * math.conj(a[i, i_ + i1_]);
                     }
                 }
             }
-            for(i_=1; i_<=n;i_++)
+            for (i_ = 1; i_ <= n; i_++)
             {
-                y[i_] = alpha*y[i_];
+                y[i_] = alpha * y[i_];
             }
         }
 
-
-        public static void hermitianrank2update(ref complex[,] a,
+        public static void hermitianrank2update(
+            ref complex[,] a,
             bool isupper,
             int i1,
             int i2,
@@ -10429,7 +10379,8 @@ public partial class alglib
             complex[] y,
             ref complex[] t,
             complex alpha,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int tp1 = 0;
@@ -10438,66 +10389,67 @@ public partial class alglib
             int i_ = 0;
             int i1_ = 0;
 
-            if( isupper )
+            if (isupper)
             {
-                for(i=i1; i<=i2; i++)
+                for (i = i1; i <= i2; i++)
                 {
-                    tp1 = i+1-i1;
-                    tp2 = i2-i1+1;
-                    v = alpha*x[i+1-i1];
-                    for(i_=tp1; i_<=tp2;i_++)
+                    tp1 = i + 1 - i1;
+                    tp2 = i2 - i1 + 1;
+                    v = alpha * x[i + 1 - i1];
+                    for (i_ = tp1; i_ <= tp2; i_++)
                     {
-                        t[i_] = v*math.conj(y[i_]);
+                        t[i_] = v * math.conj(y[i_]);
                     }
-                    v = math.conj(alpha)*y[i+1-i1];
-                    for(i_=tp1; i_<=tp2;i_++)
+                    v = math.conj(alpha) * y[i + 1 - i1];
+                    for (i_ = tp1; i_ <= tp2; i_++)
                     {
-                        t[i_] = t[i_] + v*math.conj(x[i_]);
+                        t[i_] = t[i_] + v * math.conj(x[i_]);
                     }
                     i1_ = (tp1) - (i);
-                    for(i_=i; i_<=i2;i_++)
+                    for (i_ = i; i_ <= i2; i_++)
                     {
-                        a[i,i_] = a[i,i_] + t[i_+i1_];
+                        a[i, i_] = a[i, i_] + t[i_ + i1_];
                     }
                 }
             }
             else
             {
-                for(i=i1; i<=i2; i++)
+                for (i = i1; i <= i2; i++)
                 {
                     tp1 = 1;
-                    tp2 = i+1-i1;
-                    v = alpha*x[i+1-i1];
-                    for(i_=tp1; i_<=tp2;i_++)
+                    tp2 = i + 1 - i1;
+                    v = alpha * x[i + 1 - i1];
+                    for (i_ = tp1; i_ <= tp2; i_++)
                     {
-                        t[i_] = v*math.conj(y[i_]);
+                        t[i_] = v * math.conj(y[i_]);
                     }
-                    v = math.conj(alpha)*y[i+1-i1];
-                    for(i_=tp1; i_<=tp2;i_++)
+                    v = math.conj(alpha) * y[i + 1 - i1];
+                    for (i_ = tp1; i_ <= tp2; i_++)
                     {
-                        t[i_] = t[i_] + v*math.conj(x[i_]);
+                        t[i_] = t[i_] + v * math.conj(x[i_]);
                     }
                     i1_ = (tp1) - (i1);
-                    for(i_=i1; i_<=i;i_++)
+                    for (i_ = i1; i_ <= i; i_++)
                     {
-                        a[i,i_] = a[i,i_] + t[i_+i1_];
+                        a[i, i_] = a[i, i_] + t[i_ + i1_];
                     }
                 }
             }
         }
-
-
     }
+
     public class sblas
     {
-        public static void symmetricmatrixvectormultiply(double[,] a,
+        public static void symmetricmatrixvectormultiply(
+            double[,] a,
             bool isupper,
             int i1,
             int i2,
             double[] x,
             double alpha,
             ref double[] y,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int ba1 = 0;
@@ -10511,12 +10463,12 @@ public partial class alglib
             int i_ = 0;
             int i1_ = 0;
 
-            n = i2-i1+1;
-            if( n<=0 )
+            n = i2 - i1 + 1;
+            if (n <= 0)
             {
                 return;
             }
-            
+
             //
             // Let A = L + D + U, where
             //  L is strictly lower triangular (main diagonal is zero)
@@ -10527,93 +10479,91 @@ public partial class alglib
             //
             // Calculate D*x first
             //
-            for(i=i1; i<=i2; i++)
+            for (i = i1; i <= i2; i++)
             {
-                y[i-i1+1] = a[i,i]*x[i-i1+1];
+                y[i - i1 + 1] = a[i, i] * x[i - i1 + 1];
             }
-            
+
             //
             // Add L*x + U*x
             //
-            if( isupper )
+            if (isupper)
             {
-                for(i=i1; i<=i2-1; i++)
+                for (i = i1; i <= i2 - 1; i++)
                 {
-                    
                     //
                     // Add L*x to the result
                     //
-                    v = x[i-i1+1];
-                    by1 = i-i1+2;
+                    v = x[i - i1 + 1];
+                    by1 = i - i1 + 2;
                     by2 = n;
-                    ba1 = i+1;
+                    ba1 = i + 1;
                     ba2 = i2;
                     i1_ = (ba1) - (by1);
-                    for(i_=by1; i_<=by2;i_++)
+                    for (i_ = by1; i_ <= by2; i_++)
                     {
-                        y[i_] = y[i_] + v*a[i,i_+i1_];
+                        y[i_] = y[i_] + v * a[i, i_ + i1_];
                     }
-                    
+
                     //
                     // Add U*x to the result
                     //
-                    bx1 = i-i1+2;
+                    bx1 = i - i1 + 2;
                     bx2 = n;
-                    ba1 = i+1;
+                    ba1 = i + 1;
                     ba2 = i2;
-                    i1_ = (ba1)-(bx1);
+                    i1_ = (ba1) - (bx1);
                     v = 0.0;
-                    for(i_=bx1; i_<=bx2;i_++)
+                    for (i_ = bx1; i_ <= bx2; i_++)
                     {
-                        v += x[i_]*a[i,i_+i1_];
+                        v += x[i_] * a[i, i_ + i1_];
                     }
-                    y[i-i1+1] = y[i-i1+1]+v;
+                    y[i - i1 + 1] = y[i - i1 + 1] + v;
                 }
             }
             else
             {
-                for(i=i1+1; i<=i2; i++)
+                for (i = i1 + 1; i <= i2; i++)
                 {
-                    
                     //
                     // Add L*x to the result
                     //
                     bx1 = 1;
-                    bx2 = i-i1;
+                    bx2 = i - i1;
                     ba1 = i1;
-                    ba2 = i-1;
-                    i1_ = (ba1)-(bx1);
+                    ba2 = i - 1;
+                    i1_ = (ba1) - (bx1);
                     v = 0.0;
-                    for(i_=bx1; i_<=bx2;i_++)
+                    for (i_ = bx1; i_ <= bx2; i_++)
                     {
-                        v += x[i_]*a[i,i_+i1_];
+                        v += x[i_] * a[i, i_ + i1_];
                     }
-                    y[i-i1+1] = y[i-i1+1]+v;
-                    
+                    y[i - i1 + 1] = y[i - i1 + 1] + v;
+
                     //
                     // Add U*x to the result
                     //
-                    v = x[i-i1+1];
+                    v = x[i - i1 + 1];
                     by1 = 1;
-                    by2 = i-i1;
+                    by2 = i - i1;
                     ba1 = i1;
-                    ba2 = i-1;
+                    ba2 = i - 1;
                     i1_ = (ba1) - (by1);
-                    for(i_=by1; i_<=by2;i_++)
+                    for (i_ = by1; i_ <= by2; i_++)
                     {
-                        y[i_] = y[i_] + v*a[i,i_+i1_];
+                        y[i_] = y[i_] + v * a[i, i_ + i1_];
                     }
                 }
             }
-            for(i_=1; i_<=n;i_++)
+            for (i_ = 1; i_ <= n; i_++)
             {
-                y[i_] = alpha*y[i_];
+                y[i_] = alpha * y[i_];
             }
             apserv.touchint(ref ba2, _params);
         }
 
-
-        public static void symmetricrank2update(ref double[,] a,
+        public static void symmetricrank2update(
+            ref double[,] a,
             bool isupper,
             int i1,
             int i2,
@@ -10621,7 +10571,8 @@ public partial class alglib
             double[] y,
             ref double[] t,
             double alpha,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int tp1 = 0;
@@ -10630,70 +10581,66 @@ public partial class alglib
             int i_ = 0;
             int i1_ = 0;
 
-            if( isupper )
+            if (isupper)
             {
-                for(i=i1; i<=i2; i++)
+                for (i = i1; i <= i2; i++)
                 {
-                    tp1 = i+1-i1;
-                    tp2 = i2-i1+1;
-                    v = x[i+1-i1];
-                    for(i_=tp1; i_<=tp2;i_++)
+                    tp1 = i + 1 - i1;
+                    tp2 = i2 - i1 + 1;
+                    v = x[i + 1 - i1];
+                    for (i_ = tp1; i_ <= tp2; i_++)
                     {
-                        t[i_] = v*y[i_];
+                        t[i_] = v * y[i_];
                     }
-                    v = y[i+1-i1];
-                    for(i_=tp1; i_<=tp2;i_++)
+                    v = y[i + 1 - i1];
+                    for (i_ = tp1; i_ <= tp2; i_++)
                     {
-                        t[i_] = t[i_] + v*x[i_];
+                        t[i_] = t[i_] + v * x[i_];
                     }
-                    for(i_=tp1; i_<=tp2;i_++)
+                    for (i_ = tp1; i_ <= tp2; i_++)
                     {
-                        t[i_] = alpha*t[i_];
+                        t[i_] = alpha * t[i_];
                     }
                     i1_ = (tp1) - (i);
-                    for(i_=i; i_<=i2;i_++)
+                    for (i_ = i; i_ <= i2; i_++)
                     {
-                        a[i,i_] = a[i,i_] + t[i_+i1_];
+                        a[i, i_] = a[i, i_] + t[i_ + i1_];
                     }
                 }
             }
             else
             {
-                for(i=i1; i<=i2; i++)
+                for (i = i1; i <= i2; i++)
                 {
                     tp1 = 1;
-                    tp2 = i+1-i1;
-                    v = x[i+1-i1];
-                    for(i_=tp1; i_<=tp2;i_++)
+                    tp2 = i + 1 - i1;
+                    v = x[i + 1 - i1];
+                    for (i_ = tp1; i_ <= tp2; i_++)
                     {
-                        t[i_] = v*y[i_];
+                        t[i_] = v * y[i_];
                     }
-                    v = y[i+1-i1];
-                    for(i_=tp1; i_<=tp2;i_++)
+                    v = y[i + 1 - i1];
+                    for (i_ = tp1; i_ <= tp2; i_++)
                     {
-                        t[i_] = t[i_] + v*x[i_];
+                        t[i_] = t[i_] + v * x[i_];
                     }
-                    for(i_=tp1; i_<=tp2;i_++)
+                    for (i_ = tp1; i_ <= tp2; i_++)
                     {
-                        t[i_] = alpha*t[i_];
+                        t[i_] = alpha * t[i_];
                     }
                     i1_ = (tp1) - (i1);
-                    for(i_=i1; i_<=i;i_++)
+                    for (i_ = i1; i_ <= i; i_++)
                     {
-                        a[i,i_] = a[i,i_] + t[i_+i1_];
+                        a[i, i_] = a[i, i_] + t[i_ + i1_];
                     }
                 }
             }
         }
-
-
     }
+
     public class blas
     {
-        public static double vectornorm2(double[] x,
-            int i1,
-            int i2,
-            alglib.xparams _params)
+        public static double vectornorm2(double[] x, int i1, int i2, Alglib.xparams _params)
         {
             double result = 0;
             int n = 0;
@@ -10702,52 +10649,48 @@ public partial class alglib
             double scl = 0;
             double ssq = 0;
 
-            n = i2-i1+1;
-            if( n<1 )
+            n = i2 - i1 + 1;
+            if (n < 1)
             {
                 result = 0;
                 return result;
             }
-            if( n==1 )
+            if (n == 1)
             {
                 result = Math.Abs(x[i1]);
                 return result;
             }
             scl = 0;
             ssq = 1;
-            for(ix=i1; ix<=i2; ix++)
+            for (ix = i1; ix <= i2; ix++)
             {
-                if( (double)(x[ix])!=(double)(0) )
+                if ((double)(x[ix]) != (double)(0))
                 {
                     absxi = Math.Abs(x[ix]);
-                    if( (double)(scl)<(double)(absxi) )
+                    if ((double)(scl) < (double)(absxi))
                     {
-                        ssq = 1+ssq*math.sqr(scl/absxi);
+                        ssq = 1 + ssq * math.sqr(scl / absxi);
                         scl = absxi;
                     }
                     else
                     {
-                        ssq = ssq+math.sqr(absxi/scl);
+                        ssq = ssq + math.sqr(absxi / scl);
                     }
                 }
             }
-            result = scl*Math.Sqrt(ssq);
+            result = scl * Math.Sqrt(ssq);
             return result;
         }
 
-
-        public static int vectoridxabsmax(double[] x,
-            int i1,
-            int i2,
-            alglib.xparams _params)
+        public static int vectoridxabsmax(double[] x, int i1, int i2, Alglib.xparams _params)
         {
             int result = 0;
             int i = 0;
 
             result = i1;
-            for(i=i1+1; i<=i2; i++)
+            for (i = i1 + 1; i <= i2; i++)
             {
-                if( (double)(Math.Abs(x[i]))>(double)(Math.Abs(x[result])) )
+                if ((double)(Math.Abs(x[i])) > (double)(Math.Abs(x[result])))
                 {
                     result = i;
                 }
@@ -10755,20 +10698,21 @@ public partial class alglib
             return result;
         }
 
-
-        public static int columnidxabsmax(double[,] x,
+        public static int columnidxabsmax(
+            double[,] x,
             int i1,
             int i2,
             int j,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int result = 0;
             int i = 0;
 
             result = i1;
-            for(i=i1+1; i<=i2; i++)
+            for (i = i1 + 1; i <= i2; i++)
             {
-                if( (double)(Math.Abs(x[i,j]))>(double)(Math.Abs(x[result,j])) )
+                if ((double)(Math.Abs(x[i, j])) > (double)(Math.Abs(x[result, j])))
                 {
                     result = i;
                 }
@@ -10776,20 +10720,15 @@ public partial class alglib
             return result;
         }
 
-
-        public static int rowidxabsmax(double[,] x,
-            int j1,
-            int j2,
-            int i,
-            alglib.xparams _params)
+        public static int rowidxabsmax(double[,] x, int j1, int j2, int i, Alglib.xparams _params)
         {
             int result = 0;
             int j = 0;
 
             result = j1;
-            for(j=j1+1; j<=j2; j++)
+            for (j = j1 + 1; j <= j2; j++)
             {
-                if( (double)(Math.Abs(x[i,j]))>(double)(Math.Abs(x[i,result])) )
+                if ((double)(Math.Abs(x[i, j])) > (double)(Math.Abs(x[i, result])))
                 {
                     result = j;
                 }
@@ -10797,41 +10736,42 @@ public partial class alglib
             return result;
         }
 
-
-        public static double upperhessenberg1norm(double[,] a,
+        public static double upperhessenberg1norm(
+            double[,] a,
             int i1,
             int i2,
             int j1,
             int j2,
             ref double[] work,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             double result = 0;
             int i = 0;
             int j = 0;
 
-            alglib.ap.assert(i2-i1==j2-j1, "UpperHessenberg1Norm: I2-I1<>J2-J1!");
-            for(j=j1; j<=j2; j++)
+            Alglib.ap.assert(i2 - i1 == j2 - j1, "UpperHessenberg1Norm: I2-I1<>J2-J1!");
+            for (j = j1; j <= j2; j++)
             {
                 work[j] = 0;
             }
-            for(i=i1; i<=i2; i++)
+            for (i = i1; i <= i2; i++)
             {
-                for(j=Math.Max(j1, j1+i-i1-1); j<=j2; j++)
+                for (j = Math.Max(j1, j1 + i - i1 - 1); j <= j2; j++)
                 {
-                    work[j] = work[j]+Math.Abs(a[i,j]);
+                    work[j] = work[j] + Math.Abs(a[i, j]);
                 }
             }
             result = 0;
-            for(j=j1; j<=j2; j++)
+            for (j = j1; j <= j2; j++)
             {
                 result = Math.Max(result, work[j]);
             }
             return result;
         }
 
-
-        public static void copymatrix(double[,] a,
+        public static void copymatrix(
+            double[,] a,
             int is1,
             int is2,
             int js1,
@@ -10841,38 +10781,40 @@ public partial class alglib
             int id2,
             int jd1,
             int jd2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int isrc = 0;
             int idst = 0;
             int i_ = 0;
             int i1_ = 0;
 
-            if( is1>is2 || js1>js2 )
+            if (is1 > is2 || js1 > js2)
             {
                 return;
             }
-            alglib.ap.assert(is2-is1==id2-id1, "CopyMatrix: different sizes!");
-            alglib.ap.assert(js2-js1==jd2-jd1, "CopyMatrix: different sizes!");
-            for(isrc=is1; isrc<=is2; isrc++)
+            Alglib.ap.assert(is2 - is1 == id2 - id1, "CopyMatrix: different sizes!");
+            Alglib.ap.assert(js2 - js1 == jd2 - jd1, "CopyMatrix: different sizes!");
+            for (isrc = is1; isrc <= is2; isrc++)
             {
-                idst = isrc-is1+id1;
+                idst = isrc - is1 + id1;
                 i1_ = (js1) - (jd1);
-                for(i_=jd1; i_<=jd2;i_++)
+                for (i_ = jd1; i_ <= jd2; i_++)
                 {
-                    b[idst,i_] = a[isrc,i_+i1_];
+                    b[idst, i_] = a[isrc, i_ + i1_];
                 }
             }
         }
 
-
-        public static void inplacetranspose(ref double[,] a,
+        public static void inplacetranspose(
+            ref double[,] a,
             int i1,
             int i2,
             int j1,
             int j2,
             ref double[] work,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
@@ -10882,37 +10824,37 @@ public partial class alglib
             int i_ = 0;
             int i1_ = 0;
 
-            if( i1>i2 || j1>j2 )
+            if (i1 > i2 || j1 > j2)
             {
                 return;
             }
-            alglib.ap.assert(i1-i2==j1-j2, "InplaceTranspose error: incorrect array size!");
-            for(i=i1; i<=i2-1; i++)
+            Alglib.ap.assert(i1 - i2 == j1 - j2, "InplaceTranspose error: incorrect array size!");
+            for (i = i1; i <= i2 - 1; i++)
             {
-                j = j1+i-i1;
-                ips = i+1;
-                jps = j1+ips-i1;
-                l = i2-i;
+                j = j1 + i - i1;
+                ips = i + 1;
+                jps = j1 + ips - i1;
+                l = i2 - i;
                 i1_ = (ips) - (1);
-                for(i_=1; i_<=l;i_++)
+                for (i_ = 1; i_ <= l; i_++)
                 {
-                    work[i_] = a[i_+i1_,j];
+                    work[i_] = a[i_ + i1_, j];
                 }
                 i1_ = (jps) - (ips);
-                for(i_=ips; i_<=i2;i_++)
+                for (i_ = ips; i_ <= i2; i_++)
                 {
-                    a[i_,j] = a[i,i_+i1_];
+                    a[i_, j] = a[i, i_ + i1_];
                 }
                 i1_ = (1) - (jps);
-                for(i_=jps; i_<=j2;i_++)
+                for (i_ = jps; i_ <= j2; i_++)
                 {
-                    a[i,i_] = work[i_+i1_];
+                    a[i, i_] = work[i_ + i1_];
                 }
             }
         }
 
-
-        public static void copyandtranspose(double[,] a,
+        public static void copyandtranspose(
+            double[,] a,
             int is1,
             int is2,
             int js1,
@@ -10922,32 +10864,33 @@ public partial class alglib
             int id2,
             int jd1,
             int jd2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int isrc = 0;
             int jdst = 0;
             int i_ = 0;
             int i1_ = 0;
 
-            if( is1>is2 || js1>js2 )
+            if (is1 > is2 || js1 > js2)
             {
                 return;
             }
-            alglib.ap.assert(is2-is1==jd2-jd1, "CopyAndTranspose: different sizes!");
-            alglib.ap.assert(js2-js1==id2-id1, "CopyAndTranspose: different sizes!");
-            for(isrc=is1; isrc<=is2; isrc++)
+            Alglib.ap.assert(is2 - is1 == jd2 - jd1, "CopyAndTranspose: different sizes!");
+            Alglib.ap.assert(js2 - js1 == id2 - id1, "CopyAndTranspose: different sizes!");
+            for (isrc = is1; isrc <= is2; isrc++)
             {
-                jdst = isrc-is1+jd1;
+                jdst = isrc - is1 + jd1;
                 i1_ = (js1) - (id1);
-                for(i_=id1; i_<=id2;i_++)
+                for (i_ = id1; i_ <= id2; i_++)
                 {
-                    b[i_,jdst] = a[isrc,i_+i1_];
+                    b[i_, jdst] = a[isrc, i_ + i1_];
                 }
             }
         }
 
-
-        public static void matrixvectormultiply(double[,] a,
+        public static void matrixvectormultiply(
+            double[,] a,
             int i1,
             int i2,
             int j1,
@@ -10961,108 +10904,104 @@ public partial class alglib
             int iy1,
             int iy2,
             double beta,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             double v = 0;
             int i_ = 0;
             int i1_ = 0;
 
-            if( !trans )
+            if (!trans)
             {
-                
                 //
                 // y := alpha*A*x + beta*y;
                 //
-                if( i1>i2 || j1>j2 )
+                if (i1 > i2 || j1 > j2)
                 {
                     return;
                 }
-                alglib.ap.assert(j2-j1==ix2-ix1, "MatrixVectorMultiply: A and X dont match!");
-                alglib.ap.assert(i2-i1==iy2-iy1, "MatrixVectorMultiply: A and Y dont match!");
-                
+                Alglib.ap.assert(j2 - j1 == ix2 - ix1, "MatrixVectorMultiply: A and X dont match!");
+                Alglib.ap.assert(i2 - i1 == iy2 - iy1, "MatrixVectorMultiply: A and Y dont match!");
+
                 //
                 // beta*y
                 //
-                if( (double)(beta)==(double)(0) )
+                if ((double)(beta) == (double)(0))
                 {
-                    for(i=iy1; i<=iy2; i++)
+                    for (i = iy1; i <= iy2; i++)
                     {
                         y[i] = 0;
                     }
                 }
                 else
                 {
-                    for(i_=iy1; i_<=iy2;i_++)
+                    for (i_ = iy1; i_ <= iy2; i_++)
                     {
-                        y[i_] = beta*y[i_];
+                        y[i_] = beta * y[i_];
                     }
                 }
-                
+
                 //
                 // alpha*A*x
                 //
-                for(i=i1; i<=i2; i++)
+                for (i = i1; i <= i2; i++)
                 {
-                    i1_ = (ix1)-(j1);
+                    i1_ = (ix1) - (j1);
                     v = 0.0;
-                    for(i_=j1; i_<=j2;i_++)
+                    for (i_ = j1; i_ <= j2; i_++)
                     {
-                        v += a[i,i_]*x[i_+i1_];
+                        v += a[i, i_] * x[i_ + i1_];
                     }
-                    y[iy1+i-i1] = y[iy1+i-i1]+alpha*v;
+                    y[iy1 + i - i1] = y[iy1 + i - i1] + alpha * v;
                 }
             }
             else
             {
-                
                 //
                 // y := alpha*A'*x + beta*y;
                 //
-                if( i1>i2 || j1>j2 )
+                if (i1 > i2 || j1 > j2)
                 {
                     return;
                 }
-                alglib.ap.assert(i2-i1==ix2-ix1, "MatrixVectorMultiply: A and X dont match!");
-                alglib.ap.assert(j2-j1==iy2-iy1, "MatrixVectorMultiply: A and Y dont match!");
-                
+                Alglib.ap.assert(i2 - i1 == ix2 - ix1, "MatrixVectorMultiply: A and X dont match!");
+                Alglib.ap.assert(j2 - j1 == iy2 - iy1, "MatrixVectorMultiply: A and Y dont match!");
+
                 //
                 // beta*y
                 //
-                if( (double)(beta)==(double)(0) )
+                if ((double)(beta) == (double)(0))
                 {
-                    for(i=iy1; i<=iy2; i++)
+                    for (i = iy1; i <= iy2; i++)
                     {
                         y[i] = 0;
                     }
                 }
                 else
                 {
-                    for(i_=iy1; i_<=iy2;i_++)
+                    for (i_ = iy1; i_ <= iy2; i_++)
                     {
-                        y[i_] = beta*y[i_];
+                        y[i_] = beta * y[i_];
                     }
                 }
-                
+
                 //
                 // alpha*A'*x
                 //
-                for(i=i1; i<=i2; i++)
+                for (i = i1; i <= i2; i++)
                 {
-                    v = alpha*x[ix1+i-i1];
+                    v = alpha * x[ix1 + i - i1];
                     i1_ = (j1) - (iy1);
-                    for(i_=iy1; i_<=iy2;i_++)
+                    for (i_ = iy1; i_ <= iy2; i_++)
                     {
-                        y[i_] = y[i_] + v*a[i,i_+i1_];
+                        y[i_] = y[i_] + v * a[i, i_ + i1_];
                     }
                 }
             }
         }
 
-
-        public static double pythag2(double x,
-            double y,
-            alglib.xparams _params)
+        public static double pythag2(double x, double y, Alglib.xparams _params)
         {
             double result = 0;
             double w = 0;
@@ -11074,19 +11013,19 @@ public partial class alglib
             yabs = Math.Abs(y);
             w = Math.Max(xabs, yabs);
             z = Math.Min(xabs, yabs);
-            if( (double)(z)==(double)(0) )
+            if ((double)(z) == (double)(0))
             {
                 result = w;
             }
             else
             {
-                result = w*Math.Sqrt(1+math.sqr(z/w));
+                result = w * Math.Sqrt(1 + math.sqr(z / w));
             }
             return result;
         }
 
-
-        public static void matrixmatrixmultiply(double[,] a,
+        public static void matrixmatrixmultiply(
+            double[,] a,
             int ai1,
             int ai2,
             int aj1,
@@ -11106,7 +11045,8 @@ public partial class alglib
             int cj2,
             double beta,
             ref double[] work,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int arows = 0;
             int acols = 0;
@@ -11122,37 +11062,36 @@ public partial class alglib
             int i_ = 0;
             int i1_ = 0;
 
-            
             //
             // Setup
             //
-            if( !transa )
+            if (!transa)
             {
-                arows = ai2-ai1+1;
-                acols = aj2-aj1+1;
+                arows = ai2 - ai1 + 1;
+                acols = aj2 - aj1 + 1;
             }
             else
             {
-                arows = aj2-aj1+1;
-                acols = ai2-ai1+1;
+                arows = aj2 - aj1 + 1;
+                acols = ai2 - ai1 + 1;
             }
-            if( !transb )
+            if (!transb)
             {
-                brows = bi2-bi1+1;
-                bcols = bj2-bj1+1;
+                brows = bi2 - bi1 + 1;
+                bcols = bj2 - bj1 + 1;
             }
             else
             {
-                brows = bj2-bj1+1;
-                bcols = bi2-bi1+1;
+                brows = bj2 - bj1 + 1;
+                bcols = bi2 - bi1 + 1;
             }
-            alglib.ap.assert(acols==brows, "MatrixMatrixMultiply: incorrect matrix sizes!");
-            if( ((arows<=0 || acols<=0) || brows<=0) || bcols<=0 )
+            Alglib.ap.assert(acols == brows, "MatrixMatrixMultiply: incorrect matrix sizes!");
+            if (((arows <= 0 || acols <= 0) || brows <= 0) || bcols <= 0)
             {
                 return;
             }
             crows = arows;
-            
+
             //
             // Test WORK
             //
@@ -11161,173 +11100,175 @@ public partial class alglib
             i = Math.Max(i, bcols);
             work[1] = 0;
             work[i] = 0;
-            
+
             //
             // Prepare C
             //
-            if( (double)(beta)==(double)(0) )
+            if ((double)(beta) == (double)(0))
             {
-                for(i=ci1; i<=ci2; i++)
+                for (i = ci1; i <= ci2; i++)
                 {
-                    for(j=cj1; j<=cj2; j++)
+                    for (j = cj1; j <= cj2; j++)
                     {
-                        c[i,j] = 0;
+                        c[i, j] = 0;
                     }
                 }
             }
             else
             {
-                for(i=ci1; i<=ci2; i++)
+                for (i = ci1; i <= ci2; i++)
                 {
-                    for(i_=cj1; i_<=cj2;i_++)
+                    for (i_ = cj1; i_ <= cj2; i_++)
                     {
-                        c[i,i_] = beta*c[i,i_];
+                        c[i, i_] = beta * c[i, i_];
                     }
                 }
             }
-            
+
             //
             // A*B
             //
-            if( !transa && !transb )
+            if (!transa && !transb)
             {
-                for(l=ai1; l<=ai2; l++)
+                for (l = ai1; l <= ai2; l++)
                 {
-                    for(r=bi1; r<=bi2; r++)
+                    for (r = bi1; r <= bi2; r++)
                     {
-                        v = alpha*a[l,aj1+r-bi1];
-                        k = ci1+l-ai1;
+                        v = alpha * a[l, aj1 + r - bi1];
+                        k = ci1 + l - ai1;
                         i1_ = (bj1) - (cj1);
-                        for(i_=cj1; i_<=cj2;i_++)
+                        for (i_ = cj1; i_ <= cj2; i_++)
                         {
-                            c[k,i_] = c[k,i_] + v*b[r,i_+i1_];
+                            c[k, i_] = c[k, i_] + v * b[r, i_ + i1_];
                         }
                     }
                 }
                 return;
             }
-            
+
             //
             // A*B'
             //
-            if( !transa && transb )
+            if (!transa && transb)
             {
-                if( arows*acols<brows*bcols )
+                if (arows * acols < brows * bcols)
                 {
-                    for(r=bi1; r<=bi2; r++)
+                    for (r = bi1; r <= bi2; r++)
                     {
-                        for(l=ai1; l<=ai2; l++)
+                        for (l = ai1; l <= ai2; l++)
                         {
-                            i1_ = (bj1)-(aj1);
+                            i1_ = (bj1) - (aj1);
                             v = 0.0;
-                            for(i_=aj1; i_<=aj2;i_++)
+                            for (i_ = aj1; i_ <= aj2; i_++)
                             {
-                                v += a[l,i_]*b[r,i_+i1_];
+                                v += a[l, i_] * b[r, i_ + i1_];
                             }
-                            c[ci1+l-ai1,cj1+r-bi1] = c[ci1+l-ai1,cj1+r-bi1]+alpha*v;
+                            c[ci1 + l - ai1, cj1 + r - bi1] =
+                                c[ci1 + l - ai1, cj1 + r - bi1] + alpha * v;
                         }
                     }
                     return;
                 }
                 else
                 {
-                    for(l=ai1; l<=ai2; l++)
+                    for (l = ai1; l <= ai2; l++)
                     {
-                        for(r=bi1; r<=bi2; r++)
+                        for (r = bi1; r <= bi2; r++)
                         {
-                            i1_ = (bj1)-(aj1);
+                            i1_ = (bj1) - (aj1);
                             v = 0.0;
-                            for(i_=aj1; i_<=aj2;i_++)
+                            for (i_ = aj1; i_ <= aj2; i_++)
                             {
-                                v += a[l,i_]*b[r,i_+i1_];
+                                v += a[l, i_] * b[r, i_ + i1_];
                             }
-                            c[ci1+l-ai1,cj1+r-bi1] = c[ci1+l-ai1,cj1+r-bi1]+alpha*v;
+                            c[ci1 + l - ai1, cj1 + r - bi1] =
+                                c[ci1 + l - ai1, cj1 + r - bi1] + alpha * v;
                         }
                     }
                     return;
                 }
             }
-            
+
             //
             // A'*B
             //
-            if( transa && !transb )
+            if (transa && !transb)
             {
-                for(l=aj1; l<=aj2; l++)
+                for (l = aj1; l <= aj2; l++)
                 {
-                    for(r=bi1; r<=bi2; r++)
+                    for (r = bi1; r <= bi2; r++)
                     {
-                        v = alpha*a[ai1+r-bi1,l];
-                        k = ci1+l-aj1;
+                        v = alpha * a[ai1 + r - bi1, l];
+                        k = ci1 + l - aj1;
                         i1_ = (bj1) - (cj1);
-                        for(i_=cj1; i_<=cj2;i_++)
+                        for (i_ = cj1; i_ <= cj2; i_++)
                         {
-                            c[k,i_] = c[k,i_] + v*b[r,i_+i1_];
+                            c[k, i_] = c[k, i_] + v * b[r, i_ + i1_];
                         }
                     }
                 }
                 return;
             }
-            
+
             //
             // A'*B'
             //
-            if( transa && transb )
+            if (transa && transb)
             {
-                if( arows*acols<brows*bcols )
+                if (arows * acols < brows * bcols)
                 {
-                    for(r=bi1; r<=bi2; r++)
+                    for (r = bi1; r <= bi2; r++)
                     {
-                        k = cj1+r-bi1;
-                        for(i=1; i<=crows; i++)
+                        k = cj1 + r - bi1;
+                        for (i = 1; i <= crows; i++)
                         {
                             work[i] = 0.0;
                         }
-                        for(l=ai1; l<=ai2; l++)
+                        for (l = ai1; l <= ai2; l++)
                         {
-                            v = alpha*b[r,bj1+l-ai1];
+                            v = alpha * b[r, bj1 + l - ai1];
                             i1_ = (aj1) - (1);
-                            for(i_=1; i_<=crows;i_++)
+                            for (i_ = 1; i_ <= crows; i_++)
                             {
-                                work[i_] = work[i_] + v*a[l,i_+i1_];
+                                work[i_] = work[i_] + v * a[l, i_ + i1_];
                             }
                         }
                         i1_ = (1) - (ci1);
-                        for(i_=ci1; i_<=ci2;i_++)
+                        for (i_ = ci1; i_ <= ci2; i_++)
                         {
-                            c[i_,k] = c[i_,k] + work[i_+i1_];
+                            c[i_, k] = c[i_, k] + work[i_ + i1_];
                         }
                     }
                     return;
                 }
                 else
                 {
-                    for(l=aj1; l<=aj2; l++)
+                    for (l = aj1; l <= aj2; l++)
                     {
-                        k = ai2-ai1+1;
+                        k = ai2 - ai1 + 1;
                         i1_ = (ai1) - (1);
-                        for(i_=1; i_<=k;i_++)
+                        for (i_ = 1; i_ <= k; i_++)
                         {
-                            work[i_] = a[i_+i1_,l];
+                            work[i_] = a[i_ + i1_, l];
                         }
-                        for(r=bi1; r<=bi2; r++)
+                        for (r = bi1; r <= bi2; r++)
                         {
-                            i1_ = (bj1)-(1);
+                            i1_ = (bj1) - (1);
                             v = 0.0;
-                            for(i_=1; i_<=k;i_++)
+                            for (i_ = 1; i_ <= k; i_++)
                             {
-                                v += work[i_]*b[r,i_+i1_];
+                                v += work[i_] * b[r, i_ + i1_];
                             }
-                            c[ci1+l-aj1,cj1+r-bi1] = c[ci1+l-aj1,cj1+r-bi1]+alpha*v;
+                            c[ci1 + l - aj1, cj1 + r - bi1] =
+                                c[ci1 + l - aj1, cj1 + r - bi1] + alpha * v;
                         }
                     }
                     return;
                 }
             }
         }
-
-
     }
+
     public class linmin
     {
         public class linminstate : apobject
@@ -11357,14 +11298,15 @@ public partial class alglib
             public double width;
             public double width1;
             public double xtrapf;
+
             public linminstate()
             {
                 init();
             }
-            public override void init()
-            {
-            }
-            public override alglib.apobject make_copy()
+
+            public override void init() { }
+
+            public override Alglib.apobject make_copy()
             {
                 linminstate _result = new linminstate();
                 _result.brackt = brackt;
@@ -11396,7 +11338,6 @@ public partial class alglib
             }
         };
 
-
         public class armijostate : apobject
         {
             public bool needf;
@@ -11412,10 +11353,12 @@ public partial class alglib
             public int nfev;
             public int info;
             public rcommstate rstate;
+
             public armijostate()
             {
                 init();
             }
+
             public override void init()
             {
                 x = new double[0];
@@ -11423,7 +11366,8 @@ public partial class alglib
                 s = new double[0];
                 rstate = new rcommstate();
             }
-            public override alglib.apobject make_copy()
+
+            public override Alglib.apobject make_copy()
             {
                 armijostate _result = new armijostate();
                 _result.needf = needf;
@@ -11443,16 +11387,12 @@ public partial class alglib
             }
         };
 
-
-
-
         public const double ftol = 0.001;
-        public const double xtol = 100*math.machineepsilon;
+        public const double xtol = 100 * math.machineepsilon;
         public const int maxfev = 20;
         public const double stpmin = 1.0E-50;
         public const double defstpmax = 1.0E+50;
         public const double armijofactor = 1.3;
-
 
         /*************************************************************************
         Normalizes direction/step pair: makes |D|=1, scales Stp.
@@ -11461,52 +11401,52 @@ public partial class alglib
           -- ALGLIB --
              Copyright 01.04.2010 by Bochkanov Sergey
         *************************************************************************/
-        public static void linminnormalized(ref double[] d,
+        public static void linminnormalized(
+            ref double[] d,
             ref double stp,
             int n,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             double mx = 0;
             double s = 0;
             int i = 0;
             int i_ = 0;
 
-            
             //
             // first, scale D to avoid underflow/overflow durng squaring
             //
             mx = 0;
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 mx = Math.Max(mx, Math.Abs(d[i]));
             }
-            if( (double)(mx)==(double)(0) )
+            if ((double)(mx) == (double)(0))
             {
                 return;
             }
-            s = 1/mx;
-            for(i_=0; i_<=n-1;i_++)
+            s = 1 / mx;
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
-                d[i_] = s*d[i_];
+                d[i_] = s * d[i_];
             }
-            stp = stp/s;
-            
+            stp = stp / s;
+
             //
             // normalize D
             //
             s = 0.0;
-            for(i_=0; i_<=n-1;i_++)
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
-                s += d[i_]*d[i_];
+                s += d[i_] * d[i_];
             }
-            s = 1/Math.Sqrt(s);
-            for(i_=0; i_<=n-1;i_++)
+            s = 1 / Math.Sqrt(s);
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
-                d[i_] = s*d[i_];
+                d[i_] = s * d[i_];
             }
-            stp = stp/s;
+            stp = stp / s;
         }
-
 
         /*************************************************************************
         THE  PURPOSE  OF  MCSRCH  IS  TO  FIND A STEP WHICH SATISFIES A SUFFICIENT
@@ -11624,7 +11564,8 @@ public partial class alglib
         ARGONNE NATIONAL LABORATORY. MINPACK PROJECT. JUNE 1983
         JORGE J. MORE', DAVID J. THUENTE
         *************************************************************************/
-        public static void mcsrch(int n,
+        public static void mcsrch(
+            int n,
             ref double[] x,
             ref double f,
             ref double[] g,
@@ -11637,7 +11578,8 @@ public partial class alglib
             ref double[] wa,
             linminstate state,
             ref int stage,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             double v = 0;
@@ -11646,7 +11588,6 @@ public partial class alglib
             double zero = 0;
             int i_ = 0;
 
-            
             //
             // init
             //
@@ -11654,71 +11595,88 @@ public partial class alglib
             p66 = 0.66;
             state.xtrapf = 4.0;
             zero = 0;
-            if( (double)(stpmax)==(double)(0) )
+            if ((double)(stpmax) == (double)(0))
             {
                 stpmax = defstpmax;
             }
-            if( (double)(stp)<(double)(stpmin) )
+            if ((double)(stp) < (double)(stpmin))
             {
                 stp = stpmin;
             }
-            if( (double)(stp)>(double)(stpmax) )
+            if ((double)(stp) > (double)(stpmax))
             {
                 stp = stpmax;
             }
-            
+
             //
             // Main cycle
             //
-            while( true )
+            while (true)
             {
-                if( stage==0 )
+                if (stage == 0)
                 {
-                    
                     //
                     // NEXT
                     //
                     stage = 2;
                     continue;
                 }
-                if( stage==2 )
+                if (stage == 2)
                 {
                     state.infoc = 1;
                     info = 0;
-                    
+
                     //
                     //     CHECK THE INPUT PARAMETERS FOR ERRORS.
                     //
-                    if( (double)(stpmax)<(double)(stpmin) && (double)(stpmax)>(double)(0) )
+                    if ((double)(stpmax) < (double)(stpmin) && (double)(stpmax) > (double)(0))
                     {
                         info = 5;
                         stp = stpmax;
                         stage = 0;
                         return;
                     }
-                    if( ((((((n<=0 || (double)(stp)<=(double)(0)) || (double)(ftol)<(double)(0)) || (double)(gtol)<(double)(zero)) || (double)(xtol)<(double)(zero)) || (double)(stpmin)<(double)(zero)) || (double)(stpmax)<(double)(stpmin)) || maxfev<=0 )
+                    if (
+                        (
+                            (
+                                (
+                                    (
+                                        (
+                                            (n <= 0 || (double)(stp) <= (double)(0))
+                                            || (double)(ftol) < (double)(0)
+                                        )
+                                        || (double)(gtol) < (double)(zero)
+                                    )
+                                    || (double)(xtol) < (double)(zero)
+                                )
+                                || (double)(stpmin) < (double)(zero)
+                            )
+                            || (double)(stpmax) < (double)(stpmin)
+                        )
+                        || maxfev <= 0
+                    )
                     {
                         stage = 0;
                         return;
                     }
-                    
+
                     //
                     //     COMPUTE THE INITIAL GRADIENT IN THE SEARCH DIRECTION
                     //     AND CHECK THAT S IS A DESCENT DIRECTION.
                     //
                     v = 0.0;
-                    for(i_=0; i_<=n-1;i_++)
+                    for (i_ = 0; i_ <= n - 1; i_++)
                     {
-                        v += g[i_]*s[i_];
+                        v += g[i_] * s[i_];
                     }
                     state.dginit = v;
-                    if( (double)(state.dginit)>=(double)(0) )
+                    if ((double)(state.dginit) >= (double)(0))
                     {
                         stage = 0;
                         stp = 0;
                         return;
                     }
-                    
+
                     //
                     //     INITIALIZE LOCAL VARIABLES.
                     //
@@ -11726,14 +11684,14 @@ public partial class alglib
                     state.stage1 = true;
                     nfev = 0;
                     state.finit = f;
-                    state.dgtest = ftol*state.dginit;
-                    state.width = stpmax-stpmin;
-                    state.width1 = state.width/p5;
-                    for(i_=0; i_<=n-1;i_++)
+                    state.dgtest = ftol * state.dginit;
+                    state.width = stpmax - stpmin;
+                    state.width1 = state.width / p5;
+                    for (i_ = 0; i_ <= n - 1; i_++)
                     {
                         wa[i_] = x[i_];
                     }
-                    
+
                     //
                     //     THE VARIABLES STX, FX, DGX CONTAIN THE VALUES OF THE STEP,
                     //     FUNCTION, AND DIRECTIONAL DERIVATIVE AT THE BEST STEP.
@@ -11749,25 +11707,24 @@ public partial class alglib
                     state.sty = 0;
                     state.fy = state.finit;
                     state.dgy = state.dginit;
-                    
+
                     //
                     // NEXT
                     //
                     stage = 3;
                     continue;
                 }
-                if( stage==3 )
+                if (stage == 3)
                 {
-                    
                     //
                     //     START OF ITERATION.
                     //
                     //     SET THE MINIMUM AND MAXIMUM STEPS TO CORRESPOND
                     //     TO THE PRESENT INTERVAL OF UNCERTAINTY.
                     //
-                    if( state.brackt )
+                    if (state.brackt)
                     {
-                        if( (double)(state.stx)<(double)(state.sty) )
+                        if ((double)(state.stx) < (double)(state.sty))
                         {
                             state.stmin = state.stx;
                             state.stmax = state.sty;
@@ -11781,106 +11738,162 @@ public partial class alglib
                     else
                     {
                         state.stmin = state.stx;
-                        state.stmax = stp+state.xtrapf*(stp-state.stx);
+                        state.stmax = stp + state.xtrapf * (stp - state.stx);
                     }
-                    
+
                     //
                     //        FORCE THE STEP TO BE WITHIN THE BOUNDS STPMAX AND STPMIN.
                     //
-                    if( (double)(stp)>(double)(stpmax) )
+                    if ((double)(stp) > (double)(stpmax))
                     {
                         stp = stpmax;
                     }
-                    if( (double)(stp)<(double)(stpmin) )
+                    if ((double)(stp) < (double)(stpmin))
                     {
                         stp = stpmin;
                     }
-                    
+
                     //
                     //        IF AN UNUSUAL TERMINATION IS TO OCCUR THEN LET
                     //        STP BE THE LOWEST POINT OBTAINED SO FAR.
                     //
-                    if( (((state.brackt && ((double)(stp)<=(double)(state.stmin) || (double)(stp)>=(double)(state.stmax))) || nfev>=maxfev-1) || state.infoc==0) || (state.brackt && (double)(state.stmax-state.stmin)<=(double)(xtol*state.stmax)) )
+                    if (
+                        (
+                            (
+                                (
+                                    state.brackt
+                                    && (
+                                        (double)(stp) <= (double)(state.stmin)
+                                        || (double)(stp) >= (double)(state.stmax)
+                                    )
+                                )
+                                || nfev >= maxfev - 1
+                            )
+                            || state.infoc == 0
+                        )
+                        || (
+                            state.brackt
+                            && (double)(state.stmax - state.stmin) <= (double)(xtol * state.stmax)
+                        )
+                    )
                     {
                         stp = state.stx;
                     }
-                    
+
                     //
                     //        EVALUATE THE FUNCTION AND GRADIENT AT STP
                     //        AND COMPUTE THE DIRECTIONAL DERIVATIVE.
                     //
-                    for(i_=0; i_<=n-1;i_++)
+                    for (i_ = 0; i_ <= n - 1; i_++)
                     {
                         x[i_] = wa[i_];
                     }
-                    for(i_=0; i_<=n-1;i_++)
+                    for (i_ = 0; i_ <= n - 1; i_++)
                     {
-                        x[i_] = x[i_] + stp*s[i_];
+                        x[i_] = x[i_] + stp * s[i_];
                     }
-                    
+
                     //
                     // NEXT
                     //
                     stage = 4;
                     return;
                 }
-                if( stage==4 )
+                if (stage == 4)
                 {
                     info = 0;
-                    nfev = nfev+1;
+                    nfev = nfev + 1;
                     v = 0.0;
-                    for(i_=0; i_<=n-1;i_++)
+                    for (i_ = 0; i_ <= n - 1; i_++)
                     {
-                        v += g[i_]*s[i_];
+                        v += g[i_] * s[i_];
                     }
                     state.dg = v;
-                    state.ftest1 = state.finit+stp*state.dgtest;
-                    
+                    state.ftest1 = state.finit + stp * state.dgtest;
+
                     //
                     //        TEST FOR CONVERGENCE.
                     //
-                    if( (state.brackt && ((double)(stp)<=(double)(state.stmin) || (double)(stp)>=(double)(state.stmax))) || state.infoc==0 )
+                    if (
+                        (
+                            state.brackt
+                            && (
+                                (double)(stp) <= (double)(state.stmin)
+                                || (double)(stp) >= (double)(state.stmax)
+                            )
+                        )
+                        || state.infoc == 0
+                    )
                     {
                         info = 6;
                     }
-                    if( (((double)(stp)==(double)(stpmax) && (double)(f)<(double)(state.finit)) && (double)(f)<=(double)(state.ftest1)) && (double)(state.dg)<=(double)(state.dgtest) )
+                    if (
+                        (
+                            (
+                                (double)(stp) == (double)(stpmax)
+                                && (double)(f) < (double)(state.finit)
+                            )
+                            && (double)(f) <= (double)(state.ftest1)
+                        )
+                        && (double)(state.dg) <= (double)(state.dgtest)
+                    )
                     {
                         info = 5;
                     }
-                    if( (double)(stp)==(double)(stpmin) && (((double)(f)>=(double)(state.finit) || (double)(f)>(double)(state.ftest1)) || (double)(state.dg)>=(double)(state.dgtest)) )
+                    if (
+                        (double)(stp) == (double)(stpmin)
+                        && (
+                            (
+                                (double)(f) >= (double)(state.finit)
+                                || (double)(f) > (double)(state.ftest1)
+                            )
+                            || (double)(state.dg) >= (double)(state.dgtest)
+                        )
+                    )
                     {
                         info = 4;
                     }
-                    if( nfev>=maxfev )
+                    if (nfev >= maxfev)
                     {
                         info = 3;
                     }
-                    if( state.brackt && (double)(state.stmax-state.stmin)<=(double)(xtol*state.stmax) )
+                    if (
+                        state.brackt
+                        && (double)(state.stmax - state.stmin) <= (double)(xtol * state.stmax)
+                    )
                     {
                         info = 2;
                     }
-                    if( ((double)(f)<(double)(state.finit) && (double)(f)<=(double)(state.ftest1)) && (double)(Math.Abs(state.dg))<=(double)(-(gtol*state.dginit)) )
+                    if (
+                        (
+                            (double)(f) < (double)(state.finit)
+                            && (double)(f) <= (double)(state.ftest1)
+                        )
+                        && (double)(Math.Abs(state.dg)) <= (double)(-(gtol * state.dginit))
+                    )
                     {
                         info = 1;
                     }
-                    
+
                     //
                     //        CHECK FOR TERMINATION.
                     //
-                    if( info!=0 )
+                    if (info != 0)
                     {
-                        
                         //
                         // Check guarantees provided by the function for INFO=1 or INFO=5
                         //
-                        if( info==1 || info==5 )
+                        if (info == 1 || info == 5)
                         {
                             v = 0.0;
-                            for(i=0; i<=n-1; i++)
+                            for (i = 0; i <= n - 1; i++)
                             {
-                                v = v+(wa[i]-x[i])*(wa[i]-x[i]);
+                                v = v + (wa[i] - x[i]) * (wa[i] - x[i]);
                             }
-                            if( (double)(f)>=(double)(state.finit) || (double)(v)==(double)(0.0) )
+                            if (
+                                (double)(f) >= (double)(state.finit)
+                                || (double)(v) == (double)(0.0)
+                            )
                             {
                                 info = 6;
                             }
@@ -11888,16 +11901,19 @@ public partial class alglib
                         stage = 0;
                         return;
                     }
-                    
+
                     //
                     //        IN THE FIRST STAGE WE SEEK A STEP FOR WHICH THE MODIFIED
                     //        FUNCTION HAS A NONPOSITIVE VALUE AND NONNEGATIVE DERIVATIVE.
                     //
-                    if( (state.stage1 && (double)(f)<=(double)(state.ftest1)) && (double)(state.dg)>=(double)(Math.Min(ftol, gtol)*state.dginit) )
+                    if (
+                        (state.stage1 && (double)(f) <= (double)(state.ftest1))
+                        && (double)(state.dg) >= (double)(Math.Min(ftol, gtol) * state.dginit)
+                    )
                     {
                         state.stage1 = false;
                     }
-                    
+
                     //
                     //        A MODIFIED FUNCTION IS USED TO PREDICT THE STEP ONLY IF
                     //        WE HAVE NOT OBTAINED A STEP FOR WHICH THE MODIFIED
@@ -11905,57 +11921,91 @@ public partial class alglib
                     //        DERIVATIVE, AND IF A LOWER FUNCTION VALUE HAS BEEN
                     //        OBTAINED BUT THE DECREASE IS NOT SUFFICIENT.
                     //
-                    if( (state.stage1 && (double)(f)<=(double)(state.fx)) && (double)(f)>(double)(state.ftest1) )
+                    if (
+                        (state.stage1 && (double)(f) <= (double)(state.fx))
+                        && (double)(f) > (double)(state.ftest1)
+                    )
                     {
-                        
                         //
                         //           DEFINE THE MODIFIED FUNCTION AND DERIVATIVE VALUES.
                         //
-                        state.fm = f-stp*state.dgtest;
-                        state.fxm = state.fx-state.stx*state.dgtest;
-                        state.fym = state.fy-state.sty*state.dgtest;
-                        state.dgm = state.dg-state.dgtest;
-                        state.dgxm = state.dgx-state.dgtest;
-                        state.dgym = state.dgy-state.dgtest;
-                        
+                        state.fm = f - stp * state.dgtest;
+                        state.fxm = state.fx - state.stx * state.dgtest;
+                        state.fym = state.fy - state.sty * state.dgtest;
+                        state.dgm = state.dg - state.dgtest;
+                        state.dgxm = state.dgx - state.dgtest;
+                        state.dgym = state.dgy - state.dgtest;
+
                         //
                         //           CALL CSTEP TO UPDATE THE INTERVAL OF UNCERTAINTY
                         //           AND TO COMPUTE THE NEW STEP.
                         //
-                        mcstep(ref state.stx, ref state.fxm, ref state.dgxm, ref state.sty, ref state.fym, ref state.dgym, ref stp, state.fm, state.dgm, ref state.brackt, state.stmin, state.stmax, ref state.infoc, _params);
-                        
+                        mcstep(
+                            ref state.stx,
+                            ref state.fxm,
+                            ref state.dgxm,
+                            ref state.sty,
+                            ref state.fym,
+                            ref state.dgym,
+                            ref stp,
+                            state.fm,
+                            state.dgm,
+                            ref state.brackt,
+                            state.stmin,
+                            state.stmax,
+                            ref state.infoc,
+                            _params
+                        );
+
                         //
                         //           RESET THE FUNCTION AND GRADIENT VALUES FOR F.
                         //
-                        state.fx = state.fxm+state.stx*state.dgtest;
-                        state.fy = state.fym+state.sty*state.dgtest;
-                        state.dgx = state.dgxm+state.dgtest;
-                        state.dgy = state.dgym+state.dgtest;
+                        state.fx = state.fxm + state.stx * state.dgtest;
+                        state.fy = state.fym + state.sty * state.dgtest;
+                        state.dgx = state.dgxm + state.dgtest;
+                        state.dgy = state.dgym + state.dgtest;
                     }
                     else
                     {
-                        
                         //
                         //           CALL MCSTEP TO UPDATE THE INTERVAL OF UNCERTAINTY
                         //           AND TO COMPUTE THE NEW STEP.
                         //
-                        mcstep(ref state.stx, ref state.fx, ref state.dgx, ref state.sty, ref state.fy, ref state.dgy, ref stp, f, state.dg, ref state.brackt, state.stmin, state.stmax, ref state.infoc, _params);
+                        mcstep(
+                            ref state.stx,
+                            ref state.fx,
+                            ref state.dgx,
+                            ref state.sty,
+                            ref state.fy,
+                            ref state.dgy,
+                            ref stp,
+                            f,
+                            state.dg,
+                            ref state.brackt,
+                            state.stmin,
+                            state.stmax,
+                            ref state.infoc,
+                            _params
+                        );
                     }
-                    
+
                     //
                     //        FORCE A SUFFICIENT DECREASE IN THE SIZE OF THE
                     //        INTERVAL OF UNCERTAINTY.
                     //
-                    if( state.brackt )
+                    if (state.brackt)
                     {
-                        if( (double)(Math.Abs(state.sty-state.stx))>=(double)(p66*state.width1) )
+                        if (
+                            (double)(Math.Abs(state.sty - state.stx))
+                            >= (double)(p66 * state.width1)
+                        )
                         {
-                            stp = state.stx+p5*(state.sty-state.stx);
+                            stp = state.stx + p5 * (state.sty - state.stx);
                         }
                         state.width1 = state.width;
-                        state.width = Math.Abs(state.sty-state.stx);
+                        state.width = Math.Abs(state.sty - state.stx);
                     }
-                    
+
                     //
                     //  NEXT.
                     //
@@ -11964,7 +12014,6 @@ public partial class alglib
                 }
             }
         }
-
 
         /*************************************************************************
         These functions perform Armijo line search using  at  most  FMAX  function
@@ -11991,7 +12040,8 @@ public partial class alglib
           -- ALGLIB --
              Copyright 05.10.2010 by Bochkanov Sergey
         *************************************************************************/
-        public static void armijocreate(int n,
+        public static void armijocreate(
+            int n,
             double[] x,
             double f,
             double[] s,
@@ -11999,19 +12049,20 @@ public partial class alglib
             double stpmax,
             int fmax,
             armijostate state,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i_ = 0;
 
-            if( alglib.ap.len(state.x)<n )
+            if (Alglib.ap.len(state.x) < n)
             {
                 state.x = new double[n];
             }
-            if( alglib.ap.len(state.xbase)<n )
+            if (Alglib.ap.len(state.xbase) < n)
             {
                 state.xbase = new double[n];
             }
-            if( alglib.ap.len(state.s)<n )
+            if (Alglib.ap.len(state.s) < n)
             {
                 state.s = new double[n];
             }
@@ -12020,19 +12071,18 @@ public partial class alglib
             state.stplen = stp;
             state.fcur = f;
             state.n = n;
-            for(i_=0; i_<=n-1;i_++)
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
                 state.xbase[i_] = x[i_];
             }
-            for(i_=0; i_<=n-1;i_++)
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
                 state.s[i_] = s[i_];
             }
-            state.rstate.ia = new int[0+1];
-            state.rstate.ra = new double[0+1];
+            state.rstate.ia = new int[0 + 1];
+            state.rstate.ra = new double[0 + 1];
             state.rstate.stage = -1;
         }
-
 
         /*************************************************************************
         This is rcomm-based search function
@@ -12040,15 +12090,13 @@ public partial class alglib
           -- ALGLIB --
              Copyright 05.10.2010 by Bochkanov Sergey
         *************************************************************************/
-        public static bool armijoiteration(armijostate state,
-            alglib.xparams _params)
+        public static bool armijoiteration(armijostate state, Alglib.xparams _params)
         {
             bool result = new bool();
             double v = 0;
             int n = 0;
             int i_ = 0;
 
-            
             //
             // Reverse communication preparations
             // I know it looks ugly, but it works the same way
@@ -12059,7 +12107,7 @@ public partial class alglib
             //   generation - on first subroutine call
             // * values from previous call - on subsequent calls
             //
-            if( state.rstate.stage>=0 )
+            if (state.rstate.stage >= 0)
             {
                 n = state.rstate.ia[0];
                 v = state.rstate.ra[0];
@@ -12069,33 +12117,36 @@ public partial class alglib
                 n = 359;
                 v = -58;
             }
-            if( state.rstate.stage==0 )
+            if (state.rstate.stage == 0)
             {
                 goto lbl_0;
             }
-            if( state.rstate.stage==1 )
+            if (state.rstate.stage == 1)
             {
                 goto lbl_1;
             }
-            if( state.rstate.stage==2 )
+            if (state.rstate.stage == 2)
             {
                 goto lbl_2;
             }
-            if( state.rstate.stage==3 )
+            if (state.rstate.stage == 3)
             {
                 goto lbl_3;
             }
-            
+
             //
             // Routine body
             //
-            if( ((double)(state.stplen)<=(double)(0) || (double)(state.stpmax)<(double)(0)) || state.fmax<2 )
+            if (
+                ((double)(state.stplen) <= (double)(0) || (double)(state.stpmax) < (double)(0))
+                || state.fmax < 2
+            )
             {
                 state.info = 0;
                 result = false;
                 return result;
             }
-            if( (double)(state.stplen)<=(double)(stpmin) )
+            if ((double)(state.stplen) <= (double)(stpmin))
             {
                 state.info = 4;
                 result = false;
@@ -12103,93 +12154,96 @@ public partial class alglib
             }
             n = state.n;
             state.nfev = 0;
-            
+
             //
             // We always need F
             //
             state.needf = true;
-            
+
             //
             // Bound StpLen
             //
-            if( (double)(state.stplen)>(double)(state.stpmax) && (double)(state.stpmax)!=(double)(0) )
+            if (
+                (double)(state.stplen) > (double)(state.stpmax)
+                && (double)(state.stpmax) != (double)(0)
+            )
             {
                 state.stplen = state.stpmax;
             }
-            
+
             //
             // Increase length
             //
-            v = state.stplen*armijofactor;
-            if( (double)(v)>(double)(state.stpmax) && (double)(state.stpmax)!=(double)(0) )
+            v = state.stplen * armijofactor;
+            if ((double)(v) > (double)(state.stpmax) && (double)(state.stpmax) != (double)(0))
             {
                 v = state.stpmax;
             }
-            for(i_=0; i_<=n-1;i_++)
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
                 state.x[i_] = state.xbase[i_];
             }
-            for(i_=0; i_<=n-1;i_++)
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
-                state.x[i_] = state.x[i_] + v*state.s[i_];
+                state.x[i_] = state.x[i_] + v * state.s[i_];
             }
             state.rstate.stage = 0;
             goto lbl_rcomm;
-        lbl_0:
-            state.nfev = state.nfev+1;
-            if( (double)(state.f)>=(double)(state.fcur) )
+            lbl_0:
+            state.nfev = state.nfev + 1;
+            if ((double)(state.f) >= (double)(state.fcur))
             {
                 goto lbl_4;
             }
             state.stplen = v;
             state.fcur = state.f;
-        lbl_6:
-            if( false )
+            lbl_6:
+            if (false)
             {
                 goto lbl_7;
             }
-            
+
             //
             // test stopping conditions
             //
-            if( state.nfev>=state.fmax )
+            if (state.nfev >= state.fmax)
             {
                 state.info = 3;
                 result = false;
                 return result;
             }
-            if( (double)(state.stplen)>=(double)(state.stpmax) )
+            if ((double)(state.stplen) >= (double)(state.stpmax))
             {
                 state.info = 5;
                 result = false;
                 return result;
             }
-            
+
             //
             // evaluate F
             //
-            v = state.stplen*armijofactor;
-            if( (double)(v)>(double)(state.stpmax) && (double)(state.stpmax)!=(double)(0) )
+            v = state.stplen * armijofactor;
+            if ((double)(v) > (double)(state.stpmax) && (double)(state.stpmax) != (double)(0))
             {
                 v = state.stpmax;
             }
-            for(i_=0; i_<=n-1;i_++)
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
                 state.x[i_] = state.xbase[i_];
             }
-            for(i_=0; i_<=n-1;i_++)
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
-                state.x[i_] = state.x[i_] + v*state.s[i_];
+                state.x[i_] = state.x[i_] + v * state.s[i_];
             }
             state.rstate.stage = 1;
             goto lbl_rcomm;
-        lbl_1:
-            state.nfev = state.nfev+1;
-            
+            lbl_1:
+            state.nfev = state.nfev + 1;
+
             //
             // make decision
             //
-            if( (double)(state.f)<(double)(state.fcur) )
+            if ((double)(state.f) < (double)(state.fcur))
             {
                 state.stplen = v;
                 state.fcur = state.f;
@@ -12201,76 +12255,76 @@ public partial class alglib
                 return result;
             }
             goto lbl_6;
-        lbl_7:
-        lbl_4:
-            
+            lbl_7:
+            lbl_4:
+
             //
             // Decrease length
             //
-            v = state.stplen/armijofactor;
-            for(i_=0; i_<=n-1;i_++)
+            v = state.stplen / armijofactor;
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
                 state.x[i_] = state.xbase[i_];
             }
-            for(i_=0; i_<=n-1;i_++)
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
-                state.x[i_] = state.x[i_] + v*state.s[i_];
+                state.x[i_] = state.x[i_] + v * state.s[i_];
             }
             state.rstate.stage = 2;
             goto lbl_rcomm;
-        lbl_2:
-            state.nfev = state.nfev+1;
-            if( (double)(state.f)>=(double)(state.fcur) )
+            lbl_2:
+            state.nfev = state.nfev + 1;
+            if ((double)(state.f) >= (double)(state.fcur))
             {
                 goto lbl_8;
             }
-            state.stplen = state.stplen/armijofactor;
+            state.stplen = state.stplen / armijofactor;
             state.fcur = state.f;
-        lbl_10:
-            if( false )
+            lbl_10:
+            if (false)
             {
                 goto lbl_11;
             }
-            
+
             //
             // test stopping conditions
             //
-            if( state.nfev>=state.fmax )
+            if (state.nfev >= state.fmax)
             {
                 state.info = 3;
                 result = false;
                 return result;
             }
-            if( (double)(state.stplen)<=(double)(stpmin) )
+            if ((double)(state.stplen) <= (double)(stpmin))
             {
                 state.info = 4;
                 result = false;
                 return result;
             }
-            
+
             //
             // evaluate F
             //
-            v = state.stplen/armijofactor;
-            for(i_=0; i_<=n-1;i_++)
+            v = state.stplen / armijofactor;
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
                 state.x[i_] = state.xbase[i_];
             }
-            for(i_=0; i_<=n-1;i_++)
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
-                state.x[i_] = state.x[i_] + v*state.s[i_];
+                state.x[i_] = state.x[i_] + v * state.s[i_];
             }
             state.rstate.stage = 3;
             goto lbl_rcomm;
-        lbl_3:
-            state.nfev = state.nfev+1;
-            
+            lbl_3:
+            state.nfev = state.nfev + 1;
+
             //
             // make decision
             //
-            if( (double)(state.f)<(double)(state.fcur) )
+            if ((double)(state.f) < (double)(state.fcur))
             {
-                state.stplen = state.stplen/armijofactor;
+                state.stplen = state.stplen / armijofactor;
                 state.fcur = state.f;
             }
             else
@@ -12280,26 +12334,25 @@ public partial class alglib
                 return result;
             }
             goto lbl_10;
-        lbl_11:
-        lbl_8:
-            
+            lbl_11:
+            lbl_8:
+
             //
             // Nothing to be done
             //
             state.info = 1;
             result = false;
             return result;
-            
+
             //
             // Saving state
             //
-        lbl_rcomm:
+            lbl_rcomm:
             result = true;
             state.rstate.ia[0] = n;
             state.rstate.ra[0] = v;
             return result;
         }
-
 
         /*************************************************************************
         Results of Armijo search
@@ -12318,19 +12371,21 @@ public partial class alglib
           -- ALGLIB --
              Copyright 05.10.2010 by Bochkanov Sergey
         *************************************************************************/
-        public static void armijoresults(armijostate state,
+        public static void armijoresults(
+            armijostate state,
             ref int info,
             ref double stp,
             ref double f,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             info = state.info;
             stp = state.stplen;
             f = state.fcur;
         }
 
-
-        private static void mcstep(ref double stx,
+        private static void mcstep(
+            ref double stx,
             ref double fx,
             ref double dx,
             ref double sty,
@@ -12343,7 +12398,8 @@ public partial class alglib
             double stmin,
             double stmax,
             ref int info,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool bound = new bool();
             double gamma = 0;
@@ -12358,57 +12414,68 @@ public partial class alglib
             double theta = 0;
 
             info = 0;
-            
+
             //
             //     CHECK THE INPUT PARAMETERS FOR ERRORS.
             //
-            if( ((brackt && ((double)(stp)<=(double)(Math.Min(stx, sty)) || (double)(stp)>=(double)(Math.Max(stx, sty)))) || (double)(dx*(stp-stx))>=(double)(0)) || (double)(stmax)<(double)(stmin) )
+            if (
+                (
+                    (
+                        brackt
+                        && (
+                            (double)(stp) <= (double)(Math.Min(stx, sty))
+                            || (double)(stp) >= (double)(Math.Max(stx, sty))
+                        )
+                    )
+                    || (double)(dx * (stp - stx)) >= (double)(0)
+                )
+                || (double)(stmax) < (double)(stmin)
+            )
             {
                 return;
             }
-            
+
             //
             //     DETERMINE IF THE DERIVATIVES HAVE OPPOSITE SIGN.
             //
-            sgnd = dp*(dx/Math.Abs(dx));
-            
+            sgnd = dp * (dx / Math.Abs(dx));
+
             //
             //     FIRST CASE. A HIGHER FUNCTION VALUE.
             //     THE MINIMUM IS BRACKETED. IF THE CUBIC STEP IS CLOSER
             //     TO STX THAN THE QUADRATIC STEP, THE CUBIC STEP IS TAKEN,
             //     ELSE THE AVERAGE OF THE CUBIC AND QUADRATIC STEPS IS TAKEN.
             //
-            if( (double)(fp)>(double)(fx) )
+            if ((double)(fp) > (double)(fx))
             {
                 info = 1;
                 bound = true;
-                theta = 3*(fx-fp)/(stp-stx)+dx+dp;
+                theta = 3 * (fx - fp) / (stp - stx) + dx + dp;
                 s = Math.Max(Math.Abs(theta), Math.Max(Math.Abs(dx), Math.Abs(dp)));
-                gamma = s*Math.Sqrt(math.sqr(theta/s)-dx/s*(dp/s));
-                if( (double)(stp)<(double)(stx) )
+                gamma = s * Math.Sqrt(math.sqr(theta / s) - dx / s * (dp / s));
+                if ((double)(stp) < (double)(stx))
                 {
                     gamma = -gamma;
                 }
-                p = gamma-dx+theta;
-                q = gamma-dx+gamma+dp;
-                r = p/q;
-                stpc = stx+r*(stp-stx);
-                stpq = stx+dx/((fx-fp)/(stp-stx)+dx)/2*(stp-stx);
-                if( (double)(Math.Abs(stpc-stx))<(double)(Math.Abs(stpq-stx)) )
+                p = gamma - dx + theta;
+                q = gamma - dx + gamma + dp;
+                r = p / q;
+                stpc = stx + r * (stp - stx);
+                stpq = stx + dx / ((fx - fp) / (stp - stx) + dx) / 2 * (stp - stx);
+                if ((double)(Math.Abs(stpc - stx)) < (double)(Math.Abs(stpq - stx)))
                 {
                     stpf = stpc;
                 }
                 else
                 {
-                    stpf = stpc+(stpq-stpc)/2;
+                    stpf = stpc + (stpq - stpc) / 2;
                 }
                 brackt = true;
             }
             else
             {
-                if( (double)(sgnd)<(double)(0) )
+                if ((double)(sgnd) < (double)(0))
                 {
-                    
                     //
                     //     SECOND CASE. A LOWER FUNCTION VALUE AND DERIVATIVES OF
                     //     OPPOSITE SIGN. THE MINIMUM IS BRACKETED. IF THE CUBIC
@@ -12417,19 +12484,19 @@ public partial class alglib
                     //
                     info = 2;
                     bound = false;
-                    theta = 3*(fx-fp)/(stp-stx)+dx+dp;
+                    theta = 3 * (fx - fp) / (stp - stx) + dx + dp;
                     s = Math.Max(Math.Abs(theta), Math.Max(Math.Abs(dx), Math.Abs(dp)));
-                    gamma = s*Math.Sqrt(math.sqr(theta/s)-dx/s*(dp/s));
-                    if( (double)(stp)>(double)(stx) )
+                    gamma = s * Math.Sqrt(math.sqr(theta / s) - dx / s * (dp / s));
+                    if ((double)(stp) > (double)(stx))
                     {
                         gamma = -gamma;
                     }
-                    p = gamma-dp+theta;
-                    q = gamma-dp+gamma+dx;
-                    r = p/q;
-                    stpc = stp+r*(stx-stp);
-                    stpq = stp+dp/(dp-dx)*(stx-stp);
-                    if( (double)(Math.Abs(stpc-stp))>(double)(Math.Abs(stpq-stp)) )
+                    p = gamma - dp + theta;
+                    q = gamma - dp + gamma + dx;
+                    r = p / q;
+                    stpc = stp + r * (stx - stp);
+                    stpq = stp + dp / (dp - dx) * (stx - stp);
+                    if ((double)(Math.Abs(stpc - stp)) > (double)(Math.Abs(stpq - stp)))
                     {
                         stpf = stpc;
                     }
@@ -12441,9 +12508,8 @@ public partial class alglib
                 }
                 else
                 {
-                    if( (double)(Math.Abs(dp))<(double)(Math.Abs(dx)) )
+                    if ((double)(Math.Abs(dp)) < (double)(Math.Abs(dx)))
                     {
-                        
                         //
                         //     THIRD CASE. A LOWER FUNCTION VALUE, DERIVATIVES OF THE
                         //     SAME SIGN, AND THE MAGNITUDE OF THE DERIVATIVE DECREASES.
@@ -12456,28 +12522,28 @@ public partial class alglib
                         //
                         info = 3;
                         bound = true;
-                        theta = 3*(fx-fp)/(stp-stx)+dx+dp;
+                        theta = 3 * (fx - fp) / (stp - stx) + dx + dp;
                         s = Math.Max(Math.Abs(theta), Math.Max(Math.Abs(dx), Math.Abs(dp)));
-                        
+
                         //
                         //        THE CASE GAMMA = 0 ONLY ARISES IF THE CUBIC DOES NOT TEND
                         //        TO INFINITY IN THE DIRECTION OF THE STEP.
                         //
-                        gamma = s*Math.Sqrt(Math.Max(0, math.sqr(theta/s)-dx/s*(dp/s)));
-                        if( (double)(stp)>(double)(stx) )
+                        gamma = s * Math.Sqrt(Math.Max(0, math.sqr(theta / s) - dx / s * (dp / s)));
+                        if ((double)(stp) > (double)(stx))
                         {
                             gamma = -gamma;
                         }
-                        p = gamma-dp+theta;
-                        q = gamma+(dx-dp)+gamma;
-                        r = p/q;
-                        if( (double)(r)<(double)(0) && (double)(gamma)!=(double)(0) )
+                        p = gamma - dp + theta;
+                        q = gamma + (dx - dp) + gamma;
+                        r = p / q;
+                        if ((double)(r) < (double)(0) && (double)(gamma) != (double)(0))
                         {
-                            stpc = stp+r*(stx-stp);
+                            stpc = stp + r * (stx - stp);
                         }
                         else
                         {
-                            if( (double)(stp)>(double)(stx) )
+                            if ((double)(stp) > (double)(stx))
                             {
                                 stpc = stmax;
                             }
@@ -12486,10 +12552,10 @@ public partial class alglib
                                 stpc = stmin;
                             }
                         }
-                        stpq = stp+dp/(dp-dx)*(stx-stp);
-                        if( brackt )
+                        stpq = stp + dp / (dp - dx) * (stx - stp);
+                        if (brackt)
                         {
-                            if( (double)(Math.Abs(stp-stpc))<(double)(Math.Abs(stp-stpq)) )
+                            if ((double)(Math.Abs(stp - stpc)) < (double)(Math.Abs(stp - stpq)))
                             {
                                 stpf = stpc;
                             }
@@ -12500,7 +12566,7 @@ public partial class alglib
                         }
                         else
                         {
-                            if( (double)(Math.Abs(stp-stpc))>(double)(Math.Abs(stp-stpq)) )
+                            if ((double)(Math.Abs(stp - stpc)) > (double)(Math.Abs(stp - stpq)))
                             {
                                 stpf = stpc;
                             }
@@ -12512,7 +12578,6 @@ public partial class alglib
                     }
                     else
                     {
-                        
                         //
                         //     FOURTH CASE. A LOWER FUNCTION VALUE, DERIVATIVES OF THE
                         //     SAME SIGN, AND THE MAGNITUDE OF THE DERIVATIVE DOES
@@ -12521,24 +12586,24 @@ public partial class alglib
                         //
                         info = 4;
                         bound = false;
-                        if( brackt )
+                        if (brackt)
                         {
-                            theta = 3*(fp-fy)/(sty-stp)+dy+dp;
+                            theta = 3 * (fp - fy) / (sty - stp) + dy + dp;
                             s = Math.Max(Math.Abs(theta), Math.Max(Math.Abs(dy), Math.Abs(dp)));
-                            gamma = s*Math.Sqrt(math.sqr(theta/s)-dy/s*(dp/s));
-                            if( (double)(stp)>(double)(sty) )
+                            gamma = s * Math.Sqrt(math.sqr(theta / s) - dy / s * (dp / s));
+                            if ((double)(stp) > (double)(sty))
                             {
                                 gamma = -gamma;
                             }
-                            p = gamma-dp+theta;
-                            q = gamma-dp+gamma+dy;
-                            r = p/q;
-                            stpc = stp+r*(sty-stp);
+                            p = gamma - dp + theta;
+                            q = gamma - dp + gamma + dy;
+                            r = p / q;
+                            stpc = stp + r * (sty - stp);
                             stpf = stpc;
                         }
                         else
                         {
-                            if( (double)(stp)>(double)(stx) )
+                            if ((double)(stp) > (double)(stx))
                             {
                                 stpf = stmax;
                             }
@@ -12550,12 +12615,12 @@ public partial class alglib
                     }
                 }
             }
-            
+
             //
             //     UPDATE THE INTERVAL OF UNCERTAINTY. THIS UPDATE DOES NOT
             //     DEPEND ON THE NEW STEP OR THE CASE ANALYSIS ABOVE.
             //
-            if( (double)(fp)>(double)(fx) )
+            if ((double)(fp) > (double)(fx))
             {
                 sty = stp;
                 fy = fp;
@@ -12563,7 +12628,7 @@ public partial class alglib
             }
             else
             {
-                if( (double)(sgnd)<(double)(0.0) )
+                if ((double)(sgnd) < (double)(0.0))
                 {
                     sty = stx;
                     fy = fx;
@@ -12573,28 +12638,27 @@ public partial class alglib
                 fx = fp;
                 dx = dp;
             }
-            
+
             //
             //     COMPUTE THE NEW STEP AND SAFEGUARD IT.
             //
             stpf = Math.Min(stmax, stpf);
             stpf = Math.Max(stmin, stpf);
             stp = stpf;
-            if( brackt && bound )
+            if (brackt && bound)
             {
-                if( (double)(sty)>(double)(stx) )
+                if ((double)(sty) > (double)(stx))
                 {
-                    stp = Math.Min(stx+0.66*(sty-stx), stp);
+                    stp = Math.Min(stx + 0.66 * (sty - stx), stp);
                 }
                 else
                 {
-                    stp = Math.Max(stx+0.66*(sty-stx), stp);
+                    stp = Math.Max(stx + 0.66 * (sty - stx), stp);
                 }
             }
         }
-
-
     }
+
     public class xblas
     {
         /*************************************************************************
@@ -12618,13 +12682,15 @@ public partial class alglib
           -- ALGLIB --
              Copyright 24.08.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void xdot(double[] a,
+        public static void xdot(
+            double[] a,
             double[] b,
             int n,
             ref double[] temp,
             ref double r,
             ref double rerr,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             double mx = 0;
@@ -12633,25 +12699,24 @@ public partial class alglib
             r = 0;
             rerr = 0;
 
-            
             //
             // special cases:
             // * N=0
             //
-            if( n==0 )
+            if (n == 0)
             {
                 r = 0;
                 rerr = 0;
                 return;
             }
             mx = 0;
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
-                v = a[i]*b[i];
+                v = a[i] * b[i];
                 temp[i] = v;
                 mx = Math.Max(mx, Math.Abs(v));
             }
-            if( (double)(mx)==(double)(0) )
+            if ((double)(mx) == (double)(0))
             {
                 r = 0;
                 rerr = 0;
@@ -12659,7 +12724,6 @@ public partial class alglib
             }
             xsum(ref temp, mx, n, ref r, ref rerr, _params);
         }
-
 
         /*************************************************************************
         More precise complex dot-product. Absolute error of  subroutine  result is
@@ -12682,13 +12746,15 @@ public partial class alglib
           -- ALGLIB --
              Copyright 27.01.2010 by Bochkanov Sergey
         *************************************************************************/
-        public static void xcdot(complex[] a,
+        public static void xcdot(
+            complex[] a,
             complex[] b,
             int n,
             ref double[] temp,
             ref complex r,
             ref double rerr,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             double mx = 0;
@@ -12699,77 +12765,77 @@ public partial class alglib
             r = 0;
             rerr = 0;
 
-            
             //
             // special cases:
             // * N=0
             //
-            if( n==0 )
+            if (n == 0)
             {
                 r = 0;
                 rerr = 0;
                 return;
             }
-            
+
             //
             // calculate real part
             //
             mx = 0;
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
-                v = a[i].x*b[i].x;
-                temp[2*i+0] = v;
+                v = a[i].x * b[i].x;
+                temp[2 * i + 0] = v;
                 mx = Math.Max(mx, Math.Abs(v));
-                v = -(a[i].y*b[i].y);
-                temp[2*i+1] = v;
+                v = -(a[i].y * b[i].y);
+                temp[2 * i + 1] = v;
                 mx = Math.Max(mx, Math.Abs(v));
             }
-            if( (double)(mx)==(double)(0) )
+            if ((double)(mx) == (double)(0))
             {
                 r.x = 0;
                 rerrx = 0;
             }
             else
             {
-                xsum(ref temp, mx, 2*n, ref r.x, ref rerrx, _params);
+                xsum(ref temp, mx, 2 * n, ref r.x, ref rerrx, _params);
             }
-            
+
             //
             // calculate imaginary part
             //
             mx = 0;
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
-                v = a[i].x*b[i].y;
-                temp[2*i+0] = v;
+                v = a[i].x * b[i].y;
+                temp[2 * i + 0] = v;
                 mx = Math.Max(mx, Math.Abs(v));
-                v = a[i].y*b[i].x;
-                temp[2*i+1] = v;
+                v = a[i].y * b[i].x;
+                temp[2 * i + 1] = v;
                 mx = Math.Max(mx, Math.Abs(v));
             }
-            if( (double)(mx)==(double)(0) )
+            if ((double)(mx) == (double)(0))
             {
                 r.y = 0;
                 rerry = 0;
             }
             else
             {
-                xsum(ref temp, mx, 2*n, ref r.y, ref rerry, _params);
+                xsum(ref temp, mx, 2 * n, ref r.y, ref rerry, _params);
             }
-            
+
             //
             // total error
             //
-            if( (double)(rerrx)==(double)(0) && (double)(rerry)==(double)(0) )
+            if ((double)(rerrx) == (double)(0) && (double)(rerry) == (double)(0))
             {
                 rerr = 0;
             }
             else
             {
-                rerr = Math.Max(rerrx, rerry)*Math.Sqrt(1+math.sqr(Math.Min(rerrx, rerry)/Math.Max(rerrx, rerry)));
+                rerr =
+                    Math.Max(rerrx, rerry)
+                    * Math.Sqrt(1 + math.sqr(Math.Min(rerrx, rerry) / Math.Max(rerrx, rerry)));
             }
         }
-
 
         /*************************************************************************
         Internal subroutine for extra-precise calculation of SUM(w[i]).
@@ -12787,12 +12853,14 @@ public partial class alglib
           -- ALGLIB --
              Copyright 24.08.2009 by Bochkanov Sergey
         *************************************************************************/
-        private static void xsum(ref double[] w,
+        private static void xsum(
+            ref double[] w,
             double mx,
             int n,
             ref double r,
             ref double rerr,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int k = 0;
@@ -12808,67 +12876,65 @@ public partial class alglib
             r = 0;
             rerr = 0;
 
-            
             //
             // special cases:
             // * N=0
             // * N is too large to use integer arithmetics
             //
-            if( n==0 )
+            if (n == 0)
             {
                 r = 0;
                 rerr = 0;
                 return;
             }
-            if( (double)(mx)==(double)(0) )
+            if ((double)(mx) == (double)(0))
             {
                 r = 0;
                 rerr = 0;
                 return;
             }
-            alglib.ap.assert(n<536870912, "XDot: N is too large!");
-            
+            Alglib.ap.assert(n < 536870912, "XDot: N is too large!");
+
             //
             // Prepare
             //
             ln2 = Math.Log(2);
-            rerr = mx*math.machineepsilon;
-            
+            rerr = mx * math.machineepsilon;
+
             //
             // 1. find S such that 0.5<=S*MX<1
             // 2. multiply W by S, so task is normalized in some sense
             // 3. S:=1/S so we can obtain original vector multiplying by S
             //
-            k = (int)Math.Round(Math.Log(mx)/ln2);
+            k = (int)Math.Round(Math.Log(mx) / ln2);
             s = xfastpow(2, -k, _params);
-            if( !math.isfinite(s) )
+            if (!math.isfinite(s))
             {
-                
                 //
                 // Overflow or underflow during evaluation of S; fallback low-precision code
                 //
                 r = 0;
-                rerr = mx*math.machineepsilon;
-                for(i=0; i<=n-1; i++)
+                rerr = mx * math.machineepsilon;
+                for (i = 0; i <= n - 1; i++)
                 {
-                    r = r+w[i];
+                    r = r + w[i];
                 }
                 return;
             }
-            while( (double)(s*mx)>=(double)(1) )
+            while ((double)(s * mx) >= (double)(1))
             {
-                s = 0.5*s;
+                s = 0.5 * s;
             }
-            while( (double)(s*mx)<(double)(0.5) )
+            while ((double)(s * mx) < (double)(0.5))
             {
-                s = 2*s;
+                s = 2 * s;
             }
-            for(i_=0; i_<=n-1;i_++)
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
-                w[i_] = s*w[i_];
+                w[i_] = s * w[i_];
             }
-            s = 1/s;
-            
+            s = 1 / s;
+
             //
             // find Chunk=2^M such that N*Chunk<2^29
             //
@@ -12876,52 +12942,51 @@ public partial class alglib
             // to tolerate possible problems with rounding and N's close
             // to the limit, so we don't want to be very strict here.
             //
-            k = (int)(Math.Log((double)536870912/(double)n)/ln2);
+            k = (int)(Math.Log((double)536870912 / (double)n) / ln2);
             chunk = xfastpow(2, k, _params);
-            if( (double)(chunk)<(double)(2) )
+            if ((double)(chunk) < (double)(2))
             {
                 chunk = 2;
             }
-            invchunk = 1/chunk;
-            
+            invchunk = 1 / chunk;
+
             //
             // calculate result
             //
             r = 0;
-            for(i_=0; i_<=n-1;i_++)
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
-                w[i_] = chunk*w[i_];
+                w[i_] = chunk * w[i_];
             }
-            while( true )
+            while (true)
             {
-                s = s*invchunk;
+                s = s * invchunk;
                 allzeros = true;
                 ks = 0;
-                for(i=0; i<=n-1; i++)
+                for (i = 0; i <= n - 1; i++)
                 {
                     v = w[i];
                     k = (int)(v);
-                    if( (double)(v)!=(double)(k) )
+                    if ((double)(v) != (double)(k))
                     {
                         allzeros = false;
                     }
-                    w[i] = chunk*(v-k);
-                    ks = ks+k;
+                    w[i] = chunk * (v - k);
+                    ks = ks + k;
                 }
-                r = r+s*ks;
+                r = r + s * ks;
                 v = Math.Abs(r);
-                if( allzeros || (double)(s*n+mx)==(double)(mx) )
+                if (allzeros || (double)(s * n + mx) == (double)(mx))
                 {
                     break;
                 }
             }
-            
+
             //
             // correct error
             //
-            rerr = Math.Max(rerr, Math.Abs(r)*math.machineepsilon);
+            rerr = Math.Max(rerr, Math.Abs(r) * math.machineepsilon);
         }
-
 
         /*************************************************************************
         Fast Pow
@@ -12929,38 +12994,35 @@ public partial class alglib
           -- ALGLIB --
              Copyright 24.08.2009 by Bochkanov Sergey
         *************************************************************************/
-        private static double xfastpow(double r,
-            int n,
-            alglib.xparams _params)
+        private static double xfastpow(double r, int n, Alglib.xparams _params)
         {
             double result = 0;
 
             result = 0;
-            if( n>0 )
+            if (n > 0)
             {
-                if( n%2==0 )
+                if (n % 2 == 0)
                 {
-                    result = math.sqr(xfastpow(r, n/2, _params));
+                    result = math.sqr(xfastpow(r, n / 2, _params));
                 }
                 else
                 {
-                    result = r*xfastpow(r, n-1, _params);
+                    result = r * xfastpow(r, n - 1, _params);
                 }
                 return result;
             }
-            if( n==0 )
+            if (n == 0)
             {
                 result = 1;
             }
-            if( n<0 )
+            if (n < 0)
             {
-                result = xfastpow(1/r, -n, _params);
+                result = xfastpow(1 / r, -n, _params);
             }
             return result;
         }
-
-
     }
+
     public class basicstatops
     {
         /*************************************************************************
@@ -12979,11 +13041,13 @@ public partial class alglib
               X by zeros (exact zeros are used, not sum which is only approximately
               equal to zero).
         *************************************************************************/
-        public static void rankx(double[] x,
+        public static void rankx(
+            double[] x,
             int n,
             bool iscentered,
             apserv.apbuffers buf,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
@@ -12991,93 +13055,91 @@ public partial class alglib
             double tmp = 0;
             double voffs = 0;
 
-            
             //
             // Prepare
             //
-            if( n<1 )
+            if (n < 1)
             {
                 return;
             }
-            if( n==1 )
+            if (n == 1)
             {
                 x[0] = 0;
                 return;
             }
-            if( alglib.ap.len(buf.ra1)<n )
+            if (Alglib.ap.len(buf.ra1) < n)
             {
                 buf.ra1 = new double[n];
             }
-            if( alglib.ap.len(buf.ia1)<n )
+            if (Alglib.ap.len(buf.ia1) < n)
             {
                 buf.ia1 = new int[n];
             }
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 buf.ra1[i] = x[i];
                 buf.ia1[i] = i;
             }
             tsort.tagsortfasti(ref buf.ra1, ref buf.ia1, ref buf.ra2, ref buf.ia2, n, _params);
-            
+
             //
             // Special test for all values being equal
             //
-            if( (double)(buf.ra1[0])==(double)(buf.ra1[n-1]) )
+            if ((double)(buf.ra1[0]) == (double)(buf.ra1[n - 1]))
             {
-                if( iscentered )
+                if (iscentered)
                 {
                     tmp = 0.0;
                 }
                 else
                 {
-                    tmp = (double)(n-1)/(double)2;
+                    tmp = (double)(n - 1) / (double)2;
                 }
-                for(i=0; i<=n-1; i++)
+                for (i = 0; i <= n - 1; i++)
                 {
                     x[i] = tmp;
                 }
                 return;
             }
-            
+
             //
             // compute tied ranks
             //
             i = 0;
-            while( i<=n-1 )
+            while (i <= n - 1)
             {
-                j = i+1;
-                while( j<=n-1 )
+                j = i + 1;
+                while (j <= n - 1)
                 {
-                    if( (double)(buf.ra1[j])!=(double)(buf.ra1[i]) )
+                    if ((double)(buf.ra1[j]) != (double)(buf.ra1[i]))
                     {
                         break;
                     }
-                    j = j+1;
+                    j = j + 1;
                 }
-                for(k=i; k<=j-1; k++)
+                for (k = i; k <= j - 1; k++)
                 {
-                    buf.ra1[k] = (double)(i+j-1)/(double)2;
+                    buf.ra1[k] = (double)(i + j - 1) / (double)2;
                 }
                 i = j;
             }
-            
+
             //
             // back to x
             //
-            if( iscentered )
+            if (iscentered)
             {
-                voffs = (double)(n-1)/(double)2;
+                voffs = (double)(n - 1) / (double)2;
             }
             else
             {
                 voffs = 0.0;
             }
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
-                x[buf.ia1[i]] = buf.ra1[i]-voffs;
+                x[buf.ia1[i]] = buf.ra1[i] - voffs;
             }
         }
-
 
         /*************************************************************************
         Internal untied ranking subroutine.
@@ -13089,48 +13151,48 @@ public partial class alglib
 
         Returns untied ranks (in case of a tie ranks are resolved arbitrarily).
         *************************************************************************/
-        public static void rankxuntied(double[] x,
+        public static void rankxuntied(
+            double[] x,
             int n,
             apserv.apbuffers buf,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
 
-            
             //
             // Prepare
             //
-            if( n<1 )
+            if (n < 1)
             {
                 return;
             }
-            if( n==1 )
+            if (n == 1)
             {
                 x[0] = 0;
                 return;
             }
-            if( alglib.ap.len(buf.ra1)<n )
+            if (Alglib.ap.len(buf.ra1) < n)
             {
                 buf.ra1 = new double[n];
             }
-            if( alglib.ap.len(buf.ia1)<n )
+            if (Alglib.ap.len(buf.ia1) < n)
             {
                 buf.ia1 = new int[n];
             }
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 buf.ra1[i] = x[i];
                 buf.ia1[i] = i;
             }
             tsort.tagsortfasti(ref buf.ra1, ref buf.ia1, ref buf.ra2, ref buf.ia2, n, _params);
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
                 x[buf.ia1[i]] = i;
             }
         }
-
-
     }
+
     public class hpccores
     {
         /*************************************************************************
@@ -13155,16 +13217,18 @@ public partial class alglib
             public double e;
             public double[] g;
             public double[] tmp0;
+
             public mlpbuffers()
             {
                 init();
             }
+
             public override void init()
             {
                 batch4buf = new double[0];
                 hpcbuf = new double[0];
-                xy = new double[0,0];
-                xy2 = new double[0,0];
+                xy = new double[0, 0];
+                xy2 = new double[0, 0];
                 xyrow = new double[0];
                 x = new double[0];
                 y = new double[0];
@@ -13172,7 +13236,8 @@ public partial class alglib
                 g = new double[0];
                 tmp0 = new double[0];
             }
-            public override alglib.apobject make_copy()
+
+            public override Alglib.apobject make_copy()
             {
                 mlpbuffers _result = new mlpbuffers();
                 _result.chunksize = chunksize;
@@ -13195,9 +13260,6 @@ public partial class alglib
             }
         };
 
-
-
-
         /*************************************************************************
         Prepares HPC compuations  of  chunked  gradient with HPCChunkedGradient().
         You  have to call this function  before  calling  HPCChunkedGradient() for
@@ -13211,59 +13273,61 @@ public partial class alglib
             HPCFinalizeChunkedGradient(Buf, Grad)
 
         *************************************************************************/
-        public static void hpcpreparechunkedgradient(double[] weights,
+        public static void hpcpreparechunkedgradient(
+            double[] weights,
             int wcount,
             int ntotal,
             int nin,
             int nout,
             mlpbuffers buf,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int batch4size = 0;
             int chunksize = 0;
 
             chunksize = 4;
-            batch4size = 3*chunksize*ntotal+chunksize*(2*nout+1);
-            if( alglib.ap.rows(buf.xy)<chunksize || alglib.ap.cols(buf.xy)<nin+nout )
+            batch4size = 3 * chunksize * ntotal + chunksize * (2 * nout + 1);
+            if (Alglib.ap.rows(buf.xy) < chunksize || Alglib.ap.cols(buf.xy) < nin + nout)
             {
-                buf.xy = new double[chunksize, nin+nout];
+                buf.xy = new double[chunksize, nin + nout];
             }
-            if( alglib.ap.rows(buf.xy2)<chunksize || alglib.ap.cols(buf.xy2)<nin+nout )
+            if (Alglib.ap.rows(buf.xy2) < chunksize || Alglib.ap.cols(buf.xy2) < nin + nout)
             {
-                buf.xy2 = new double[chunksize, nin+nout];
+                buf.xy2 = new double[chunksize, nin + nout];
             }
-            if( alglib.ap.len(buf.xyrow)<nin+nout )
+            if (Alglib.ap.len(buf.xyrow) < nin + nout)
             {
-                buf.xyrow = new double[nin+nout];
+                buf.xyrow = new double[nin + nout];
             }
-            if( alglib.ap.len(buf.x)<nin )
+            if (Alglib.ap.len(buf.x) < nin)
             {
                 buf.x = new double[nin];
             }
-            if( alglib.ap.len(buf.y)<nout )
+            if (Alglib.ap.len(buf.y) < nout)
             {
                 buf.y = new double[nout];
             }
-            if( alglib.ap.len(buf.desiredy)<nout )
+            if (Alglib.ap.len(buf.desiredy) < nout)
             {
                 buf.desiredy = new double[nout];
             }
-            if( alglib.ap.len(buf.batch4buf)<batch4size )
+            if (Alglib.ap.len(buf.batch4buf) < batch4size)
             {
                 buf.batch4buf = new double[batch4size];
             }
-            if( alglib.ap.len(buf.hpcbuf)<wcount )
+            if (Alglib.ap.len(buf.hpcbuf) < wcount)
             {
                 buf.hpcbuf = new double[wcount];
             }
-            if( alglib.ap.len(buf.g)<wcount )
+            if (Alglib.ap.len(buf.g) < wcount)
             {
                 buf.g = new double[wcount];
             }
-            if( !hpcpreparechunkedgradientx(weights, wcount, buf.hpcbuf, _params) )
+            if (!hpcpreparechunkedgradientx(weights, wcount, buf.hpcbuf, _params))
             {
-                for(i=0; i<=wcount-1; i++)
+                for (i = 0; i <= wcount - 1; i++)
                 {
                     buf.hpcbuf[i] = 0.0;
                 }
@@ -13274,7 +13338,6 @@ public partial class alglib
             buf.nout = nout;
             buf.chunksize = chunksize;
         }
-
 
         /*************************************************************************
         Finalizes HPC compuations  of  chunked gradient with HPCChunkedGradient().
@@ -13289,27 +13352,29 @@ public partial class alglib
             HPCFinalizeChunkedGradient(Buf, Grad)
 
         *************************************************************************/
-        public static void hpcfinalizechunkedgradient(mlpbuffers buf,
+        public static void hpcfinalizechunkedgradient(
+            mlpbuffers buf,
             double[] grad,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
 
-            if( !hpcfinalizechunkedgradientx(buf.hpcbuf, buf.wcount, grad, _params) )
+            if (!hpcfinalizechunkedgradientx(buf.hpcbuf, buf.wcount, grad, _params))
             {
-                for(i=0; i<=buf.wcount-1; i++)
+                for (i = 0; i <= buf.wcount - 1; i++)
                 {
-                    grad[i] = grad[i]+buf.hpcbuf[i];
+                    grad[i] = grad[i] + buf.hpcbuf[i];
                 }
             }
         }
-
 
         /*************************************************************************
         Fast kernel for chunked gradient.
 
         *************************************************************************/
-        public static bool hpcchunkedgradient(double[] weights,
+        public static bool hpcchunkedgradient(
+            double[] weights,
             int[] structinfo,
             double[] columnmeans,
             double[] columnsigmas,
@@ -13320,7 +13385,8 @@ public partial class alglib
             double[] hpcbuf,
             ref double e,
             bool naturalerrorfunc,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
@@ -13328,12 +13394,12 @@ public partial class alglib
             return result;
         }
 
-
         /*************************************************************************
         Fast kernel for chunked processing.
 
         *************************************************************************/
-        public static bool hpcchunkedprocess(double[] weights,
+        public static bool hpcchunkedprocess(
+            double[] weights,
             int[] structinfo,
             double[] columnmeans,
             double[] columnsigmas,
@@ -13342,14 +13408,14 @@ public partial class alglib
             int csize,
             double[] batch4buf,
             double[] hpcbuf,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         Stub function.
@@ -13358,17 +13424,18 @@ public partial class alglib
              14.06.2013
              Bochkanov Sergey
         *************************************************************************/
-        private static bool hpcpreparechunkedgradientx(double[] weights,
+        private static bool hpcpreparechunkedgradientx(
+            double[] weights,
             int wcount,
             double[] hpcbuf,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
 
         /*************************************************************************
         Stub function.
@@ -13377,25 +13444,28 @@ public partial class alglib
              14.06.2013
              Bochkanov Sergey
         *************************************************************************/
-        private static bool hpcfinalizechunkedgradientx(double[] buf,
+        private static bool hpcfinalizechunkedgradientx(
+            double[] buf,
             int wcount,
             double[] grad,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             bool result = new bool();
 
             result = false;
             return result;
         }
-
-
     }
+
     public class ntheory
     {
-        public static void findprimitiverootandinverse(int n,
+        public static void findprimitiverootandinverse(
+            int n,
             ref int proot,
             ref int invproot,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int candroot = 0;
             int phin = 0;
@@ -13414,20 +13484,20 @@ public partial class alglib
             proot = 0;
             invproot = 0;
 
-            alglib.ap.assert(n>=3, "FindPrimitiveRootAndInverse: N<3");
+            Alglib.ap.assert(n >= 3, "FindPrimitiveRootAndInverse: N<3");
             proot = 0;
             invproot = 0;
-            
+
             //
             // check that N is prime
             //
-            alglib.ap.assert(isprime(n, _params), "FindPrimitiveRoot: N is not prime");
-            
+            Alglib.ap.assert(isprime(n, _params), "FindPrimitiveRoot: N is not prime");
+
             //
             // Because N is prime, Euler totient function is equal to N-1
             //
-            phin = n-1;
-            
+            phin = n - 1;
+
             //
             // Test different values of PRoot - from 2 to N-1.
             // One of these values MUST be primitive root.
@@ -13440,9 +13510,8 @@ public partial class alglib
             // * a number m for which these k results are all different from 1 is a
             //   primitive root.
             //
-            for(candroot=2; candroot<=n-1; candroot++)
+            for (candroot = 2; candroot <= n - 1; candroot++)
             {
-                
                 //
                 // We have current candidate root in CandRoot.
                 //
@@ -13456,31 +13525,31 @@ public partial class alglib
                 q = phin;
                 f = 2;
                 allnonone = true;
-                while( q>1 )
+                while (q > 1)
                 {
-                    if( q%f==0 )
+                    if (q % f == 0)
                     {
-                        t = modexp(candroot, phin/f, n, _params);
-                        if( t==1 )
+                        t = modexp(candroot, phin / f, n, _params);
+                        if (t == 1)
                         {
                             allnonone = false;
                             break;
                         }
-                        while( q%f==0 )
+                        while (q % f == 0)
                         {
-                            q = q/f;
+                            q = q / f;
                         }
                     }
-                    f = f+1;
+                    f = f + 1;
                 }
-                if( allnonone )
+                if (allnonone)
                 {
                     proot = candroot;
                     break;
                 }
             }
-            alglib.ap.assert(proot>=2, "FindPrimitiveRoot: internal error (root not found)");
-            
+            Alglib.ap.assert(proot >= 2, "FindPrimitiveRoot: internal error (root not found)");
+
             //
             // Use extended Euclidean algorithm to find multiplicative inverse of primitive root
             //
@@ -13490,98 +13559,97 @@ public partial class alglib
             lasty = 0;
             a = proot;
             b = n;
-            while( b!=0 )
+            while (b != 0)
             {
-                q = a/b;
-                t = a%b;
+                q = a / b;
+                t = a % b;
                 a = b;
                 b = t;
-                t = lastx-q*x;
+                t = lastx - q * x;
                 lastx = x;
                 x = t;
-                t = lasty-q*y;
+                t = lasty - q * y;
                 lasty = y;
                 y = t;
             }
-            while( lastx<0 )
+            while (lastx < 0)
             {
-                lastx = lastx+n;
+                lastx = lastx + n;
             }
             invproot = lastx;
-            
+
             //
             // Check that it is safe to perform multiplication modulo N.
             // Check results for consistency.
             //
-            n2 = (n-1)*(n-1);
-            alglib.ap.assert(n2/(n-1)==n-1, "FindPrimitiveRoot: internal error");
-            alglib.ap.assert(proot*invproot/proot==invproot, "FindPrimitiveRoot: internal error");
-            alglib.ap.assert(proot*invproot/invproot==proot, "FindPrimitiveRoot: internal error");
-            alglib.ap.assert(proot*invproot%n==1, "FindPrimitiveRoot: internal error");
+            n2 = (n - 1) * (n - 1);
+            Alglib.ap.assert(n2 / (n - 1) == n - 1, "FindPrimitiveRoot: internal error");
+            Alglib.ap.assert(
+                proot * invproot / proot == invproot,
+                "FindPrimitiveRoot: internal error"
+            );
+            Alglib.ap.assert(
+                proot * invproot / invproot == proot,
+                "FindPrimitiveRoot: internal error"
+            );
+            Alglib.ap.assert(proot * invproot % n == 1, "FindPrimitiveRoot: internal error");
         }
 
-
-        private static bool isprime(int n,
-            alglib.xparams _params)
+        private static bool isprime(int n, Alglib.xparams _params)
         {
             bool result = new bool();
             int p = 0;
 
             result = false;
             p = 2;
-            while( p*p<=n )
+            while (p * p <= n)
             {
-                if( n%p==0 )
+                if (n % p == 0)
                 {
                     return result;
                 }
-                p = p+1;
+                p = p + 1;
             }
             result = true;
             return result;
         }
 
-
-        private static int modmul(int a,
-            int b,
-            int n,
-            alglib.xparams _params)
+        private static int modmul(int a, int b, int n, Alglib.xparams _params)
         {
             int result = 0;
             int t = 0;
             double ra = 0;
             double rb = 0;
 
-            alglib.ap.assert(a>=0 && a<n, "ModMul: A<0 or A>=N");
-            alglib.ap.assert(b>=0 && b<n, "ModMul: B<0 or B>=N");
-            
+            Alglib.ap.assert(a >= 0 && a < n, "ModMul: A<0 or A>=N");
+            Alglib.ap.assert(b >= 0 && b < n, "ModMul: B<0 or B>=N");
+
             //
             // Base cases
             //
             ra = a;
             rb = b;
-            if( b==0 || a==0 )
+            if (b == 0 || a == 0)
             {
                 result = 0;
                 return result;
             }
-            if( b==1 || a==1 )
+            if (b == 1 || a == 1)
             {
-                result = a*b;
+                result = a * b;
                 return result;
             }
-            if( (double)(ra*rb)==(double)(a*b) )
+            if ((double)(ra * rb) == (double)(a * b))
             {
-                result = a*b%n;
+                result = a * b % n;
                 return result;
             }
-            
+
             //
             // Non-base cases
             //
-            if( b%2==0 )
+            if (b % 2 == 0)
             {
-                
                 //
                 // A*B = (A*(B/2)) * 2
                 //
@@ -13593,17 +13661,16 @@ public partial class alglib
                 //
                 // In case integer result overflows, we generate exception
                 //
-                t = modmul(a, b/2, n, _params);
-                result = t-n;
-                result = result+t;
-                if( result<0 )
+                t = modmul(a, b / 2, n, _params);
+                result = t - n;
+                result = result + t;
+                if (result < 0)
                 {
-                    result = result+n;
+                    result = result + n;
                 }
             }
             else
             {
-                
                 //
                 // A*B = (A*(B div 2)) * 2 + A
                 //
@@ -13615,68 +13682,63 @@ public partial class alglib
                 //
                 // In case integer result overflows, we generate exception
                 //
-                t = modmul(a, b/2, n, _params);
-                result = t-n;
-                result = result+t;
-                if( result<0 )
+                t = modmul(a, b / 2, n, _params);
+                result = t - n;
+                result = result + t;
+                if (result < 0)
                 {
-                    result = result+n;
+                    result = result + n;
                 }
-                result = result-n;
-                result = result+a;
-                if( result<0 )
+                result = result - n;
+                result = result + a;
+                if (result < 0)
                 {
-                    result = result+n;
+                    result = result + n;
                 }
             }
             return result;
         }
 
-
-        private static int modexp(int a,
-            int b,
-            int n,
-            alglib.xparams _params)
+        private static int modexp(int a, int b, int n, Alglib.xparams _params)
         {
             int result = 0;
             int t = 0;
 
-            alglib.ap.assert(a>=0 && a<n, "ModExp: A<0 or A>=N");
-            alglib.ap.assert(b>=0, "ModExp: B<0");
-            
+            Alglib.ap.assert(a >= 0 && a < n, "ModExp: A<0 or A>=N");
+            Alglib.ap.assert(b >= 0, "ModExp: B<0");
+
             //
             // Base cases
             //
-            if( b==0 )
+            if (b == 0)
             {
                 result = 1;
                 return result;
             }
-            if( b==1 )
+            if (b == 1)
             {
                 result = a;
                 return result;
             }
-            
+
             //
             // Non-base cases
             //
-            if( b%2==0 )
+            if (b % 2 == 0)
             {
                 t = modmul(a, a, n, _params);
-                result = modexp(t, b/2, n, _params);
+                result = modexp(t, b / 2, n, _params);
             }
             else
             {
                 t = modmul(a, a, n, _params);
-                result = modexp(t, b/2, n, _params);
+                result = modexp(t, b / 2, n, _params);
                 result = modmul(result, a, n, _params);
             }
             return result;
         }
-
-
     }
+
     public class ftbase
     {
         /*************************************************************************
@@ -13820,7 +13882,7 @@ public partial class alglib
 
 
             
-        TODO 
+        TODO
              2. from KFLOPs to UNITs, 1 UNIT = 100 000 FLOP!!!!!!!!!!!
 
              3. from IsRoot to TaskType = {0, -1, +1}; or maybe, add IsSeparatePlan
@@ -13836,33 +13898,33 @@ public partial class alglib
             public double[] buffer;
             public double[] precr;
             public double[] preci;
-            public alglib.smp.shared_pool bluesteinpool;
+            public Alglib.smp.shared_pool bluesteinpool;
+
             public fasttransformplan()
             {
                 init();
             }
+
             public override void init()
             {
-                entries = new int[0,0];
+                entries = new int[0, 0];
                 buffer = new double[0];
                 precr = new double[0];
                 preci = new double[0];
-                bluesteinpool = new alglib.smp.shared_pool();
+                bluesteinpool = new Alglib.smp.shared_pool();
             }
-            public override alglib.apobject make_copy()
+
+            public override Alglib.apobject make_copy()
             {
                 fasttransformplan _result = new fasttransformplan();
                 _result.entries = (int[,])entries.Clone();
                 _result.buffer = (double[])buffer.Clone();
                 _result.precr = (double[])precr.Clone();
                 _result.preci = (double[])preci.Clone();
-                _result.bluesteinpool = (alglib.smp.shared_pool)bluesteinpool.make_copy();
+                _result.bluesteinpool = (Alglib.smp.shared_pool)bluesteinpool.make_copy();
                 return _result;
             }
         };
-
-
-
 
         public const int coltype = 0;
         public const int coloperandscnt = 1;
@@ -13892,7 +13954,6 @@ public partial class alglib
         public const double ftbaseinefficiencyfactor = 1.3;
         public const int ftbasemaxsmoothfactor = 5;
 
-
         /*************************************************************************
         This subroutine generates FFT plan for K complex FFT's with length N each.
 
@@ -13906,10 +13967,12 @@ public partial class alglib
           -- ALGLIB --
              Copyright 05.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        public static void ftcomplexfftplan(int n,
+        public static void ftcomplexfftplan(
+            int n,
             int k,
             fasttransformplan plan,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             apserv.srealarray bluesteinbuf = new apserv.srealarray();
             int rowptr = 0;
@@ -13919,13 +13982,12 @@ public partial class alglib
             int precrsize = 0;
             int precisize = 0;
 
-            
             //
             // Initial check for parameters
             //
-            alglib.ap.assert(n>0, "FTComplexFFTPlan: N<=0");
-            alglib.ap.assert(k>0, "FTComplexFFTPlan: K<=0");
-            
+            Alglib.ap.assert(n > 0, "FTComplexFFTPlan: N<=0");
+            Alglib.ap.assert(k > 0, "FTComplexFFTPlan: K<=0");
+
             //
             // Determine required sizes of precomputed real and integer
             // buffers. This stage of code is highly dependent on internals
@@ -13944,15 +14006,15 @@ public partial class alglib
             precrsize = 0;
             precisize = 0;
             ftdeterminespacerequirements(n, ref precrsize, ref precisize, _params);
-            if( precrsize>0 )
+            if (precrsize > 0)
             {
                 plan.precr = new double[precrsize];
             }
-            if( precisize>0 )
+            if (precisize > 0)
             {
                 plan.preci = new double[precisize];
             }
-            
+
             //
             // Generate plan
             //
@@ -13960,19 +14022,35 @@ public partial class alglib
             precrptr = 0;
             preciptr = 0;
             bluesteinsize = 1;
-            plan.buffer = new double[2*n*k];
-            ftcomplexfftplanrec(n, k, true, true, ref rowptr, ref bluesteinsize, ref precrptr, ref preciptr, plan, _params);
+            plan.buffer = new double[2 * n * k];
+            ftcomplexfftplanrec(
+                n,
+                k,
+                true,
+                true,
+                ref rowptr,
+                ref bluesteinsize,
+                ref precrptr,
+                ref preciptr,
+                plan,
+                _params
+            );
             bluesteinbuf.val = new double[bluesteinsize];
-            alglib.smp.ae_shared_pool_set_seed(plan.bluesteinpool, bluesteinbuf);
-            
+            Alglib.smp.ae_shared_pool_set_seed(plan.bluesteinpool, bluesteinbuf);
+
             //
             // Check that actual amount of precomputed space used by transformation
             // plan is EXACTLY equal to amount of space allocated by us.
             //
-            alglib.ap.assert(precrptr==precrsize, "FTComplexFFTPlan: internal error (PrecRPtr<>PrecRSize)");
-            alglib.ap.assert(preciptr==precisize, "FTComplexFFTPlan: internal error (PrecRPtr<>PrecRSize)");
+            Alglib.ap.assert(
+                precrptr == precrsize,
+                "FTComplexFFTPlan: internal error (PrecRPtr<>PrecRSize)"
+            );
+            Alglib.ap.assert(
+                preciptr == precisize,
+                "FTComplexFFTPlan: internal error (PrecRPtr<>PrecRSize)"
+            );
         }
-
 
         /*************************************************************************
         This subroutine applies transformation plan to input/output array A.
@@ -13992,22 +14070,26 @@ public partial class alglib
           -- ALGLIB --
              Copyright 05.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        public static void ftapplyplan(fasttransformplan plan,
+        public static void ftapplyplan(
+            fasttransformplan plan,
             double[] a,
             int offsa,
             int repcnt,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int plansize = 0;
             int i = 0;
 
-            plansize = plan.entries[0,coloperandscnt]*plan.entries[0,coloperandsize]*plan.entries[0,colmicrovectorsize];
-            for(i=0; i<=repcnt-1; i++)
+            plansize =
+                plan.entries[0, coloperandscnt]
+                * plan.entries[0, coloperandsize]
+                * plan.entries[0, colmicrovectorsize];
+            for (i = 0; i <= repcnt - 1; i++)
             {
-                ftapplysubplan(plan, 0, a, offsa+plansize*i, 0, plan.buffer, 1, _params);
+                ftapplysubplan(plan, 0, a, offsa + plansize * i, 0, plan.buffer, 1, _params);
             }
         }
-
 
         /*************************************************************************
         Returns good factorization N=N1*N2.
@@ -14020,11 +14102,13 @@ public partial class alglib
           -- ALGLIB --
              Copyright 01.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static void ftbasefactorize(int n,
+        public static void ftbasefactorize(
+            int n,
             int tasktype,
             ref int n1,
             ref int n2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int j = 0;
 
@@ -14033,58 +14117,57 @@ public partial class alglib
 
             n1 = 0;
             n2 = 0;
-            
+
             //
             // try to find good codelet
             //
-            if( n1*n2!=n )
+            if (n1 * n2 != n)
             {
-                for(j=ftbasecodeletrecommended; j>=2; j--)
+                for (j = ftbasecodeletrecommended; j >= 2; j--)
                 {
-                    if( n%j==0 )
+                    if (n % j == 0)
                     {
                         n1 = j;
-                        n2 = n/j;
+                        n2 = n / j;
                         break;
                     }
                 }
             }
-            
+
             //
             // try to factorize N
             //
-            if( n1*n2!=n )
+            if (n1 * n2 != n)
             {
-                for(j=ftbasecodeletrecommended+1; j<=n-1; j++)
+                for (j = ftbasecodeletrecommended + 1; j <= n - 1; j++)
                 {
-                    if( n%j==0 )
+                    if (n % j == 0)
                     {
                         n1 = j;
-                        n2 = n/j;
+                        n2 = n / j;
                         break;
                     }
                 }
             }
-            
+
             //
             // looks like N is prime :(
             //
-            if( n1*n2!=n )
+            if (n1 * n2 != n)
             {
                 n1 = 1;
                 n2 = n;
             }
-            
+
             //
             // normalize
             //
-            if( n2==1 && n1!=1 )
+            if (n2 == 1 && n1 != 1)
             {
                 n2 = n1;
                 n1 = 1;
             }
         }
-
 
         /*************************************************************************
         Is number smooth?
@@ -14092,23 +14175,21 @@ public partial class alglib
           -- ALGLIB --
              Copyright 01.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static bool ftbaseissmooth(int n,
-            alglib.xparams _params)
+        public static bool ftbaseissmooth(int n, Alglib.xparams _params)
         {
             bool result = new bool();
             int i = 0;
 
-            for(i=2; i<=ftbasemaxsmoothfactor; i++)
+            for (i = 2; i <= ftbasemaxsmoothfactor; i++)
             {
-                while( n%i==0 )
+                while (n % i == 0)
                 {
-                    n = n/i;
+                    n = n / i;
                 }
             }
-            result = n==1;
+            result = n == 1;
             return result;
         }
-
 
         /*************************************************************************
         Returns smallest smooth (divisible only by 2, 3, 5) number that is greater
@@ -14117,22 +14198,20 @@ public partial class alglib
           -- ALGLIB --
              Copyright 01.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static int ftbasefindsmooth(int n,
-            alglib.xparams _params)
+        public static int ftbasefindsmooth(int n, Alglib.xparams _params)
         {
             int result = 0;
             int best = 0;
 
             best = 2;
-            while( best<n )
+            while (best < n)
             {
-                best = 2*best;
+                best = 2 * best;
             }
             ftbasefindsmoothrec(n, 1, 2, ref best, _params);
             result = best;
             return result;
         }
-
 
         /*************************************************************************
         Returns  smallest  smooth  (divisible only by 2, 3, 5) even number that is
@@ -14141,22 +14220,20 @@ public partial class alglib
           -- ALGLIB --
              Copyright 01.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static int ftbasefindsmootheven(int n,
-            alglib.xparams _params)
+        public static int ftbasefindsmootheven(int n, Alglib.xparams _params)
         {
             int result = 0;
             int best = 0;
 
             best = 2;
-            while( best<n )
+            while (best < n)
             {
-                best = 2*best;
+                best = 2 * best;
             }
             ftbasefindsmoothrec(n, 2, 2, ref best, _params);
             result = best;
             return result;
         }
-
 
         /*************************************************************************
         Returns estimate of FLOP count for the FFT.
@@ -14169,15 +14246,13 @@ public partial class alglib
           -- ALGLIB --
              Copyright 01.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        public static double ftbasegetflopestimate(int n,
-            alglib.xparams _params)
+        public static double ftbasegetflopestimate(int n, Alglib.xparams _params)
         {
             double result = 0;
 
-            result = ftbaseinefficiencyfactor*(4*n*Math.Log(n)/Math.Log(2)-6*n+8);
+            result = ftbaseinefficiencyfactor * (4 * n * Math.Log(n) / Math.Log(2) - 6 * n + 8);
             return result;
         }
-
 
         /*************************************************************************
         This function returns EXACT estimate of the space requirements for N-point
@@ -14198,16 +14273,17 @@ public partial class alglib
           -- ALGLIB --
              Copyright 05.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        private static void ftdeterminespacerequirements(int n,
+        private static void ftdeterminespacerequirements(
+            int n,
             ref int precrsize,
             ref int precisize,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int ncur = 0;
             int f = 0;
             int i = 0;
 
-            
             //
             // Determine required sizes of precomputed real and integer
             // buffers. This stage of code is highly dependent on internals
@@ -14224,33 +14300,32 @@ public partial class alglib
             //   precomputed storage
             //
             ncur = n;
-            for(i=2; i<=maxradix; i++)
+            for (i = 2; i <= maxradix; i++)
             {
-                while( ncur%i==0 )
+                while (ncur % i == 0)
                 {
-                    ncur = ncur/i;
+                    ncur = ncur / i;
                 }
             }
             f = 2;
-            while( f<=ncur )
+            while (f <= ncur)
             {
-                while( ncur%f==0 )
+                while (ncur % f == 0)
                 {
-                    if( f>raderthreshold )
+                    if (f > raderthreshold)
                     {
-                        precrsize = precrsize+4*ftbasefindsmooth(2*f-1, _params);
+                        precrsize = precrsize + 4 * ftbasefindsmooth(2 * f - 1, _params);
                     }
                     else
                     {
-                        precrsize = precrsize+2*(f-1);
-                        ftdeterminespacerequirements(f-1, ref precrsize, ref precisize, _params);
+                        precrsize = precrsize + 2 * (f - 1);
+                        ftdeterminespacerequirements(f - 1, ref precrsize, ref precisize, _params);
                     }
-                    ncur = ncur/f;
+                    ncur = ncur / f;
                 }
-                f = f+1;
+                f = f + 1;
             }
         }
-
 
         /*************************************************************************
         Recurrent function called by FTComplexFFTPlan() and other functions. It
@@ -14295,7 +14370,8 @@ public partial class alglib
           -- ALGLIB --
              Copyright 05.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        private static void ftcomplexfftplanrec(int n,
+        private static void ftcomplexfftplanrec(
+            int n,
             int k,
             bool childplan,
             bool topmostplan,
@@ -14304,7 +14380,8 @@ public partial class alglib
             ref int precrptr,
             ref int preciptr,
             fasttransformplan plan,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             apserv.srealarray localbuf = new apserv.srealarray();
             int m = 0;
@@ -14317,75 +14394,161 @@ public partial class alglib
             int row2 = 0;
             int row3 = 0;
 
-            alglib.ap.assert(n>0, "FTComplexFFTPlan: N<=0");
-            alglib.ap.assert(k>0, "FTComplexFFTPlan: K<=0");
-            alglib.ap.assert(!topmostplan || childplan, "FTComplexFFTPlan: ChildPlan is inconsistent with TopmostPlan");
-            
+            Alglib.ap.assert(n > 0, "FTComplexFFTPlan: N<=0");
+            Alglib.ap.assert(k > 0, "FTComplexFFTPlan: K<=0");
+            Alglib.ap.assert(
+                !topmostplan || childplan,
+                "FTComplexFFTPlan: ChildPlan is inconsistent with TopmostPlan"
+            );
+
             //
             // Try to generate "topmost" plan
             //
-            if( topmostplan && n>recursivethreshold )
+            if (topmostplan && n > recursivethreshold)
             {
                 ftfactorize(n, false, ref n1, ref n2, _params);
-                if( n1*n2==0 )
+                if (n1 * n2 == 0)
                 {
-                    
                     //
                     // Handle prime-factor FFT with Bluestein's FFT.
                     // Determine size of Bluestein's buffer.
                     //
-                    m = ftbasefindsmooth(2*n-1, _params);
-                    bluesteinsize = Math.Max(2*m, bluesteinsize);
-                    
+                    m = ftbasefindsmooth(2 * n - 1, _params);
+                    bluesteinsize = Math.Max(2 * m, bluesteinsize);
+
                     //
                     // Generate plan
                     //
-                    ftpushentry2(plan, ref rowptr, opstart, k, n, 2, -1, ftoptimisticestimate(n, _params), _params);
-                    ftpushentry4(plan, ref rowptr, opbluesteinsfft, k, n, 2, m, 2, precrptr, 0, _params);
+                    ftpushentry2(
+                        plan,
+                        ref rowptr,
+                        opstart,
+                        k,
+                        n,
+                        2,
+                        -1,
+                        ftoptimisticestimate(n, _params),
+                        _params
+                    );
+                    ftpushentry4(
+                        plan,
+                        ref rowptr,
+                        opbluesteinsfft,
+                        k,
+                        n,
+                        2,
+                        m,
+                        2,
+                        precrptr,
+                        0,
+                        _params
+                    );
                     row0 = rowptr;
                     ftpushentry(plan, ref rowptr, opjmp, 0, 0, 0, 0, _params);
-                    ftcomplexfftplanrec(m, 1, true, true, ref rowptr, ref bluesteinsize, ref precrptr, ref preciptr, plan, _params);
+                    ftcomplexfftplanrec(
+                        m,
+                        1,
+                        true,
+                        true,
+                        ref rowptr,
+                        ref bluesteinsize,
+                        ref precrptr,
+                        ref preciptr,
+                        plan,
+                        _params
+                    );
                     row1 = rowptr;
-                    plan.entries[row0,colparam0] = row1-row0;
+                    plan.entries[row0, colparam0] = row1 - row0;
                     ftpushentry(plan, ref rowptr, opend, k, n, 2, 0, _params);
-                    
+
                     //
                     // Fill precomputed buffer
                     //
                     ftprecomputebluesteinsfft(n, m, plan.precr, precrptr, _params);
-                    
+
                     //
                     // Update pointer to the precomputed area
                     //
-                    precrptr = precrptr+4*m;
+                    precrptr = precrptr + 4 * m;
                 }
                 else
                 {
-                    
                     //
                     // Handle composite FFT with recursive Cooley-Tukey which
                     // uses global buffer instead of local one.
                     //
-                    ftpushentry2(plan, ref rowptr, opstart, k, n, 2, -1, ftoptimisticestimate(n, _params), _params);
+                    ftpushentry2(
+                        plan,
+                        ref rowptr,
+                        opstart,
+                        k,
+                        n,
+                        2,
+                        -1,
+                        ftoptimisticestimate(n, _params),
+                        _params
+                    );
                     ftpushentry(plan, ref rowptr, opcomplextranspose, k, n, 2, n1, _params);
                     row0 = rowptr;
-                    ftpushentry2(plan, ref rowptr, opparallelcall, k*n2, n1, 2, 0, ftoptimisticestimate(n, _params), _params);
+                    ftpushentry2(
+                        plan,
+                        ref rowptr,
+                        opparallelcall,
+                        k * n2,
+                        n1,
+                        2,
+                        0,
+                        ftoptimisticestimate(n, _params),
+                        _params
+                    );
                     ftpushentry(plan, ref rowptr, opcomplexfftfactors, k, n, 2, n1, _params);
                     ftpushentry(plan, ref rowptr, opcomplextranspose, k, n, 2, n2, _params);
                     row2 = rowptr;
-                    ftpushentry2(plan, ref rowptr, opparallelcall, k*n1, n2, 2, 0, ftoptimisticestimate(n, _params), _params);
+                    ftpushentry2(
+                        plan,
+                        ref rowptr,
+                        opparallelcall,
+                        k * n1,
+                        n2,
+                        2,
+                        0,
+                        ftoptimisticestimate(n, _params),
+                        _params
+                    );
                     ftpushentry(plan, ref rowptr, opcomplextranspose, k, n, 2, n1, _params);
                     ftpushentry(plan, ref rowptr, opend, k, n, 2, 0, _params);
                     row1 = rowptr;
-                    ftcomplexfftplanrec(n1, 1, true, false, ref rowptr, ref bluesteinsize, ref precrptr, ref preciptr, plan, _params);
-                    plan.entries[row0,colparam0] = row1-row0;
+                    ftcomplexfftplanrec(
+                        n1,
+                        1,
+                        true,
+                        false,
+                        ref rowptr,
+                        ref bluesteinsize,
+                        ref precrptr,
+                        ref preciptr,
+                        plan,
+                        _params
+                    );
+                    plan.entries[row0, colparam0] = row1 - row0;
                     row3 = rowptr;
-                    ftcomplexfftplanrec(n2, 1, true, false, ref rowptr, ref bluesteinsize, ref precrptr, ref preciptr, plan, _params);
-                    plan.entries[row2,colparam0] = row3-row2;
+                    ftcomplexfftplanrec(
+                        n2,
+                        1,
+                        true,
+                        false,
+                        ref rowptr,
+                        ref bluesteinsize,
+                        ref precrptr,
+                        ref preciptr,
+                        plan,
+                        _params
+                    );
+                    plan.entries[row2, colparam0] = row3 - row2;
                 }
                 return;
             }
-            
+
             //
             // Prepare "non-topmost" plan:
             // * calculate factorization
@@ -14395,171 +14558,345 @@ public partial class alglib
             //   applied later
             //
             ftfactorize(n, false, ref n1, ref n2, _params);
-            
+
             //
             // Handle FFT's with N1*N2=0: either small-N or prime-factor
             //
-            if( n1*n2==0 )
+            if (n1 * n2 == 0)
             {
-                if( n<=maxradix )
+                if (n <= maxradix)
                 {
-                    
                     //
                     // Small-N FFT
                     //
-                    if( childplan )
+                    if (childplan)
                     {
-                        ftpushentry2(plan, ref rowptr, opstart, k, n, 2, -1, ftoptimisticestimate(n, _params), _params);
+                        ftpushentry2(
+                            plan,
+                            ref rowptr,
+                            opstart,
+                            k,
+                            n,
+                            2,
+                            -1,
+                            ftoptimisticestimate(n, _params),
+                            _params
+                        );
                     }
                     ftpushentry(plan, ref rowptr, opcomplexcodeletfft, k, n, 2, 0, _params);
-                    if( childplan )
+                    if (childplan)
                     {
                         ftpushentry(plan, ref rowptr, opend, k, n, 2, 0, _params);
                     }
                     return;
                 }
-                if( n<=raderthreshold )
+                if (n <= raderthreshold)
                 {
-                    
                     //
                     // Handle prime-factor FFT's with Rader's FFT
                     //
-                    m = n-1;
-                    if( childplan )
+                    m = n - 1;
+                    if (childplan)
                     {
-                        ftpushentry2(plan, ref rowptr, opstart, k, n, 2, -1, ftoptimisticestimate(n, _params), _params);
+                        ftpushentry2(
+                            plan,
+                            ref rowptr,
+                            opstart,
+                            k,
+                            n,
+                            2,
+                            -1,
+                            ftoptimisticestimate(n, _params),
+                            _params
+                        );
                     }
                     ntheory.findprimitiverootandinverse(n, ref gq, ref giq, _params);
-                    ftpushentry4(plan, ref rowptr, opradersfft, k, n, 2, 2, gq, giq, precrptr, _params);
+                    ftpushentry4(
+                        plan,
+                        ref rowptr,
+                        opradersfft,
+                        k,
+                        n,
+                        2,
+                        2,
+                        gq,
+                        giq,
+                        precrptr,
+                        _params
+                    );
                     ftprecomputeradersfft(n, gq, giq, plan.precr, precrptr, _params);
-                    precrptr = precrptr+2*(n-1);
+                    precrptr = precrptr + 2 * (n - 1);
                     row0 = rowptr;
                     ftpushentry(plan, ref rowptr, opjmp, 0, 0, 0, 0, _params);
-                    ftcomplexfftplanrec(m, 1, true, false, ref rowptr, ref bluesteinsize, ref precrptr, ref preciptr, plan, _params);
+                    ftcomplexfftplanrec(
+                        m,
+                        1,
+                        true,
+                        false,
+                        ref rowptr,
+                        ref bluesteinsize,
+                        ref precrptr,
+                        ref preciptr,
+                        plan,
+                        _params
+                    );
                     row1 = rowptr;
-                    plan.entries[row0,colparam0] = row1-row0;
-                    if( childplan )
+                    plan.entries[row0, colparam0] = row1 - row0;
+                    if (childplan)
                     {
                         ftpushentry(plan, ref rowptr, opend, k, n, 2, 0, _params);
                     }
                 }
                 else
                 {
-                    
                     //
                     // Handle prime-factor FFT's with Bluestein's FFT
                     //
-                    m = ftbasefindsmooth(2*n-1, _params);
-                    bluesteinsize = Math.Max(2*m, bluesteinsize);
-                    if( childplan )
+                    m = ftbasefindsmooth(2 * n - 1, _params);
+                    bluesteinsize = Math.Max(2 * m, bluesteinsize);
+                    if (childplan)
                     {
-                        ftpushentry2(plan, ref rowptr, opstart, k, n, 2, -1, ftoptimisticestimate(n, _params), _params);
+                        ftpushentry2(
+                            plan,
+                            ref rowptr,
+                            opstart,
+                            k,
+                            n,
+                            2,
+                            -1,
+                            ftoptimisticestimate(n, _params),
+                            _params
+                        );
                     }
-                    ftpushentry4(plan, ref rowptr, opbluesteinsfft, k, n, 2, m, 2, precrptr, 0, _params);
+                    ftpushentry4(
+                        plan,
+                        ref rowptr,
+                        opbluesteinsfft,
+                        k,
+                        n,
+                        2,
+                        m,
+                        2,
+                        precrptr,
+                        0,
+                        _params
+                    );
                     ftprecomputebluesteinsfft(n, m, plan.precr, precrptr, _params);
-                    precrptr = precrptr+4*m;
+                    precrptr = precrptr + 4 * m;
                     row0 = rowptr;
                     ftpushentry(plan, ref rowptr, opjmp, 0, 0, 0, 0, _params);
-                    ftcomplexfftplanrec(m, 1, true, false, ref rowptr, ref bluesteinsize, ref precrptr, ref preciptr, plan, _params);
+                    ftcomplexfftplanrec(
+                        m,
+                        1,
+                        true,
+                        false,
+                        ref rowptr,
+                        ref bluesteinsize,
+                        ref precrptr,
+                        ref preciptr,
+                        plan,
+                        _params
+                    );
                     row1 = rowptr;
-                    plan.entries[row0,colparam0] = row1-row0;
-                    if( childplan )
+                    plan.entries[row0, colparam0] = row1 - row0;
+                    if (childplan)
                     {
                         ftpushentry(plan, ref rowptr, opend, k, n, 2, 0, _params);
                     }
                 }
                 return;
             }
-            
+
             //
             // Handle Cooley-Tukey FFT with small N1
             //
-            if( n1<=maxradix )
+            if (n1 <= maxradix)
             {
-                
                 //
                 // Specialized transformation for small N1:
                 // * N2 short inplace FFT's, each N1-point, with integrated twiddle factors
                 // * N1 long FFT's
                 // * final transposition
                 //
-                if( childplan )
+                if (childplan)
                 {
-                    ftpushentry2(plan, ref rowptr, opstart, k, n, 2, -1, ftoptimisticestimate(n, _params), _params);
+                    ftpushentry2(
+                        plan,
+                        ref rowptr,
+                        opstart,
+                        k,
+                        n,
+                        2,
+                        -1,
+                        ftoptimisticestimate(n, _params),
+                        _params
+                    );
                 }
-                ftpushentry(plan, ref rowptr, opcomplexcodelettwfft, k, n1, 2*n2, 0, _params);
-                ftcomplexfftplanrec(n2, k*n1, false, false, ref rowptr, ref bluesteinsize, ref precrptr, ref preciptr, plan, _params);
+                ftpushentry(plan, ref rowptr, opcomplexcodelettwfft, k, n1, 2 * n2, 0, _params);
+                ftcomplexfftplanrec(
+                    n2,
+                    k * n1,
+                    false,
+                    false,
+                    ref rowptr,
+                    ref bluesteinsize,
+                    ref precrptr,
+                    ref preciptr,
+                    plan,
+                    _params
+                );
                 ftpushentry(plan, ref rowptr, opcomplextranspose, k, n, 2, n1, _params);
-                if( childplan )
+                if (childplan)
                 {
                     ftpushentry(plan, ref rowptr, opend, k, n, 2, 0, _params);
                 }
                 return;
             }
-            
+
             //
             // Handle general Cooley-Tukey FFT, either "flat" or "recursive"
             //
-            if( n<=recursivethreshold )
+            if (n <= recursivethreshold)
             {
-                
                 //
                 // General code for large N1/N2, "flat" version without explicit recurrence
                 // (nested subplans are inserted directly into the body of the plan)
                 //
-                if( childplan )
+                if (childplan)
                 {
-                    ftpushentry2(plan, ref rowptr, opstart, k, n, 2, -1, ftoptimisticestimate(n, _params), _params);
+                    ftpushentry2(
+                        plan,
+                        ref rowptr,
+                        opstart,
+                        k,
+                        n,
+                        2,
+                        -1,
+                        ftoptimisticestimate(n, _params),
+                        _params
+                    );
                 }
                 ftpushentry(plan, ref rowptr, opcomplextranspose, k, n, 2, n1, _params);
-                ftcomplexfftplanrec(n1, k*n2, false, false, ref rowptr, ref bluesteinsize, ref precrptr, ref preciptr, plan, _params);
+                ftcomplexfftplanrec(
+                    n1,
+                    k * n2,
+                    false,
+                    false,
+                    ref rowptr,
+                    ref bluesteinsize,
+                    ref precrptr,
+                    ref preciptr,
+                    plan,
+                    _params
+                );
                 ftpushentry(plan, ref rowptr, opcomplexfftfactors, k, n, 2, n1, _params);
                 ftpushentry(plan, ref rowptr, opcomplextranspose, k, n, 2, n2, _params);
-                ftcomplexfftplanrec(n2, k*n1, false, false, ref rowptr, ref bluesteinsize, ref precrptr, ref preciptr, plan, _params);
+                ftcomplexfftplanrec(
+                    n2,
+                    k * n1,
+                    false,
+                    false,
+                    ref rowptr,
+                    ref bluesteinsize,
+                    ref precrptr,
+                    ref preciptr,
+                    plan,
+                    _params
+                );
                 ftpushentry(plan, ref rowptr, opcomplextranspose, k, n, 2, n1, _params);
-                if( childplan )
+                if (childplan)
                 {
                     ftpushentry(plan, ref rowptr, opend, k, n, 2, 0, _params);
                 }
             }
             else
             {
-                
                 //
                 // General code for large N1/N2, "recursive" version - nested subplans
                 // are separated from the plan body.
                 //
                 // Generate parent plan.
                 //
-                if( childplan )
+                if (childplan)
                 {
-                    ftpushentry2(plan, ref rowptr, opstart, k, n, 2, -1, ftoptimisticestimate(n, _params), _params);
+                    ftpushentry2(
+                        plan,
+                        ref rowptr,
+                        opstart,
+                        k,
+                        n,
+                        2,
+                        -1,
+                        ftoptimisticestimate(n, _params),
+                        _params
+                    );
                 }
                 ftpushentry(plan, ref rowptr, opcomplextranspose, k, n, 2, n1, _params);
                 row0 = rowptr;
-                ftpushentry2(plan, ref rowptr, opparallelcall, k*n2, n1, 2, 0, ftoptimisticestimate(n, _params), _params);
+                ftpushentry2(
+                    plan,
+                    ref rowptr,
+                    opparallelcall,
+                    k * n2,
+                    n1,
+                    2,
+                    0,
+                    ftoptimisticestimate(n, _params),
+                    _params
+                );
                 ftpushentry(plan, ref rowptr, opcomplexfftfactors, k, n, 2, n1, _params);
                 ftpushentry(plan, ref rowptr, opcomplextranspose, k, n, 2, n2, _params);
                 row2 = rowptr;
-                ftpushentry2(plan, ref rowptr, opparallelcall, k*n1, n2, 2, 0, ftoptimisticestimate(n, _params), _params);
+                ftpushentry2(
+                    plan,
+                    ref rowptr,
+                    opparallelcall,
+                    k * n1,
+                    n2,
+                    2,
+                    0,
+                    ftoptimisticestimate(n, _params),
+                    _params
+                );
                 ftpushentry(plan, ref rowptr, opcomplextranspose, k, n, 2, n1, _params);
-                if( childplan )
+                if (childplan)
                 {
                     ftpushentry(plan, ref rowptr, opend, k, n, 2, 0, _params);
                 }
-                
+
                 //
                 // Generate child subplans, insert refence to parent plans
                 //
                 row1 = rowptr;
-                ftcomplexfftplanrec(n1, 1, true, false, ref rowptr, ref bluesteinsize, ref precrptr, ref preciptr, plan, _params);
-                plan.entries[row0,colparam0] = row1-row0;
+                ftcomplexfftplanrec(
+                    n1,
+                    1,
+                    true,
+                    false,
+                    ref rowptr,
+                    ref bluesteinsize,
+                    ref precrptr,
+                    ref preciptr,
+                    plan,
+                    _params
+                );
+                plan.entries[row0, colparam0] = row1 - row0;
                 row3 = rowptr;
-                ftcomplexfftplanrec(n2, 1, true, false, ref rowptr, ref bluesteinsize, ref precrptr, ref preciptr, plan, _params);
-                plan.entries[row2,colparam0] = row3-row2;
+                ftcomplexfftplanrec(
+                    n2,
+                    1,
+                    true,
+                    false,
+                    ref rowptr,
+                    ref bluesteinsize,
+                    ref precrptr,
+                    ref preciptr,
+                    plan,
+                    _params
+                );
+                plan.entries[row2, colparam0] = row3 - row2;
             }
         }
-
 
         /*************************************************************************
         This function pushes one more entry to the plan. It resizes Entries matrix
@@ -14575,7 +14912,7 @@ public partial class alglib
             EParam0     -   parameter 0
             
         OUTPUT PARAMETERS:
-            Plan        -   updated plan    
+            Plan        -   updated plan
             RowPtr      -   updated pointer
 
         NOTE: Param1 is set to -1.
@@ -14583,18 +14920,19 @@ public partial class alglib
           -- ALGLIB --
              Copyright 05.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        private static void ftpushentry(fasttransformplan plan,
+        private static void ftpushentry(
+            fasttransformplan plan,
             ref int rowptr,
             int etype,
             int eopcnt,
             int eopsize,
             int emcvsize,
             int eparam0,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             ftpushentry2(plan, ref rowptr, etype, eopcnt, eopsize, emcvsize, eparam0, -1, _params);
         }
-
 
         /*************************************************************************
         Same as FTPushEntry(), but sets Param0 AND Param1.
@@ -14612,13 +14950,14 @@ public partial class alglib
             EParam1     -   parameter 1
             
         OUTPUT PARAMETERS:
-            Plan        -   updated plan    
+            Plan        -   updated plan
             RowPtr      -   updated pointer
 
           -- ALGLIB --
              Copyright 05.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        private static void ftpushentry2(fasttransformplan plan,
+        private static void ftpushentry2(
+            fasttransformplan plan,
             ref int rowptr,
             int etype,
             int eopcnt,
@@ -14626,23 +14965,28 @@ public partial class alglib
             int emcvsize,
             int eparam0,
             int eparam1,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
-            if( rowptr>=alglib.ap.rows(plan.entries) )
+            if (rowptr >= Alglib.ap.rows(plan.entries))
             {
-                apserv.imatrixresize(ref plan.entries, Math.Max(2*alglib.ap.rows(plan.entries), 1), colscnt, _params);
+                apserv.imatrixresize(
+                    ref plan.entries,
+                    Math.Max(2 * Alglib.ap.rows(plan.entries), 1),
+                    colscnt,
+                    _params
+                );
             }
-            plan.entries[rowptr,coltype] = etype;
-            plan.entries[rowptr,coloperandscnt] = eopcnt;
-            plan.entries[rowptr,coloperandsize] = eopsize;
-            plan.entries[rowptr,colmicrovectorsize] = emcvsize;
-            plan.entries[rowptr,colparam0] = eparam0;
-            plan.entries[rowptr,colparam1] = eparam1;
-            plan.entries[rowptr,colparam2] = 0;
-            plan.entries[rowptr,colparam3] = 0;
-            rowptr = rowptr+1;
+            plan.entries[rowptr, coltype] = etype;
+            plan.entries[rowptr, coloperandscnt] = eopcnt;
+            plan.entries[rowptr, coloperandsize] = eopsize;
+            plan.entries[rowptr, colmicrovectorsize] = emcvsize;
+            plan.entries[rowptr, colparam0] = eparam0;
+            plan.entries[rowptr, colparam1] = eparam1;
+            plan.entries[rowptr, colparam2] = 0;
+            plan.entries[rowptr, colparam3] = 0;
+            rowptr = rowptr + 1;
         }
-
 
         /*************************************************************************
         Same as FTPushEntry(), but sets Param0, Param1, Param2 and Param3.
@@ -14662,13 +15006,14 @@ public partial class alglib
             EParam3     -   parameter 3
             
         OUTPUT PARAMETERS:
-            Plan        -   updated plan    
+            Plan        -   updated plan
             RowPtr      -   updated pointer
 
           -- ALGLIB --
              Copyright 05.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        private static void ftpushentry4(fasttransformplan plan,
+        private static void ftpushentry4(
+            fasttransformplan plan,
             ref int rowptr,
             int etype,
             int eopcnt,
@@ -14678,23 +15023,28 @@ public partial class alglib
             int eparam1,
             int eparam2,
             int eparam3,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
-            if( rowptr>=alglib.ap.rows(plan.entries) )
+            if (rowptr >= Alglib.ap.rows(plan.entries))
             {
-                apserv.imatrixresize(ref plan.entries, Math.Max(2*alglib.ap.rows(plan.entries), 1), colscnt, _params);
+                apserv.imatrixresize(
+                    ref plan.entries,
+                    Math.Max(2 * Alglib.ap.rows(plan.entries), 1),
+                    colscnt,
+                    _params
+                );
             }
-            plan.entries[rowptr,coltype] = etype;
-            plan.entries[rowptr,coloperandscnt] = eopcnt;
-            plan.entries[rowptr,coloperandsize] = eopsize;
-            plan.entries[rowptr,colmicrovectorsize] = emcvsize;
-            plan.entries[rowptr,colparam0] = eparam0;
-            plan.entries[rowptr,colparam1] = eparam1;
-            plan.entries[rowptr,colparam2] = eparam2;
-            plan.entries[rowptr,colparam3] = eparam3;
-            rowptr = rowptr+1;
+            plan.entries[rowptr, coltype] = etype;
+            plan.entries[rowptr, coloperandscnt] = eopcnt;
+            plan.entries[rowptr, coloperandsize] = eopsize;
+            plan.entries[rowptr, colmicrovectorsize] = emcvsize;
+            plan.entries[rowptr, colparam0] = eparam0;
+            plan.entries[rowptr, colparam1] = eparam1;
+            plan.entries[rowptr, colparam2] = eparam2;
+            plan.entries[rowptr, colparam3] = eparam3;
+            rowptr = rowptr + 1;
         }
-
 
         /*************************************************************************
         This subroutine applies subplan to input/output array A.
@@ -14722,14 +15072,16 @@ public partial class alglib
           -- ALGLIB --
              Copyright 05.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        private static void ftapplysubplan(fasttransformplan plan,
+        private static void ftapplysubplan(
+            fasttransformplan plan,
             int subplan,
             double[] a,
             int abase,
             int aoffset,
             double[] buf,
             int repcnt,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int rowidx = 0;
             int i = 0;
@@ -14750,154 +15102,234 @@ public partial class alglib
             apserv.srealarray bufc = null;
             apserv.srealarray bufd = null;
 
-            alglib.ap.assert(plan.entries[subplan,coltype]==opstart, "FTApplySubPlan: incorrect subplan header");
-            rowidx = subplan+1;
-            while( plan.entries[rowidx,coltype]!=opend )
+            Alglib.ap.assert(
+                plan.entries[subplan, coltype] == opstart,
+                "FTApplySubPlan: incorrect subplan header"
+            );
+            rowidx = subplan + 1;
+            while (plan.entries[rowidx, coltype] != opend)
             {
-                operation = plan.entries[rowidx,coltype];
-                operandscnt = repcnt*plan.entries[rowidx,coloperandscnt];
-                operandsize = plan.entries[rowidx,coloperandsize];
-                microvectorsize = plan.entries[rowidx,colmicrovectorsize];
-                param0 = plan.entries[rowidx,colparam0];
-                param1 = plan.entries[rowidx,colparam1];
+                operation = plan.entries[rowidx, coltype];
+                operandscnt = repcnt * plan.entries[rowidx, coloperandscnt];
+                operandsize = plan.entries[rowidx, coloperandsize];
+                microvectorsize = plan.entries[rowidx, colmicrovectorsize];
+                param0 = plan.entries[rowidx, colparam0];
+                param1 = plan.entries[rowidx, colparam1];
                 apserv.touchint(ref param1, _params);
-                
+
                 //
                 // Process "jump" operation
                 //
-                if( operation==opjmp )
+                if (operation == opjmp)
                 {
-                    rowidx = rowidx+plan.entries[rowidx,colparam0];
+                    rowidx = rowidx + plan.entries[rowidx, colparam0];
                     continue;
                 }
-                
+
                 //
                 // Process "parallel call" operation:
                 // * we perform initial check for consistency between parent and child plans
                 // * we call FTSplitAndApplyParallelPlan(), which splits parallel plan into
                 //   several parallel tasks
                 //
-                if( operation==opparallelcall )
+                if (operation == opparallelcall)
                 {
-                    parentsize = operandsize*microvectorsize;
-                    childsize = plan.entries[rowidx+param0,coloperandscnt]*plan.entries[rowidx+param0,coloperandsize]*plan.entries[rowidx+param0,colmicrovectorsize];
-                    alglib.ap.assert(plan.entries[rowidx+param0,coltype]==opstart, "FTApplySubPlan: incorrect child subplan header");
-                    alglib.ap.assert(parentsize==childsize, "FTApplySubPlan: incorrect child subplan header");
-                    chunksize = Math.Max(recursivethreshold/childsize, 1);
-                    lastchunksize = operandscnt%chunksize;
-                    if( lastchunksize==0 )
+                    parentsize = operandsize * microvectorsize;
+                    childsize =
+                        plan.entries[rowidx + param0, coloperandscnt]
+                        * plan.entries[rowidx + param0, coloperandsize]
+                        * plan.entries[rowidx + param0, colmicrovectorsize];
+                    Alglib.ap.assert(
+                        plan.entries[rowidx + param0, coltype] == opstart,
+                        "FTApplySubPlan: incorrect child subplan header"
+                    );
+                    Alglib.ap.assert(
+                        parentsize == childsize,
+                        "FTApplySubPlan: incorrect child subplan header"
+                    );
+                    chunksize = Math.Max(recursivethreshold / childsize, 1);
+                    lastchunksize = operandscnt % chunksize;
+                    if (lastchunksize == 0)
                     {
                         lastchunksize = chunksize;
                     }
                     i = 0;
-                    while( i<operandscnt )
+                    while (i < operandscnt)
                     {
-                        chunksize = Math.Min(chunksize, operandscnt-i);
-                        ftapplysubplan(plan, rowidx+param0, a, abase, aoffset+i*childsize, buf, chunksize, _params);
-                        i = i+chunksize;
+                        chunksize = Math.Min(chunksize, operandscnt - i);
+                        ftapplysubplan(
+                            plan,
+                            rowidx + param0,
+                            a,
+                            abase,
+                            aoffset + i * childsize,
+                            buf,
+                            chunksize,
+                            _params
+                        );
+                        i = i + chunksize;
                     }
-                    rowidx = rowidx+1;
+                    rowidx = rowidx + 1;
                     continue;
                 }
-                
+
                 //
                 // Process "reference complex FFT" operation
                 //
-                if( operation==opcomplexreffft )
+                if (operation == opcomplexreffft)
                 {
-                    ftapplycomplexreffft(a, abase+aoffset, operandscnt, operandsize, microvectorsize, buf, _params);
-                    rowidx = rowidx+1;
+                    ftapplycomplexreffft(
+                        a,
+                        abase + aoffset,
+                        operandscnt,
+                        operandsize,
+                        microvectorsize,
+                        buf,
+                        _params
+                    );
+                    rowidx = rowidx + 1;
                     continue;
                 }
-                
+
                 //
                 // Process "codelet FFT" operation
                 //
-                if( operation==opcomplexcodeletfft )
+                if (operation == opcomplexcodeletfft)
                 {
-                    ftapplycomplexcodeletfft(a, abase+aoffset, operandscnt, operandsize, microvectorsize, _params);
-                    rowidx = rowidx+1;
+                    ftapplycomplexcodeletfft(
+                        a,
+                        abase + aoffset,
+                        operandscnt,
+                        operandsize,
+                        microvectorsize,
+                        _params
+                    );
+                    rowidx = rowidx + 1;
                     continue;
                 }
-                
+
                 //
                 // Process "integrated codelet FFT" operation
                 //
-                if( operation==opcomplexcodelettwfft )
+                if (operation == opcomplexcodelettwfft)
                 {
-                    ftapplycomplexcodelettwfft(a, abase+aoffset, operandscnt, operandsize, microvectorsize, _params);
-                    rowidx = rowidx+1;
+                    ftapplycomplexcodelettwfft(
+                        a,
+                        abase + aoffset,
+                        operandscnt,
+                        operandsize,
+                        microvectorsize,
+                        _params
+                    );
+                    rowidx = rowidx + 1;
                     continue;
                 }
-                
+
                 //
                 // Process Bluestein's FFT operation
                 //
-                if( operation==opbluesteinsfft )
+                if (operation == opbluesteinsfft)
                 {
-                    alglib.ap.assert(microvectorsize==2, "FTApplySubPlan: microvectorsize!=2 for Bluesteins FFT");
-                    alglib.smp.ae_shared_pool_retrieve(plan.bluesteinpool, ref bufa);
-                    alglib.smp.ae_shared_pool_retrieve(plan.bluesteinpool, ref bufb);
-                    alglib.smp.ae_shared_pool_retrieve(plan.bluesteinpool, ref bufc);
-                    alglib.smp.ae_shared_pool_retrieve(plan.bluesteinpool, ref bufd);
-                    ftbluesteinsfft(plan, a, abase, aoffset, operandscnt, operandsize, plan.entries[rowidx,colparam0], plan.entries[rowidx,colparam2], rowidx+plan.entries[rowidx,colparam1], bufa.val, bufb.val, bufc.val, bufd.val, _params);
-                    alglib.smp.ae_shared_pool_recycle(plan.bluesteinpool, ref bufa);
-                    alglib.smp.ae_shared_pool_recycle(plan.bluesteinpool, ref bufb);
-                    alglib.smp.ae_shared_pool_recycle(plan.bluesteinpool, ref bufc);
-                    alglib.smp.ae_shared_pool_recycle(plan.bluesteinpool, ref bufd);
-                    rowidx = rowidx+1;
+                    Alglib.ap.assert(
+                        microvectorsize == 2,
+                        "FTApplySubPlan: microvectorsize!=2 for Bluesteins FFT"
+                    );
+                    Alglib.smp.ae_shared_pool_retrieve(plan.bluesteinpool, ref bufa);
+                    Alglib.smp.ae_shared_pool_retrieve(plan.bluesteinpool, ref bufb);
+                    Alglib.smp.ae_shared_pool_retrieve(plan.bluesteinpool, ref bufc);
+                    Alglib.smp.ae_shared_pool_retrieve(plan.bluesteinpool, ref bufd);
+                    ftbluesteinsfft(
+                        plan,
+                        a,
+                        abase,
+                        aoffset,
+                        operandscnt,
+                        operandsize,
+                        plan.entries[rowidx, colparam0],
+                        plan.entries[rowidx, colparam2],
+                        rowidx + plan.entries[rowidx, colparam1],
+                        bufa.val,
+                        bufb.val,
+                        bufc.val,
+                        bufd.val,
+                        _params
+                    );
+                    Alglib.smp.ae_shared_pool_recycle(plan.bluesteinpool, ref bufa);
+                    Alglib.smp.ae_shared_pool_recycle(plan.bluesteinpool, ref bufb);
+                    Alglib.smp.ae_shared_pool_recycle(plan.bluesteinpool, ref bufc);
+                    Alglib.smp.ae_shared_pool_recycle(plan.bluesteinpool, ref bufd);
+                    rowidx = rowidx + 1;
                     continue;
                 }
-                
+
                 //
                 // Process Rader's FFT
                 //
-                if( operation==opradersfft )
+                if (operation == opradersfft)
                 {
-                    ftradersfft(plan, a, abase, aoffset, operandscnt, operandsize, rowidx+plan.entries[rowidx,colparam0], plan.entries[rowidx,colparam1], plan.entries[rowidx,colparam2], plan.entries[rowidx,colparam3], buf, _params);
-                    rowidx = rowidx+1;
+                    ftradersfft(
+                        plan,
+                        a,
+                        abase,
+                        aoffset,
+                        operandscnt,
+                        operandsize,
+                        rowidx + plan.entries[rowidx, colparam0],
+                        plan.entries[rowidx, colparam1],
+                        plan.entries[rowidx, colparam2],
+                        plan.entries[rowidx, colparam3],
+                        buf,
+                        _params
+                    );
+                    rowidx = rowidx + 1;
                     continue;
                 }
-                
+
                 //
                 // Process "complex twiddle factors" operation
                 //
-                if( operation==opcomplexfftfactors )
+                if (operation == opcomplexfftfactors)
                 {
-                    alglib.ap.assert(microvectorsize==2, "FTApplySubPlan: MicrovectorSize<>1");
-                    n1 = plan.entries[rowidx,colparam0];
-                    n2 = operandsize/n1;
-                    for(i=0; i<=operandscnt-1; i++)
+                    Alglib.ap.assert(microvectorsize == 2, "FTApplySubPlan: MicrovectorSize<>1");
+                    n1 = plan.entries[rowidx, colparam0];
+                    n2 = operandsize / n1;
+                    for (i = 0; i <= operandscnt - 1; i++)
                     {
-                        ffttwcalc(a, abase+aoffset+i*operandsize*2, n1, n2, _params);
+                        ffttwcalc(a, abase + aoffset + i * operandsize * 2, n1, n2, _params);
                     }
-                    rowidx = rowidx+1;
+                    rowidx = rowidx + 1;
                     continue;
                 }
-                
+
                 //
                 // Process "complex transposition" operation
                 //
-                if( operation==opcomplextranspose )
+                if (operation == opcomplextranspose)
                 {
-                    alglib.ap.assert(microvectorsize==2, "FTApplySubPlan: MicrovectorSize<>1");
-                    n1 = plan.entries[rowidx,colparam0];
-                    n2 = operandsize/n1;
-                    for(i=0; i<=operandscnt-1; i++)
+                    Alglib.ap.assert(microvectorsize == 2, "FTApplySubPlan: MicrovectorSize<>1");
+                    n1 = plan.entries[rowidx, colparam0];
+                    n2 = operandsize / n1;
+                    for (i = 0; i <= operandscnt - 1; i++)
                     {
-                        internalcomplexlintranspose(a, n1, n2, abase+aoffset+i*operandsize*2, buf, _params);
+                        internalcomplexlintranspose(
+                            a,
+                            n1,
+                            n2,
+                            abase + aoffset + i * operandsize * 2,
+                            buf,
+                            _params
+                        );
                     }
-                    rowidx = rowidx+1;
+                    rowidx = rowidx + 1;
                     continue;
                 }
-                
+
                 //
                 // Error
                 //
-                alglib.ap.assert(false, "FTApplySubPlan: unexpected plan type");
+                Alglib.ap.assert(false, "FTApplySubPlan: unexpected plan type");
             }
         }
-
 
         /*************************************************************************
         This subroutine applies complex reference FFT to input/output array A.
@@ -14918,13 +15350,15 @@ public partial class alglib
           -- ALGLIB --
              Copyright 05.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        private static void ftapplycomplexreffft(double[] a,
+        private static void ftapplycomplexreffft(
+            double[] a,
             int offs,
             int operandscnt,
             int operandsize,
             int microvectorsize,
             double[] buf,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int opidx = 0;
             int i = 0;
@@ -14937,35 +15371,34 @@ public partial class alglib
             double im = 0;
             int n = 0;
 
-            alglib.ap.assert(operandscnt>=1, "FTApplyComplexRefFFT: OperandsCnt<1");
-            alglib.ap.assert(operandsize>=1, "FTApplyComplexRefFFT: OperandSize<1");
-            alglib.ap.assert(microvectorsize==2, "FTApplyComplexRefFFT: MicrovectorSize<>2");
+            Alglib.ap.assert(operandscnt >= 1, "FTApplyComplexRefFFT: OperandsCnt<1");
+            Alglib.ap.assert(operandsize >= 1, "FTApplyComplexRefFFT: OperandSize<1");
+            Alglib.ap.assert(microvectorsize == 2, "FTApplyComplexRefFFT: MicrovectorSize<>2");
             n = operandsize;
-            for(opidx=0; opidx<=operandscnt-1; opidx++)
+            for (opidx = 0; opidx <= operandscnt - 1; opidx++)
             {
-                for(i=0; i<=n-1; i++)
+                for (i = 0; i <= n - 1; i++)
                 {
                     hre = 0;
                     him = 0;
-                    for(k=0; k<=n-1; k++)
+                    for (k = 0; k <= n - 1; k++)
                     {
-                        re = a[offs+opidx*operandsize*2+2*k+0];
-                        im = a[offs+opidx*operandsize*2+2*k+1];
-                        c = Math.Cos(-(2*Math.PI*k*i/n));
-                        s = Math.Sin(-(2*Math.PI*k*i/n));
-                        hre = hre+c*re-s*im;
-                        him = him+c*im+s*re;
+                        re = a[offs + opidx * operandsize * 2 + 2 * k + 0];
+                        im = a[offs + opidx * operandsize * 2 + 2 * k + 1];
+                        c = Math.Cos(-(2 * Math.PI * k * i / n));
+                        s = Math.Sin(-(2 * Math.PI * k * i / n));
+                        hre = hre + c * re - s * im;
+                        him = him + c * im + s * re;
                     }
-                    buf[2*i+0] = hre;
-                    buf[2*i+1] = him;
+                    buf[2 * i + 0] = hre;
+                    buf[2 * i + 1] = him;
                 }
-                for(i=0; i<=operandsize*2-1; i++)
+                for (i = 0; i <= operandsize * 2 - 1; i++)
                 {
-                    a[offs+opidx*operandsize*2+i] = buf[i];
+                    a[offs + opidx * operandsize * 2 + i] = buf[i];
                 }
             }
         }
-
 
         /*************************************************************************
         This subroutine applies complex codelet FFT to input/output array A.
@@ -14983,12 +15416,14 @@ public partial class alglib
           -- ALGLIB --
              Copyright 05.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        private static void ftapplycomplexcodeletfft(double[] a,
+        private static void ftapplycomplexcodeletfft(
+            double[] a,
             int offs,
             int operandscnt,
             int operandsize,
             int microvectorsize,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int opidx = 0;
             int n = 0;
@@ -15046,249 +15481,248 @@ public partial class alglib
             double c5 = 0;
             double v = 0;
 
-            alglib.ap.assert(operandscnt>=1, "FTApplyComplexCodeletFFT: OperandsCnt<1");
-            alglib.ap.assert(operandsize>=1, "FTApplyComplexCodeletFFT: OperandSize<1");
-            alglib.ap.assert(microvectorsize==2, "FTApplyComplexCodeletFFT: MicrovectorSize<>2");
+            Alglib.ap.assert(operandscnt >= 1, "FTApplyComplexCodeletFFT: OperandsCnt<1");
+            Alglib.ap.assert(operandsize >= 1, "FTApplyComplexCodeletFFT: OperandSize<1");
+            Alglib.ap.assert(microvectorsize == 2, "FTApplyComplexCodeletFFT: MicrovectorSize<>2");
             n = operandsize;
-            
+
             //
             // Hard-coded transforms for different N's
             //
-            alglib.ap.assert(n<=maxradix, "FTApplyComplexCodeletFFT: N>MaxRadix");
-            if( n==2 )
+            Alglib.ap.assert(n <= maxradix, "FTApplyComplexCodeletFFT: N>MaxRadix");
+            if (n == 2)
             {
-                for(opidx=0; opidx<=operandscnt-1; opidx++)
+                for (opidx = 0; opidx <= operandscnt - 1; opidx++)
                 {
-                    aoffset = offs+opidx*operandsize*2;
-                    a0x = a[aoffset+0];
-                    a0y = a[aoffset+1];
-                    a1x = a[aoffset+2];
-                    a1y = a[aoffset+3];
-                    v0 = a0x+a1x;
-                    v1 = a0y+a1y;
-                    v2 = a0x-a1x;
-                    v3 = a0y-a1y;
-                    a[aoffset+0] = v0;
-                    a[aoffset+1] = v1;
-                    a[aoffset+2] = v2;
-                    a[aoffset+3] = v3;
+                    aoffset = offs + opidx * operandsize * 2;
+                    a0x = a[aoffset + 0];
+                    a0y = a[aoffset + 1];
+                    a1x = a[aoffset + 2];
+                    a1y = a[aoffset + 3];
+                    v0 = a0x + a1x;
+                    v1 = a0y + a1y;
+                    v2 = a0x - a1x;
+                    v3 = a0y - a1y;
+                    a[aoffset + 0] = v0;
+                    a[aoffset + 1] = v1;
+                    a[aoffset + 2] = v2;
+                    a[aoffset + 3] = v3;
                 }
                 return;
             }
-            if( n==3 )
+            if (n == 3)
             {
-                c1 = Math.Cos(2*Math.PI/3)-1;
-                c2 = Math.Sin(2*Math.PI/3);
-                for(opidx=0; opidx<=operandscnt-1; opidx++)
+                c1 = Math.Cos(2 * Math.PI / 3) - 1;
+                c2 = Math.Sin(2 * Math.PI / 3);
+                for (opidx = 0; opidx <= operandscnt - 1; opidx++)
                 {
-                    aoffset = offs+opidx*operandsize*2;
-                    a0x = a[aoffset+0];
-                    a0y = a[aoffset+1];
-                    a1x = a[aoffset+2];
-                    a1y = a[aoffset+3];
-                    a2x = a[aoffset+4];
-                    a2y = a[aoffset+5];
-                    t1x = a1x+a2x;
-                    t1y = a1y+a2y;
-                    a0x = a0x+t1x;
-                    a0y = a0y+t1y;
-                    m1x = c1*t1x;
-                    m1y = c1*t1y;
-                    m2x = c2*(a1y-a2y);
-                    m2y = c2*(a2x-a1x);
-                    s1x = a0x+m1x;
-                    s1y = a0y+m1y;
-                    a1x = s1x+m2x;
-                    a1y = s1y+m2y;
-                    a2x = s1x-m2x;
-                    a2y = s1y-m2y;
-                    a[aoffset+0] = a0x;
-                    a[aoffset+1] = a0y;
-                    a[aoffset+2] = a1x;
-                    a[aoffset+3] = a1y;
-                    a[aoffset+4] = a2x;
-                    a[aoffset+5] = a2y;
+                    aoffset = offs + opidx * operandsize * 2;
+                    a0x = a[aoffset + 0];
+                    a0y = a[aoffset + 1];
+                    a1x = a[aoffset + 2];
+                    a1y = a[aoffset + 3];
+                    a2x = a[aoffset + 4];
+                    a2y = a[aoffset + 5];
+                    t1x = a1x + a2x;
+                    t1y = a1y + a2y;
+                    a0x = a0x + t1x;
+                    a0y = a0y + t1y;
+                    m1x = c1 * t1x;
+                    m1y = c1 * t1y;
+                    m2x = c2 * (a1y - a2y);
+                    m2y = c2 * (a2x - a1x);
+                    s1x = a0x + m1x;
+                    s1y = a0y + m1y;
+                    a1x = s1x + m2x;
+                    a1y = s1y + m2y;
+                    a2x = s1x - m2x;
+                    a2y = s1y - m2y;
+                    a[aoffset + 0] = a0x;
+                    a[aoffset + 1] = a0y;
+                    a[aoffset + 2] = a1x;
+                    a[aoffset + 3] = a1y;
+                    a[aoffset + 4] = a2x;
+                    a[aoffset + 5] = a2y;
                 }
                 return;
             }
-            if( n==4 )
+            if (n == 4)
             {
-                for(opidx=0; opidx<=operandscnt-1; opidx++)
+                for (opidx = 0; opidx <= operandscnt - 1; opidx++)
                 {
-                    aoffset = offs+opidx*operandsize*2;
-                    a0x = a[aoffset+0];
-                    a0y = a[aoffset+1];
-                    a1x = a[aoffset+2];
-                    a1y = a[aoffset+3];
-                    a2x = a[aoffset+4];
-                    a2y = a[aoffset+5];
-                    a3x = a[aoffset+6];
-                    a3y = a[aoffset+7];
-                    t1x = a0x+a2x;
-                    t1y = a0y+a2y;
-                    t2x = a1x+a3x;
-                    t2y = a1y+a3y;
-                    m2x = a0x-a2x;
-                    m2y = a0y-a2y;
-                    m3x = a1y-a3y;
-                    m3y = a3x-a1x;
-                    a[aoffset+0] = t1x+t2x;
-                    a[aoffset+1] = t1y+t2y;
-                    a[aoffset+4] = t1x-t2x;
-                    a[aoffset+5] = t1y-t2y;
-                    a[aoffset+2] = m2x+m3x;
-                    a[aoffset+3] = m2y+m3y;
-                    a[aoffset+6] = m2x-m3x;
-                    a[aoffset+7] = m2y-m3y;
+                    aoffset = offs + opidx * operandsize * 2;
+                    a0x = a[aoffset + 0];
+                    a0y = a[aoffset + 1];
+                    a1x = a[aoffset + 2];
+                    a1y = a[aoffset + 3];
+                    a2x = a[aoffset + 4];
+                    a2y = a[aoffset + 5];
+                    a3x = a[aoffset + 6];
+                    a3y = a[aoffset + 7];
+                    t1x = a0x + a2x;
+                    t1y = a0y + a2y;
+                    t2x = a1x + a3x;
+                    t2y = a1y + a3y;
+                    m2x = a0x - a2x;
+                    m2y = a0y - a2y;
+                    m3x = a1y - a3y;
+                    m3y = a3x - a1x;
+                    a[aoffset + 0] = t1x + t2x;
+                    a[aoffset + 1] = t1y + t2y;
+                    a[aoffset + 4] = t1x - t2x;
+                    a[aoffset + 5] = t1y - t2y;
+                    a[aoffset + 2] = m2x + m3x;
+                    a[aoffset + 3] = m2y + m3y;
+                    a[aoffset + 6] = m2x - m3x;
+                    a[aoffset + 7] = m2y - m3y;
                 }
                 return;
             }
-            if( n==5 )
+            if (n == 5)
             {
-                v = 2*Math.PI/5;
-                c1 = (Math.Cos(v)+Math.Cos(2*v))/2-1;
-                c2 = (Math.Cos(v)-Math.Cos(2*v))/2;
+                v = 2 * Math.PI / 5;
+                c1 = (Math.Cos(v) + Math.Cos(2 * v)) / 2 - 1;
+                c2 = (Math.Cos(v) - Math.Cos(2 * v)) / 2;
                 c3 = -Math.Sin(v);
-                c4 = -(Math.Sin(v)+Math.Sin(2*v));
-                c5 = Math.Sin(v)-Math.Sin(2*v);
-                for(opidx=0; opidx<=operandscnt-1; opidx++)
+                c4 = -(Math.Sin(v) + Math.Sin(2 * v));
+                c5 = Math.Sin(v) - Math.Sin(2 * v);
+                for (opidx = 0; opidx <= operandscnt - 1; opidx++)
                 {
-                    aoffset = offs+opidx*operandsize*2;
-                    t1x = a[aoffset+2]+a[aoffset+8];
-                    t1y = a[aoffset+3]+a[aoffset+9];
-                    t2x = a[aoffset+4]+a[aoffset+6];
-                    t2y = a[aoffset+5]+a[aoffset+7];
-                    t3x = a[aoffset+2]-a[aoffset+8];
-                    t3y = a[aoffset+3]-a[aoffset+9];
-                    t4x = a[aoffset+6]-a[aoffset+4];
-                    t4y = a[aoffset+7]-a[aoffset+5];
-                    t5x = t1x+t2x;
-                    t5y = t1y+t2y;
-                    a[aoffset+0] = a[aoffset+0]+t5x;
-                    a[aoffset+1] = a[aoffset+1]+t5y;
-                    m1x = c1*t5x;
-                    m1y = c1*t5y;
-                    m2x = c2*(t1x-t2x);
-                    m2y = c2*(t1y-t2y);
-                    m3x = -(c3*(t3y+t4y));
-                    m3y = c3*(t3x+t4x);
-                    m4x = -(c4*t4y);
-                    m4y = c4*t4x;
-                    m5x = -(c5*t3y);
-                    m5y = c5*t3x;
-                    s3x = m3x-m4x;
-                    s3y = m3y-m4y;
-                    s5x = m3x+m5x;
-                    s5y = m3y+m5y;
-                    s1x = a[aoffset+0]+m1x;
-                    s1y = a[aoffset+1]+m1y;
-                    s2x = s1x+m2x;
-                    s2y = s1y+m2y;
-                    s4x = s1x-m2x;
-                    s4y = s1y-m2y;
-                    a[aoffset+2] = s2x+s3x;
-                    a[aoffset+3] = s2y+s3y;
-                    a[aoffset+4] = s4x+s5x;
-                    a[aoffset+5] = s4y+s5y;
-                    a[aoffset+6] = s4x-s5x;
-                    a[aoffset+7] = s4y-s5y;
-                    a[aoffset+8] = s2x-s3x;
-                    a[aoffset+9] = s2y-s3y;
+                    aoffset = offs + opidx * operandsize * 2;
+                    t1x = a[aoffset + 2] + a[aoffset + 8];
+                    t1y = a[aoffset + 3] + a[aoffset + 9];
+                    t2x = a[aoffset + 4] + a[aoffset + 6];
+                    t2y = a[aoffset + 5] + a[aoffset + 7];
+                    t3x = a[aoffset + 2] - a[aoffset + 8];
+                    t3y = a[aoffset + 3] - a[aoffset + 9];
+                    t4x = a[aoffset + 6] - a[aoffset + 4];
+                    t4y = a[aoffset + 7] - a[aoffset + 5];
+                    t5x = t1x + t2x;
+                    t5y = t1y + t2y;
+                    a[aoffset + 0] = a[aoffset + 0] + t5x;
+                    a[aoffset + 1] = a[aoffset + 1] + t5y;
+                    m1x = c1 * t5x;
+                    m1y = c1 * t5y;
+                    m2x = c2 * (t1x - t2x);
+                    m2y = c2 * (t1y - t2y);
+                    m3x = -(c3 * (t3y + t4y));
+                    m3y = c3 * (t3x + t4x);
+                    m4x = -(c4 * t4y);
+                    m4y = c4 * t4x;
+                    m5x = -(c5 * t3y);
+                    m5y = c5 * t3x;
+                    s3x = m3x - m4x;
+                    s3y = m3y - m4y;
+                    s5x = m3x + m5x;
+                    s5y = m3y + m5y;
+                    s1x = a[aoffset + 0] + m1x;
+                    s1y = a[aoffset + 1] + m1y;
+                    s2x = s1x + m2x;
+                    s2y = s1y + m2y;
+                    s4x = s1x - m2x;
+                    s4y = s1y - m2y;
+                    a[aoffset + 2] = s2x + s3x;
+                    a[aoffset + 3] = s2y + s3y;
+                    a[aoffset + 4] = s4x + s5x;
+                    a[aoffset + 5] = s4y + s5y;
+                    a[aoffset + 6] = s4x - s5x;
+                    a[aoffset + 7] = s4y - s5y;
+                    a[aoffset + 8] = s2x - s3x;
+                    a[aoffset + 9] = s2y - s3y;
                 }
                 return;
             }
-            if( n==6 )
+            if (n == 6)
             {
-                c1 = Math.Cos(2*Math.PI/3)-1;
-                c2 = Math.Sin(2*Math.PI/3);
-                c3 = Math.Cos(-(Math.PI/3));
-                c4 = Math.Sin(-(Math.PI/3));
-                for(opidx=0; opidx<=operandscnt-1; opidx++)
+                c1 = Math.Cos(2 * Math.PI / 3) - 1;
+                c2 = Math.Sin(2 * Math.PI / 3);
+                c3 = Math.Cos(-(Math.PI / 3));
+                c4 = Math.Sin(-(Math.PI / 3));
+                for (opidx = 0; opidx <= operandscnt - 1; opidx++)
                 {
-                    aoffset = offs+opidx*operandsize*2;
-                    a0x = a[aoffset+0];
-                    a0y = a[aoffset+1];
-                    a1x = a[aoffset+2];
-                    a1y = a[aoffset+3];
-                    a2x = a[aoffset+4];
-                    a2y = a[aoffset+5];
-                    a3x = a[aoffset+6];
-                    a3y = a[aoffset+7];
-                    a4x = a[aoffset+8];
-                    a4y = a[aoffset+9];
-                    a5x = a[aoffset+10];
-                    a5y = a[aoffset+11];
+                    aoffset = offs + opidx * operandsize * 2;
+                    a0x = a[aoffset + 0];
+                    a0y = a[aoffset + 1];
+                    a1x = a[aoffset + 2];
+                    a1y = a[aoffset + 3];
+                    a2x = a[aoffset + 4];
+                    a2y = a[aoffset + 5];
+                    a3x = a[aoffset + 6];
+                    a3y = a[aoffset + 7];
+                    a4x = a[aoffset + 8];
+                    a4y = a[aoffset + 9];
+                    a5x = a[aoffset + 10];
+                    a5y = a[aoffset + 11];
                     v0 = a0x;
                     v1 = a0y;
-                    a0x = a0x+a3x;
-                    a0y = a0y+a3y;
-                    a3x = v0-a3x;
-                    a3y = v1-a3y;
+                    a0x = a0x + a3x;
+                    a0y = a0y + a3y;
+                    a3x = v0 - a3x;
+                    a3y = v1 - a3y;
                     v0 = a1x;
                     v1 = a1y;
-                    a1x = a1x+a4x;
-                    a1y = a1y+a4y;
-                    a4x = v0-a4x;
-                    a4y = v1-a4y;
+                    a1x = a1x + a4x;
+                    a1y = a1y + a4y;
+                    a4x = v0 - a4x;
+                    a4y = v1 - a4y;
                     v0 = a2x;
                     v1 = a2y;
-                    a2x = a2x+a5x;
-                    a2y = a2y+a5y;
-                    a5x = v0-a5x;
-                    a5y = v1-a5y;
-                    t4x = a4x*c3-a4y*c4;
-                    t4y = a4x*c4+a4y*c3;
+                    a2x = a2x + a5x;
+                    a2y = a2y + a5y;
+                    a5x = v0 - a5x;
+                    a5y = v1 - a5y;
+                    t4x = a4x * c3 - a4y * c4;
+                    t4y = a4x * c4 + a4y * c3;
                     a4x = t4x;
                     a4y = t4y;
-                    t5x = -(a5x*c3)-a5y*c4;
-                    t5y = a5x*c4-a5y*c3;
+                    t5x = -(a5x * c3) - a5y * c4;
+                    t5y = a5x * c4 - a5y * c3;
                     a5x = t5x;
                     a5y = t5y;
-                    t1x = a1x+a2x;
-                    t1y = a1y+a2y;
-                    a0x = a0x+t1x;
-                    a0y = a0y+t1y;
-                    m1x = c1*t1x;
-                    m1y = c1*t1y;
-                    m2x = c2*(a1y-a2y);
-                    m2y = c2*(a2x-a1x);
-                    s1x = a0x+m1x;
-                    s1y = a0y+m1y;
-                    a1x = s1x+m2x;
-                    a1y = s1y+m2y;
-                    a2x = s1x-m2x;
-                    a2y = s1y-m2y;
-                    t1x = a4x+a5x;
-                    t1y = a4y+a5y;
-                    a3x = a3x+t1x;
-                    a3y = a3y+t1y;
-                    m1x = c1*t1x;
-                    m1y = c1*t1y;
-                    m2x = c2*(a4y-a5y);
-                    m2y = c2*(a5x-a4x);
-                    s1x = a3x+m1x;
-                    s1y = a3y+m1y;
-                    a4x = s1x+m2x;
-                    a4y = s1y+m2y;
-                    a5x = s1x-m2x;
-                    a5y = s1y-m2y;
-                    a[aoffset+0] = a0x;
-                    a[aoffset+1] = a0y;
-                    a[aoffset+2] = a3x;
-                    a[aoffset+3] = a3y;
-                    a[aoffset+4] = a1x;
-                    a[aoffset+5] = a1y;
-                    a[aoffset+6] = a4x;
-                    a[aoffset+7] = a4y;
-                    a[aoffset+8] = a2x;
-                    a[aoffset+9] = a2y;
-                    a[aoffset+10] = a5x;
-                    a[aoffset+11] = a5y;
+                    t1x = a1x + a2x;
+                    t1y = a1y + a2y;
+                    a0x = a0x + t1x;
+                    a0y = a0y + t1y;
+                    m1x = c1 * t1x;
+                    m1y = c1 * t1y;
+                    m2x = c2 * (a1y - a2y);
+                    m2y = c2 * (a2x - a1x);
+                    s1x = a0x + m1x;
+                    s1y = a0y + m1y;
+                    a1x = s1x + m2x;
+                    a1y = s1y + m2y;
+                    a2x = s1x - m2x;
+                    a2y = s1y - m2y;
+                    t1x = a4x + a5x;
+                    t1y = a4y + a5y;
+                    a3x = a3x + t1x;
+                    a3y = a3y + t1y;
+                    m1x = c1 * t1x;
+                    m1y = c1 * t1y;
+                    m2x = c2 * (a4y - a5y);
+                    m2y = c2 * (a5x - a4x);
+                    s1x = a3x + m1x;
+                    s1y = a3y + m1y;
+                    a4x = s1x + m2x;
+                    a4y = s1y + m2y;
+                    a5x = s1x - m2x;
+                    a5y = s1y - m2y;
+                    a[aoffset + 0] = a0x;
+                    a[aoffset + 1] = a0y;
+                    a[aoffset + 2] = a3x;
+                    a[aoffset + 3] = a3y;
+                    a[aoffset + 4] = a1x;
+                    a[aoffset + 5] = a1y;
+                    a[aoffset + 6] = a4x;
+                    a[aoffset + 7] = a4y;
+                    a[aoffset + 8] = a2x;
+                    a[aoffset + 9] = a2y;
+                    a[aoffset + 10] = a5x;
+                    a[aoffset + 11] = a5y;
                 }
                 return;
             }
         }
-
 
         /*************************************************************************
         This subroutine applies complex "integrated" codelet FFT  to  input/output
@@ -15311,12 +15745,14 @@ public partial class alglib
           -- ALGLIB --
              Copyright 05.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        private static void ftapplycomplexcodelettwfft(double[] a,
+        private static void ftapplycomplexcodelettwfft(
+            double[] a,
             int offs,
             int operandscnt,
             int operandsize,
             int microvectorsize,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int opidx = 0;
             int mvidx = 0;
@@ -15396,449 +15832,451 @@ public partial class alglib
             double tw5x = 0;
             double tw5y = 0;
 
-            alglib.ap.assert(operandscnt>=1, "FTApplyComplexCodeletFFT: OperandsCnt<1");
-            alglib.ap.assert(operandsize>=1, "FTApplyComplexCodeletFFT: OperandSize<1");
-            alglib.ap.assert(microvectorsize>=1, "FTApplyComplexCodeletFFT: MicrovectorSize<>1");
-            alglib.ap.assert(microvectorsize%2==0, "FTApplyComplexCodeletFFT: MicrovectorSize is not even");
+            Alglib.ap.assert(operandscnt >= 1, "FTApplyComplexCodeletFFT: OperandsCnt<1");
+            Alglib.ap.assert(operandsize >= 1, "FTApplyComplexCodeletFFT: OperandSize<1");
+            Alglib.ap.assert(microvectorsize >= 1, "FTApplyComplexCodeletFFT: MicrovectorSize<>1");
+            Alglib.ap.assert(
+                microvectorsize % 2 == 0,
+                "FTApplyComplexCodeletFFT: MicrovectorSize is not even"
+            );
             n = operandsize;
-            m = microvectorsize/2;
-            
+            m = microvectorsize / 2;
+
             //
             // Hard-coded transforms for different N's
             //
-            alglib.ap.assert(n<=maxradix, "FTApplyComplexCodeletTwFFT: N>MaxRadix");
-            if( n==2 )
+            Alglib.ap.assert(n <= maxradix, "FTApplyComplexCodeletTwFFT: N>MaxRadix");
+            if (n == 2)
             {
-                v = -(2*Math.PI/(n*m));
-                tw0 = -(2*math.sqr(Math.Sin(0.5*v)));
+                v = -(2 * Math.PI / (n * m));
+                tw0 = -(2 * math.sqr(Math.Sin(0.5 * v)));
                 tw1 = Math.Sin(v);
-                for(opidx=0; opidx<=operandscnt-1; opidx++)
+                for (opidx = 0; opidx <= operandscnt - 1; opidx++)
                 {
-                    aoffset0 = offs+opidx*operandsize*microvectorsize;
-                    aoffset2 = aoffset0+microvectorsize;
+                    aoffset0 = offs + opidx * operandsize * microvectorsize;
+                    aoffset2 = aoffset0 + microvectorsize;
                     twxm1 = 0.0;
                     twy = 0.0;
-                    for(mvidx=0; mvidx<=m-1; mvidx++)
+                    for (mvidx = 0; mvidx <= m - 1; mvidx++)
                     {
                         a0x = a[aoffset0];
-                        a0y = a[aoffset0+1];
+                        a0y = a[aoffset0 + 1];
                         a1x = a[aoffset2];
-                        a1y = a[aoffset2+1];
-                        v0 = a0x+a1x;
-                        v1 = a0y+a1y;
-                        v2 = a0x-a1x;
-                        v3 = a0y-a1y;
+                        a1y = a[aoffset2 + 1];
+                        v0 = a0x + a1x;
+                        v1 = a0y + a1y;
+                        v2 = a0x - a1x;
+                        v3 = a0y - a1y;
                         a[aoffset0] = v0;
-                        a[aoffset0+1] = v1;
-                        a[aoffset2] = v2*(1+twxm1)-v3*twy;
-                        a[aoffset2+1] = v3*(1+twxm1)+v2*twy;
-                        aoffset0 = aoffset0+2;
-                        aoffset2 = aoffset2+2;
-                        if( (mvidx+1)%updatetw==0 )
+                        a[aoffset0 + 1] = v1;
+                        a[aoffset2] = v2 * (1 + twxm1) - v3 * twy;
+                        a[aoffset2 + 1] = v3 * (1 + twxm1) + v2 * twy;
+                        aoffset0 = aoffset0 + 2;
+                        aoffset2 = aoffset2 + 2;
+                        if ((mvidx + 1) % updatetw == 0)
                         {
-                            v = -(2*Math.PI*(mvidx+1)/(n*m));
-                            twxm1 = Math.Sin(0.5*v);
-                            twxm1 = -(2*twxm1*twxm1);
+                            v = -(2 * Math.PI * (mvidx + 1) / (n * m));
+                            twxm1 = Math.Sin(0.5 * v);
+                            twxm1 = -(2 * twxm1 * twxm1);
                             twy = Math.Sin(v);
                         }
                         else
                         {
-                            v = twxm1+tw0+twxm1*tw0-twy*tw1;
-                            twy = twy+tw1+twxm1*tw1+twy*tw0;
+                            v = twxm1 + tw0 + twxm1 * tw0 - twy * tw1;
+                            twy = twy + tw1 + twxm1 * tw1 + twy * tw0;
                             twxm1 = v;
                         }
                     }
                 }
                 return;
             }
-            if( n==3 )
+            if (n == 3)
             {
-                v = -(2*Math.PI/(n*m));
-                tw0 = -(2*math.sqr(Math.Sin(0.5*v)));
+                v = -(2 * Math.PI / (n * m));
+                tw0 = -(2 * math.sqr(Math.Sin(0.5 * v)));
                 tw1 = Math.Sin(v);
-                c1 = Math.Cos(2*Math.PI/3)-1;
-                c2 = Math.Sin(2*Math.PI/3);
-                for(opidx=0; opidx<=operandscnt-1; opidx++)
+                c1 = Math.Cos(2 * Math.PI / 3) - 1;
+                c2 = Math.Sin(2 * Math.PI / 3);
+                for (opidx = 0; opidx <= operandscnt - 1; opidx++)
                 {
-                    aoffset0 = offs+opidx*operandsize*microvectorsize;
-                    aoffset2 = aoffset0+microvectorsize;
-                    aoffset4 = aoffset2+microvectorsize;
+                    aoffset0 = offs + opidx * operandsize * microvectorsize;
+                    aoffset2 = aoffset0 + microvectorsize;
+                    aoffset4 = aoffset2 + microvectorsize;
                     twx = 1.0;
                     twxm1 = 0.0;
                     twy = 0.0;
-                    for(mvidx=0; mvidx<=m-1; mvidx++)
+                    for (mvidx = 0; mvidx <= m - 1; mvidx++)
                     {
                         a0x = a[aoffset0];
-                        a0y = a[aoffset0+1];
+                        a0y = a[aoffset0 + 1];
                         a1x = a[aoffset2];
-                        a1y = a[aoffset2+1];
+                        a1y = a[aoffset2 + 1];
                         a2x = a[aoffset4];
-                        a2y = a[aoffset4+1];
-                        t1x = a1x+a2x;
-                        t1y = a1y+a2y;
-                        a0x = a0x+t1x;
-                        a0y = a0y+t1y;
-                        m1x = c1*t1x;
-                        m1y = c1*t1y;
-                        m2x = c2*(a1y-a2y);
-                        m2y = c2*(a2x-a1x);
-                        s1x = a0x+m1x;
-                        s1y = a0y+m1y;
-                        a1x = s1x+m2x;
-                        a1y = s1y+m2y;
-                        a2x = s1x-m2x;
-                        a2y = s1y-m2y;
-                        tw2x = twx*twx-twy*twy;
-                        tw2y = 2*twx*twy;
+                        a2y = a[aoffset4 + 1];
+                        t1x = a1x + a2x;
+                        t1y = a1y + a2y;
+                        a0x = a0x + t1x;
+                        a0y = a0y + t1y;
+                        m1x = c1 * t1x;
+                        m1y = c1 * t1y;
+                        m2x = c2 * (a1y - a2y);
+                        m2y = c2 * (a2x - a1x);
+                        s1x = a0x + m1x;
+                        s1y = a0y + m1y;
+                        a1x = s1x + m2x;
+                        a1y = s1y + m2y;
+                        a2x = s1x - m2x;
+                        a2y = s1y - m2y;
+                        tw2x = twx * twx - twy * twy;
+                        tw2y = 2 * twx * twy;
                         a[aoffset0] = a0x;
-                        a[aoffset0+1] = a0y;
-                        a[aoffset2] = a1x*twx-a1y*twy;
-                        a[aoffset2+1] = a1y*twx+a1x*twy;
-                        a[aoffset4] = a2x*tw2x-a2y*tw2y;
-                        a[aoffset4+1] = a2y*tw2x+a2x*tw2y;
-                        aoffset0 = aoffset0+2;
-                        aoffset2 = aoffset2+2;
-                        aoffset4 = aoffset4+2;
-                        if( (mvidx+1)%updatetw==0 )
+                        a[aoffset0 + 1] = a0y;
+                        a[aoffset2] = a1x * twx - a1y * twy;
+                        a[aoffset2 + 1] = a1y * twx + a1x * twy;
+                        a[aoffset4] = a2x * tw2x - a2y * tw2y;
+                        a[aoffset4 + 1] = a2y * tw2x + a2x * tw2y;
+                        aoffset0 = aoffset0 + 2;
+                        aoffset2 = aoffset2 + 2;
+                        aoffset4 = aoffset4 + 2;
+                        if ((mvidx + 1) % updatetw == 0)
                         {
-                            v = -(2*Math.PI*(mvidx+1)/(n*m));
-                            twxm1 = Math.Sin(0.5*v);
-                            twxm1 = -(2*twxm1*twxm1);
+                            v = -(2 * Math.PI * (mvidx + 1) / (n * m));
+                            twxm1 = Math.Sin(0.5 * v);
+                            twxm1 = -(2 * twxm1 * twxm1);
                             twy = Math.Sin(v);
-                            twx = twxm1+1;
+                            twx = twxm1 + 1;
                         }
                         else
                         {
-                            v = twxm1+tw0+twxm1*tw0-twy*tw1;
-                            twy = twy+tw1+twxm1*tw1+twy*tw0;
+                            v = twxm1 + tw0 + twxm1 * tw0 - twy * tw1;
+                            twy = twy + tw1 + twxm1 * tw1 + twy * tw0;
                             twxm1 = v;
-                            twx = v+1;
+                            twx = v + 1;
                         }
                     }
                 }
                 return;
             }
-            if( n==4 )
+            if (n == 4)
             {
-                v = -(2*Math.PI/(n*m));
-                tw0 = -(2*math.sqr(Math.Sin(0.5*v)));
+                v = -(2 * Math.PI / (n * m));
+                tw0 = -(2 * math.sqr(Math.Sin(0.5 * v)));
                 tw1 = Math.Sin(v);
-                for(opidx=0; opidx<=operandscnt-1; opidx++)
+                for (opidx = 0; opidx <= operandscnt - 1; opidx++)
                 {
-                    aoffset0 = offs+opidx*operandsize*microvectorsize;
-                    aoffset2 = aoffset0+microvectorsize;
-                    aoffset4 = aoffset2+microvectorsize;
-                    aoffset6 = aoffset4+microvectorsize;
+                    aoffset0 = offs + opidx * operandsize * microvectorsize;
+                    aoffset2 = aoffset0 + microvectorsize;
+                    aoffset4 = aoffset2 + microvectorsize;
+                    aoffset6 = aoffset4 + microvectorsize;
                     twx = 1.0;
                     twxm1 = 0.0;
                     twy = 0.0;
-                    for(mvidx=0; mvidx<=m-1; mvidx++)
+                    for (mvidx = 0; mvidx <= m - 1; mvidx++)
                     {
                         a0x = a[aoffset0];
-                        a0y = a[aoffset0+1];
+                        a0y = a[aoffset0 + 1];
                         a1x = a[aoffset2];
-                        a1y = a[aoffset2+1];
+                        a1y = a[aoffset2 + 1];
                         a2x = a[aoffset4];
-                        a2y = a[aoffset4+1];
+                        a2y = a[aoffset4 + 1];
                         a3x = a[aoffset6];
-                        a3y = a[aoffset6+1];
-                        t1x = a0x+a2x;
-                        t1y = a0y+a2y;
-                        t2x = a1x+a3x;
-                        t2y = a1y+a3y;
-                        m2x = a0x-a2x;
-                        m2y = a0y-a2y;
-                        m3x = a1y-a3y;
-                        m3y = a3x-a1x;
-                        tw2x = twx*twx-twy*twy;
-                        tw2y = 2*twx*twy;
-                        tw3x = twx*tw2x-twy*tw2y;
-                        tw3y = twx*tw2y+twy*tw2x;
-                        a1x = m2x+m3x;
-                        a1y = m2y+m3y;
-                        a2x = t1x-t2x;
-                        a2y = t1y-t2y;
-                        a3x = m2x-m3x;
-                        a3y = m2y-m3y;
-                        a[aoffset0] = t1x+t2x;
-                        a[aoffset0+1] = t1y+t2y;
-                        a[aoffset2] = a1x*twx-a1y*twy;
-                        a[aoffset2+1] = a1y*twx+a1x*twy;
-                        a[aoffset4] = a2x*tw2x-a2y*tw2y;
-                        a[aoffset4+1] = a2y*tw2x+a2x*tw2y;
-                        a[aoffset6] = a3x*tw3x-a3y*tw3y;
-                        a[aoffset6+1] = a3y*tw3x+a3x*tw3y;
-                        aoffset0 = aoffset0+2;
-                        aoffset2 = aoffset2+2;
-                        aoffset4 = aoffset4+2;
-                        aoffset6 = aoffset6+2;
-                        if( (mvidx+1)%updatetw==0 )
+                        a3y = a[aoffset6 + 1];
+                        t1x = a0x + a2x;
+                        t1y = a0y + a2y;
+                        t2x = a1x + a3x;
+                        t2y = a1y + a3y;
+                        m2x = a0x - a2x;
+                        m2y = a0y - a2y;
+                        m3x = a1y - a3y;
+                        m3y = a3x - a1x;
+                        tw2x = twx * twx - twy * twy;
+                        tw2y = 2 * twx * twy;
+                        tw3x = twx * tw2x - twy * tw2y;
+                        tw3y = twx * tw2y + twy * tw2x;
+                        a1x = m2x + m3x;
+                        a1y = m2y + m3y;
+                        a2x = t1x - t2x;
+                        a2y = t1y - t2y;
+                        a3x = m2x - m3x;
+                        a3y = m2y - m3y;
+                        a[aoffset0] = t1x + t2x;
+                        a[aoffset0 + 1] = t1y + t2y;
+                        a[aoffset2] = a1x * twx - a1y * twy;
+                        a[aoffset2 + 1] = a1y * twx + a1x * twy;
+                        a[aoffset4] = a2x * tw2x - a2y * tw2y;
+                        a[aoffset4 + 1] = a2y * tw2x + a2x * tw2y;
+                        a[aoffset6] = a3x * tw3x - a3y * tw3y;
+                        a[aoffset6 + 1] = a3y * tw3x + a3x * tw3y;
+                        aoffset0 = aoffset0 + 2;
+                        aoffset2 = aoffset2 + 2;
+                        aoffset4 = aoffset4 + 2;
+                        aoffset6 = aoffset6 + 2;
+                        if ((mvidx + 1) % updatetw == 0)
                         {
-                            v = -(2*Math.PI*(mvidx+1)/(n*m));
-                            twxm1 = Math.Sin(0.5*v);
-                            twxm1 = -(2*twxm1*twxm1);
+                            v = -(2 * Math.PI * (mvidx + 1) / (n * m));
+                            twxm1 = Math.Sin(0.5 * v);
+                            twxm1 = -(2 * twxm1 * twxm1);
                             twy = Math.Sin(v);
-                            twx = twxm1+1;
+                            twx = twxm1 + 1;
                         }
                         else
                         {
-                            v = twxm1+tw0+twxm1*tw0-twy*tw1;
-                            twy = twy+tw1+twxm1*tw1+twy*tw0;
+                            v = twxm1 + tw0 + twxm1 * tw0 - twy * tw1;
+                            twy = twy + tw1 + twxm1 * tw1 + twy * tw0;
                             twxm1 = v;
-                            twx = v+1;
+                            twx = v + 1;
                         }
                     }
                 }
                 return;
             }
-            if( n==5 )
+            if (n == 5)
             {
-                v = -(2*Math.PI/(n*m));
-                tw0 = -(2*math.sqr(Math.Sin(0.5*v)));
+                v = -(2 * Math.PI / (n * m));
+                tw0 = -(2 * math.sqr(Math.Sin(0.5 * v)));
                 tw1 = Math.Sin(v);
-                v = 2*Math.PI/5;
-                c1 = (Math.Cos(v)+Math.Cos(2*v))/2-1;
-                c2 = (Math.Cos(v)-Math.Cos(2*v))/2;
+                v = 2 * Math.PI / 5;
+                c1 = (Math.Cos(v) + Math.Cos(2 * v)) / 2 - 1;
+                c2 = (Math.Cos(v) - Math.Cos(2 * v)) / 2;
                 c3 = -Math.Sin(v);
-                c4 = -(Math.Sin(v)+Math.Sin(2*v));
-                c5 = Math.Sin(v)-Math.Sin(2*v);
-                for(opidx=0; opidx<=operandscnt-1; opidx++)
+                c4 = -(Math.Sin(v) + Math.Sin(2 * v));
+                c5 = Math.Sin(v) - Math.Sin(2 * v);
+                for (opidx = 0; opidx <= operandscnt - 1; opidx++)
                 {
-                    aoffset0 = offs+opidx*operandsize*microvectorsize;
-                    aoffset2 = aoffset0+microvectorsize;
-                    aoffset4 = aoffset2+microvectorsize;
-                    aoffset6 = aoffset4+microvectorsize;
-                    aoffset8 = aoffset6+microvectorsize;
+                    aoffset0 = offs + opidx * operandsize * microvectorsize;
+                    aoffset2 = aoffset0 + microvectorsize;
+                    aoffset4 = aoffset2 + microvectorsize;
+                    aoffset6 = aoffset4 + microvectorsize;
+                    aoffset8 = aoffset6 + microvectorsize;
                     twx = 1.0;
                     twxm1 = 0.0;
                     twy = 0.0;
-                    for(mvidx=0; mvidx<=m-1; mvidx++)
+                    for (mvidx = 0; mvidx <= m - 1; mvidx++)
                     {
                         a0x = a[aoffset0];
-                        a0y = a[aoffset0+1];
+                        a0y = a[aoffset0 + 1];
                         a1x = a[aoffset2];
-                        a1y = a[aoffset2+1];
+                        a1y = a[aoffset2 + 1];
                         a2x = a[aoffset4];
-                        a2y = a[aoffset4+1];
+                        a2y = a[aoffset4 + 1];
                         a3x = a[aoffset6];
-                        a3y = a[aoffset6+1];
+                        a3y = a[aoffset6 + 1];
                         a4x = a[aoffset8];
-                        a4y = a[aoffset8+1];
-                        t1x = a1x+a4x;
-                        t1y = a1y+a4y;
-                        t2x = a2x+a3x;
-                        t2y = a2y+a3y;
-                        t3x = a1x-a4x;
-                        t3y = a1y-a4y;
-                        t4x = a3x-a2x;
-                        t4y = a3y-a2y;
-                        t5x = t1x+t2x;
-                        t5y = t1y+t2y;
-                        q0x = a0x+t5x;
-                        q0y = a0y+t5y;
-                        m1x = c1*t5x;
-                        m1y = c1*t5y;
-                        m2x = c2*(t1x-t2x);
-                        m2y = c2*(t1y-t2y);
-                        m3x = -(c3*(t3y+t4y));
-                        m3y = c3*(t3x+t4x);
-                        m4x = -(c4*t4y);
-                        m4y = c4*t4x;
-                        m5x = -(c5*t3y);
-                        m5y = c5*t3x;
-                        s3x = m3x-m4x;
-                        s3y = m3y-m4y;
-                        s5x = m3x+m5x;
-                        s5y = m3y+m5y;
-                        s1x = q0x+m1x;
-                        s1y = q0y+m1y;
-                        s2x = s1x+m2x;
-                        s2y = s1y+m2y;
-                        s4x = s1x-m2x;
-                        s4y = s1y-m2y;
-                        tw2x = twx*twx-twy*twy;
-                        tw2y = 2*twx*twy;
-                        tw3x = twx*tw2x-twy*tw2y;
-                        tw3y = twx*tw2y+twy*tw2x;
-                        tw4x = tw2x*tw2x-tw2y*tw2y;
-                        tw4y = tw2x*tw2y+tw2y*tw2x;
-                        a1x = s2x+s3x;
-                        a1y = s2y+s3y;
-                        a2x = s4x+s5x;
-                        a2y = s4y+s5y;
-                        a3x = s4x-s5x;
-                        a3y = s4y-s5y;
-                        a4x = s2x-s3x;
-                        a4y = s2y-s3y;
+                        a4y = a[aoffset8 + 1];
+                        t1x = a1x + a4x;
+                        t1y = a1y + a4y;
+                        t2x = a2x + a3x;
+                        t2y = a2y + a3y;
+                        t3x = a1x - a4x;
+                        t3y = a1y - a4y;
+                        t4x = a3x - a2x;
+                        t4y = a3y - a2y;
+                        t5x = t1x + t2x;
+                        t5y = t1y + t2y;
+                        q0x = a0x + t5x;
+                        q0y = a0y + t5y;
+                        m1x = c1 * t5x;
+                        m1y = c1 * t5y;
+                        m2x = c2 * (t1x - t2x);
+                        m2y = c2 * (t1y - t2y);
+                        m3x = -(c3 * (t3y + t4y));
+                        m3y = c3 * (t3x + t4x);
+                        m4x = -(c4 * t4y);
+                        m4y = c4 * t4x;
+                        m5x = -(c5 * t3y);
+                        m5y = c5 * t3x;
+                        s3x = m3x - m4x;
+                        s3y = m3y - m4y;
+                        s5x = m3x + m5x;
+                        s5y = m3y + m5y;
+                        s1x = q0x + m1x;
+                        s1y = q0y + m1y;
+                        s2x = s1x + m2x;
+                        s2y = s1y + m2y;
+                        s4x = s1x - m2x;
+                        s4y = s1y - m2y;
+                        tw2x = twx * twx - twy * twy;
+                        tw2y = 2 * twx * twy;
+                        tw3x = twx * tw2x - twy * tw2y;
+                        tw3y = twx * tw2y + twy * tw2x;
+                        tw4x = tw2x * tw2x - tw2y * tw2y;
+                        tw4y = tw2x * tw2y + tw2y * tw2x;
+                        a1x = s2x + s3x;
+                        a1y = s2y + s3y;
+                        a2x = s4x + s5x;
+                        a2y = s4y + s5y;
+                        a3x = s4x - s5x;
+                        a3y = s4y - s5y;
+                        a4x = s2x - s3x;
+                        a4y = s2y - s3y;
                         a[aoffset0] = q0x;
-                        a[aoffset0+1] = q0y;
-                        a[aoffset2] = a1x*twx-a1y*twy;
-                        a[aoffset2+1] = a1x*twy+a1y*twx;
-                        a[aoffset4] = a2x*tw2x-a2y*tw2y;
-                        a[aoffset4+1] = a2x*tw2y+a2y*tw2x;
-                        a[aoffset6] = a3x*tw3x-a3y*tw3y;
-                        a[aoffset6+1] = a3x*tw3y+a3y*tw3x;
-                        a[aoffset8] = a4x*tw4x-a4y*tw4y;
-                        a[aoffset8+1] = a4x*tw4y+a4y*tw4x;
-                        aoffset0 = aoffset0+2;
-                        aoffset2 = aoffset2+2;
-                        aoffset4 = aoffset4+2;
-                        aoffset6 = aoffset6+2;
-                        aoffset8 = aoffset8+2;
-                        if( (mvidx+1)%updatetw==0 )
+                        a[aoffset0 + 1] = q0y;
+                        a[aoffset2] = a1x * twx - a1y * twy;
+                        a[aoffset2 + 1] = a1x * twy + a1y * twx;
+                        a[aoffset4] = a2x * tw2x - a2y * tw2y;
+                        a[aoffset4 + 1] = a2x * tw2y + a2y * tw2x;
+                        a[aoffset6] = a3x * tw3x - a3y * tw3y;
+                        a[aoffset6 + 1] = a3x * tw3y + a3y * tw3x;
+                        a[aoffset8] = a4x * tw4x - a4y * tw4y;
+                        a[aoffset8 + 1] = a4x * tw4y + a4y * tw4x;
+                        aoffset0 = aoffset0 + 2;
+                        aoffset2 = aoffset2 + 2;
+                        aoffset4 = aoffset4 + 2;
+                        aoffset6 = aoffset6 + 2;
+                        aoffset8 = aoffset8 + 2;
+                        if ((mvidx + 1) % updatetw == 0)
                         {
-                            v = -(2*Math.PI*(mvidx+1)/(n*m));
-                            twxm1 = Math.Sin(0.5*v);
-                            twxm1 = -(2*twxm1*twxm1);
+                            v = -(2 * Math.PI * (mvidx + 1) / (n * m));
+                            twxm1 = Math.Sin(0.5 * v);
+                            twxm1 = -(2 * twxm1 * twxm1);
                             twy = Math.Sin(v);
-                            twx = twxm1+1;
+                            twx = twxm1 + 1;
                         }
                         else
                         {
-                            v = twxm1+tw0+twxm1*tw0-twy*tw1;
-                            twy = twy+tw1+twxm1*tw1+twy*tw0;
+                            v = twxm1 + tw0 + twxm1 * tw0 - twy * tw1;
+                            twy = twy + tw1 + twxm1 * tw1 + twy * tw0;
                             twxm1 = v;
-                            twx = v+1;
+                            twx = v + 1;
                         }
                     }
                 }
                 return;
             }
-            if( n==6 )
+            if (n == 6)
             {
-                c1 = Math.Cos(2*Math.PI/3)-1;
-                c2 = Math.Sin(2*Math.PI/3);
-                c3 = Math.Cos(-(Math.PI/3));
-                c4 = Math.Sin(-(Math.PI/3));
-                v = -(2*Math.PI/(n*m));
-                tw0 = -(2*math.sqr(Math.Sin(0.5*v)));
+                c1 = Math.Cos(2 * Math.PI / 3) - 1;
+                c2 = Math.Sin(2 * Math.PI / 3);
+                c3 = Math.Cos(-(Math.PI / 3));
+                c4 = Math.Sin(-(Math.PI / 3));
+                v = -(2 * Math.PI / (n * m));
+                tw0 = -(2 * math.sqr(Math.Sin(0.5 * v)));
                 tw1 = Math.Sin(v);
-                for(opidx=0; opidx<=operandscnt-1; opidx++)
+                for (opidx = 0; opidx <= operandscnt - 1; opidx++)
                 {
-                    aoffset0 = offs+opidx*operandsize*microvectorsize;
-                    aoffset2 = aoffset0+microvectorsize;
-                    aoffset4 = aoffset2+microvectorsize;
-                    aoffset6 = aoffset4+microvectorsize;
-                    aoffset8 = aoffset6+microvectorsize;
-                    aoffset10 = aoffset8+microvectorsize;
+                    aoffset0 = offs + opidx * operandsize * microvectorsize;
+                    aoffset2 = aoffset0 + microvectorsize;
+                    aoffset4 = aoffset2 + microvectorsize;
+                    aoffset6 = aoffset4 + microvectorsize;
+                    aoffset8 = aoffset6 + microvectorsize;
+                    aoffset10 = aoffset8 + microvectorsize;
                     twx = 1.0;
                     twxm1 = 0.0;
                     twy = 0.0;
-                    for(mvidx=0; mvidx<=m-1; mvidx++)
+                    for (mvidx = 0; mvidx <= m - 1; mvidx++)
                     {
-                        a0x = a[aoffset0+0];
-                        a0y = a[aoffset0+1];
-                        a1x = a[aoffset2+0];
-                        a1y = a[aoffset2+1];
-                        a2x = a[aoffset4+0];
-                        a2y = a[aoffset4+1];
-                        a3x = a[aoffset6+0];
-                        a3y = a[aoffset6+1];
-                        a4x = a[aoffset8+0];
-                        a4y = a[aoffset8+1];
-                        a5x = a[aoffset10+0];
-                        a5y = a[aoffset10+1];
+                        a0x = a[aoffset0 + 0];
+                        a0y = a[aoffset0 + 1];
+                        a1x = a[aoffset2 + 0];
+                        a1y = a[aoffset2 + 1];
+                        a2x = a[aoffset4 + 0];
+                        a2y = a[aoffset4 + 1];
+                        a3x = a[aoffset6 + 0];
+                        a3y = a[aoffset6 + 1];
+                        a4x = a[aoffset8 + 0];
+                        a4y = a[aoffset8 + 1];
+                        a5x = a[aoffset10 + 0];
+                        a5y = a[aoffset10 + 1];
                         v0 = a0x;
                         v1 = a0y;
-                        a0x = a0x+a3x;
-                        a0y = a0y+a3y;
-                        a3x = v0-a3x;
-                        a3y = v1-a3y;
+                        a0x = a0x + a3x;
+                        a0y = a0y + a3y;
+                        a3x = v0 - a3x;
+                        a3y = v1 - a3y;
                         v0 = a1x;
                         v1 = a1y;
-                        a1x = a1x+a4x;
-                        a1y = a1y+a4y;
-                        a4x = v0-a4x;
-                        a4y = v1-a4y;
+                        a1x = a1x + a4x;
+                        a1y = a1y + a4y;
+                        a4x = v0 - a4x;
+                        a4y = v1 - a4y;
                         v0 = a2x;
                         v1 = a2y;
-                        a2x = a2x+a5x;
-                        a2y = a2y+a5y;
-                        a5x = v0-a5x;
-                        a5y = v1-a5y;
-                        t4x = a4x*c3-a4y*c4;
-                        t4y = a4x*c4+a4y*c3;
+                        a2x = a2x + a5x;
+                        a2y = a2y + a5y;
+                        a5x = v0 - a5x;
+                        a5y = v1 - a5y;
+                        t4x = a4x * c3 - a4y * c4;
+                        t4y = a4x * c4 + a4y * c3;
                         a4x = t4x;
                         a4y = t4y;
-                        t5x = -(a5x*c3)-a5y*c4;
-                        t5y = a5x*c4-a5y*c3;
+                        t5x = -(a5x * c3) - a5y * c4;
+                        t5y = a5x * c4 - a5y * c3;
                         a5x = t5x;
                         a5y = t5y;
-                        t1x = a1x+a2x;
-                        t1y = a1y+a2y;
-                        a0x = a0x+t1x;
-                        a0y = a0y+t1y;
-                        m1x = c1*t1x;
-                        m1y = c1*t1y;
-                        m2x = c2*(a1y-a2y);
-                        m2y = c2*(a2x-a1x);
-                        s1x = a0x+m1x;
-                        s1y = a0y+m1y;
-                        a1x = s1x+m2x;
-                        a1y = s1y+m2y;
-                        a2x = s1x-m2x;
-                        a2y = s1y-m2y;
-                        t1x = a4x+a5x;
-                        t1y = a4y+a5y;
-                        a3x = a3x+t1x;
-                        a3y = a3y+t1y;
-                        m1x = c1*t1x;
-                        m1y = c1*t1y;
-                        m2x = c2*(a4y-a5y);
-                        m2y = c2*(a5x-a4x);
-                        s1x = a3x+m1x;
-                        s1y = a3y+m1y;
-                        a4x = s1x+m2x;
-                        a4y = s1y+m2y;
-                        a5x = s1x-m2x;
-                        a5y = s1y-m2y;
-                        tw2x = twx*twx-twy*twy;
-                        tw2y = 2*twx*twy;
-                        tw3x = twx*tw2x-twy*tw2y;
-                        tw3y = twx*tw2y+twy*tw2x;
-                        tw4x = tw2x*tw2x-tw2y*tw2y;
-                        tw4y = 2*tw2x*tw2y;
-                        tw5x = tw3x*tw2x-tw3y*tw2y;
-                        tw5y = tw3x*tw2y+tw3y*tw2x;
-                        a[aoffset0+0] = a0x;
-                        a[aoffset0+1] = a0y;
-                        a[aoffset2+0] = a3x*twx-a3y*twy;
-                        a[aoffset2+1] = a3y*twx+a3x*twy;
-                        a[aoffset4+0] = a1x*tw2x-a1y*tw2y;
-                        a[aoffset4+1] = a1y*tw2x+a1x*tw2y;
-                        a[aoffset6+0] = a4x*tw3x-a4y*tw3y;
-                        a[aoffset6+1] = a4y*tw3x+a4x*tw3y;
-                        a[aoffset8+0] = a2x*tw4x-a2y*tw4y;
-                        a[aoffset8+1] = a2y*tw4x+a2x*tw4y;
-                        a[aoffset10+0] = a5x*tw5x-a5y*tw5y;
-                        a[aoffset10+1] = a5y*tw5x+a5x*tw5y;
-                        aoffset0 = aoffset0+2;
-                        aoffset2 = aoffset2+2;
-                        aoffset4 = aoffset4+2;
-                        aoffset6 = aoffset6+2;
-                        aoffset8 = aoffset8+2;
-                        aoffset10 = aoffset10+2;
-                        if( (mvidx+1)%updatetw==0 )
+                        t1x = a1x + a2x;
+                        t1y = a1y + a2y;
+                        a0x = a0x + t1x;
+                        a0y = a0y + t1y;
+                        m1x = c1 * t1x;
+                        m1y = c1 * t1y;
+                        m2x = c2 * (a1y - a2y);
+                        m2y = c2 * (a2x - a1x);
+                        s1x = a0x + m1x;
+                        s1y = a0y + m1y;
+                        a1x = s1x + m2x;
+                        a1y = s1y + m2y;
+                        a2x = s1x - m2x;
+                        a2y = s1y - m2y;
+                        t1x = a4x + a5x;
+                        t1y = a4y + a5y;
+                        a3x = a3x + t1x;
+                        a3y = a3y + t1y;
+                        m1x = c1 * t1x;
+                        m1y = c1 * t1y;
+                        m2x = c2 * (a4y - a5y);
+                        m2y = c2 * (a5x - a4x);
+                        s1x = a3x + m1x;
+                        s1y = a3y + m1y;
+                        a4x = s1x + m2x;
+                        a4y = s1y + m2y;
+                        a5x = s1x - m2x;
+                        a5y = s1y - m2y;
+                        tw2x = twx * twx - twy * twy;
+                        tw2y = 2 * twx * twy;
+                        tw3x = twx * tw2x - twy * tw2y;
+                        tw3y = twx * tw2y + twy * tw2x;
+                        tw4x = tw2x * tw2x - tw2y * tw2y;
+                        tw4y = 2 * tw2x * tw2y;
+                        tw5x = tw3x * tw2x - tw3y * tw2y;
+                        tw5y = tw3x * tw2y + tw3y * tw2x;
+                        a[aoffset0 + 0] = a0x;
+                        a[aoffset0 + 1] = a0y;
+                        a[aoffset2 + 0] = a3x * twx - a3y * twy;
+                        a[aoffset2 + 1] = a3y * twx + a3x * twy;
+                        a[aoffset4 + 0] = a1x * tw2x - a1y * tw2y;
+                        a[aoffset4 + 1] = a1y * tw2x + a1x * tw2y;
+                        a[aoffset6 + 0] = a4x * tw3x - a4y * tw3y;
+                        a[aoffset6 + 1] = a4y * tw3x + a4x * tw3y;
+                        a[aoffset8 + 0] = a2x * tw4x - a2y * tw4y;
+                        a[aoffset8 + 1] = a2y * tw4x + a2x * tw4y;
+                        a[aoffset10 + 0] = a5x * tw5x - a5y * tw5y;
+                        a[aoffset10 + 1] = a5y * tw5x + a5x * tw5y;
+                        aoffset0 = aoffset0 + 2;
+                        aoffset2 = aoffset2 + 2;
+                        aoffset4 = aoffset4 + 2;
+                        aoffset6 = aoffset6 + 2;
+                        aoffset8 = aoffset8 + 2;
+                        aoffset10 = aoffset10 + 2;
+                        if ((mvidx + 1) % updatetw == 0)
                         {
-                            v = -(2*Math.PI*(mvidx+1)/(n*m));
-                            twxm1 = Math.Sin(0.5*v);
-                            twxm1 = -(2*twxm1*twxm1);
+                            v = -(2 * Math.PI * (mvidx + 1) / (n * m));
+                            twxm1 = Math.Sin(0.5 * v);
+                            twxm1 = -(2 * twxm1 * twxm1);
                             twy = Math.Sin(v);
-                            twx = twxm1+1;
+                            twx = twxm1 + 1;
                         }
                         else
                         {
-                            v = twxm1+tw0+twxm1*tw0-twy*tw1;
-                            twy = twy+tw1+twxm1*tw1+twy*tw0;
+                            v = twxm1 + tw0 + twxm1 * tw0 - twy * tw1;
+                            twy = twy + tw1 + twxm1 * tw1 + twy * tw0;
                             twxm1 = v;
-                            twx = v+1;
+                            twx = v + 1;
                         }
                     }
                 }
                 return;
             }
         }
-
 
         /*************************************************************************
         This subroutine precomputes data for complex Bluestein's  FFT  and  writes
@@ -15863,46 +16301,46 @@ public partial class alglib
           -- ALGLIB --
              Copyright 08.05.2013 by Bochkanov Sergey
         *************************************************************************/
-        private static void ftprecomputebluesteinsfft(int n,
+        private static void ftprecomputebluesteinsfft(
+            int n,
             int m,
             double[] precr,
             int offs,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             double bx = 0;
             double by = 0;
             fasttransformplan plan = new fasttransformplan();
 
-            
             //
             // Fill first half of PrecR with b[k] = exp(i*pi*k^2/N)
             //
-            for(i=0; i<=2*m-1; i++)
+            for (i = 0; i <= 2 * m - 1; i++)
             {
-                precr[offs+i] = 0;
+                precr[offs + i] = 0;
             }
-            for(i=0; i<=n-1; i++)
+            for (i = 0; i <= n - 1; i++)
             {
-                bx = Math.Cos(Math.PI/n*i*i);
-                by = Math.Sin(Math.PI/n*i*i);
-                precr[offs+2*i+0] = bx;
-                precr[offs+2*i+1] = by;
-                precr[offs+2*((m-i)%m)+0] = bx;
-                precr[offs+2*((m-i)%m)+1] = by;
+                bx = Math.Cos(Math.PI / n * i * i);
+                by = Math.Sin(Math.PI / n * i * i);
+                precr[offs + 2 * i + 0] = bx;
+                precr[offs + 2 * i + 1] = by;
+                precr[offs + 2 * ((m - i) % m) + 0] = bx;
+                precr[offs + 2 * ((m - i) % m) + 1] = by;
             }
-            
+
             //
             // Precomputed FFT
             //
             ftcomplexfftplan(m, 1, plan, _params);
-            for(i=0; i<=2*m-1; i++)
+            for (i = 0; i <= 2 * m - 1; i++)
             {
-                precr[offs+2*m+i] = precr[offs+i];
+                precr[offs + 2 * m + i] = precr[offs + i];
             }
-            ftapplysubplan(plan, 0, precr, offs+2*m, 0, plan.buffer, 1, _params);
+            ftapplysubplan(plan, 0, precr, offs + 2 * m, 0, plan.buffer, 1, _params);
         }
-
 
         /*************************************************************************
         This subroutine applies complex Bluestein's FFT to input/output array A.
@@ -15932,7 +16370,8 @@ public partial class alglib
           -- ALGLIB --
              Copyright 05.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        private static void ftbluesteinsfft(fasttransformplan plan,
+        private static void ftbluesteinsfft(
+            fasttransformplan plan,
             double[] a,
             int abase,
             int aoffset,
@@ -15945,7 +16384,8 @@ public partial class alglib
             double[] bufb,
             double[] bufc,
             double[] bufd,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int op = 0;
             int i = 0;
@@ -15961,53 +16401,52 @@ public partial class alglib
             int p1 = 0;
             int p2 = 0;
 
-            for(op=0; op<=operandscnt-1; op++)
+            for (op = 0; op <= operandscnt - 1; op++)
             {
-                
                 //
                 // Multiply A by conj(Z), store to buffer.
                 // Pad A by zeros.
                 //
                 // NOTE: Z[k]=exp(i*pi*k^2/N)
                 //
-                p0 = abase+aoffset+op*2*n;
+                p0 = abase + aoffset + op * 2 * n;
                 p1 = precoffs;
-                for(i=0; i<=n-1; i++)
+                for (i = 0; i <= n - 1; i++)
                 {
-                    x = a[p0+0];
-                    y = a[p0+1];
-                    bx = plan.precr[p1+0];
-                    by = -plan.precr[p1+1];
-                    bufa[2*i+0] = x*bx-y*by;
-                    bufa[2*i+1] = x*by+y*bx;
-                    p0 = p0+2;
-                    p1 = p1+2;
+                    x = a[p0 + 0];
+                    y = a[p0 + 1];
+                    bx = plan.precr[p1 + 0];
+                    by = -plan.precr[p1 + 1];
+                    bufa[2 * i + 0] = x * bx - y * by;
+                    bufa[2 * i + 1] = x * by + y * bx;
+                    p0 = p0 + 2;
+                    p1 = p1 + 2;
                 }
-                for(i=2*n; i<=2*m-1; i++)
+                for (i = 2 * n; i <= 2 * m - 1; i++)
                 {
                     bufa[i] = 0;
                 }
-                
+
                 //
                 // Perform convolution of A and Z (using precomputed
                 // FFT of Z stored in Plan structure).
                 //
                 ftapplysubplan(plan, subplan, bufa, 0, 0, bufc, 1, _params);
                 p0 = 0;
-                p1 = precoffs+2*m;
-                for(i=0; i<=m-1; i++)
+                p1 = precoffs + 2 * m;
+                for (i = 0; i <= m - 1; i++)
                 {
-                    ax = bufa[p0+0];
-                    ay = bufa[p0+1];
-                    bx = plan.precr[p1+0];
-                    by = plan.precr[p1+1];
-                    bufa[p0+0] = ax*bx-ay*by;
-                    bufa[p0+1] = -(ax*by+ay*bx);
-                    p0 = p0+2;
-                    p1 = p1+2;
+                    ax = bufa[p0 + 0];
+                    ay = bufa[p0 + 1];
+                    bx = plan.precr[p1 + 0];
+                    by = plan.precr[p1 + 1];
+                    bufa[p0 + 0] = ax * bx - ay * by;
+                    bufa[p0 + 1] = -(ax * by + ay * bx);
+                    p0 = p0 + 2;
+                    p1 = p1 + 2;
                 }
                 ftapplysubplan(plan, subplan, bufa, 0, 0, bufc, 1, _params);
-                
+
                 //
                 // Post processing:
                 //     A:=conj(Z)*conj(A)/M
@@ -16016,22 +16455,21 @@ public partial class alglib
                 //
                 p0 = precoffs;
                 p1 = 0;
-                p2 = abase+aoffset+op*2*n;
-                for(i=0; i<=n-1; i++)
+                p2 = abase + aoffset + op * 2 * n;
+                for (i = 0; i <= n - 1; i++)
                 {
-                    bx = plan.precr[p0+0];
-                    by = plan.precr[p0+1];
-                    rx = bufa[p1+0]/m;
-                    ry = -(bufa[p1+1]/m);
-                    a[p2+0] = rx*bx-ry*-by;
-                    a[p2+1] = rx*-by+ry*bx;
-                    p0 = p0+2;
-                    p1 = p1+2;
-                    p2 = p2+2;
+                    bx = plan.precr[p0 + 0];
+                    by = plan.precr[p0 + 1];
+                    rx = bufa[p1 + 0] / m;
+                    ry = -(bufa[p1 + 1] / m);
+                    a[p2 + 0] = rx * bx - ry * -by;
+                    a[p2 + 1] = rx * -by + ry * bx;
+                    p0 = p0 + 2;
+                    p1 = p1 + 2;
+                    p2 = p2 + 2;
                 }
             }
         }
-
 
         /*************************************************************************
         This subroutine precomputes data for complex Rader's FFT and  writes  them
@@ -16055,34 +16493,34 @@ public partial class alglib
           -- ALGLIB --
              Copyright 08.05.2013 by Bochkanov Sergey
         *************************************************************************/
-        private static void ftprecomputeradersfft(int n,
+        private static void ftprecomputeradersfft(
+            int n,
             int rq,
             int riq,
             double[] precr,
             int offs,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int q = 0;
             fasttransformplan plan = new fasttransformplan();
             int kiq = 0;
             double v = 0;
 
-            
             //
             // Fill PrecR with Rader factors, perform FFT
             //
             kiq = 1;
-            for(q=0; q<=n-2; q++)
+            for (q = 0; q <= n - 2; q++)
             {
-                v = -(2*Math.PI*kiq/n);
-                precr[offs+2*q+0] = Math.Cos(v);
-                precr[offs+2*q+1] = Math.Sin(v);
-                kiq = kiq*riq%n;
+                v = -(2 * Math.PI * kiq / n);
+                precr[offs + 2 * q + 0] = Math.Cos(v);
+                precr[offs + 2 * q + 1] = Math.Sin(v);
+                kiq = kiq * riq % n;
             }
-            ftcomplexfftplan(n-1, 1, plan, _params);
+            ftcomplexfftplan(n - 1, 1, plan, _params);
             ftapplysubplan(plan, 0, precr, offs, 0, plan.buffer, 1, _params);
         }
-
 
         /*************************************************************************
         This subroutine applies complex Rader's FFT to input/output array A.
@@ -16109,7 +16547,8 @@ public partial class alglib
           -- ALGLIB --
              Copyright 05.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        private static void ftradersfft(fasttransformplan plan,
+        private static void ftradersfft(
+            fasttransformplan plan,
             double[] a,
             int abase,
             int aoffset,
@@ -16120,7 +16559,8 @@ public partial class alglib
             int riq,
             int precoffs,
             double[] buf,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int opidx = 0;
             int i = 0;
@@ -16138,98 +16578,96 @@ public partial class alglib
             double rx = 0;
             double ry = 0;
 
-            alglib.ap.assert(operandscnt>=1, "FTApplyComplexRefFFT: OperandsCnt<1");
-            
+            Alglib.ap.assert(operandscnt >= 1, "FTApplyComplexRefFFT: OperandsCnt<1");
+
             //
             // Process operands
             //
-            for(opidx=0; opidx<=operandscnt-1; opidx++)
+            for (opidx = 0; opidx <= operandscnt - 1; opidx++)
             {
-                
                 //
                 // fill QA
                 //
                 kq = 1;
-                p0 = abase+aoffset+opidx*n*2;
-                p1 = aoffset+opidx*n*2;
-                rx = a[p0+0];
-                ry = a[p0+1];
+                p0 = abase + aoffset + opidx * n * 2;
+                p1 = aoffset + opidx * n * 2;
+                rx = a[p0 + 0];
+                ry = a[p0 + 1];
                 x0 = rx;
                 y0 = ry;
-                for(q=0; q<=n-2; q++)
+                for (q = 0; q <= n - 2; q++)
                 {
-                    ax = a[p0+2*kq+0];
-                    ay = a[p0+2*kq+1];
-                    buf[p1+0] = ax;
-                    buf[p1+1] = ay;
-                    rx = rx+ax;
-                    ry = ry+ay;
-                    kq = kq*rq%n;
-                    p1 = p1+2;
+                    ax = a[p0 + 2 * kq + 0];
+                    ay = a[p0 + 2 * kq + 1];
+                    buf[p1 + 0] = ax;
+                    buf[p1 + 1] = ay;
+                    rx = rx + ax;
+                    ry = ry + ay;
+                    kq = kq * rq % n;
+                    p1 = p1 + 2;
                 }
-                p0 = abase+aoffset+opidx*n*2;
-                p1 = aoffset+opidx*n*2;
-                for(q=0; q<=n-2; q++)
+                p0 = abase + aoffset + opidx * n * 2;
+                p1 = aoffset + opidx * n * 2;
+                for (q = 0; q <= n - 2; q++)
                 {
                     a[p0] = buf[p1];
-                    a[p0+1] = buf[p1+1];
-                    p0 = p0+2;
-                    p1 = p1+2;
+                    a[p0 + 1] = buf[p1 + 1];
+                    p0 = p0 + 2;
+                    p1 = p1 + 2;
                 }
-                
+
                 //
                 // Convolution
                 //
-                ftapplysubplan(plan, subplan, a, abase, aoffset+opidx*n*2, buf, 1, _params);
-                p0 = abase+aoffset+opidx*n*2;
+                ftapplysubplan(plan, subplan, a, abase, aoffset + opidx * n * 2, buf, 1, _params);
+                p0 = abase + aoffset + opidx * n * 2;
                 p1 = precoffs;
-                for(i=0; i<=n-2; i++)
+                for (i = 0; i <= n - 2; i++)
                 {
-                    ax = a[p0+0];
-                    ay = a[p0+1];
-                    bx = plan.precr[p1+0];
-                    by = plan.precr[p1+1];
-                    a[p0+0] = ax*bx-ay*by;
-                    a[p0+1] = -(ax*by+ay*bx);
-                    p0 = p0+2;
-                    p1 = p1+2;
+                    ax = a[p0 + 0];
+                    ay = a[p0 + 1];
+                    bx = plan.precr[p1 + 0];
+                    by = plan.precr[p1 + 1];
+                    a[p0 + 0] = ax * bx - ay * by;
+                    a[p0 + 1] = -(ax * by + ay * bx);
+                    p0 = p0 + 2;
+                    p1 = p1 + 2;
                 }
-                ftapplysubplan(plan, subplan, a, abase, aoffset+opidx*n*2, buf, 1, _params);
-                p0 = abase+aoffset+opidx*n*2;
-                for(i=0; i<=n-2; i++)
+                ftapplysubplan(plan, subplan, a, abase, aoffset + opidx * n * 2, buf, 1, _params);
+                p0 = abase + aoffset + opidx * n * 2;
+                for (i = 0; i <= n - 2; i++)
                 {
-                    a[p0+0] = a[p0+0]/(n-1);
-                    a[p0+1] = -(a[p0+1]/(n-1));
-                    p0 = p0+2;
+                    a[p0 + 0] = a[p0 + 0] / (n - 1);
+                    a[p0 + 1] = -(a[p0 + 1] / (n - 1));
+                    p0 = p0 + 2;
                 }
-                
+
                 //
                 // Result
                 //
-                buf[aoffset+opidx*n*2+0] = rx;
-                buf[aoffset+opidx*n*2+1] = ry;
+                buf[aoffset + opidx * n * 2 + 0] = rx;
+                buf[aoffset + opidx * n * 2 + 1] = ry;
                 kiq = 1;
-                p0 = aoffset+opidx*n*2;
-                p1 = abase+aoffset+opidx*n*2;
-                for(q=0; q<=n-2; q++)
+                p0 = aoffset + opidx * n * 2;
+                p1 = abase + aoffset + opidx * n * 2;
+                for (q = 0; q <= n - 2; q++)
                 {
-                    buf[p0+2*kiq+0] = x0+a[p1+0];
-                    buf[p0+2*kiq+1] = y0+a[p1+1];
-                    kiq = kiq*riq%n;
-                    p1 = p1+2;
+                    buf[p0 + 2 * kiq + 0] = x0 + a[p1 + 0];
+                    buf[p0 + 2 * kiq + 1] = y0 + a[p1 + 1];
+                    kiq = kiq * riq % n;
+                    p1 = p1 + 2;
                 }
-                p0 = abase+aoffset+opidx*n*2;
-                p1 = aoffset+opidx*n*2;
-                for(q=0; q<=n-1; q++)
+                p0 = abase + aoffset + opidx * n * 2;
+                p1 = aoffset + opidx * n * 2;
+                for (q = 0; q <= n - 1; q++)
                 {
                     a[p0] = buf[p1];
-                    a[p0+1] = buf[p1+1];
-                    p0 = p0+2;
-                    p1 = p1+2;
+                    a[p0 + 1] = buf[p1 + 1];
+                    p0 = p0 + 2;
+                    p1 = p1 + 2;
                 }
             }
         }
-
 
         /*************************************************************************
         Factorizes task size N into product of two smaller sizes N1 and N2
@@ -16247,11 +16685,13 @@ public partial class alglib
           -- ALGLIB --
              Copyright 08.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        private static void ftfactorize(int n,
+        private static void ftfactorize(
+            int n,
             bool isroot,
             ref int n1,
             ref int n2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int j = 0;
             int k = 0;
@@ -16259,81 +16699,83 @@ public partial class alglib
             n1 = 0;
             n2 = 0;
 
-            alglib.ap.assert(n>0, "FTFactorize: N<=0");
+            Alglib.ap.assert(n > 0, "FTFactorize: N<=0");
             n1 = 0;
             n2 = 0;
-            
+
             //
             // Small N
             //
-            if( n<=maxradix )
+            if (n <= maxradix)
             {
                 return;
             }
-            
+
             //
             // Large N, recursive split
             //
-            if( n>recursivethreshold )
+            if (n > recursivethreshold)
             {
-                k = (int)Math.Ceiling(Math.Sqrt(n))+1;
-                alglib.ap.assert(k*k>=n, "FTFactorize: internal error during recursive factorization");
-                for(j=k; j>=2; j--)
+                k = (int)Math.Ceiling(Math.Sqrt(n)) + 1;
+                Alglib.ap.assert(
+                    k * k >= n,
+                    "FTFactorize: internal error during recursive factorization"
+                );
+                for (j = k; j >= 2; j--)
                 {
-                    if( n%j==0 )
+                    if (n % j == 0)
                     {
-                        n1 = Math.Min(n/j, j);
-                        n2 = Math.Max(n/j, j);
+                        n1 = Math.Min(n / j, j);
+                        n2 = Math.Max(n / j, j);
                         return;
                     }
                 }
             }
-            
+
             //
             // N>MaxRadix, try to find good codelet
             //
-            for(j=maxradix; j>=2; j--)
+            for (j = maxradix; j >= 2; j--)
             {
-                if( n%j==0 )
+                if (n % j == 0)
                 {
                     n1 = j;
-                    n2 = n/j;
+                    n2 = n / j;
                     break;
                 }
             }
-            
+
             //
             // In case no good codelet was found,
             // try to factorize N into product of ANY primes.
             //
-            if( n1*n2!=n )
+            if (n1 * n2 != n)
             {
-                for(j=2; j<=n-1; j++)
+                for (j = 2; j <= n - 1; j++)
                 {
-                    if( n%j==0 )
+                    if (n % j == 0)
                     {
                         n1 = j;
-                        n2 = n/j;
+                        n2 = n / j;
                         break;
                     }
-                    if( j*j>n )
+                    if (j * j > n)
                     {
                         break;
                     }
                 }
             }
-            
+
             //
             // normalize
             //
-            if( n1>n2 )
+            if (n1 > n2)
             {
                 j = n1;
                 n1 = n2;
                 n2 = j;
             }
         }
-
 
         /*************************************************************************
         Returns optimistic estimate of the FFT cost, in UNITs (1 UNIT = 100 KFLOPs)
@@ -16349,16 +16791,14 @@ public partial class alglib
           -- ALGLIB --
              Copyright 08.04.2013 by Bochkanov Sergey
         *************************************************************************/
-        private static int ftoptimisticestimate(int n,
-            alglib.xparams _params)
+        private static int ftoptimisticestimate(int n, Alglib.xparams _params)
         {
             int result = 0;
 
-            alglib.ap.assert(n>0, "FTOptimisticEstimate: N<=0");
-            result = (int)Math.Floor(1.0E-5*5*n*Math.Log(n)/Math.Log(2));
+            Alglib.ap.assert(n > 0, "FTOptimisticEstimate: N<=0");
+            result = (int)Math.Floor(1.0E-5 * 5 * n * Math.Log(n) / Math.Log(2));
             return result;
         }
-
 
         /*************************************************************************
         Twiddle factors calculation
@@ -16366,11 +16806,13 @@ public partial class alglib
           -- ALGLIB --
              Copyright 01.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        private static void ffttwcalc(double[] a,
+        private static void ffttwcalc(
+            double[] a,
             int aoffset,
             int n1,
             int n2,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j2 = 0;
@@ -16390,7 +16832,6 @@ public partial class alglib
             double v = 0;
             int updatetw2 = 0;
 
-            
             //
             // Multiplication by twiddle factors for complex Cooley-Tukey FFT
             // with N factorized as N1*N2.
@@ -16434,32 +16875,30 @@ public partial class alglib
             // during outer loop we update W[I,1].
             //
             //
-            alglib.ap.assert(updatetw>=2, "FFTTwCalc: internal error - UpdateTw<2");
-            updatetw2 = updatetw/2;
-            halfn1 = n1/2;
-            n = n1*n2;
-            v = -(2*Math.PI/n);
-            twbasexm1 = -(2*math.sqr(Math.Sin(0.5*v)));
+            Alglib.ap.assert(updatetw >= 2, "FFTTwCalc: internal error - UpdateTw<2");
+            updatetw2 = updatetw / 2;
+            halfn1 = n1 / 2;
+            n = n1 * n2;
+            v = -(2 * Math.PI / n);
+            twbasexm1 = -(2 * math.sqr(Math.Sin(0.5 * v)));
             twbasey = Math.Sin(v);
             twrowxm1 = 0;
             twrowy = 0;
             offs = aoffset;
-            for(i=0; i<=n2-1; i++)
+            for (i = 0; i <= n2 - 1; i++)
             {
-                
                 //
                 // Initialize twiddle factor for current row
                 //
                 twxm1 = 0;
                 twy = 0;
-                
+
                 //
                 // N1-point block is separated into 2-point chunks and residual 1-point chunk
                 // (in case N1 is odd). Unrolled loop is several times faster.
                 //
-                for(j2=0; j2<=halfn1-1; j2++)
+                for (j2 = 0; j2 <= halfn1 - 1; j2++)
                 {
-                    
                     //
                     // Processing:
                     // * process first element in a chunk.
@@ -16467,82 +16906,78 @@ public partial class alglib
                     // * process second element
                     // * conditional update of the twiddle factor
                     //
-                    x = a[offs+0];
-                    y = a[offs+1];
-                    tmpx = x*(1+twxm1)-y*twy;
-                    tmpy = x*twy+y*(1+twxm1);
-                    a[offs+0] = tmpx;
-                    a[offs+1] = tmpy;
-                    tmpx = (1+twxm1)*twrowxm1-twy*twrowy;
-                    twy = twy+(1+twxm1)*twrowy+twy*twrowxm1;
-                    twxm1 = twxm1+tmpx;
-                    x = a[offs+2];
-                    y = a[offs+3];
-                    tmpx = x*(1+twxm1)-y*twy;
-                    tmpy = x*twy+y*(1+twxm1);
-                    a[offs+2] = tmpx;
-                    a[offs+3] = tmpy;
-                    offs = offs+4;
-                    if( (j2+1)%updatetw2==0 && j2<halfn1-1 )
+                    x = a[offs + 0];
+                    y = a[offs + 1];
+                    tmpx = x * (1 + twxm1) - y * twy;
+                    tmpy = x * twy + y * (1 + twxm1);
+                    a[offs + 0] = tmpx;
+                    a[offs + 1] = tmpy;
+                    tmpx = (1 + twxm1) * twrowxm1 - twy * twrowy;
+                    twy = twy + (1 + twxm1) * twrowy + twy * twrowxm1;
+                    twxm1 = twxm1 + tmpx;
+                    x = a[offs + 2];
+                    y = a[offs + 3];
+                    tmpx = x * (1 + twxm1) - y * twy;
+                    tmpy = x * twy + y * (1 + twxm1);
+                    a[offs + 2] = tmpx;
+                    a[offs + 3] = tmpy;
+                    offs = offs + 4;
+                    if ((j2 + 1) % updatetw2 == 0 && j2 < halfn1 - 1)
                     {
-                        
                         //
                         // Recalculate twiddle factor
                         //
-                        v = -(2*Math.PI*i*2*(j2+1)/n);
-                        twxm1 = Math.Sin(0.5*v);
-                        twxm1 = -(2*twxm1*twxm1);
+                        v = -(2 * Math.PI * i * 2 * (j2 + 1) / n);
+                        twxm1 = Math.Sin(0.5 * v);
+                        twxm1 = -(2 * twxm1 * twxm1);
                         twy = Math.Sin(v);
                     }
                     else
                     {
-                        
                         //
                         // Update twiddle factor
                         //
-                        tmpx = (1+twxm1)*twrowxm1-twy*twrowy;
-                        twy = twy+(1+twxm1)*twrowy+twy*twrowxm1;
-                        twxm1 = twxm1+tmpx;
+                        tmpx = (1 + twxm1) * twrowxm1 - twy * twrowy;
+                        twy = twy + (1 + twxm1) * twrowy + twy * twrowxm1;
+                        twxm1 = twxm1 + tmpx;
                     }
                 }
-                if( n1%2==1 )
+                if (n1 % 2 == 1)
                 {
-                    
                     //
                     // Handle residual chunk
                     //
-                    x = a[offs+0];
-                    y = a[offs+1];
-                    tmpx = x*(1+twxm1)-y*twy;
-                    tmpy = x*twy+y*(1+twxm1);
-                    a[offs+0] = tmpx;
-                    a[offs+1] = tmpy;
-                    offs = offs+2;
+                    x = a[offs + 0];
+                    y = a[offs + 1];
+                    tmpx = x * (1 + twxm1) - y * twy;
+                    tmpy = x * twy + y * (1 + twxm1);
+                    a[offs + 0] = tmpx;
+                    a[offs + 1] = tmpy;
+                    offs = offs + 2;
                 }
-                
+
                 //
                 // update TwRow: TwRow(new) = TwRow(old)*TwBase
                 //
-                if( i<n2-1 )
+                if (i < n2 - 1)
                 {
-                    if( (i+1)%updatetw==0 )
+                    if ((i + 1) % updatetw == 0)
                     {
-                        v = -(2*Math.PI*(i+1)/n);
-                        twrowxm1 = Math.Sin(0.5*v);
-                        twrowxm1 = -(2*twrowxm1*twrowxm1);
+                        v = -(2 * Math.PI * (i + 1) / n);
+                        twrowxm1 = Math.Sin(0.5 * v);
+                        twrowxm1 = -(2 * twrowxm1 * twrowxm1);
                         twrowy = Math.Sin(v);
                     }
                     else
                     {
-                        tmpx = twbasexm1+twrowxm1*twbasexm1-twrowy*twbasey;
-                        tmpy = twbasey+twrowxm1*twbasey+twrowy*twbasexm1;
-                        twrowxm1 = twrowxm1+tmpx;
-                        twrowy = twrowy+tmpy;
+                        tmpx = twbasexm1 + twrowxm1 * twbasexm1 - twrowy * twbasey;
+                        tmpy = twbasey + twrowxm1 * twbasey + twrowy * twbasexm1;
+                        twrowxm1 = twrowxm1 + tmpx;
+                        twrowy = twrowy + tmpy;
                     }
                 }
             }
         }
-
 
         /*************************************************************************
         Linear transpose: transpose complex matrix stored in 1-dimensional array
@@ -16550,24 +16985,25 @@ public partial class alglib
           -- ALGLIB --
              Copyright 01.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        private static void internalcomplexlintranspose(double[] a,
+        private static void internalcomplexlintranspose(
+            double[] a,
             int m,
             int n,
             int astart,
             double[] buf,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i_ = 0;
             int i1_ = 0;
 
             ffticltrec(a, astart, n, buf, 0, m, m, n, _params);
             i1_ = (0) - (astart);
-            for(i_=astart; i_<=astart+2*m*n-1;i_++)
+            for (i_ = astart; i_ <= astart + 2 * m * n - 1; i_++)
             {
-                a[i_] = buf[i_+i1_];
+                a[i_] = buf[i_ + i1_];
             }
         }
-
 
         /*************************************************************************
         Recurrent subroutine for a InternalComplexLinTranspose
@@ -16582,7 +17018,8 @@ public partial class alglib
           -- ALGLIB --
              Copyright 01.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        private static void ffticltrec(double[] a,
+        private static void ffticltrec(
+            double[] a,
             int astart,
             int astride,
             double[] b,
@@ -16590,7 +17027,8 @@ public partial class alglib
             int bstride,
             int m,
             int n,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
@@ -16600,65 +17038,82 @@ public partial class alglib
             int m1 = 0;
             int n1 = 0;
 
-            if( m==0 || n==0 )
+            if (m == 0 || n == 0)
             {
                 return;
             }
-            if( Math.Max(m, n)<=8 )
+            if (Math.Max(m, n) <= 8)
             {
-                m2 = 2*bstride;
-                for(i=0; i<=m-1; i++)
+                m2 = 2 * bstride;
+                for (i = 0; i <= m - 1; i++)
                 {
-                    idx1 = bstart+2*i;
-                    idx2 = astart+2*i*astride;
-                    for(j=0; j<=n-1; j++)
+                    idx1 = bstart + 2 * i;
+                    idx2 = astart + 2 * i * astride;
+                    for (j = 0; j <= n - 1; j++)
                     {
-                        b[idx1+0] = a[idx2+0];
-                        b[idx1+1] = a[idx2+1];
-                        idx1 = idx1+m2;
-                        idx2 = idx2+2;
+                        b[idx1 + 0] = a[idx2 + 0];
+                        b[idx1 + 1] = a[idx2 + 1];
+                        idx1 = idx1 + m2;
+                        idx2 = idx2 + 2;
                     }
                 }
                 return;
             }
-            if( n>m )
+            if (n > m)
             {
-                
                 //
                 // New partition:
                 //
                 // "A^T -> B" becomes "(A1 A2)^T -> ( B1 )
                 //                                  ( B2 )
                 //
-                n1 = n/2;
-                if( n-n1>=8 && n1%8!=0 )
+                n1 = n / 2;
+                if (n - n1 >= 8 && n1 % 8 != 0)
                 {
-                    n1 = n1+(8-n1%8);
+                    n1 = n1 + (8 - n1 % 8);
                 }
-                alglib.ap.assert(n-n1>0);
+                Alglib.ap.assert(n - n1 > 0);
                 ffticltrec(a, astart, astride, b, bstart, bstride, m, n1, _params);
-                ffticltrec(a, astart+2*n1, astride, b, bstart+2*n1*bstride, bstride, m, n-n1, _params);
+                ffticltrec(
+                    a,
+                    astart + 2 * n1,
+                    astride,
+                    b,
+                    bstart + 2 * n1 * bstride,
+                    bstride,
+                    m,
+                    n - n1,
+                    _params
+                );
             }
             else
             {
-                
                 //
                 // New partition:
                 //
                 // "A^T -> B" becomes "( A1 )^T -> ( B1 B2 )
                 //                     ( A2 )
                 //
-                m1 = m/2;
-                if( m-m1>=8 && m1%8!=0 )
+                m1 = m / 2;
+                if (m - m1 >= 8 && m1 % 8 != 0)
                 {
-                    m1 = m1+(8-m1%8);
+                    m1 = m1 + (8 - m1 % 8);
                 }
-                alglib.ap.assert(m-m1>0);
+                Alglib.ap.assert(m - m1 > 0);
                 ffticltrec(a, astart, astride, b, bstart, bstride, m1, n, _params);
-                ffticltrec(a, astart+2*m1*astride, astride, b, bstart+2*m1, bstride, m-m1, n, _params);
+                ffticltrec(
+                    a,
+                    astart + 2 * m1 * astride,
+                    astride,
+                    b,
+                    bstart + 2 * m1,
+                    bstride,
+                    m - m1,
+                    n,
+                    _params
+                );
             }
         }
-
 
         /*************************************************************************
         Recurrent subroutine for a InternalRealLinTranspose
@@ -16667,7 +17122,8 @@ public partial class alglib
           -- ALGLIB --
              Copyright 01.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        private static void fftirltrec(ref double[] a,
+        private static void fftirltrec(
+            ref double[] a,
             int astart,
             int astride,
             ref double[] b,
@@ -16675,7 +17131,8 @@ public partial class alglib
             int bstride,
             int m,
             int n,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
             int i = 0;
             int j = 0;
@@ -16684,63 +17141,80 @@ public partial class alglib
             int m1 = 0;
             int n1 = 0;
 
-            if( m==0 || n==0 )
+            if (m == 0 || n == 0)
             {
                 return;
             }
-            if( Math.Max(m, n)<=8 )
+            if (Math.Max(m, n) <= 8)
             {
-                for(i=0; i<=m-1; i++)
+                for (i = 0; i <= m - 1; i++)
                 {
-                    idx1 = bstart+i;
-                    idx2 = astart+i*astride;
-                    for(j=0; j<=n-1; j++)
+                    idx1 = bstart + i;
+                    idx2 = astart + i * astride;
+                    for (j = 0; j <= n - 1; j++)
                     {
                         b[idx1] = a[idx2];
-                        idx1 = idx1+bstride;
-                        idx2 = idx2+1;
+                        idx1 = idx1 + bstride;
+                        idx2 = idx2 + 1;
                     }
                 }
                 return;
             }
-            if( n>m )
+            if (n > m)
             {
-                
                 //
                 // New partition:
                 //
                 // "A^T -> B" becomes "(A1 A2)^T -> ( B1 )
                 //                                  ( B2 )
                 //
-                n1 = n/2;
-                if( n-n1>=8 && n1%8!=0 )
+                n1 = n / 2;
+                if (n - n1 >= 8 && n1 % 8 != 0)
                 {
-                    n1 = n1+(8-n1%8);
+                    n1 = n1 + (8 - n1 % 8);
                 }
-                alglib.ap.assert(n-n1>0);
+                Alglib.ap.assert(n - n1 > 0);
                 fftirltrec(ref a, astart, astride, ref b, bstart, bstride, m, n1, _params);
-                fftirltrec(ref a, astart+n1, astride, ref b, bstart+n1*bstride, bstride, m, n-n1, _params);
+                fftirltrec(
+                    ref a,
+                    astart + n1,
+                    astride,
+                    ref b,
+                    bstart + n1 * bstride,
+                    bstride,
+                    m,
+                    n - n1,
+                    _params
+                );
             }
             else
             {
-                
                 //
                 // New partition:
                 //
                 // "A^T -> B" becomes "( A1 )^T -> ( B1 B2 )
                 //                     ( A2 )
                 //
-                m1 = m/2;
-                if( m-m1>=8 && m1%8!=0 )
+                m1 = m / 2;
+                if (m - m1 >= 8 && m1 % 8 != 0)
                 {
-                    m1 = m1+(8-m1%8);
+                    m1 = m1 + (8 - m1 % 8);
                 }
-                alglib.ap.assert(m-m1>0);
+                Alglib.ap.assert(m - m1 > 0);
                 fftirltrec(ref a, astart, astride, ref b, bstart, bstride, m1, n, _params);
-                fftirltrec(ref a, astart+m1*astride, astride, ref b, bstart+m1, bstride, m-m1, n, _params);
+                fftirltrec(
+                    ref a,
+                    astart + m1 * astride,
+                    astride,
+                    ref b,
+                    bstart + m1,
+                    bstride,
+                    m - m1,
+                    n,
+                    _params
+                );
             }
         }
-
 
         /*************************************************************************
         recurrent subroutine for FFTFindSmoothRec
@@ -16748,73 +17222,74 @@ public partial class alglib
           -- ALGLIB --
              Copyright 01.05.2009 by Bochkanov Sergey
         *************************************************************************/
-        private static void ftbasefindsmoothrec(int n,
+        private static void ftbasefindsmoothrec(
+            int n,
             int seed,
             int leastfactor,
             ref int best,
-            alglib.xparams _params)
+            Alglib.xparams _params
+        )
         {
-            alglib.ap.assert(ftbasemaxsmoothfactor<=5, "FTBaseFindSmoothRec: internal error!");
-            if( seed>=n )
+            Alglib.ap.assert(ftbasemaxsmoothfactor <= 5, "FTBaseFindSmoothRec: internal error!");
+            if (seed >= n)
             {
                 best = Math.Min(best, seed);
                 return;
             }
-            if( leastfactor<=2 )
+            if (leastfactor <= 2)
             {
-                ftbasefindsmoothrec(n, seed*2, 2, ref best, _params);
+                ftbasefindsmoothrec(n, seed * 2, 2, ref best, _params);
             }
-            if( leastfactor<=3 )
+            if (leastfactor <= 3)
             {
-                ftbasefindsmoothrec(n, seed*3, 3, ref best, _params);
+                ftbasefindsmoothrec(n, seed * 3, 3, ref best, _params);
             }
-            if( leastfactor<=5 )
+            if (leastfactor <= 5)
             {
-                ftbasefindsmoothrec(n, seed*5, 5, ref best, _params);
+                ftbasefindsmoothrec(n, seed * 5, 5, ref best, _params);
             }
         }
-
-
     }
+
     public class nearunityunit
     {
-        public static double nulog1p(double x,
-            alglib.xparams _params)
+        public static double nulog1p(double x, Alglib.xparams _params)
         {
             double result = 0;
             double z = 0;
             double lp = 0;
             double lq = 0;
 
-            z = 1.0+x;
-            if( (double)(z)<(double)(0.70710678118654752440) || (double)(z)>(double)(1.41421356237309504880) )
+            z = 1.0 + x;
+            if (
+                (double)(z) < (double)(0.70710678118654752440)
+                || (double)(z) > (double)(1.41421356237309504880)
+            )
             {
                 result = Math.Log(z);
                 return result;
             }
-            z = x*x;
+            z = x * x;
             lp = 4.5270000862445199635215E-5;
-            lp = lp*x+4.9854102823193375972212E-1;
-            lp = lp*x+6.5787325942061044846969E0;
-            lp = lp*x+2.9911919328553073277375E1;
-            lp = lp*x+6.0949667980987787057556E1;
-            lp = lp*x+5.7112963590585538103336E1;
-            lp = lp*x+2.0039553499201281259648E1;
+            lp = lp * x + 4.9854102823193375972212E-1;
+            lp = lp * x + 6.5787325942061044846969E0;
+            lp = lp * x + 2.9911919328553073277375E1;
+            lp = lp * x + 6.0949667980987787057556E1;
+            lp = lp * x + 5.7112963590585538103336E1;
+            lp = lp * x + 2.0039553499201281259648E1;
             lq = 1.0000000000000000000000E0;
-            lq = lq*x+1.5062909083469192043167E1;
-            lq = lq*x+8.3047565967967209469434E1;
-            lq = lq*x+2.2176239823732856465394E2;
-            lq = lq*x+3.0909872225312059774938E2;
-            lq = lq*x+2.1642788614495947685003E2;
-            lq = lq*x+6.0118660497603843919306E1;
-            z = -(0.5*z)+x*(z*lp/lq);
-            result = x+z;
+            lq = lq * x + 1.5062909083469192043167E1;
+            lq = lq * x + 8.3047565967967209469434E1;
+            lq = lq * x + 2.2176239823732856465394E2;
+            lq = lq * x + 3.0909872225312059774938E2;
+            lq = lq * x + 2.1642788614495947685003E2;
+            lq = lq * x + 6.0118660497603843919306E1;
+            z = -(0.5 * z) + x * (z * lp / lq);
+            result = x + z;
             return result;
         }
 
-
-        public static double nuexpm1(double x,
-            alglib.xparams _params)
+        public static double nuexpm1(double x, Alglib.xparams _params)
         {
             double result = 0;
             double r = 0;
@@ -16822,56 +17297,48 @@ public partial class alglib
             double ep = 0;
             double eq = 0;
 
-            if( (double)(x)<(double)(-0.5) || (double)(x)>(double)(0.5) )
+            if ((double)(x) < (double)(-0.5) || (double)(x) > (double)(0.5))
             {
-                result = Math.Exp(x)-1.0;
+                result = Math.Exp(x) - 1.0;
                 return result;
             }
-            xx = x*x;
+            xx = x * x;
             ep = 1.2617719307481059087798E-4;
-            ep = ep*xx+3.0299440770744196129956E-2;
-            ep = ep*xx+9.9999999999999999991025E-1;
+            ep = ep * xx + 3.0299440770744196129956E-2;
+            ep = ep * xx + 9.9999999999999999991025E-1;
             eq = 3.0019850513866445504159E-6;
-            eq = eq*xx+2.5244834034968410419224E-3;
-            eq = eq*xx+2.2726554820815502876593E-1;
-            eq = eq*xx+2.0000000000000000000897E0;
-            r = x*ep;
-            r = r/(eq-r);
-            result = r+r;
+            eq = eq * xx + 2.5244834034968410419224E-3;
+            eq = eq * xx + 2.2726554820815502876593E-1;
+            eq = eq * xx + 2.0000000000000000000897E0;
+            r = x * ep;
+            r = r / (eq - r);
+            result = r + r;
             return result;
         }
 
-
-        public static double nucosm1(double x,
-            alglib.xparams _params)
+        public static double nucosm1(double x, Alglib.xparams _params)
         {
             double result = 0;
             double xx = 0;
             double c = 0;
 
-            if( (double)(x)<(double)(-(0.25*Math.PI)) || (double)(x)>(double)(0.25*Math.PI) )
+            if ((double)(x) < (double)(-(0.25 * Math.PI)) || (double)(x) > (double)(0.25 * Math.PI))
             {
-                result = Math.Cos(x)-1;
+                result = Math.Cos(x) - 1;
                 return result;
             }
-            xx = x*x;
+            xx = x * x;
             c = 4.7377507964246204691685E-14;
-            c = c*xx-1.1470284843425359765671E-11;
-            c = c*xx+2.0876754287081521758361E-9;
-            c = c*xx-2.7557319214999787979814E-7;
-            c = c*xx+2.4801587301570552304991E-5;
-            c = c*xx-1.3888888888888872993737E-3;
-            c = c*xx+4.1666666666666666609054E-2;
-            result = -(0.5*xx)+xx*xx*c;
+            c = c * xx - 1.1470284843425359765671E-11;
+            c = c * xx + 2.0876754287081521758361E-9;
+            c = c * xx - 2.7557319214999787979814E-7;
+            c = c * xx + 2.4801587301570552304991E-5;
+            c = c * xx - 1.3888888888888872993737E-3;
+            c = c * xx + 4.1666666666666666609054E-2;
+            result = -(0.5 * xx) + xx * xx * c;
             return result;
         }
-
-
     }
-    public class alglibbasics
-    {
 
-
-    }
+    public class alglibbasics { }
 }
-

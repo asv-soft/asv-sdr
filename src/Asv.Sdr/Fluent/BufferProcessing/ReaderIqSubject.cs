@@ -2,7 +2,6 @@ using System;
 using System.Buffers;
 using System.Reactive.Subjects;
 using Asv.Common;
-using Asv.Sdr.V2;
 
 namespace Asv.Sdr
 {
@@ -14,7 +13,8 @@ namespace Asv.Sdr
 
         public ReaderIqSubject(int size, bool useArrayPool)
         {
-            if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(size);
+
             OutputBufferSize = size;
             if (useArrayPool)
             {
@@ -25,18 +25,22 @@ namespace Asv.Sdr
             {
                 Buffer = new TOut[size];
             }
+
             Memory = new Memory<TOut>(Buffer, 0, size);
         }
 
         protected void Publish()
         {
-            if (IsDisposed == false)
+            if (!IsDisposed)
+            {
                 _onData.OnNext(Memory);
+            }
         }
 
         public int OutputBufferSize { get; }
 
-        public IDisposable Subscribe(IObserver<Memory<TOut>> observer) => _onData.Subscribe(observer);
+        public IDisposable Subscribe(IObserver<Memory<TOut>> observer) =>
+            _onData.Subscribe(observer);
 
         protected override void InternalDisposeOnce()
         {
@@ -48,7 +52,8 @@ namespace Asv.Sdr
 
     public abstract class ReaderIqSubject<TIn, TOut> : ReaderIqSubject<TOut>
     {
-        protected ReaderIqSubject(IReaderIqSubject<TIn> input, int outputSize, bool useArrayPool) : base(outputSize, useArrayPool)
+        protected ReaderIqSubject(IReaderIqSubject<TIn> input, int outputSize, bool useArrayPool)
+            : base(outputSize, useArrayPool)
         {
             Disposable.Add(input.Subscribe(OnData));
         }
@@ -63,7 +68,7 @@ namespace Asv.Sdr
     }
 
     public delegate void ProcessDelegate<TIn, TOut>(ReadOnlySpan<TIn> input, Span<TOut> output);
-    
+
     public delegate void ProcessDelegate<T>(ReadOnlySpan<T> input);
 
     public class ReaderIqCallbackSubject<T> : DisposableOnceWithCancel, IReaderIqSubject<T>
@@ -71,9 +76,13 @@ namespace Asv.Sdr
         private readonly ProcessDelegate<T> _processCallback;
         private readonly Subject<Memory<T>> _output;
 
-        public ReaderIqCallbackSubject(IReaderIqSubject<T> input, ProcessDelegate<T> processCallback)
+        public ReaderIqCallbackSubject(
+            IReaderIqSubject<T> input,
+            ProcessDelegate<T> processCallback
+        )
         {
-            _processCallback = processCallback ?? throw new ArgumentNullException(nameof(processCallback));
+            _processCallback =
+                processCallback ?? throw new ArgumentNullException(nameof(processCallback));
             OutputBufferSize = input.OutputBufferSize;
             _output = new Subject<Memory<T>>().DisposeItWith(Disposable);
             input.Subscribe(OnData).DisposeItWith(Disposable);
@@ -89,16 +98,24 @@ namespace Asv.Sdr
         {
             return _output.Subscribe(observer);
         }
+
         public int OutputBufferSize { get; }
     }
-    
+
     public class ReaderIqCallbackSubject<TIn, TOut> : ReaderIqSubject<TIn, TOut>
     {
         private readonly ProcessDelegate<TIn, TOut> _processCallback;
 
-        public ReaderIqCallbackSubject(IReaderIqSubject<TIn> input, int outputSize, ProcessDelegate<TIn, TOut> processCallback, bool useArrayPool) : base(input, outputSize, useArrayPool)
+        public ReaderIqCallbackSubject(
+            IReaderIqSubject<TIn> input,
+            int outputSize,
+            ProcessDelegate<TIn, TOut> processCallback,
+            bool useArrayPool
+        )
+            : base(input, outputSize, useArrayPool)
         {
-            _processCallback = processCallback ?? throw new ArgumentNullException(nameof(processCallback));
+            _processCallback =
+                processCallback ?? throw new ArgumentNullException(nameof(processCallback));
         }
 
         protected override void Process(ReadOnlySpan<TIn> input, Span<TOut> output)
@@ -107,7 +124,7 @@ namespace Asv.Sdr
         }
     }
 
-    public delegate TOut ProcessValueDelegate<in TIn, out TOut>(TIn input,int index);
+    public delegate TOut ProcessValueDelegate<in TIn, out TOut>(TIn input, int index);
 
     public class ReaderIqSelectIAndQSubject<TIn, TOut> : ReaderIqSubject<TIn, TOut>
     {
@@ -115,7 +132,13 @@ namespace Asv.Sdr
         private readonly ProcessValueDelegate<TIn, TOut> _processCallbackQ;
         private readonly int _size;
 
-        public ReaderIqSelectIAndQSubject(IReaderIqSubject<TIn> input, ProcessValueDelegate<TIn,TOut> iCallback, ProcessValueDelegate<TIn, TOut> qCallback, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
+        public ReaderIqSelectIAndQSubject(
+            IReaderIqSubject<TIn> input,
+            ProcessValueDelegate<TIn, TOut> iCallback,
+            ProcessValueDelegate<TIn, TOut> qCallback,
+            bool useArrayPool
+        )
+            : base(input, input.OutputBufferSize, useArrayPool)
         {
             _processCallbackI = iCallback ?? throw new ArgumentNullException(nameof(iCallback));
             _processCallbackQ = qCallback ?? throw new ArgumentNullException(nameof(qCallback));
@@ -127,20 +150,31 @@ namespace Asv.Sdr
             for (var i = 0; i < _size; i++)
             {
                 output[i * 2] = _processCallbackI(input[i * 2], i);
-                output[i * 2 + 1] = _processCallbackQ(input[i * 2 + 1], i);
+                output[(i * 2) + 1] = _processCallbackQ(input[(i * 2) + 1], i);
             }
         }
     }
 
-    public delegate void ProcessIWithQValueDelegate<in TIn, TOut>(TIn inputI, TIn inputQ, int index, out TOut outI, out TOut outQ);
+    public delegate void ProcessIWithQValueDelegate<in TIn, TOut>(
+        TIn inputI,
+        TIn inputQ,
+        int index,
+        out TOut outI,
+        out TOut outQ
+    );
 
     public class ReaderIqSelectIWithQSubject<TIn, TOut> : ReaderIqSubject<TIn, TOut>
     {
         private readonly ProcessIWithQValueDelegate<TIn, TOut> _processCallback;
-        
+
         private readonly int _size;
 
-        public ReaderIqSelectIWithQSubject(IReaderIqSubject<TIn> input, ProcessIWithQValueDelegate<TIn, TOut> callback, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
+        public ReaderIqSelectIWithQSubject(
+            IReaderIqSubject<TIn> input,
+            ProcessIWithQValueDelegate<TIn, TOut> callback,
+            bool useArrayPool
+        )
+            : base(input, input.OutputBufferSize, useArrayPool)
         {
             _processCallback = callback ?? throw new ArgumentNullException(nameof(callback));
             _size = input.OutputBufferSize / 2;
@@ -150,9 +184,15 @@ namespace Asv.Sdr
         {
             for (var i = 0; i < _size; i++)
             {
-                _processCallback(input[i * 2], input[i * 2 + 1], i, out var iValue, out var qValue);
+                _processCallback(
+                    input[i * 2],
+                    input[(i * 2) + 1],
+                    i,
+                    out var iValue,
+                    out var qValue
+                );
                 output[i * 2] = iValue;
-                output[i * 2 + 1] = qValue;
+                output[(i * 2) + 1] = qValue;
             }
         }
     }

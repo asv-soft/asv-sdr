@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Buffers;
-using Asv.Common;
 
 namespace Asv.Sdr
 {
-    public class ReaderIqDiffPhaseFloat:ReaderIqSubject<float,double>
+    public class ReaderIqDiffPhaseFloat : ReaderIqSubject<float, double>
     {
         private readonly int _size;
 
-        public ReaderIqDiffPhaseFloat(IReaderIqSubject<float> input, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
+        public ReaderIqDiffPhaseFloat(IReaderIqSubject<float> input, bool useArrayPool)
+            : base(input, input.OutputBufferSize, useArrayPool)
         {
             _size = input.OutputBufferSize / 2;
         }
@@ -19,9 +18,11 @@ namespace Asv.Sdr
             for (var i = 1; i < _size; i++)
             {
                 output[i * 2] = input[i * 2];
-                output[i * 2 + 1] = DspMathEx.GetDistanceAngleRad(input[(i-1)*2+1], input[i * 2 + 1]);
+                output[(i * 2) + 1] = DspMathEx.GetDistanceAngleRad(
+                    input[((i - 1) * 2) + 1],
+                    input[(i * 2) + 1]
+                );
             }
-            
         }
     }
 
@@ -29,9 +30,10 @@ namespace Asv.Sdr
     {
         private readonly int _size;
 
-        public ReaderIqDiffPhaseDouble(IReaderIqSubject<double> input, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
+        public ReaderIqDiffPhaseDouble(IReaderIqSubject<double> input, bool useArrayPool)
+            : base(input, input.OutputBufferSize, useArrayPool)
         {
-            _size = input.OutputBufferSize / 2 - 1;
+            _size = (input.OutputBufferSize / 2) - 1;
         }
 
         protected override void Process(ReadOnlySpan<double> input, Span<double> output)
@@ -39,11 +41,14 @@ namespace Asv.Sdr
             for (var i = 0; i < _size; i++)
             {
                 output[i * 2] = input[i * 2];
-                output[i * 2 + 1] = DspMathEx.GetDistanceAngleRad(input[i * 2 + 1], input[(i + 1) * 2 + 1]);
+                output[(i * 2) + 1] = DspMathEx.GetDistanceAngleRad(
+                    input[(i * 2) + 1],
+                    input[((i + 1) * 2) + 1]
+                );
             }
-            output[_size * 2] = input[_size * 2];
-            output[_size * 2 + 1] = output[(_size -1) * 2 + 1]; // copy last value
 
+            output[_size * 2] = input[_size * 2];
+            output[(_size * 2) + 1] = output[((_size - 1) * 2) + 1]; // copy last value
         }
     }
 }

@@ -9,55 +9,55 @@ namespace Asv.Sdr.SignalHound
      * functions in the API manual.
      */
 
-    enum saStatus
+    enum SaStatus
     {
-        saUnknownErr = -666,
+        SaUnknownErr = -666,
 
         // Setting specific error codes
-        saFrequencyRangeErr = -99,
-        saInvalidDetectorErr = -95,
-        saInvalidScaleErr = -94,
-        saBandwidthErr = -91,
-        saExternalReferenceNotFound = -89,
+        SaFrequencyRangeErr = -99,
+        SaInvalidDetectorErr = -95,
+        SaInvalidScaleErr = -94,
+        SaBandwidthErr = -91,
+        SaExternalReferenceNotFound = -89,
 
         // Device-specific errors
-        saLNAErr = -21,
-        saOvenColdErr = -20,
+        SaLnaErr = -21,
+        SaOvenColdErr = -20,
 
         // Data errors
-        saInternetErr = -12,
-        saUSBCommErr = -11,
+        SaInternetErr = -12,
+        SaUsbCommErr = -11,
 
         // General configuration errors
-        saTrackingGeneratorNotFound = -10,
-        saDeviceNotIdleErr = -9,
-        saDeviceNotFoundErr = -8,
-        saInvalidModeErr = -7,
-        saNotConfiguredErr = -6,
-        saTooManyDevicesErr = -5,
-        saInvalidParameterErr = -4,
-        saDeviceNotOpenErr = -3,
-        saInvalidDeviceErr = -2,
-        saNullPtrErr = -1,
+        SaTrackingGeneratorNotFound = -10,
+        SaDeviceNotIdleErr = -9,
+        SaDeviceNotFoundErr = -8,
+        SaInvalidModeErr = -7,
+        SaNotConfiguredErr = -6,
+        SaTooManyDevicesErr = -5,
+        SaInvalidParameterErr = -4,
+        SaDeviceNotOpenErr = -3,
+        SaInvalidDeviceErr = -2,
+        SaNullPtrErr = -1,
 
         // No Error
-        saNoError = 0,
+        SaNoError = 0,
 
         // Warnings
-        saNoCorrections = 1,
-        saCompressionWarning = 2,
-        saParameterClamped = 3,
-        saBandwidthClamped = 4,
-    };
+        SaNoCorrections = 1,
+        SaCompressionWarning = 2,
+        SaParameterClamped = 3,
+        SaBandwidthClamped = 4,
+    }
 
-    enum saDeviceType
+    enum SaDeviceType
     {
-        saDeviceTypeNone = 0,
-        saDeviceTypeSA44 = 1,
-        saDeviceTypeSA44B = 2,
-        saDeviceTypeSA124A = 3,
-        saDeviceTypeSA124B = 4
-    };
+        SaDeviceTypeNone = 0,
+        SaDeviceTypeSa44 = 1,
+        SaDeviceTypeSa44B = 2,
+        SaDeviceTypeSa124A = 3,
+        SaDeviceTypeSa124B = 4,
+    }
 
     class SaApi
     {
@@ -108,164 +108,245 @@ namespace Asv.Sdr.SignalHound
         public static int SA_AUDIO_LSB = 3;
         public static int SA_AUDIO_CW = 4;
 
+        [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern SaStatus SaGetSerialNumberList(
+            int[] serialNumbers,
+            ref int deviceCount
+        );
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saGetSerialNumberList(int[] serialNumbers, ref int deviceCount);
+        public static extern SaStatus SaOpenDeviceBySerialNumber(ref int device, int serialNumber);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saOpenDeviceBySerialNumber(ref int device, int serialNumber);
+        public static extern SaStatus SaOpenDevice(ref int device);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saOpenDevice(ref int device);
+        public static extern SaStatus SaCloseDevice(int device);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saCloseDevice(int device);
+        public static extern SaStatus SaPreset(int device);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saPreset(int device);
+        public static extern SaStatus SaGetSerialNumber(int device, ref int serial);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saGetSerialNumber(int device, ref int serial);
+        public static extern SaStatus SaGetDeviceType(int device, ref SaDeviceType deviceType);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saGetDeviceType(int device, ref saDeviceType device_type);
+        public static extern SaStatus SaConfigAcquisition(int device, int detector, int scale);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saConfigAcquisition(int device, int detector, int scale);
+        public static extern SaStatus SaConfigCenterSpan(int device, double center, double span);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saConfigCenterSpan(int device, double center, double span);
+        public static extern SaStatus SaConfigLevel(int device, double reflevel);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saConfigLevel(int device, double reflevel);
+        public static extern SaStatus SaConfigGainAtten(
+            int device,
+            int atten,
+            int gain,
+            bool preAmp
+        );
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saConfigGainAtten(int device, int atten, int gain, bool preAmp);
+        public static extern SaStatus SaConfigSweepCoupling(
+            int device,
+            double rbw,
+            double vbw,
+            bool reject
+        );
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saConfigSweepCoupling(int device, double rbw, double vbw, bool reject);
+        public static extern SaStatus SaConfigRBWShape(int device, int rbwShape);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saConfigRBWShape(int device, int rbwShape);
+        public static extern SaStatus SaConfigProcUnits(int device, int units);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saConfigProcUnits(int device, int units);
+        public static extern SaStatus SaConfigIQ(int device, int decimation, double bandwidth);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saConfigIQ(int device, int decimation, double bandwidth);
+        public static extern SaStatus SaConfigAudio(
+            int device,
+            int audioType,
+            double centerFreq,
+            double bandwidth,
+            double audioLowPassFreq,
+            double audioHighPassFreq,
+            double fmDeemphasis
+        );
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saConfigAudio(int device, int audioType, double centerFreq, double bandwidth, double audioLowPassFreq, double audioHighPassFreq, double fmDeemphasis);
+        public static extern SaStatus SaConfigRealTime(
+            int device,
+            double frameScale,
+            int frameRate
+        );
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saConfigRealTime(int device, double frameScale, int frameRate);
+        public static extern SaStatus SaConfigRealTimeOverlap(int device, double advanceRate);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saConfigRealTimeOverlap(int device, double advanceRate);
+        public static extern SaStatus SaSetTimebase(int device, int timebase);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saSetTimebase(int device, int timebase);
+        public static extern SaStatus SaInitiate(int device, int mode, int flag);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saInitiate(int device, int mode, int flag);
+        public static extern SaStatus SaAbort(int device);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saAbort(int device);
+        public static extern SaStatus SaQuerySweepInfo(
+            int device,
+            ref int sweepLength,
+            ref double startFreq,
+            ref double binSize
+        );
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saQuerySweepInfo(int device, ref int sweepLength, ref double startFreq, ref double binSize);
+        public static extern SaStatus SaQueryStreamInfo(
+            int device,
+            ref int returnLen,
+            ref double bandwidth,
+            ref double samplesPerSecond
+        );
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saQueryStreamInfo(int device, ref int returnLen, ref double bandwidth, ref double samplesPerSecond);
+        public static extern SaStatus SaQueryRealTimeFrameInfo(
+            int device,
+            ref int frameWidth,
+            ref int frameHeight
+        );
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saQueryRealTimeFrameInfo(int device, ref int frameWidth, ref int frameHeight);
+        public static extern SaStatus SaQueryRealTimePoi(int device, ref double poi);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saQueryRealTimePoi(int device, ref double poi);
+        public static extern SaStatus SaGetSweep32f(int device, float[] min, float[] max);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saGetSweep_32f(int device, float[] min, float[] max);
+        public static extern SaStatus SaGetSweep64f(int device, double[] min, double[] max);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saGetSweep_64f(int device, double[] min, double[] max);
+        public static extern SaStatus SaGetPartialSweep32f(
+            int device,
+            float[] min,
+            float[] max,
+            ref int start,
+            ref int stop
+        );
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saGetPartialSweep_32f(int device, float[] min, float[] max, ref int start, ref int stop);
+        public static extern SaStatus SaGetPartialSweep64f(
+            int device,
+            double[] min,
+            double[] max,
+            ref int start,
+            ref int stop
+        );
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saGetPartialSweep_64f(int device, double[] min, double[] max, ref int start, ref int stop);
+        public static extern SaStatus SaGetRealTimeFrame(
+            int device,
+            float[] sweep_min,
+            float[] sweep_max,
+            float[] colorFrame,
+            float[] alphaFrame
+        );
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saGetRealTimeFrame(int device, float[] sweep_min, float[] sweep_max, float[] colorFrame, float[] alphaFrame);
+        public static extern SaStatus SaGetIQ32f(int device, float[] iq);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saGetIQ_32f(int device, float[] iq);
+        public static extern SaStatus SaGetIQ64f(int device, double[] iq);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saGetIQ_64f(int device, double[] iq);
+        public static extern SaStatus SaGetIQDataUnpacked(
+            int device,
+            float[] iqData,
+            int iqCount,
+            int purge,
+            ref int dataRemaining,
+            ref int sampleLoss,
+            ref int sec,
+            ref int milli
+        );
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saGetIQDataUnpacked(int device, float[] iqData, int iqCount, int purge, ref int dataRemaining, ref int sampleLoss, ref int sec, ref int milli);
+        public static extern SaStatus SaGetAudio(int device, float[] audio);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saGetAudio(int device, float[] audio);
+        public static extern SaStatus SaQueryTemperature(int device, ref float temp);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saQueryTemperature(int device, ref float temp);
+        public static extern SaStatus SaQueryDiagnostics(int device, ref float voltage);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saQueryDiagnostics(int device, ref float voltage);
+        public static extern SaStatus SaAttachTg(int device);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saAttachTg(int device);
+        public static extern SaStatus SaIsTgAttached(int device, ref bool attached);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saIsTgAttached(int device, ref bool attached);
+        public static extern SaStatus SaConfigTgSweep(
+            int device,
+            int sweepSize,
+            bool highDynamicRange,
+            bool passiveDevice
+        );
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saConfigTgSweep(int device, int sweepSize, bool highDynamicRange, bool passiveDevice);
+        public static extern SaStatus SaStoreTgThru(int device, int flag);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saStoreTgThru(int device, int flag);
+        public static extern SaStatus SaSetTg(int device, double frequency, double amplitude);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saSetTg(int device, double frequency, double amplitude);
+        public static extern SaStatus SaSetTgReference(int device, int reference);
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saSetTgReference(int device, int reference);
+        public static extern SaStatus SaGetTgFreqAmpl(
+            int device,
+            ref double frequency,
+            ref double amplitude
+        );
 
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saGetTgFreqAmpl(int device, ref double frequency, ref double amplitude);
+        public static extern SaStatus SaConfigIFOutput(
+            int device,
+            double inputFreq,
+            double outputFreq,
+            int inputAtten,
+            int outputGain
+        );
 
-        [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern saStatus saConfigIFOutput(int device, double inputFreq, double outputFreq, int inputAtten, int outputGain);
-
-        public static string saGetAPIString()
+        public static string SaGetAPIString()
         {
-            IntPtr strPtr = saGetAPIVersion();
-            return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(strPtr);
+            IntPtr strPtr = SaGetAPIVersion();
+            return Marshal.PtrToStringAnsi(strPtr) ?? string.Empty;
         }
 
-        public static string saGetProductString()
+        public static string SaGetProductString()
         {
-            IntPtr strPtr = saGetProductID();
-            return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(strPtr);
+            IntPtr strPtr = SaGetProductID();
+            return Marshal.PtrToStringAnsi(strPtr) ?? string.Empty;
         }
 
-        public static string saGetStatusString(saStatus status)
+        public static string SaGetStatusString(SaStatus status)
         {
-            IntPtr strPtr = saGetErrorString(status);
-            return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(strPtr);
+            IntPtr strPtr = SaGetErrorString(status);
+            return Marshal.PtrToStringAnsi(strPtr) ?? string.Empty;
         }
 
         // Call string variants above instead
         [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr saGetAPIVersion();
-        [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr saGetProductID();
-        [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr saGetErrorString(saStatus status);
-    }
+        private static extern IntPtr SaGetAPIVersion();
 
+        [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr SaGetProductID();
+
+        [DllImport("sa_api.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr SaGetErrorString(SaStatus status);
+    }
 }

@@ -30,22 +30,22 @@ namespace Asv.Tools
             double v = Math.Pow(10, Math.Abs(GainDB) / 20.0);
             double norm;
             if (GainDB >= 0)
-            {    // boost
-                norm = 1 / (1 + sqrt2 * k + k * k);
-                A0 = (1 + Math.Sqrt(2 * v) * k + v * k * k) * norm;
-                A1 = 2 * (v * k * k - 1) * norm;
-                A2 = (1 - Math.Sqrt(2 * v) * k + v * k * k) * norm;
-                B1 = 2 * (k * k - 1) * norm;
-                B2 = (1 - sqrt2 * k + k * k) * norm;
+            { // boost
+                norm = 1 / (1 + (sqrt2 * k) + (k * k));
+                A0 = (1 + (Math.Sqrt(2 * v) * k) + (v * k * k)) * norm;
+                A1 = 2 * ((v * k * k) - 1) * norm;
+                A2 = (1 - (Math.Sqrt(2 * v) * k) + (v * k * k)) * norm;
+                B1 = 2 * ((k * k) - 1) * norm;
+                B2 = (1 - (sqrt2 * k) + (k * k)) * norm;
             }
             else
-            {    // cut
-                norm = 1 / (1 + Math.Sqrt(2 * v) * k + v * k * k);
-                A0 = (1 + sqrt2 * k + k * k) * norm;
-                A1 = 2 * (k * k - 1) * norm;
-                A2 = (1 - sqrt2 * k + k * k) * norm;
-                B1 = 2 * (v * k * k - 1) * norm;
-                B2 = (1 - Math.Sqrt(2 * v) * k + v * k * k) * norm;
+            { // cut
+                norm = 1 / (1 + (Math.Sqrt(2 * v) * k) + (v * k * k));
+                A0 = (1 + (sqrt2 * k) + (k * k)) * norm;
+                A1 = 2 * ((k * k) - 1) * norm;
+                A2 = (1 - (sqrt2 * k) + (k * k)) * norm;
+                B1 = 2 * ((v * k * k) - 1) * norm;
+                B2 = (1 - (Math.Sqrt(2 * v) * k) + (v * k * k)) * norm;
             }
         }
     }

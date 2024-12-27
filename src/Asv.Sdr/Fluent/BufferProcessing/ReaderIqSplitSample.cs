@@ -11,10 +11,16 @@ namespace Asv.Sdr
         private readonly Memory<T> _memory;
         private int _freeSpace;
         private readonly int _sourceSize;
-        public ReaderIqSplitSample(IReaderIqSubject<T> src, int samplesCnt, bool useArrayPool = false)
+
+        public ReaderIqSplitSample(
+            IReaderIqSubject<T> src,
+            int samplesCnt,
+            bool useArrayPool = false
+        )
         {
             T[] buffer;
-            if (samplesCnt <= 0) throw new ArgumentOutOfRangeException(nameof(samplesCnt));
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(samplesCnt);
+
             OutputBufferSize = samplesCnt;
             _freeSpace = samplesCnt;
             _sourceSize = src.OutputBufferSize;
@@ -27,27 +33,32 @@ namespace Asv.Sdr
             {
                 buffer = new T[samplesCnt];
             }
+
             _memory = new Memory<T>(buffer, 0, samplesCnt);
-            
+
             Disposable.Add(src.Subscribe(OnData));
         }
-        
+
         public IDisposable Subscribe(IObserver<Memory<T>> observer) => _onData.Subscribe(observer);
 
         private void OnData(Memory<T> buffer)
         {
             var input = buffer.Span;
             var inputIndex = 0;
-            
+
             var output = _memory.Span;
             var outputIndex = OutputBufferSize - _freeSpace;
-            
+
             while (inputIndex < _sourceSize)
             {
                 if (_freeSpace <= (input.Length - inputIndex))
                 {
-                    var spanIn = input[new Range(new Index(inputIndex), new Index(inputIndex + _freeSpace))];
-                    var spanOut = output[new Range(new Index(outputIndex), new Index(outputIndex + _freeSpace))];
+                    var spanIn = input[
+                        new Range(new Index(inputIndex), new Index(inputIndex + _freeSpace))
+                    ];
+                    var spanOut = output[
+                        new Range(new Index(outputIndex), new Index(outputIndex + _freeSpace))
+                    ];
                     inputIndex += _freeSpace;
                     outputIndex = 0;
                     _freeSpace = OutputBufferSize;
@@ -58,7 +69,9 @@ namespace Asv.Sdr
                 {
                     var leftCnt = input.Length - inputIndex;
                     var spanIn = input[inputIndex..];
-                    var spanOut = output[new Range(new Index(outputIndex), new Index(outputIndex + leftCnt))];
+                    var spanOut = output[
+                        new Range(new Index(outputIndex), new Index(outputIndex + leftCnt))
+                    ];
                     inputIndex += leftCnt;
                     outputIndex += leftCnt;
                     _freeSpace -= leftCnt;
@@ -66,15 +79,17 @@ namespace Asv.Sdr
                 }
             }
         }
-        
+
         private void Publish()
         {
             if (IsDisposed == false)
+            {
                 _onData.OnNext(_memory);
+            }
         }
-        
+
         public int OutputBufferSize { get; }
-        
+
         protected override void InternalDisposeOnce()
         {
             base.InternalDisposeOnce();

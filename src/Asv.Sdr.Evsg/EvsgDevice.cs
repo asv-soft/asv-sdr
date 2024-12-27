@@ -18,8 +18,7 @@ namespace Asv.Sdr.Evsg
         IObservable<EvsgIlsStreamData> StartIlsLocStream();
     }
 
-
-    public class EvsgDevice:DisposableOnceWithCancel,IEvsgDevice
+    public class EvsgDevice : DisposableOnceWithCancel, IEvsgDevice
     {
         private readonly TelnetStream _strm;
         private const int DefaultTimeoutMs = 3_000;
@@ -32,7 +31,10 @@ namespace Asv.Sdr.Evsg
             _port.Enable();
             _strm = new TelnetStream(_port, Encoding.ASCII).DisposeItWith(Disposable);
             _isConnected.DisposeItWith(Disposable);
-            _port.State.Select(_ => _ == PortState.Connected).Subscribe(_isConnected.AsObserver()).DisposeItWith(Disposable);
+            _port
+                .State.Select(_ => _ == PortState.Connected)
+                .Subscribe(_isConnected.AsObserver())
+                .DisposeItWith(Disposable);
         }
 
         public ReadOnlyReactiveProperty<bool> IsConnected => _isConnected;
@@ -41,7 +43,7 @@ namespace Asv.Sdr.Evsg
         {
             while (_isConnected.Value == false)
             {
-                await Task.Delay(100,cancel);
+                await Task.Delay(100, cancel);
             }
         }
 
@@ -58,32 +60,40 @@ namespace Asv.Sdr.Evsg
         private async Task StartIlsLocStream(CancellationToken cancel)
         {
             const string successResult = "READY.";
-            var result =  await _strm.RequestText("STREAM ALL,1", DefaultTimeoutMs, cancel);
-            if (result.Equals(successResult) == false)
+            var result = await _strm.RequestText("STREAM ALL,1", DefaultTimeoutMs, cancel);
+            if (!result.Equals(successResult))
+            {
                 throw new Exception($"Unknown result: want {successResult}. Got {result}");
+            }
         }
 
         public async Task StopStream(CancellationToken cancel)
         {
             const string successResult = "READY.";
             var result = await _strm.RequestText("STOPSTREAM", DefaultTimeoutMs, cancel);
-            if (result.Equals(successResult) == false)
+            if (!result.Equals(successResult))
+            {
                 throw new Exception($"Unknown result: want {successResult}. Got {result}");
+            }
         }
 
         public IObservable<EvsgIlsStreamData> StartIlsLocStream()
         {
-            return Observable.Create<EvsgIlsStreamData>(observer =>
-            {
-                StopStream(CancellationToken.None).Wait(DefaultTimeoutMs);
-                StartIlsLocStream(CancellationToken.None).Wait(DefaultTimeoutMs);
-                return new CompositeDisposable(
-                    _strm.OnReceive.Select(_ => new EvsgIlsStreamData(_)).Subscribe(observer),
-                    System.Reactive.Disposables.Disposable.Create(() =>StopStream(CancellationToken.None).Wait(DefaultTimeoutMs)));
-            }).AsSystemObservable();
+            return Observable
+                .Create<EvsgIlsStreamData>(observer =>
+                {
+                    StopStream(CancellationToken.None).Wait(DefaultTimeoutMs);
+                    StartIlsLocStream(CancellationToken.None).Wait(DefaultTimeoutMs);
+                    return new CompositeDisposable(
+                        _strm.OnReceive.Select(_ => new EvsgIlsStreamData(_)).Subscribe(observer),
+                        System.Reactive.Disposables.Disposable.Create(
+                            () => StopStream(CancellationToken.None).Wait(DefaultTimeoutMs)
+                        )
+                    );
+                })
+                .AsSystemObservable();
         }
     }
-
 
     public class EvsgIlsStreamData
     {
@@ -176,6 +186,5 @@ namespace Asv.Sdr.Evsg
         public string IFBW_Man_WIDE => _buffer[79];
         public string IFBW_Man_UCLC => _buffer[80];
         public string TrigCounter => _buffer[81];
-
     }
 }

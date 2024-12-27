@@ -18,8 +18,6 @@ public partial class SignalHoundView : ReactiveUserControl<SignalHoundViewModel>
                 .WhereNotNull()
                 .Subscribe(x => x.InitCharts(AvaPlot00))
                 .DisposeWith(disp);
-
         });
     }
-
 }

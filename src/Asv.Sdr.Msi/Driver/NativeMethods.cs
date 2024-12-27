@@ -2,67 +2,71 @@
 
 namespace Asv.Sdr.Msi
 {
-    public enum mir_sdr_ErrT : int
+    public enum MirSdrErrT : int
     {
-        mir_sdr_Success = 0,
-        mir_sdr_Fail = 1,
-        mir_sdr_InvalidParam = 2,
-        mir_sdr_OutOfRange = 3,
-        mir_sdr_GainUpdateError = 4,
-        mir_sdr_RfUpdateError = 5,
-        mir_sdr_FsUpdateError = 6,
-        mir_sdr_HwError = 7,
-        mir_sdr_AliasingError = 8,
-        mir_sdr_NotInitialised
+        MirSdrSuccess = 0,
+        MirSdrFail = 1,
+        MirSdrInvalidParam = 2,
+        MirSdrOutOfRange = 3,
+        MirSdrGainUpdateError = 4,
+        MirSdrRfUpdateError = 5,
+        MirSdrFsUpdateError = 6,
+        MirSdrHwError = 7,
+        MirSdrAliasingError = 8,
+        MirSdrNotInitialised,
     }
 
-    public enum mir_sdr_Bw_MHzT : int
+    public enum MirSdrBwMHzT : int
     {
-        mir_sdr_BW_0_200 = 200,
-        mir_sdr_BW_0_300 = 300,
-        mir_sdr_BW_0_600 = 600,
-        mir_sdr_BW_1_536 = 1536,
-        mir_sdr_BW_5_000 = 5000,
-        mir_sdr_BW_6_000 = 6000,
-        mir_sdr_BW_7_000 = 7000,
-        mir_sdr_BW_8_000 = 8000
+        MirSdrBw0200 = 200,
+        MirSdrBw0300 = 300,
+        MirSdrBw0600 = 600,
+        MirSdrBw1536 = 1536,
+        MirSdrBw5000 = 5000,
+        MirSdrBw6000 = 6000,
+        MirSdrBw7000 = 7000,
+        MirSdrBw8000 = 8000,
     }
 
-    public enum mir_sdr_If_kHzT : int
+    public enum MirSdrIfKHzT : int
     {
-        mir_sdr_IF_Zero = 0,
-        mir_sdr_IF_0_450 = 450,
-        mir_sdr_IF_1_620 = 1620,
-        mir_sdr_IF_2_048 = 2048
+        MirSdrIfZero = 0,
+        MirSdrIf0450 = 450,
+        MirSdrIf1620 = 1620,
+        MirSdrIf2048 = 2048,
     }
 
-    public enum mir_sdr_LoModeT : int
+    public enum MirSdrLoModeT : int
     {
-        mir_sdr_LO_Undefined = 0,
+        MirSdrLoUndefined = 0,
+
         /// <summary>
         /// 1st LO is automatically selected to provide appropriate coverage across all tuner frequency ranges
         /// </summary>
-        mir_sdr_LO_Auto = 1,
+        MirSdrLoAuto = 1,
+
         /// <summary>
         /// 1st LO is set to 120MHz (coverage gap between 370MHZ and 420MHz)
         /// </summary>
-        mir_sdr_LO_120MHz = 2,
+        MirSdrLo120MHz = 2,
+
         /// <summary>
         /// 1st LO is set to 144MHz (coverage gap between 250MHZ and 255MHz and between 400MHz and 420MHz)
         /// </summary>
-        mir_sdr_LO_144MHz = 3,
+        MirSdrLo144MHz = 3,
+
         /// <summary>
         /// 1st LO is set to 168MHz (coverage gap between 250MHZ and 265MHz)
         /// </summary>
-        mir_sdr_LO_168MHz = 4
+        MirSdrLo168MHz = 4,
     }
 
-    public enum mir_sdr_AgcControlT
+    public enum MirSdrAgcControlT
     {
-        mir_sdr_AGC_DISABLE = 0,
-        mir_sdr_AGC_100HZ = 1,
-        mir_sdr_AGC_50HZ = 2,
-        mir_sdr_AGC_5HZ = 3
+        MirSdrAgcDisable = 0,
+        MirSdrAgc100Hz = 1,
+        MirSdrAgc50Hz = 2,
+        MirSdrAgc5Hz = 3,
     }
 
     public class NativeMethods
@@ -81,13 +85,27 @@ namespace Asv.Sdr.Msi
         /// <param name="samplesPerPacket">Количество выборок, которые будут возвращены при каждом вызове mir_sdr_ReadPacket()</param>
         /// <returns></returns>
         [DllImport(APIDLL)]
-        public static extern mir_sdr_ErrT mir_sdr_Init(int gRdB, double fsMHz, double rfMHz, mir_sdr_Bw_MHzT bwType, mir_sdr_If_kHzT ifType, out int samplesPerPacket);
+        public static extern MirSdrErrT mir_sdr_Init(
+            int gRdB,
+            double fsMHz,
+            double rfMHz,
+            MirSdrBwMHzT bwType,
+            MirSdrIfKHzT ifType,
+            out int samplesPerPacket
+        );
 
         [DllImport(APIDLL)]
-        public static extern mir_sdr_ErrT mir_sdr_Uninit();
+        public static extern MirSdrErrT mir_sdr_Uninit();
 
         [DllImport(APIDLL)]
-        public unsafe static extern mir_sdr_ErrT mir_sdr_ReadPacket(short* xi, short* xq, out uint firstSampleNum, out int grChanged, out int rfChanged, out int fsChanged);
+        public static extern unsafe MirSdrErrT mir_sdr_ReadPacket(
+            short* xi,
+            short* xq,
+            out uint firstSampleNum,
+            out int grChanged,
+            out int rfChanged,
+            out int fsChanged
+        );
 
         /// <summary>
         /// Регулирует номинальную центральную частоту тюнера, поддерживаемую во внутреннем состоянии API.
@@ -105,10 +123,15 @@ namespace Asv.Sdr.Msi
         /// 1 - Синхронно</param>
         /// <returns></returns>
         [DllImport(APIDLL)]
-        public static extern mir_sdr_ErrT mir_sdr_SetRf(double drfHz, int abs, int syncUpdate);
+        public static extern MirSdrErrT mir_sdr_SetRf(double drfHz, int abs, int syncUpdate);
 
         [DllImport(APIDLL)]
-        public static extern mir_sdr_ErrT mir_sdr_SetFs(double dfsHz, int abs, int syncUpdate, int reCal);
+        public static extern MirSdrErrT mir_sdr_SetFs(
+            double dfsHz,
+            int abs,
+            int syncUpdate,
+            int reCal
+        );
 
         /// <summary>
         /// Программирует требуемое снижение усиления в тюнере. Внутреннее состояние обновляется независимо от того, какой параметр abs установлен.
@@ -119,7 +142,7 @@ namespace Asv.Sdr.Msi
         /// mir_sdr_SetSyncUpdateSampleNum() и mir_sdr_SetSyncUpdatePeriod(). 0 - Немедленно, 1 - Синхронно</param>
         /// <returns></returns>
         [DllImport(APIDLL)]
-        public static extern mir_sdr_ErrT mir_sdr_SetGr(int gRdB, int abs, int syncUpdate);
+        public static extern MirSdrErrT mir_sdr_SetGr(int gRdB, int abs, int syncUpdate);
 
         /// <summary>
         /// Изменяет параметры снижения усиления по умолчанию, требуемые в тюнере.
@@ -128,7 +151,7 @@ namespace Asv.Sdr.Msi
         /// <param name="lnaGrThreshold">Порог, при котором LNA будет включен</param>
         /// <returns></returns>
         [DllImport(APIDLL)]
-        public static extern mir_sdr_ErrT mir_sdr_SetGrParams(int minimumGr, int lnaGrThreshold);
+        public static extern MirSdrErrT mir_sdr_SetGrParams(int minimumGr, int lnaGrThreshold);
 
         /// <summary>
         /// Устанавливает режим коррекции смещения постоянного тока для тюнера.
@@ -143,8 +166,7 @@ namespace Asv.Sdr.Msi
         /// <param name="speedUp">Режим ускорения. 0 - Отключен, 1 - Включен</param>
         /// <returns></returns>
         [DllImport(APIDLL)]
-        public static extern mir_sdr_ErrT mir_sdr_SetDcMode(int dcCal, int speedUp);
-
+        public static extern MirSdrErrT mir_sdr_SetDcMode(int dcCal, int speedUp);
 
         /// <summary>
         /// Для указания поправочного коэффициента, используемого для учета смещения от номинала в кварцевом генераторе.
@@ -152,19 +174,17 @@ namespace Asv.Sdr.Msi
         /// <param name="ppm">Смещение частей на миллион (например, +/- 1 ppm указывает погрешность +/- 24 Гц для кристалла 24 МГц).</param>
         /// <returns></returns>
         [DllImport(APIDLL)]
-        public static extern mir_sdr_ErrT mir_sdr_SetPpm(double ppm);
-
+        public static extern MirSdrErrT mir_sdr_SetPpm(double ppm);
 
         /// <summary>
         /// Позволяет указать конкретную частоту 1-го гетеродина или выбирает автоматический режим,
         /// который позволяет API определять наиболее подходящую частоту 1-го гетеродина во всех диапазонах частот тюнера.
         /// Эта функция должна быть вызвана до инициализации API — в противном случае используйте mir_sdr_ReInit().
         /// </summary>
-        /// <param name="loMode"></param>
-        /// <returns></returns>
+        /// <param name="loMode">loMode.</param>
+        /// <returns>.</returns>
         [DllImport(APIDLL)]
-        public static extern mir_sdr_ErrT mir_sdr_SetLoMode(mir_sdr_LoModeT loMode);
-
+        public static extern MirSdrErrT mir_sdr_SetLoMode(MirSdrLoModeT loMode);
 
         /// <summary>
         /// Используется для контроля того, включена ли AGC или нет, и параметров, позволяющих настраивать AGC.
@@ -177,20 +197,26 @@ namespace Asv.Sdr.Msi
         /// <param name="hang_ms">В настоящее время не используется, установлено значение 0.</param>
         /// <param name="syncAgcUpdate">0 - немедленное обновление; 1 - синхронное обновление</param>
         /// <param name="lagcLNAstate">Указывает состояние LNA для использования в обновлениях усиления, когда AGC использует mir_sdr_SetGrAltMode() или mir_sdr_RSP_SetGr(), как указано при вызове mir_sdr_StreamInit().</param>
-        /// <returns></returns>
+        /// <returns>.</returns>
         [DllImport(APIDLL)]
-        public static extern mir_sdr_ErrT mir_sdr_AgcControl(mir_sdr_AgcControlT enable, int setPoint_dBfs, int knee_dBfs, uint decay_ms, uint hang_ms, int syncAgcUpdate, int lagcLNAstate);
-
-
+        public static extern MirSdrErrT mir_sdr_AgcControl(
+            MirSdrAgcControlT enable,
+            int setPoint_dBfs,
+            int knee_dBfs,
+            uint decay_ms,
+            uint hang_ms,
+            int syncAgcUpdate,
+            int lagcLNAstate
+        );
 
         [DllImport(APIDLL)]
-        public static extern mir_sdr_ErrT mir_sdr_SetDcTrackTime(int trackTime);
+        public static extern MirSdrErrT mir_sdr_SetDcTrackTime(int trackTime);
 
         [DllImport(APIDLL)]
-        public static extern mir_sdr_ErrT mir_sdr_SetSyncUpdateSampleNum(uint sampleNum);
+        public static extern MirSdrErrT mir_sdr_SetSyncUpdateSampleNum(uint sampleNum);
 
         [DllImport(APIDLL)]
-        public static extern mir_sdr_ErrT mir_sdr_SetSyncUpdatePeriod(uint period);
+        public static extern MirSdrErrT mir_sdr_SetSyncUpdatePeriod(uint period);
 
         /// <summary>
         /// Команда, которая преобразует выборочные данные IF, полученные из потоковых данных, в данные I и Q в формате нулевой IF.
@@ -209,8 +235,15 @@ namespace Asv.Sdr.Msi
         /// <param name="Preset">Если Preset равно 1, то состояние фильтрации будет сброшено перед любой операцией фильтрации.</param>
         /// <returns></returns>
         [DllImport(APIDLL)]
-        public unsafe static extern mir_sdr_ErrT mir_sdr_DownConvert(short* xin, short* xi, short* xq,  uint SamplesPerPacket, mir_sdr_If_kHzT ifType, uint Decimation, uint Preset);
-
+        public static extern unsafe MirSdrErrT mir_sdr_DownConvert(
+            short* xin,
+            short* xi,
+            short* xq,
+            uint SamplesPerPacket,
+            MirSdrIfKHzT ifType,
+            uint Decimation,
+            uint Preset
+        );
 
         /// <summary>
         /// Команда, предназначенная для установки различных параметров управления оборудованием.
@@ -224,14 +257,16 @@ namespace Asv.Sdr.Msi
         /// </param>
         /// <returns></returns>
         [DllImport(APIDLL)]
-        public static extern mir_sdr_ErrT mir_sdr_SetParam(int ParameterId, int Value);
+        public static extern MirSdrErrT mir_sdr_SetParam(int ParameterId, int Value);
 
         [DllImport(APIDLL)]
-        public static extern mir_sdr_ErrT mir_sdr_ResetUpdateFlags(int ResetGainUpdate, int ResetRFUpdate, int ResetFsUpdate);
+        public static extern MirSdrErrT mir_sdr_ResetUpdateFlags(
+            int ResetGainUpdate,
+            int ResetRFUpdate,
+            int ResetFsUpdate
+        );
 
         [DllImport(APIDLL)]
-        public static extern mir_sdr_ErrT mir_sdr_ApiVersion(out float version);    // Called by application to retrieve version of API used to create Dll
-
-
+        public static extern MirSdrErrT mir_sdr_ApiVersion(out float version); // Called by application to retrieve version of API used to create Dll
     }
 }

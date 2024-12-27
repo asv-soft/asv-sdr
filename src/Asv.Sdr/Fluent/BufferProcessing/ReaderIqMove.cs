@@ -6,7 +6,8 @@ namespace Asv.Sdr
     {
         private readonly int _size;
 
-        public ReaderIqMoveIToQDouble(IReaderIqSubject<double> input, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
+        public ReaderIqMoveIToQDouble(IReaderIqSubject<double> input, bool useArrayPool)
+            : base(input, input.OutputBufferSize, useArrayPool)
         {
             _size = input.OutputBufferSize / 2;
         }
@@ -15,7 +16,7 @@ namespace Asv.Sdr
         {
             for (var i = 0; i < _size; i++)
             {
-                output[i * 2 + 1] = input[i * 2];
+                output[(i * 2) + 1] = input[i * 2];
                 output[i * 2] = 0;
             }
         }
@@ -25,7 +26,8 @@ namespace Asv.Sdr
     {
         private readonly int _size;
 
-        public ReaderIqMoveIToQFloat(IReaderIqSubject<float> input, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
+        public ReaderIqMoveIToQFloat(IReaderIqSubject<float> input, bool useArrayPool)
+            : base(input, input.OutputBufferSize, useArrayPool)
         {
             _size = input.OutputBufferSize / 2;
         }
@@ -34,7 +36,7 @@ namespace Asv.Sdr
         {
             for (var i = 0; i < _size; i++)
             {
-                output[i * 2 + 1] = input[i * 2];
+                output[(i * 2) + 1] = input[i * 2];
                 output[i * 2] = 0;
             }
         }
@@ -44,7 +46,8 @@ namespace Asv.Sdr
     {
         private readonly int _size;
 
-        public ReaderIqMoveQToIDouble(IReaderIqSubject<double> input, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
+        public ReaderIqMoveQToIDouble(IReaderIqSubject<double> input, bool useArrayPool)
+            : base(input, input.OutputBufferSize, useArrayPool)
         {
             _size = input.OutputBufferSize / 2;
         }
@@ -53,8 +56,8 @@ namespace Asv.Sdr
         {
             for (var i = 0; i < _size; i++)
             {
-                output[i * 2] = input[i * 2 + 1];
-                output[i * 2 + 1] = 0;
+                output[i * 2] = input[(i * 2) + 1];
+                output[(i * 2) + 1] = 0;
             }
         }
     }
@@ -63,7 +66,8 @@ namespace Asv.Sdr
     {
         private readonly int _size;
 
-        public ReaderIqMoveQToIFloat(IReaderIqSubject<float> input, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
+        public ReaderIqMoveQToIFloat(IReaderIqSubject<float> input, bool useArrayPool)
+            : base(input, input.OutputBufferSize, useArrayPool)
         {
             _size = input.OutputBufferSize / 2;
         }
@@ -72,8 +76,8 @@ namespace Asv.Sdr
         {
             for (var i = 0; i < _size; i++)
             {
-                output[i * 2] = input[i * 2 + 1];
-                output[i * 2 + 1] = 0;
+                output[i * 2] = input[(i * 2) + 1];
+                output[(i * 2) + 1] = 0;
             }
         }
     }

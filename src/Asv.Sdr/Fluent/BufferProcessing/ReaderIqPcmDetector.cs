@@ -7,7 +7,7 @@ using Asv.Sdr.DebugPlot;
 
 namespace Asv.Sdr
 {
-    public class ReaderIqPcmDetector: DisposableOnceWithCancel, IReaderIqSubject<double>
+    public class ReaderIqPcmDetector : DisposableOnceWithCancel, IReaderIqSubject<double>
     {
         private readonly PulseCrossCorrelation _correlation;
         private readonly CircularBuffer2<double>? _correlationBuffer;
@@ -23,28 +23,43 @@ namespace Asv.Sdr
         private int _correlationBufferCount;
         private int _coutner;
 
-        public ReaderIqPcmDetector(IReaderIqSubject<double> input, int pulseSize,
-            byte[] template, double correlationThreshold, int maxPulseCount, int prefixPulseCount, IDebugPlot? plot,
-            bool useArrayPool)
+        public ReaderIqPcmDetector(
+            IReaderIqSubject<double> input,
+            int pulseSize,
+            byte[] template,
+            double correlationThreshold,
+            int maxPulseCount,
+            int prefixPulseCount,
+            IDebugPlot? plot,
+            bool useArrayPool
+        )
         {
             _correlation = new PulseCrossCorrelation(pulseSize, template);
             _correlationThreshold = correlationThreshold;
             _plot = plot ?? NullDebugPlot.Instance;
             _correlationBufferLength = template.Length * pulseSize;
-            var rawBufferLength = (template.Length + maxPulseCount + prefixPulseCount * 2) * pulseSize;
-            
+            var rawBufferLength =
+                (template.Length + maxPulseCount + (prefixPulseCount * 2)) * pulseSize;
+
             if (useArrayPool)
             {
                 if (_plot.IsEnabled)
                 {
                     var buff = ArrayPool<double>.Shared.Rent(_correlationBufferLength);
-                    _correlationBuffer = new CircularBuffer2<double>(buff, _correlationBufferLength);
-                    Disposable.AddAction(() => { ArrayPool<double>.Shared.Return(buff); });
+                    _correlationBuffer = new CircularBuffer2<double>(
+                        buff,
+                        _correlationBufferLength
+                    );
+                    Disposable.AddAction(() =>
+                    {
+                        ArrayPool<double>.Shared.Return(buff);
+                    });
                 }
+
                 var rawBuff = ArrayPool<double>.Shared.Rent(rawBufferLength);
                 _rawBuffer = new CircularBuffer2<double>(rawBuff, rawBufferLength);
                 _outputBuffer = ArrayPool<double>.Shared.Rent(rawBufferLength);
-                Disposable.AddAction(()=>
+                Disposable.AddAction(() =>
                 {
                     ArrayPool<double>.Shared.Return(rawBuff);
                     ArrayPool<double>.Shared.Return(_outputBuffer);
@@ -56,9 +71,11 @@ namespace Asv.Sdr
                 {
                     _correlationBuffer = new CircularBuffer2<double>(_correlationBufferLength);
                 }
+
                 _rawBuffer = new CircularBuffer2<double>(rawBufferLength);
                 _outputBuffer = new double[rawBufferLength];
             }
+
             _outputMemory = new Memory<double>(_outputBuffer, 0, _rawBuffer.Capacity);
             OutputBufferSize = _rawBuffer.Capacity;
             _prefixPulseSize = prefixPulseCount * pulseSize;
@@ -69,9 +86,9 @@ namespace Asv.Sdr
         private void OnNext(Memory<double> input)
         {
             var span = input.Span;
-            for (var i = 0; i < input.Length/2; i++)
+            for (var i = 0; i < input.Length / 2; i++)
             {
-                OnNext(span[i*2]);
+                OnNext(span[i * 2]);
             }
         }
 
@@ -90,6 +107,7 @@ namespace Asv.Sdr
                             _correlationBuffer.Clear();
                             _correlationBuffer.PushBack(riseCorr);
                         }
+
                         _correlationBufferCount = 1;
                         while (_rawBuffer.Size > _prefixPulseSize)
                         {
@@ -104,10 +122,11 @@ namespace Asv.Sdr
 
                     _correlationBufferCount++;
                     _rawBuffer.PushBack(input);
+
                     // full buffer
-                    if (_correlationBufferCount >=_correlationBufferLength)
+                    if (_correlationBufferCount >= _correlationBufferLength)
                     {
-                        if (_correlationBuffer!=null)
+                        if (_correlationBuffer != null)
                         {
                             var maxIndex = 0;
                             var maxValue = double.MinValue;
@@ -119,14 +138,24 @@ namespace Asv.Sdr
                                     maxIndex = i;
                                 }
                             }
+
                             _plot.Begin();
-                            _plot.AddSignal("Correlation",_correlationBuffer.ToArray());
-                            _plot.AddHorizontalLine("Corr max",maxValue);
-                            _plot.AddVerticalLine("Corr max",maxIndex);
-                            _plot.AddMarker("Corr max",$"MAX [{maxIndex} | {maxValue:F3}]",maxIndex,maxValue);
-                            _plot.AddAnnotation("Avg", $"Index: {Interlocked.Increment(ref _coutner)}");
+                            _plot.AddSignal("Correlation", _correlationBuffer.ToArray());
+                            _plot.AddHorizontalLine("Corr max", maxValue);
+                            _plot.AddVerticalLine("Corr max", maxIndex);
+                            _plot.AddMarker(
+                                "Corr max",
+                                $"MAX [{maxIndex} | {maxValue:F3}]",
+                                maxIndex,
+                                maxValue
+                            );
+                            _plot.AddAnnotation(
+                                "Avg",
+                                $"Index: {Interlocked.Increment(ref _coutner)}"
+                            );
                             _plot.End();
                         }
+
                         _state = State.Data;
                         _correlation.Reset();
                     }
@@ -147,7 +176,6 @@ namespace Asv.Sdr
             }
         }
 
-
         private enum State
         {
             Rise,
@@ -155,7 +183,8 @@ namespace Asv.Sdr
             Data,
         }
 
-        public IDisposable Subscribe(IObserver<Memory<double>> observer) => _output.Subscribe(observer);
+        public IDisposable Subscribe(IObserver<Memory<double>> observer) =>
+            _output.Subscribe(observer);
 
         public int OutputBufferSize { get; }
     }

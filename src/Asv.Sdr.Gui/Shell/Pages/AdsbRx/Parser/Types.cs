@@ -7,7 +7,7 @@ public enum CapabilityEnum
     Level2OnGround,
     Level2Airborne,
     Level2OnGroundOrAirborne,
-    DLRequest0OrFlightStatus2345OnGroundOrAirborne
+    DLRequest0OrFlightStatus2345OnGroundOrAirborne,
 }
 
 public enum AdsbMessageTypeEnum
@@ -20,7 +20,7 @@ public enum AdsbMessageTypeEnum
     Reserved = 23,
     AircraftStatus = 28,
     TargetStateAndStatusInformation = 29,
-    AircraftOperationStatus = 31
+    AircraftOperationStatus = 31,
 }
 
 public enum SurfacePositionTypeCodes
@@ -43,7 +43,7 @@ public enum SurfacePositionTypeCodes
     /// <summary>
     /// Статус и индикаторы режима для воздушных судов на земле.
     /// </summary>
-    GroundStatusAndMode = 8
+    GroundStatusAndMode = 8,
 }
 
 public enum AirbornePositionBaroAltTypeCode
@@ -52,38 +52,47 @@ public enum AirbornePositionBaroAltTypeCode
     /// Базовое позиционирование с низкой точностью
     /// </summary>
     BasicPositionLowPrecision = 9,
+
     /// <summary>
     /// Базовое позиционирование с низкой частотой обновления
     /// </summary>
     BasicPositionLowUpdateRate = 10,
+
     /// <summary>
     /// Базовое позиционирование с высокой частотой обновления
     /// </summary>
     BasicPositionHighUpdateRate = 11,
+
     /// <summary>
     /// Базовое позиционирование с высокой точностью
     /// </summary>
     BasicPositionHighPrecision = 12,
+
     /// <summary>
     /// Улучшенное позиционирование с индикацией NIC
     /// </summary>
     EnhancedPositionWithNic = 13,
+
     /// <summary>
     /// Улучшенное позиционирование с индикацией NACp
     /// </summary>
     EnhancedPositionWithNacP = 14,
+
     /// <summary>
     /// Улучшенное позиционирование с данными вертикальной скорости
     /// </summary>
     EnhancedPositionWithVerticalRate = 15,
+
     /// <summary>
     /// Высокоточное позиционирование с индикацией NIC
     /// </summary>
     HighPrecisionPositionWithNic = 16,
+
     /// <summary>
     /// Высокоточное позиционирование с индикацией NACp
     /// </summary>
     HighPrecisionPositionWithNacP = 17,
+
     /// <summary>
     /// Высокоточное позиционирование с вертикальной скоростью и данными целостности
     /// </summary>
@@ -96,14 +105,16 @@ public enum AirbornePositionGnssAltTypeCode
     /// Базовая информация о GNSS местоположении
     /// </summary>
     BasicGnssPosition = 20,
+
     /// <summary>
     /// Улучшенная информация о GNSS местоположении с дополнительными данными о целостности
     /// </summary>
     EnhancedGnssPositionWithIntegrity = 21,
+
     /// <summary>
     /// Высокоточная информация о GNSS местоположении с расширенными функциями навигации
     /// </summary>
-    HighPrecisionGnssPositionWithAdvNavFeatures = 22
+    HighPrecisionGnssPositionWithAdvNavFeatures = 22,
 }
 
 public enum AircraftCategoryEnum
@@ -125,7 +136,7 @@ public enum AircraftCategoryEnum
     HighVortexAircraft,
     Heavy,
     HighPerformanceAndHighSpeed,
-    Rotorcraft
+    Rotorcraft,
 }
 
 public enum VelocitySubTypeEnum
@@ -133,7 +144,7 @@ public enum VelocitySubTypeEnum
     SubType1 = 1,
     SubType2 = 2,
     SubType3 = 3,
-    SubType4 = 4
+    SubType4 = 4,
 }
 
 public enum NavigationUncertaintyCategoryEnum
@@ -145,50 +156,51 @@ public enum NavigationUncertaintyCategoryEnum
     CategoryE,
     CategoryF,
     CategoryG,
-    NotAvailable
+    NotAvailable,
 }
 
 public enum VerticalRateSourceEnum
 {
     Barometric,
-    Gnss
+    Gnss,
 }
 
 public enum CprFormatEnum
 {
     Even,
-    Odd
+    Odd,
 }
 
 public enum GroundTrackStatusEnum
 {
     Invalid = 0,
-    Valid = 1
+    Valid = 1,
 }
+
 public enum SurveillanceStatusEnum
 {
     NoCondition = 0,
     PermanentAlert = 1,
     TemporaryAlert = 2,
-    SpecialPositionIdentification = 3
+    SpecialPositionIdentification = 3,
 }
 
 public enum EastWestVelocityDirectionEnum
 {
     FromWestToEast = 0,
-    FromEastToWest = 1
+    FromEastToWest = 1,
 }
 
 public enum NorthSouthVelocityDirectionEnum
 {
     FromSouthToNorth = 0,
-    FromNorthToSouth = 1
+    FromNorthToSouth = 1,
 }
 
 public enum MagneticHeadingStatusEnum
 {
     NotAvailable = 0,
-    Available = 1
+    Available = 1,
 }
 
 public enum AirspeedTypeEnum
@@ -197,21 +209,22 @@ public enum AirspeedTypeEnum
     ///  Indicated airspeed
     /// </summary>
     IAS = 0,
+
     /// <summary>
     /// True airspeed
     /// </summary>
-    TAS = 1
+    TAS = 1,
 }
 
 public enum OperationStatusTypeEnum
 {
     Airborne = 0,
-    Surface = 1
+    Surface = 1,
 }
 
 public enum AdsbVersionNumberEnum
 {
     AppendixA = 0,
     AppendixB = 1,
-    AppendixC = 2
+    AppendixC = 2,
 }

@@ -32,30 +32,71 @@ namespace Asv.Sdr.LimeSdr
 
         private async Task Init(LimeTxSourceIqConfig config)
         {
-
             await _device.EnableChannel(LmsChannel.Tx, config.Channel, true, DisposeCancel);
             await _device.SetSampleRate(config.SampleRate, 0, DisposeCancel);
-            await _device.SetFrequency(LmsChannel.Tx, config.Channel, config.Frequency, DisposeCancel);
-            await _device.SetAntenna(LmsChannel.Tx, config.Channel, (uint)config.Path, DisposeCancel);
-            await _device.SetBandWidth(LmsChannel.Tx, config.Channel, config.BandWidth, DisposeCancel);
-            await _device.SetNormalizedGain(LmsChannel.Tx, config.Channel, config.Gain, DisposeCancel);
+            await _device.SetFrequency(
+                LmsChannel.Tx,
+                config.Channel,
+                config.Frequency,
+                DisposeCancel
+            );
+            await _device.SetAntenna(
+                LmsChannel.Tx,
+                config.Channel,
+                (uint)config.Path,
+                DisposeCancel
+            );
+            await _device.SetBandWidth(
+                LmsChannel.Tx,
+                config.Channel,
+                config.BandWidth,
+                DisposeCancel
+            );
+            await _device.SetNormalizedGain(
+                LmsChannel.Tx,
+                config.Channel,
+                config.Gain,
+                DisposeCancel
+            );
             await _device.SetLPFBw(LmsChannel.Tx, config.Channel, config.BandWidth, DisposeCancel);
             await _device.SetLPF(LmsChannel.Tx, config.Channel, true, DisposeCancel);
-            await _device.SetGFIRLPF(LmsChannel.Tx, config.Channel, true, config.BandWidth, DisposeCancel);
-            
+            await _device.SetGFIRLPF(
+                LmsChannel.Tx,
+                config.Channel,
+                true,
+                config.BandWidth,
+                DisposeCancel
+            );
+
             if (config.LmsSelfCalibrate)
             {
-                await _device.Calibrate(LmsChannel.Tx, config.Channel, config.BandWidth, 0, DisposeCancel);
+                await _device.Calibrate(
+                    LmsChannel.Tx,
+                    config.Channel,
+                    config.BandWidth,
+                    0,
+                    DisposeCancel
+                );
             }
-            _txStream = await _device.CreateStream(LmsChannel.Tx, config.Channel, (uint)config.SampleRate);
+
+            _txStream = await _device.CreateStream(
+                LmsChannel.Tx,
+                config.Channel,
+                (uint)config.SampleRate
+            );
+
             await _txStream.Start(DisposeCancel);
         }
 
         public async Task<double> GetLevel(CancellationToken cancel)
         {
-            var gain = await _device.GetNormalizedGainDbm(LmsChannel.Tx, _config.Channel, DisposeCancel);
+            var gain = await _device.GetNormalizedGainDbm(
+                LmsChannel.Tx,
+                _config.Channel,
+                DisposeCancel
+            );
             var rssi = await _device.ReadRSSI(DisposeCancel);
-            var result = 20 * Math.Log10((float)rssi / MaxRssi) - gain;
+            var result = (20 * Math.Log10((float)rssi / MaxRssi)) - gain;
             return result;
         }
 

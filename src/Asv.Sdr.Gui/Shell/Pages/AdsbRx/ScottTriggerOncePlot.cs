@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Subjects;
-using System.Threading;
 using Asv.Sdr.DebugPlot;
 using ReactiveUI;
 using ScottPlot;
@@ -26,7 +25,7 @@ public static class DebugPlotHelper
             AnnotationPosition.LowerLeft => Alignment.LowerLeft,
             AnnotationPosition.LowerCenter => Alignment.LowerCenter,
             AnnotationPosition.LowerRight => Alignment.LowerRight,
-            _ => throw new ArgumentOutOfRangeException(nameof(position), position, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(position), position, null),
         };
     }
 }
@@ -42,16 +41,24 @@ public class ScottTriggerOncePlot(AvaPlot plot) : IDebugPlot
     {
         _plotOnce = true;
     }
-    
+
     public void Begin()
     {
-        if (!_plotOnce || !IsPlotEnabled) return;
-        RxApp.MainThreadScheduler.Schedule(()=>plot.Plot.Clear());
+        if (!_plotOnce || !IsPlotEnabled)
+        {
+            return;
+        }
+
+        RxApp.MainThreadScheduler.Schedule(() => plot.Plot.Clear());
     }
 
     public void AddSignal(string name, double[] values)
     {
-        if (!_plotOnce || !IsPlotEnabled) return;
+        if (!_plotOnce || !IsPlotEnabled)
+        {
+            return;
+        }
+
         RxApp.MainThreadScheduler.Schedule(() =>
         {
             var plot1 = plot.Plot.Add.Signal(values);
@@ -61,7 +68,11 @@ public class ScottTriggerOncePlot(AvaPlot plot) : IDebugPlot
 
     public void AddHorizontalLine(string name, double value)
     {
-        if (!_plotOnce || !IsPlotEnabled) return;
+        if (!_plotOnce || !IsPlotEnabled)
+        {
+            return;
+        }
+
         RxApp.MainThreadScheduler.Schedule(() =>
         {
             var plot1 = plot.Plot.Add.HorizontalLine(value);
@@ -71,7 +82,11 @@ public class ScottTriggerOncePlot(AvaPlot plot) : IDebugPlot
 
     public void AddVerticalLine(string name, int xValue)
     {
-        if (!_plotOnce || !IsPlotEnabled) return;
+        if (!_plotOnce || !IsPlotEnabled)
+        {
+            return;
+        }
+
         RxApp.MainThreadScheduler.Schedule(() =>
         {
             var plot1 = plot.Plot.Add.VerticalLine(xValue);
@@ -81,7 +96,11 @@ public class ScottTriggerOncePlot(AvaPlot plot) : IDebugPlot
 
     public void AddMarker(string name, string text, int xValue, double yValue)
     {
-        if (!_plotOnce || !IsPlotEnabled) return;
+        if (!_plotOnce || !IsPlotEnabled)
+        {
+            return;
+        }
+
         RxApp.MainThreadScheduler.Schedule(() =>
         {
             var plot1 = plot.Plot.Add.Marker(xValue, yValue);
@@ -89,17 +108,29 @@ public class ScottTriggerOncePlot(AvaPlot plot) : IDebugPlot
         });
     }
 
-    public void AddAnnotation(string name, string text, AnnotationPosition position = AnnotationPosition.UpperLeft)
+    public void AddAnnotation(
+        string name,
+        string text,
+        AnnotationPosition position = AnnotationPosition.UpperLeft
+    )
     {
-        if (!_plotOnce || !IsPlotEnabled) return;
-        RxApp.MainThreadScheduler.Schedule(() => plot.Plot.Add.Annotation(text, DebugPlotHelper.Convert(position)));
-    }
+        if (!_plotOnce || !IsPlotEnabled)
+        {
+            return;
+        }
 
-    
+        RxApp.MainThreadScheduler.Schedule(
+            () => plot.Plot.Add.Annotation(text, DebugPlotHelper.Convert(position))
+        );
+    }
 
     public void End()
     {
-        if (!_plotOnce || !IsPlotEnabled) return;
+        if (!_plotOnce || !IsPlotEnabled)
+        {
+            return;
+        }
+
         RxApp.MainThreadScheduler.Schedule(plot.Refresh);
         _onTrigger.OnNext(Unit.Default);
         _plotOnce = false;
@@ -121,14 +152,22 @@ public class ScottDebugPlot(AvaPlot plot) : IDebugPlot
 
     public void Begin()
     {
-        if (!IsPlotEnabled) return;
-        RxApp.MainThreadScheduler.Schedule(()=>plot.Plot.Clear());
+        if (!IsPlotEnabled)
+        {
+            return;
+        }
+
+        RxApp.MainThreadScheduler.Schedule(() => plot.Plot.Clear());
     }
 
     public void AddSignal(string name, double[] values)
     {
-        if (!IsPlotEnabled) return;
-        RxApp.MainThreadScheduler.Schedule(()=>
+        if (!IsPlotEnabled)
+        {
+            return;
+        }
+
+        RxApp.MainThreadScheduler.Schedule(() =>
         {
             var plot1 = plot.Plot.Add.Signal(values);
             plot1.LegendText = name;
@@ -137,49 +176,71 @@ public class ScottDebugPlot(AvaPlot plot) : IDebugPlot
 
     public void AddHorizontalLine(string name, double value)
     {
-        if (!IsPlotEnabled) return;
-        RxApp.MainThreadScheduler.Schedule(()=>
+        if (!IsPlotEnabled)
+        {
+            return;
+        }
+
+        RxApp.MainThreadScheduler.Schedule(() =>
         {
             var plot1 = plot.Plot.Add.HorizontalLine(value);
             plot1.LegendText = name;
         });
-
     }
 
     public void AddVerticalLine(string name, int xValue)
     {
-        if (!IsPlotEnabled) return;
-        RxApp.MainThreadScheduler.Schedule(()=>
+        if (!IsPlotEnabled)
+        {
+            return;
+        }
+
+        RxApp.MainThreadScheduler.Schedule(() =>
         {
             var plot1 = plot.Plot.Add.VerticalLine(xValue);
             plot1.LegendText = name;
         });
-
     }
 
     public void AddMarker(string name, string text, int xValue, double yValue)
     {
-        if (!IsPlotEnabled) return;
-        RxApp.MainThreadScheduler.Schedule(()=>
+        if (!IsPlotEnabled)
+        {
+            return;
+        }
+
+        RxApp.MainThreadScheduler.Schedule(() =>
         {
             var plot1 = plot.Plot.Add.Marker(xValue, yValue);
-            plot1.LegendText = name +" "+ text;
+            plot1.LegendText = name + " " + text;
         });
-
     }
 
-    public void AddAnnotation(string name, string text, AnnotationPosition position = AnnotationPosition.UpperLeft)
+    public void AddAnnotation(
+        string name,
+        string text,
+        AnnotationPosition position = AnnotationPosition.UpperLeft
+    )
     {
-        if (!IsPlotEnabled) return;
-        RxApp.MainThreadScheduler.Schedule(() => plot.Plot.Add.Annotation(text, DebugPlotHelper.Convert(position)));
+        if (!IsPlotEnabled)
+        {
+            return;
+        }
+
+        RxApp.MainThreadScheduler.Schedule(
+            () => plot.Plot.Add.Annotation(text, DebugPlotHelper.Convert(position))
+        );
     }
 
     public void End()
     {
         _onTrigger.OnNext(Unit.Default);
-        if (!IsPlotEnabled) return;
-        RxApp.MainThreadScheduler.Schedule(plot.Refresh);
+        if (!IsPlotEnabled)
+        {
+            return;
+        }
 
+        RxApp.MainThreadScheduler.Schedule(plot.Refresh);
     }
 
     public IObservable<Unit> OnTrigger => _onTrigger;
@@ -205,6 +266,7 @@ public class ScottDebugTriggerPlot : IDebugPlot
             {
                 RxApp.MainThreadScheduler.Schedule(action);
             }
+
             _onTrigger.OnNext(Unit.Default);
         });
     }
@@ -215,14 +277,22 @@ public class ScottDebugTriggerPlot : IDebugPlot
     public void Begin()
     {
         _actions.Clear();
-        if (!IsPlotEnabled) return;
-        _actions.Enqueue(()=>_plot.Plot.Clear());
+        if (!IsPlotEnabled)
+        {
+            return;
+        }
+
+        _actions.Enqueue(() => _plot.Plot.Clear());
     }
 
     public void AddSignal(string name, double[] values)
     {
-        if (!IsPlotEnabled) return;
-        _actions.Enqueue(()=>
+        if (!IsPlotEnabled)
+        {
+            return;
+        }
+
+        _actions.Enqueue(() =>
         {
             var plot1 = _plot.Plot.Add.Signal(values);
             plot1.LegendText = name;
@@ -231,8 +301,12 @@ public class ScottDebugTriggerPlot : IDebugPlot
 
     public void AddHorizontalLine(string name, double value)
     {
-        if (!IsPlotEnabled) return;
-        _actions.Enqueue(()=>
+        if (!IsPlotEnabled)
+        {
+            return;
+        }
+
+        _actions.Enqueue(() =>
         {
             var plot1 = _plot.Plot.Add.HorizontalLine(value);
             plot1.LegendText = name;
@@ -241,8 +315,12 @@ public class ScottDebugTriggerPlot : IDebugPlot
 
     public void AddVerticalLine(string name, int xValue)
     {
-        if (!IsPlotEnabled) return;
-        _actions.Enqueue(()=>
+        if (!IsPlotEnabled)
+        {
+            return;
+        }
+
+        _actions.Enqueue(() =>
         {
             var plot1 = _plot.Plot.Add.VerticalLine(xValue);
             plot1.LegendText = name;
@@ -251,23 +329,39 @@ public class ScottDebugTriggerPlot : IDebugPlot
 
     public void AddMarker(string name, string text, int xValue, double yValue)
     {
-        if (!IsPlotEnabled) return;
-        _actions.Enqueue(()=>
+        if (!IsPlotEnabled)
+        {
+            return;
+        }
+
+        _actions.Enqueue(() =>
         {
             var plot1 = _plot.Plot.Add.Marker(xValue, yValue);
-            plot1.LegendText = name +" "+ text;
+            plot1.LegendText = name + " " + text;
         });
     }
 
-    public void AddAnnotation(string name, string text, AnnotationPosition position = AnnotationPosition.UpperLeft)
+    public void AddAnnotation(
+        string name,
+        string text,
+        AnnotationPosition position = AnnotationPosition.UpperLeft
+    )
     {
-        if (!IsPlotEnabled) return;
+        if (!IsPlotEnabled)
+        {
+            return;
+        }
+
         _actions.Enqueue(() => _plot.Plot.Add.Annotation(text, DebugPlotHelper.Convert(position)));
     }
 
     public void End()
     {
-        if (!IsPlotEnabled) return;
+        if (!IsPlotEnabled)
+        {
+            return;
+        }
+
         _actions.Enqueue(_plot.Refresh);
     }
 

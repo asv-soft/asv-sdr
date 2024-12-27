@@ -7,7 +7,12 @@ namespace Asv.Sdr
     {
         private readonly double[] _filter;
 
-        public ReaderIqWindowFilterDouble(IReaderIqSubject<double> input, WindowFilterEnum type, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
+        public ReaderIqWindowFilterDouble(
+            IReaderIqSubject<double> input,
+            WindowFilterEnum type,
+            bool useArrayPool
+        )
+            : base(input, input.OutputBufferSize, useArrayPool)
         {
             _filter = WindowFilters.Create(type, input.OutputBufferSize);
         }
@@ -25,7 +30,12 @@ namespace Asv.Sdr
     {
         private readonly double[] _filter;
 
-        public ReaderIqWindowFilterFloat(IReaderIqSubject<float> input, WindowFilterEnum type, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
+        public ReaderIqWindowFilterFloat(
+            IReaderIqSubject<float> input,
+            WindowFilterEnum type,
+            bool useArrayPool
+        )
+            : base(input, input.OutputBufferSize, useArrayPool)
         {
             _filter = WindowFilters.Create(type, input.OutputBufferSize);
         }

@@ -33,9 +33,14 @@ namespace Asv.Sdr
         private readonly Subject<(double, double)> _onData = new();
         private readonly IDisposable _subscribe;
 
-        public ReactiveDsp2ArgsFilter(IObservable<(double, double)> src, IDspFilter filter1, IDspFilter filter2)
+        public ReactiveDsp2ArgsFilter(
+            IObservable<(double, double)> src,
+            IDspFilter filter1,
+            IDspFilter filter2
+        )
         {
-            _subscribe = src.Select(_ => (filter1.Process(_.Item1), filter2.Process(_.Item2))).Subscribe(_onData);
+            _subscribe = src.Select(_ => (filter1.Process(_.Item1), filter2.Process(_.Item2)))
+                .Subscribe(_onData);
         }
 
         protected override void InternalDisposeOnce()

@@ -19,9 +19,8 @@ public partial class AdsbTxView : ReactiveUserControl<AdsbTxViewModel>
         {
             this.WhenAnyValue(x => x.ViewModel)
                 .WhereNotNull()
-                .Subscribe(x => x.InitCharts(AvaPlotLms,AvaPlotSh))
+                .Subscribe(x => x.InitCharts(AvaPlotLms, AvaPlotSh))
                 .DisposeWith(disp);
-
         });
     }
 }

@@ -24,12 +24,11 @@ namespace Asv.Sdr.LimeSdr
         public bool FlushPartialPacket { get; set; } = true;
     }
 
-    public class LimeReaderIq: DisposableOnceWithCancel, IReaderIq<float>
+    public class LimeReaderIq : DisposableOnceWithCancel, IReaderIq<float>
     {
         private readonly ILimeSdrDevice _device;
         private readonly LimeSourceIqConfig _config;
         private ILmsStream _rxStream;
-        private double _rssi;
         const uint MaxRssi = 0x15FF4;
 
         public LimeReaderIq(ILimeSdrDevice device, LimeSourceIqConfig config)
@@ -41,63 +40,113 @@ namespace Asv.Sdr.LimeSdr
 
         private async Task Init(LimeSourceIqConfig config)
         {
-            
-            
             await _device.EnableChannel(LmsChannel.Rx, config.Channel, true, DisposeCancel);
             await _device.EnableChannel(LmsChannel.Tx, config.Channel, true, DisposeCancel);
             await _device.SetSampleRate(config.SampleRate, 0, DisposeCancel);
-            await _device.SetFrequency(LmsChannel.Rx, config.Channel, config.Frequency, DisposeCancel);
-            await _device.SetAntenna(LmsChannel.Rx, config.Channel, (uint)config.Path, DisposeCancel);
-            await _device.SetBandWidth(LmsChannel.Rx, config.Channel, config.BandWidth, DisposeCancel);
-            await _device.SetNormalizedGain(LmsChannel.Rx, config.Channel, config.Gain, DisposeCancel);
+            await _device.SetFrequency(
+                LmsChannel.Rx,
+                config.Channel,
+                config.Frequency,
+                DisposeCancel
+            );
+            await _device.SetAntenna(
+                LmsChannel.Rx,
+                config.Channel,
+                (uint)config.Path,
+                DisposeCancel
+            );
+            await _device.SetBandWidth(
+                LmsChannel.Rx,
+                config.Channel,
+                config.BandWidth,
+                DisposeCancel
+            );
+            await _device.SetNormalizedGain(
+                LmsChannel.Rx,
+                config.Channel,
+                config.Gain,
+                DisposeCancel
+            );
             await _device.EnableRSSIMeasure(config.AmountDataRssi);
-            
-            // await _device.WriteLMSParam(LimeSdrParams.LMS7_G_PGA_RBB_R3, 24, DisposeCancel);
-            if (config.LmsLpfEnable == true)
+
+            if (config.LmsLpfEnable)
             {
-                await _device.SetLPFBw(LmsChannel.Rx, config.Channel, config.LmsLpfBandWidth, DisposeCancel);
+                await _device.SetLPFBw(
+                    LmsChannel.Rx,
+                    config.Channel,
+                    config.LmsLpfBandWidth,
+                    DisposeCancel
+                );
                 await _device.SetLPF(LmsChannel.Rx, config.Channel, true, DisposeCancel);
             }
             else
             {
                 await _device.SetLPF(LmsChannel.Rx, config.Channel, false, DisposeCancel);
             }
-            
+
             if (config.GfirEnable)
             {
-                await _device.SetGFIRLPF(LmsChannel.Rx, config.Channel, true, config.GfirBandWidth, DisposeCancel);
+                await _device.SetGFIRLPF(
+                    LmsChannel.Rx,
+                    config.Channel,
+                    true,
+                    config.GfirBandWidth,
+                    DisposeCancel
+                );
             }
             else
             {
-                await _device.SetGFIRLPF(LmsChannel.Rx, config.Channel, false, 96_000, DisposeCancel);
+                await _device.SetGFIRLPF(
+                    LmsChannel.Rx,
+                    config.Channel,
+                    false,
+                    96_000,
+                    DisposeCancel
+                );
             }
-            
+
             if (config.LmsSelfCalibrate)
             {
-                await _device.Calibrate(LmsChannel.Rx, config.Channel, config.BandWidth, 0, DisposeCancel);
+                await _device.Calibrate(
+                    LmsChannel.Rx,
+                    config.Channel,
+                    config.BandWidth,
+                    0,
+                    DisposeCancel
+                );
             }
-        
-            
-            _rxStream = await _device.CreateStream(LmsChannel.Rx, config.Channel, (uint)( config.RxBufferSize ?? config.SampleRate), throughputVsLatency: config.ThroughputVsLatency, flushPartialPacket:config.FlushPartialPacket);
+
+            _rxStream = await _device.CreateStream(
+                LmsChannel.Rx,
+                config.Channel,
+                (uint)(config.RxBufferSize ?? config.SampleRate),
+                throughputVsLatency: config.ThroughputVsLatency,
+                flushPartialPacket: config.FlushPartialPacket
+            );
+
             await _rxStream.Start(DisposeCancel);
-            
         }
 
         public async Task<double> GetLevel(CancellationToken cancel)
         {
-            var gain = await _device.GetNormalizedGainDbm(LmsChannel.Rx, _config.Channel, DisposeCancel);
+            var gain = await _device.GetNormalizedGainDbm(
+                LmsChannel.Rx,
+                _config.Channel,
+                DisposeCancel
+            );
             var rssi = await _device.ReadRSSI(DisposeCancel);
-            var result = 20 * Math.Log10((float)rssi / MaxRssi) - gain;
+            var result = (20 * Math.Log10((float)rssi / MaxRssi)) - gain;
             return result;
         }
 
         public async Task<int> Read(Memory<float> iqBuffer, CancellationToken cancel = default)
         {
-            var result =  await _rxStream.Read(iqBuffer, 5000, DisposeCancel);
+            var result = await _rxStream.Read(iqBuffer, 5000, DisposeCancel);
             if (iqBuffer.Length / 2 != result)
             {
                 Console.WriteLine("Read less than expected");
             }
+
             return result;
         }
     }

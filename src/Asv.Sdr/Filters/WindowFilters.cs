@@ -7,7 +7,7 @@ namespace Asv.Sdr
         None,
         Hamming,
         Hann,
-        Cosine
+        Cosine,
     }
 
     public static class WindowFilters
@@ -20,7 +20,7 @@ namespace Asv.Sdr
                 WindowFilterEnum.Hamming => Hamming(width),
                 WindowFilterEnum.Hann => Hann(width),
                 WindowFilterEnum.Cosine => Cosine(width),
-                _ => throw new ArgumentOutOfRangeException(nameof(filter), filter, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(filter), filter, null),
             };
         }
 
@@ -28,7 +28,10 @@ namespace Asv.Sdr
         {
             var numArray = new double[width];
             for (var index = 0; index < numArray.Length; ++index)
+            {
                 numArray[index] = 1;
+            }
+
             return numArray;
         }
 
@@ -37,23 +40,34 @@ namespace Asv.Sdr
             var num = 2.0 * Math.PI / (double)width;
             var numArray = new double[width];
             for (var index = 0; index < numArray.Length; ++index)
-                numArray[index] = 0.53836 + -0.46164 * Math.Cos((double)index * num);
+            {
+                numArray[index] = 0.53836 + (-0.46164 * Math.Cos(index * num));
+            }
+
             return numArray;
         }
+
         public static double[] Hann(int width)
         {
-            var num = 2.0 * Math.PI / (double)width;
+            var num = 2.0 * Math.PI / width;
             var numArray = new double[width];
             for (var index = 0; index < numArray.Length; ++index)
-                numArray[index] = 0.5 - 0.5 * Math.Cos((double)index * num);
+            {
+                numArray[index] = 0.5 - (0.5 * Math.Cos(index * num));
+            }
+
             return numArray;
         }
+
         public static double[] Cosine(int width)
         {
-            var num = Math.PI / (double)width;
+            var num = Math.PI / width;
             var numArray = new double[width];
             for (var index = 0; index < numArray.Length; ++index)
-                numArray[index] = Math.Sin((double)index * num);
+            {
+                numArray[index] = Math.Sin(index * num);
+            }
+
             return numArray;
         }
     }
