@@ -5,16 +5,18 @@
              xmlns:gui="clr-namespace:Asv.Sdr.Gui"
              xmlns:avalonia="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Asv.Sdr.Gui.LimeSdrView"
-             x:DataType="gui:LimeSdrViewModel">
+             x:Class="Asv.Sdr.Gui.AdSdrView"
+             x:DataType="gui:AdSdrViewModel">
     <Design.DataContext>
-        <gui:LimeSdrViewModel />
+        <gui:AdSdrViewModel />
     </Design.DataContext>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8">
-            <Button Command="{Binding ConnectLms}">Connect Lms</Button>            
-            <Button Command="{Binding ConnectSh}">Connect Sh</Button>
-            <Button Command="{Binding AutoscaleLms}">Autoscale</Button>
+            <Button Command="{Binding Update}">Update </Button>
+            <ComboBox ItemsSource="{Binding Devices}" 
+                      DisplayMemberBinding="{Binding Value}"
+                      SelectedItem="{Binding SelectedDevice}"/>
+            <Button Command="{Binding Connect}">Connect </Button>            
         </StackPanel>
         <Grid ColumnDefinitions="*,*">
             <avalonia:AvaPlot Grid.Column="0" Name="AvaPlotSh"/>
