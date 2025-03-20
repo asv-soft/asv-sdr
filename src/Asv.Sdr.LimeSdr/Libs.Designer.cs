@@ -62,16 +62,6 @@ namespace Asv.Sdr.LimeSdr {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] LimeSuiteX32 {
-            get {
-                object obj = ResourceManager.GetObject("LimeSuiteX32", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
         internal static byte[] LimeSuiteX64 {
             get {
                 object obj = ResourceManager.GetObject("LimeSuiteX64", resourceCulture);

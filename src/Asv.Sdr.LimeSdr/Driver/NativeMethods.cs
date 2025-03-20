@@ -15,6 +15,7 @@ namespace Asv.Sdr.LimeSdr
 #else
         public static bool Is64BitOperatingSystem = false;
 #endif
+        
     }
     
     
