@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 
-namespace Asv.Sdr.Gui;
+namespace Asv.Sdr;
 
 public static class AdsbParserFactory
 {

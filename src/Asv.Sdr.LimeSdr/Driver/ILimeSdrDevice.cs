@@ -164,22 +164,31 @@ namespace Asv.Sdr.LimeSdr
             return ((val1 & 0x3) | (val2 << 2)) & 0x3FFFF;
         }
 
+        // public static async Task WriteFpgaRegisterBits(this ILimeSdrDevice src, ushort address, ushort index, ushort length, ushort value, CancellationToken cancel)
+        // {
+        //     if (length is <= 0 or > 16) throw new Exception("Error length");
+        //     var mask = 1;
+        //     var reg = await src.ReadFpgaRegister(address, cancel);
+        //     for (int i = index; i < index + length; i++, mask <<= 1)
+        //     {
+        //         if ((value & mask) > 0)
+        //         {
+        //             reg |= (ushort)(1u << i);
+        //         }
+        //         else
+        //         {
+        //             reg &= (ushort)(~(1u << i));
+        //         }
+        //     }
+        //     await src.WriteFpgaRegister(address, reg, cancel);
+        // }
+        
         public static async Task WriteFpgaRegisterBits(this ILimeSdrDevice src, ushort address, ushort index, ushort length, ushort value, CancellationToken cancel)
         {
             if (length is <= 0 or > 16) throw new Exception("Error length");
-            var mask = 1;
+            var mask = (ushort)((unchecked((ushort)~0u) << (index + length)) | (unchecked((ushort)~0u) >> (sizeof(ushort) * 8 - index)));
             var reg = await src.ReadFpgaRegister(address, cancel);
-            for (int i = index; i < index + length; i++, mask <<= 1)
-            {
-                if ((value & mask) > 0)
-                {
-                    reg |= (ushort)(1u << i);
-                }
-                else
-                {
-                    reg &= (ushort)(~(1u << i));
-                }
-            }
+            reg = (ushort)((reg & mask) | ((value << index) & ~mask));
             await src.WriteFpgaRegister(address, reg, cancel);
         }
 
@@ -188,8 +197,23 @@ namespace Asv.Sdr.LimeSdr
             if (length is <= 0 or > 16) throw new Exception("Error length");
             var reg = await src.ReadFpgaRegister(address, cancel);
             var mask = ~(ushort)0u >> (sizeof(ushort) * 8 - length);
-            // reg <<= sizeof(ushort) - length;
-            // reg >>= index;
+            return (ushort)((reg >> index) & mask);
+        }
+        
+        internal static void InternalWriteFpgaRegisterBits(this ILmsRegisterEditor src, ushort address, ushort index, ushort length, ushort value)
+        {
+            if (length is <= 0 or > 16) throw new Exception("Error length");
+            var mask = (ushort)((unchecked((ushort)~0u) << (index + length)) | (unchecked((ushort)~0u) >> (sizeof(ushort) * 8 - index)));
+            var reg = src.RaedFPGAReg(address);
+            reg = (ushort)((reg & mask) | ((value << index) & ~mask));
+            src.WriteFPGAReg(address, reg);
+        }
+
+        internal static ushort InternalReadFpgaRegisterBits(this ILmsRegisterEditor src, ushort address, ushort index, ushort length)
+        {
+            if (length is <= 0 or > 16) throw new Exception("Error length");
+            var reg = src.RaedFPGAReg(address);
+            var mask = ~(ushort)0u >> (sizeof(ushort) * 8 - length);
             return (ushort)((reg >> index) & mask);
         }
     }

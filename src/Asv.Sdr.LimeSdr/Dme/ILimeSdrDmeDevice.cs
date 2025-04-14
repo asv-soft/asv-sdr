@@ -174,4 +174,11 @@ public interface ILimeSdrDmeDevice:ILimeSdrDevice
     /// Writes data to the DEBUG_from_periphcfg register (0x00DF).
     /// </summary>
     Task DmeWriteDebugFromPeriphCfg(ushort data, CancellationToken cancel = default);
+    /// <summary>
+    /// RF rellay control
+    /// </summary>
+    /// <param name="isTx">If true enable TX</param>
+    /// <param name="cancel"></param>
+    /// <returns></returns>
+    Task RfRelaySelectOutput(bool isTx, CancellationToken cancel = default);
 }

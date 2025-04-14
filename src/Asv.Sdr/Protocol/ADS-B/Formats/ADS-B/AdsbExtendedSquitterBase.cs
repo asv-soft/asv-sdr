@@ -1,6 +1,6 @@
 using System;
 
-namespace Asv.Sdr.Gui;
+namespace Asv.Sdr;
 
 public enum SquitterTypeEnum
 {
@@ -42,7 +42,7 @@ public abstract class AdsbExtendedSquitterBase : AdsbDfMessageBase
 
     public override int GetByteSize()
     {
-        return AdsbHelper.LongFrameLengthBytes;
+        return TransponderHelper.LongFrameLengthBytes;
     }
 
     protected override bool CheckMessageId(int downlinkFormat)

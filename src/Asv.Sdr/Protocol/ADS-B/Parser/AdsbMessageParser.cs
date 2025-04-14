@@ -5,7 +5,7 @@ using System.Threading;
 using Asv.Common;
 using Asv.IO;
 
-namespace Asv.Sdr.Gui;
+namespace Asv.Sdr;
 
 public class AdsbMessageParser : DisposableOnce
 {
@@ -68,7 +68,7 @@ public class AdsbMessageParser : DisposableOnce
         Crc3
     }
     
-    private readonly byte[] _frame = new byte[AdsbHelper.LongFrameLengthBytes];
+    private readonly byte[] _frame = new byte[TransponderHelper.LongFrameLengthBytes];
     private int _msgLen;
     private bool _first;
     private int _firstValue;
@@ -179,12 +179,10 @@ public class AdsbMessageParser : DisposableOnce
             case State.Preamb1:
                 _syncByte <<= 1;
                 _syncByte |= (byte)(mag & 0x1);
-                if (_syncByte == AdsbHelper.Preamble[0])
+                if (_syncByte == TransponderHelper.Preamble[0])
                 {
-                    _frame[_readedBytes] = _syncByte;
                     _syncByte = 0;
                     _state = State.Preamb2;
-                    _readedBytes++;
                 }
                 break;
             case State.Preamb2:
@@ -193,12 +191,10 @@ public class AdsbMessageParser : DisposableOnce
                 _readedBits++;
                 if (_readedBits == 8)
                 {
-                    if (_syncByte == AdsbHelper.Preamble[1])
+                    if (_syncByte == TransponderHelper.Preamble[1])
                     {
-                        _frame[_readedBytes] = _syncByte;
                         _syncByte = 0;
                         _readedBits = 0;
-                        _readedBytes++;
                         _state = State.DFAndAC;
                     }
                     else
@@ -212,8 +208,8 @@ public class AdsbMessageParser : DisposableOnce
                 {
                     _frame[_readedBytes] = dfacByte;
                     _readedBytes++;
-                    var df = AdsbHelper.GetDownlinkFormat(new ReadOnlySpan<byte>(_frame)[.._readedBytes]);
-                    _msgLen = AdsbHelper.GetMessageLength(df);
+                    var df = TransponderHelper.GetDownlinkFormat(new ReadOnlySpan<byte>(_frame)[.._readedBytes]);
+                    _msgLen = TransponderHelper.GetMessageLength(df);
                     _state = State.Payload;
                 }
                 break;
@@ -257,12 +253,12 @@ public class AdsbMessageParser : DisposableOnce
                     _readedBytes++;
                     if (_readedBytes == _msgLen)
                     {
-                        var originalCrc = AdsbHelper.CalcCrc(_frame);
+                        var originalCrc = ModeSHelper.CalcCrc24(_frame, _msgLen);
                         var sourceCrc = (uint)(_frame[_msgLen - 3] << 16) | (uint)(_frame[_msgLen - 2] << 8) |
                                         _frame[_msgLen - 1];
                         if (originalCrc == sourceCrc)
                         {
-                            var id = AdsbHelper.GetMessageId(_frame);
+                            var id = TransponderHelper.GetMessageId(_frame);
                             _onMessageRecev.OnNext($"Down link format: {(_frame[2] >> 3) & 0x1F}");
                             var span = new ReadOnlySpan<byte>(_frame, 0, _msgLen);
                             ParsePacket(id, ref span, true);

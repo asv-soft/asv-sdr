@@ -1,7 +1,7 @@
 using System;
 using Asv.IO;
 
-namespace Asv.Sdr.Gui;
+namespace Asv.Sdr;
 
 public class AdsbSurfacePosition : AdsbExtendedSquitterBase
 {
@@ -31,7 +31,7 @@ public class AdsbSurfacePosition : AdsbExtendedSquitterBase
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, (uint)CprFormat);
         if (!double.IsNaN(Latitude) && !double.IsNaN(Longitude))
         {
-            var position = AdsbHelper.UnambiguousPositionEncoding(Latitude, Longitude, CprFormat, 90.0);
+            var position = TransponderHelper.UnambiguousPositionEncoding(Latitude, Longitude, CprFormat, 90.0);
             NCprLat = position.Lat;
             NCprLon = position.Lon;
         }
@@ -46,14 +46,14 @@ public class AdsbSurfacePosition : AdsbExtendedSquitterBase
 
         if (CprFormat == CprFormatEnum.Even)
         {
-            var pos = AdsbHelper.GloballyUnambiguousPositionDecoding(NCprLat, NCprLon, prevPosition.NCprLat,
+            var pos = TransponderHelper.GloballyUnambiguousPositionDecoding(NCprLat, NCprLon, prevPosition.NCprLat,
                 prevPosition.NCprLon, DateTime.Now, DateTime.Now.AddSeconds(-1), 90.0);
             Latitude = pos.Lat;
             Longitude = pos.Lon;
         }
         else
         {
-            var pos = AdsbHelper.GloballyUnambiguousPositionDecoding(prevPosition.NCprLat, prevPosition.NCprLon,
+            var pos = TransponderHelper.GloballyUnambiguousPositionDecoding(prevPosition.NCprLat, prevPosition.NCprLon,
                 NCprLat, NCprLon, DateTime.Now.AddSeconds(-1), DateTime.Now, 90.0);
             Latitude = pos.Lat;
             Longitude = pos.Lon;
@@ -82,7 +82,7 @@ public class AdsbSurfacePosition : AdsbExtendedSquitterBase
 
     private double GetMovement(uint mov)
     {
-        return mov switch
+        var m = mov switch
         {
             0 => double.NaN,
             1 => 0.0,
@@ -91,15 +91,17 @@ public class AdsbSurfacePosition : AdsbExtendedSquitterBase
             <= 38 => 2.0 + (mov - 13) * 0.5,
             <= 93 => 15 + (mov - 39) * 1.0,
             <= 108 => 70 + (mov - 94) * 2.0,
-            <= 123 => 100 + (mov - 109) * 5,
+            <= 123 => 100 + (mov - 109) * 5.0,
             124 => 175.0,
             _ => double.MaxValue
         };
+        return m * 0.51444;  // knots => m/s
     }
     
     private uint SetMovement(double mov)
     {
         if (double.IsNaN(mov)) return 0;
+        mov /= 0.51444; // m/s => knots
         if (Math.Abs(double.MaxValue - mov) < 1) return 125;
         return mov switch
         {

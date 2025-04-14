@@ -14,6 +14,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Asv.Common" Version="$(AsvCommonVersion)" />
+    <PackageReference Include="Asv.IO" Version="$(AsvCommonVersion)" />
     <PackageReference Include="System.Reactive" Version="$(SystemReactiveVersion)" />
     <PackageReference Include="MathNet.Filtering" Version="0.7.0" />
     <PackageReference Include="System.Memory" Version="4.5.5" />

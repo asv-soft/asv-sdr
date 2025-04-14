@@ -46,8 +46,8 @@ public class AdsbRxViewModel:ShellPage
         byte shift = 0x80; 
         for (var i = 0; i < 8; i++)
         {
-            result[i] = (byte)((AdsbHelper.Preamble[0] & shift) != 0 ? 1 : 0);
-            result[i + 8] = (byte)((AdsbHelper.Preamble[1] & shift) != 0 ? 1 : 0);
+            result[i] = (byte)((TransponderHelper.Preamble[0] & shift) != 0 ? 1 : 0);
+            result[i + 8] = (byte)((TransponderHelper.Preamble[1] & shift) != 0 ? 1 : 0);
             shift >>= 1;
         }
         

@@ -1,6 +1,6 @@
 using System;
 
-namespace Asv.Sdr.Gui;
+namespace Asv.Sdr;
 
 /// <summary>
     /// Exception class that represents a generic GNSS parser exception.

@@ -1,7 +1,7 @@
 using System;
 using Asv.IO;
 
-namespace Asv.Sdr.Gui;
+namespace Asv.Sdr;
 
 public class AdsbAircraftIdentification : AdsbExtendedSquitterBase
 {
@@ -11,10 +11,10 @@ public class AdsbAircraftIdentification : AdsbExtendedSquitterBase
 
     public AircraftCategoryEnum AircraftCategory
     {
-        get => AdsbHelper.GetAircraftCategory(_rawMt, _rawCa);
+        get => TransponderHelper.GetAircraftCategory(_rawMt, _rawCa);
         set
         {
-            AdsbHelper.SetAircraftCategory(value, out var tc, out var ca);
+            TransponderHelper.SetAircraftCategory(value, out var tc, out var ca);
             _rawMt = tc;
             _rawCa = ca;
         }
@@ -27,7 +27,7 @@ public class AdsbAircraftIdentification : AdsbExtendedSquitterBase
         base.InternalDeserialize(ref buffer);
         _rawMt = (buffer[0] >> 3) & 0x1F;
         _rawCa = buffer[0] & 0x7;
-        AircraftIdentification = AdsbHelper.AircraftIdDecoding(buffer.Slice(1, 6));
+        AircraftIdentification = TransponderHelper.AircraftIdDecoding(buffer.Slice(1, 6));
         buffer = buffer[7..];
     }
 
@@ -35,7 +35,7 @@ public class AdsbAircraftIdentification : AdsbExtendedSquitterBase
     {
         var tcCa = (byte)(((_rawMt & 0x1F) << 3) | (_rawCa & 0x7));
         BinSerialize.WriteByte(ref buffer, tcCa);
-        var id = AdsbHelper.AircraftIdEncoding(AircraftIdentification);
+        var id = TransponderHelper.AircraftIdEncoding(AircraftIdentification);
         for (var i = 0; i < 6; i++)
         {
             BinSerialize.WriteByte(ref buffer, id[i]);
