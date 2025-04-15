@@ -663,7 +663,6 @@ public class AdsbReplyViewModel:ShellPage
 
         if (_device == null || _device.IsDisposed) return;
         await _device.WriteDF17VelocityMessage(buffDF17, cancel).ConfigureAwait(false);
-        var readDF = await _device.ReadDF17VelocityMessage(cancel).ConfigureAwait(false);
     }
 
     #endregion
