@@ -8,9 +8,16 @@ using ZLogger;
 namespace Asv.Sdr.LimeSdr;
 
 
+public class LimeSdrDmeDeviceConfig
+{
+    public int RfRelayGpio { get; set; } = 0;
+    public bool RfRelayRxIsHigh { get; set; } = true;
+}
 
 public class LimeSdrDmeDevice:LimeSdrDevice, ILimeSdrDmeDevice
 {
+    private readonly LimeSdrDmeDeviceConfig _config;
+    
     private const ushort ControlAddress = 0x00D0;
     private const ushort DistanceAddressHigh = 0x00D1; // Address for high part of the distance
     private const ushort DistanceAddressLow = 0x00D2;  // Address for low part of the distance
@@ -28,9 +35,10 @@ public class LimeSdrDmeDevice:LimeSdrDevice, ILimeSdrDmeDevice
     
     private readonly ILogger _logger;
 
-    public LimeSdrDmeDevice(string deviceId,ILogger? logger = null)
+    public LimeSdrDmeDevice(string deviceId, LimeSdrDmeDeviceConfig config, ILogger? logger = null)
         :base(deviceId,true,logger ?? NullLogger.Instance)
     {
+        _config = config;
         _logger = logger ?? NullLogger.Instance;
     }
 
@@ -309,4 +317,27 @@ public class LimeSdrDmeDevice:LimeSdrDevice, ILimeSdrDmeDevice
         return this.WriteFpgaRegister(DebugFromPeriphcfgAddress, data, cancel);
     }
 
+    public async Task RfRelaySelectOutput(bool isTx, CancellationToken cancel = default)
+    {
+        var value = isTx ? !_config.RfRelayRxIsHigh : _config.RfRelayRxIsHigh;
+        _logger.ZLogDebug($"Setting RF relay to {(isTx ? "TX" : "RX")} (GPIO[{_config.RfRelayGpio}]={value})");
+        var arr = new byte[1] ;
+        await ReadGpioDirection(arr, cancel);
+        var dir = arr[0];
+        await ReadGpio(arr, cancel);
+        var gpio = arr[0];
+        var dirMask = (byte)(1 << _config.RfRelayGpio);
+        arr[0] = (byte)(dir | dirMask);
+        await WriteGpioDirection(arr, cancel);
+        
+        if (value)
+        {
+            arr[0] = (byte)(gpio | dirMask);
+        }
+        else
+        {
+            arr[0] = (byte)(gpio & ~dirMask);
+        }
+        await WriteGpio(arr, cancel);
+    }
 }

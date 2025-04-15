@@ -2,106 +2,27 @@ using System;
 using System.Text;
 using Asv.IO;
 
-namespace Asv.Sdr.Gui;
+namespace Asv.Sdr;
 
-public static class AdsbHelper
+public static class TransponderHelper
 {
     public static readonly byte[] Preamble = [0xA1, 0x40];
-    public const int LongFrameLengthBytes = 2 + 14;
-    public const int ShortFrameLengthBytes = 2 + 7;
+    public const int LongFrameLengthBytes = 14;
+    public const int ShortFrameLengthBytes = 7;
     
     
-    private const uint Polynomial = 0xfffa0480;
-    
-    public static uint CalcCrc(ReadOnlySpan<byte> frame)
-    {
-        var df = GetDownlinkFormat(frame);
-        var messageLength = GetMessageLength(df);
-        var crcBuffer = frame.Slice(2, messageLength - 2);
-        return messageLength switch
-        {
-            LongFrameLengthBytes => GetLongFrameParity(crcBuffer),
-            ShortFrameLengthBytes => GetShortFrameParity(crcBuffer),
-            _ => throw new Exception($"Unable to calculate checksum for frame. Frame length={messageLength} unknown")
-        };
-    }
-
-    private static uint GetLongFrameParity(ReadOnlySpan<byte> frame)
-    {
-        var data = (uint)(frame[0] << 24) | (uint)(frame[1] << 16) | (uint)(frame[2] << 8) | frame[3];
-        var data1 = (uint)(frame[4] << 24) | (uint)(frame[5] << 16) | (uint)(frame[6] << 8) | frame[7];
-        var data2 = (uint)(frame[8] << 24) | (uint)(frame[9] << 16) | (uint)(frame[10] << 8);
-
-        for (var i = 0; i < 88; i++)
-        {
-            if ((data & 0x80000000) != 0)
-            {
-                data ^= Polynomial;
-            }
-
-            data <<= 1;
-            if ((data1 & 0x80000000) != 0)
-            {
-                data |= 1;
-            }
-
-            data1 <<= 1;
-            if ((data2 & 0x80000000) != 0)
-            {
-                data1 |= 1;
-            }
-
-            data2 <<= 1;
-        }
-
-        var result0 = (byte)(data >> 24);
-        var result1 = (byte)((data >> 16) & 0xff);
-        var result2 = (byte)((data >> 8) & 0xff);
-
-        // var sum = (uint)((result0 ^ frame[11]) << 16) | (uint)((result1 ^ frame[12]) << 8) |
-        //           (uint)(result2 ^ frame[13]);
-        
-        var sum = (uint)(result0 << 16) | (uint)(result1 << 8) | result2;
-
-
-        return sum;
-    }
-    private static uint GetShortFrameParity(ReadOnlySpan<byte> frame)
-    {
-        var data = (uint)(frame[0] << 24) | (uint)(frame[1] << 16) | (uint)(frame[2] << 8) | frame[3];
-        for (var i = 0; i < 32; i++)
-        {
-            if ((data & 0x80000000) != 0)
-            {
-                data ^= Polynomial;
-            }
-
-            data <<= 1;
-        }
-
-        var result0 = (byte)(data >> 24);
-        var result1 = (byte)((data >> 16) & 0xff);
-        var result2 = (byte)((data >> 8) & 0xff);
-
-        // var sum = (uint)((result0 ^ frame[4]) << 16) | (uint)((result1 ^ frame[5]) << 8) | (uint)(result2 ^ frame[6]);
-
-        var sum = (uint)(result0 << 16) | (uint)(result1 << 8) | result2;
-        
-        return sum;
-    }
-
     public static int GetMessageLength(int downlinkFormat)
     {
         return downlinkFormat >= 16 ? LongFrameLengthBytes : ShortFrameLengthBytes;
     }
     public static int GetDownlinkFormat(ReadOnlySpan<byte> frame)
     {
-        return (frame[2] >> 3) & 0x1F;
+        return (frame[0] >> 3) & 0x1F;
     }
 
     public static int AdditionalIdentifier(ReadOnlySpan<byte> frame)
     {
-        return frame[2] & 0x7;
+        return frame[0] & 0x7;
     }
 
     public static CapabilityEnum GetCapability(int ca)
@@ -133,7 +54,7 @@ public static class AdsbHelper
     }
     public static AdsbMessageTypeEnum GetMessageType(ReadOnlySpan<byte> frame)
     {
-        var tc = (frame[6] >> 3) & 0x1F;
+        var tc = (frame[4] >> 3) & 0x1F;
         return tc switch
         {
             >= 1 and <= 4 => AdsbMessageTypeEnum.AircraftIdentification,
@@ -151,7 +72,7 @@ public static class AdsbHelper
 
     private static byte GetExtendedSquitterSybType(ReadOnlySpan<byte> frame)
     {
-        return (byte)(frame[6] & 0x07);
+        return (byte)(frame[4] & 0x07);
     }
 
     public static ushort GetMessageId(ReadOnlySpan<byte> buffer)
@@ -195,15 +116,15 @@ public static class AdsbHelper
 
     public static AircraftCategoryEnum GetAircraftCategory(int tc, int ca)
     {
-        if (tc == 1) return AircraftCategoryEnum.Reserved;
         if (ca == 0) return AircraftCategoryEnum.NoCategoryInformation;
+        if (tc == 1) return AircraftCategoryEnum.Reserved;
         return tc switch
         {
             2 => ca switch
             {
                 1 => AircraftCategoryEnum.SurfaceEmergencyVehicle,
-                3 => AircraftCategoryEnum.SurfaceServiceVehicle,
-                >= 4 and <= 7 => AircraftCategoryEnum.GroundObstruction
+                2 => AircraftCategoryEnum.SurfaceServiceVehicle,
+                3 => AircraftCategoryEnum.GroundObstruction
             },
             3 => ca switch
             {
@@ -218,8 +139,8 @@ public static class AdsbHelper
             4 => ca switch
             {
                 1 => AircraftCategoryEnum.Light,
-                2 => AircraftCategoryEnum.Medium1,
-                3 => AircraftCategoryEnum.Medium2,
+                2 => AircraftCategoryEnum.Small,
+                3 => AircraftCategoryEnum.Large,
                 4 => AircraftCategoryEnum.HighVortexAircraft,
                 5 => AircraftCategoryEnum.Heavy,
                 6 => AircraftCategoryEnum.HighPerformanceAndHighSpeed,
@@ -238,7 +159,7 @@ public static class AdsbHelper
                 caValue = 0;
                 break;
             case AircraftCategoryEnum.NoCategoryInformation:
-                tcValue = 2;
+                tcValue = 4;
                 caValue = 0;
                 break;
             case AircraftCategoryEnum.SurfaceEmergencyVehicle:
@@ -281,11 +202,11 @@ public static class AdsbHelper
                 tcValue = 4;
                 caValue = 1;
                 break;
-            case AircraftCategoryEnum.Medium1:
+            case AircraftCategoryEnum.Small:
                 tcValue = 4;
                 caValue = 2;
                 break;
-            case AircraftCategoryEnum.Medium2:
+            case AircraftCategoryEnum.Large:
                 tcValue = 4;
                 caValue = 3;
                 break;
@@ -425,7 +346,7 @@ public static class AdsbHelper
         var latOdd = dLatOdd * (Mod(j, 59) + latCprOdd);
 
         if (latEven >= 270.0) latEven -= 360.0;
-        if (latOdd >= 270.0) latOdd -= 360;
+        if (latOdd >= 270.0) latOdd -= 360.0;
 
         var nlEven = Nl(latEven);
         var nlOdd = Nl(latOdd);

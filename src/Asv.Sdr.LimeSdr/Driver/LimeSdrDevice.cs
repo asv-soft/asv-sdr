@@ -66,7 +66,8 @@ namespace Asv.Sdr.LimeSdr
         private readonly bool _isThreadSafe;
         private readonly HashSet<string> _ignoreLogLmsParams;
         private readonly ILogger _logger;
-        
+        private ILmsRegisterEditor _registerEditorEditor;
+
 
         public LimeSdrDevice(string deviceId, bool isThreadSave = true, ILoggerFactory? logFactory = null)
             :this(deviceId,isThreadSave,logFactory?.CreateLogger<LimeSdrDevice>() ?? LmsLogManager.GetLogger(nameof(LimeSdrDevice)),LimeSdrParams.LMS7_CAPSEL,LimeSdrParams.LMS7_CAPTURE)
@@ -76,6 +77,7 @@ namespace Asv.Sdr.LimeSdr
         public LimeSdrDevice(string deviceId, bool isThreadSave,ILogger logger, params LMS7Parameter[] ignoreLogLmsParams)
         {
             ArgumentNullException.ThrowIfNull(logger);
+            _registerEditorEditor = new LmsRegisterEditor(this);
             _logger = logger;
             DeviceId = deviceId;
             _isThreadSafe = isThreadSave;
@@ -119,7 +121,7 @@ namespace Asv.Sdr.LimeSdr
                 }
             }
           
-            Check(LMS_Init(_device),nameof(LMS_Init));
+            // Check(LMS_Init(_device),nameof(LMS_Init));
             //Check(LMS_Reset(_device), nameof(LMS_Reset));
 
             
@@ -535,7 +537,19 @@ namespace Asv.Sdr.LimeSdr
         }
         
         #endregion
-        
+
+        #region Single task
+
+        public Task AtomicEditRegister(Action<ILmsRegisterEditor> edit, CancellationToken cancel)
+        {
+            return _taskFactory.StartNew(() =>
+            {
+                if (IsDisposed) return;
+                edit(_registerEditorEditor);
+            }, cancel);
+        }
+
+        #endregion
         
         #region CustomRegister
 
@@ -578,6 +592,51 @@ namespace Asv.Sdr.LimeSdr
             {
                 throw new Exception($"Call {methodName} error: {limesdr_strerror()}");
             }
+        }
+
+        internal void InternalWriteFPGAReg(ushort addr, ushort val)
+        {
+            _logger.ZLogInformation($"Set FPGA register [{addr:X2}]={val}");
+            Check(LMS_WriteFPGAReg(_device, addr, val),nameof(LMS_WriteFPGAReg));
+        }
+
+        internal ushort InternalReadFPGAReg(ushort addr)
+        {
+            unsafe
+            {
+                if (IsDisposed) return ushort.MaxValue;
+                var buffer = new ushort[1];
+                fixed (ushort* buf = &buffer[0])
+                {
+                    Check(LMS_ReadFPGAReg(_device, addr, buf),nameof(LMS_ReadFPGAReg));
+                }
+                return buffer[0];
+            }
+        }
+    }
+
+    public interface ILmsRegisterEditor
+    {
+        void WriteFPGAReg(ushort addr, ushort val);
+        ushort RaedFPGAReg(ushort addr);
+    }
+
+    public class LmsRegisterEditor : ILmsRegisterEditor
+    {
+        private readonly LimeSdrDevice _device;
+
+        public LmsRegisterEditor(LimeSdrDevice device)
+        {
+            _device = device;
+        }
+        public void WriteFPGAReg(ushort addr, ushort val)
+        {
+            _device.InternalWriteFPGAReg(addr, val);
+        }
+
+        public ushort RaedFPGAReg(ushort addr)
+        {
+            return _device.InternalReadFPGAReg(addr);
         }
     }
 }

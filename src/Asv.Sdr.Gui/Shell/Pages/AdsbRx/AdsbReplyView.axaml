@@ -1,0 +1,164 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalonia="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
+             xmlns:gui="clr-namespace:Asv.Sdr.Gui"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Asv.Sdr.Gui.AdsbReplyView"
+             x:DataType="gui:AdsbReplyViewModel">
+    <Design.DataContext>
+        <gui:AdsbReplyViewModel />
+    </Design.DataContext>
+    <Grid ColumnDefinitions="*,*">
+        <Grid Grid.Column="0" RowDefinitions="*,*">
+            <StackPanel Grid.Row="0" Orientation="Vertical" Spacing="8">
+                <StackPanel Orientation="Horizontal">
+                    <Button Command="{CompiledBinding ConnectLms}">Connect Lms</Button>
+                    <Button Command="{CompiledBinding DisconnectLms}">Disconnect Lms</Button>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="ICAO:" VerticalAlignment="Center"/>
+                    <TextBox Text="{CompiledBinding MyIcaoStr}" VerticalAlignment="Center" Margin="5,0"/>
+                    <Button Command="{CompiledBinding ApplyIcao}">Apply ICAO</Button>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="TX Gain" VerticalAlignment="Center"/>
+                    <Slider Minimum="0" Width="200" Maximum="1" Value="{CompiledBinding TxGain}" Margin="5,0"/>
+                    <TextBlock Text="{CompiledBinding TxGainStr}" VerticalAlignment="Center"/>
+                    <TextBlock Text="RX Gain" VerticalAlignment="Center" Margin="5,0"/>
+                    <Slider Minimum="0" Width="200" Maximum="1" Value="{CompiledBinding RxGain}"/>
+                    <TextBlock Text="{CompiledBinding RxGainStr}" VerticalAlignment="Center" Margin="5,0"/>
+                    <TextBlock Text="RX Peak Amp:" VerticalAlignment="Center"/>
+                    <TextBlock Text="{CompiledBinding PeakAmp}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="DF Delay" VerticalAlignment="Center"/>
+                    <Slider Minimum="-819.0" Width="500" Maximum="819.0" Value="{CompiledBinding DfDelay}" Margin="5,0"/>
+                    <TextBlock Text="{CompiledBinding DfDelayStr}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="UF Type:" VerticalAlignment="Center"/>
+                    <TextBox Text="{CompiledBinding AnyUFTypeStr}" VerticalAlignment="Center" Margin="5,0"/>
+                    <Button Command="{CompiledBinding ApplyUFType}">Apply UF Type</Button>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <ToggleSwitch OffContent="DF4 Reply Off" OnContent="DF4 Reply On" IsChecked="{CompiledBinding OnOffDf4Reply}"/>
+                    <ToggleSwitch OffContent="DF5 Reply Off" OnContent="DF5 Reply On" IsChecked="{CompiledBinding OnOffDf5Reply}" Margin="5,0,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <ToggleSwitch OffContent="DF20 Reply Off" OnContent="DF20 Reply On" IsChecked="{CompiledBinding OnOffDf20Reply}"/>
+                    <ToggleSwitch OffContent="DF21 Reply Off" OnContent="DF21 Reply On" IsChecked="{CompiledBinding OnOffDf21Reply}" Margin="5,0,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <ToggleSwitch OffContent="DF11 Reply Off" OnContent="DF11 Reply On" IsChecked="{CompiledBinding OnOffDf11Reply}"/>
+                    <ToggleSwitch OffContent="DF11 Squitter Off" OnContent="DF11 Squitter On" IsChecked="{CompiledBinding OnOffDf11Squitter}" Margin="5,0,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <ToggleSwitch OffContent="DF17 ID Off" OnContent="DF17 ID On" IsChecked="{CompiledBinding OnOffDf17Id}"/>
+                    <ToggleSwitch OffContent="DF17 Position Off" OnContent="DF17 Position On" IsChecked="{CompiledBinding OnOffDf17Pos}" Margin="5,0"/>
+                    <ToggleSwitch OffContent="DF17 Velocity Off" OnContent="DF17 Velocity On" IsChecked="{CompiledBinding OnOffDf17Vel}"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="UF4:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding UF4Message}" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding UF4Cnt}" VerticalAlignment="Center"/>
+                        <TextBlock Text="ICAO:" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding UF4Icao}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="DF4:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding DF4Message}" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding DF4Cnt}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="UF5:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding UF5Message}" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding UF5Cnt}" VerticalAlignment="Center"/>
+                        <TextBlock Text="ICAO:" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding UF5Icao}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="DF5:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding DF5Message}" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding DF5Cnt}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="UF20:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding UF20Message}" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding UF20Cnt}" VerticalAlignment="Center"/>
+                        <TextBlock Text="ICAO:" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding UF20Icao}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="DF20:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding DF20Message}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="UF21:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding UF21Message}" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding UF21Cnt}" VerticalAlignment="Center"/>
+                        <TextBlock Text="ICAO:" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding UF21Icao}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="DF21:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding DF21Message}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="UF11:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding UF11Message}" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding UF11Cnt}" VerticalAlignment="Center"/>
+                        <TextBlock Text="ICAO:" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding UF11Icao}" VerticalAlignment="Center"/>
+                        <TextBlock Text="PR" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding PR}" VerticalAlignment="Center"/>
+                        <TextBlock Text="IC" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding IC}" VerticalAlignment="Center"/>
+                        <TextBlock Text="CL: " VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding CL}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="DF11 Squitter:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding DF11Message}" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding DF11Cnt}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="UF:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding AnyUFType}" VerticalAlignment="Center"/>
+                        <TextBlock Text=":" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding AnyUFMessage}" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding AnyUFCnt}" VerticalAlignment="Center"/>
+                        <TextBlock Text="ICAO:" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding AnyUFIcao}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="DF17 ID:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding DF17IdMessage}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="DF17 Position (Even):" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding DF17PosEvenMessage}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="DF17 Position (Odd):" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding DF17PosOddMessage}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="DF17 Velocity:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding DF17VelMessage}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+            
+        </Grid>
+        <Grid Grid.Column="1">
+            
+        </Grid>
+    </Grid>
+</UserControl>

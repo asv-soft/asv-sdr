@@ -1,7 +1,7 @@
 using System;
 using Asv.IO;
 
-namespace Asv.Sdr.Gui;
+namespace Asv.Sdr;
 
 public class AdsbAircraftOperationStatus : AdsbExtendedSquitterBase
 {

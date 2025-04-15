@@ -1,4 +1,4 @@
-namespace Asv.Sdr.Gui;
+namespace Asv.Sdr;
 
 public enum CapabilityEnum
 {
@@ -120,8 +120,8 @@ public enum AircraftCategoryEnum
     UnmannedAerialVehicle,
     SpaceOrTransAtmosphericVehicle,
     Light,
-    Medium1,
-    Medium2,
+    Small,
+    Large,
     HighVortexAircraft,
     Heavy,
     HighPerformanceAndHighSpeed,
@@ -138,14 +138,9 @@ public enum VelocitySubTypeEnum
 
 public enum NavigationUncertaintyCategoryEnum
 {
-    CategoryA,
-    CategoryB,
-    CategoryC,
-    CategoryD,
-    CategoryE,
-    CategoryF,
-    CategoryG,
-    NotAvailable
+    AdsbVersion0,
+    AdsbVersion1,
+    AdsbVersion2
 }
 
 public enum VerticalRateSourceEnum

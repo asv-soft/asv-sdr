@@ -1,7 +1,7 @@
 using System;
 using Asv.IO;
 
-namespace Asv.Sdr.Gui;
+namespace Asv.Sdr;
 
 public abstract class AdsbAirbornePosition : AdsbExtendedSquitterBase
 {
@@ -49,7 +49,7 @@ public abstract class AdsbAirbornePosition : AdsbExtendedSquitterBase
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, (uint)CprFormat);
         if (!double.IsNaN(Latitude) && !double.IsNaN(Longitude))
         {
-            var pos = AdsbHelper.UnambiguousPositionEncoding(Latitude, Longitude, CprFormat);
+            var pos = TransponderHelper.UnambiguousPositionEncoding(Latitude, Longitude, CprFormat);
             NCprLat = pos.Lat;
             NCprLon = pos.Lon;
         }
@@ -64,14 +64,14 @@ public abstract class AdsbAirbornePosition : AdsbExtendedSquitterBase
 
         if (CprFormat == CprFormatEnum.Even)
         {
-            var pos = AdsbHelper.GloballyUnambiguousPositionDecoding(NCprLat, NCprLon, prevPosition.NCprLat,
+            var pos = TransponderHelper.GloballyUnambiguousPositionDecoding(NCprLat, NCprLon, prevPosition.NCprLat,
                 prevPosition.NCprLon, DateTime.Now, DateTime.Now.AddSeconds(-1));
             Latitude = pos.Lat;
             Longitude = pos.Lon;
         }
         else
         {
-            var pos = AdsbHelper.GloballyUnambiguousPositionDecoding(prevPosition.NCprLat, prevPosition.NCprLon,
+            var pos = TransponderHelper.GloballyUnambiguousPositionDecoding(prevPosition.NCprLat, prevPosition.NCprLon,
                 NCprLat, NCprLon, DateTime.Now.AddSeconds(-1), DateTime.Now);
             Latitude = pos.Lat;
             Longitude = pos.Lon;
@@ -145,7 +145,7 @@ public class AdsbAirbornePositionWithBaroAlt : AdsbAirbornePosition
         return (uint)(((altNorm & 0x7F0) << 1) | 0x10 | (altNorm & 0xF));
     }
 
-    #region MyRegion
+    #region Gray code
 
     // Функция для преобразования двоичного числа в код Грея
     private static int BinaryToGray(int binary)
