@@ -460,7 +460,7 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
             return Task.CompletedTask;
         }
 
-        var frame = new ValueTuple<ushort, ushort>[14];
+        var frame = new ValueTuple<ushort, ushort>[7];
         frame[0] = new ValueTuple<ushort, ushort>(DF20_111_96_InternAddr, (ushort)((message.Span[0] << 8) | message.Span[1]));
         frame[1] = new ValueTuple<ushort, ushort>(DF20_95_80_InternAddr, (ushort)((message.Span[2] << 8) | message.Span[3]));
         frame[2] = new ValueTuple<ushort, ushort>(DF20_79_64_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
@@ -497,7 +497,7 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
             return Task.CompletedTask;
         }
 
-        var frame = new ValueTuple<ushort, ushort>[14];
+        var frame = new ValueTuple<ushort, ushort>[7];
         frame[0] = new ValueTuple<ushort, ushort>(DF21_111_96_InternAddr, (ushort)((message.Span[0] << 8) | message.Span[1]));
         frame[1] = new ValueTuple<ushort, ushort>(DF21_95_80_InternAddr, (ushort)((message.Span[2] << 8) | message.Span[3]));
         frame[2] = new ValueTuple<ushort, ushort>(DF21_79_64_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
@@ -540,11 +540,7 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
         return WriteAdsbFrame(frame, cancel);
     }
 
-#if DEBUG
     public async Task<byte[]> ReadDF11Message(CancellationToken cancel = default)
-#else
-    private async Task<byte[]> ReadDF11Message(CancellationToken cancel = default)
-#endif
     {
         var addrs = new[] { DF11_55_40_InternAddr, DF11_39_24_InternAddr};
         var values = await ReadAdsbFrame(addrs, cancel).ConfigureAwait(false);
@@ -796,7 +792,7 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
             return Task.CompletedTask;
         }
 
-        var df20Frame = new ValueTuple<ushort, ushort>[14];
+        var df20Frame = new ValueTuple<ushort, ushort>[7];
         df20Frame[0] = new ValueTuple<ushort, ushort>(DF20_111_96_InternAddr, (ushort)((df20[0] << 8) | df20[1]));
         df20Frame[1] = new ValueTuple<ushort, ushort>(DF20_95_80_InternAddr, (ushort)((df20[2] << 8) | df20[3]));
         df20Frame[2] = new ValueTuple<ushort, ushort>(DF20_79_64_InternAddr, (ushort)((df20[4] << 8) | df20[5]));
@@ -812,7 +808,7 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
             return Task.CompletedTask;
         }
 
-        var df21Frame = new ValueTuple<ushort, ushort>[14];
+        var df21Frame = new ValueTuple<ushort, ushort>[7];
         df21Frame[0] = new ValueTuple<ushort, ushort>(DF21_111_96_InternAddr, (ushort)((df21[0] << 8) | df21[1]));
         df21Frame[1] = new ValueTuple<ushort, ushort>(DF21_95_80_InternAddr, (ushort)((df21[2] << 8) | df21[3]));
         df21Frame[2] = new ValueTuple<ushort, ushort>(DF21_79_64_InternAddr, (ushort)((df21[4] << 8) | df21[5]));
@@ -861,7 +857,7 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
             return Task.CompletedTask;
         }
 
-        var df21Frame = new ValueTuple<ushort, ushort>[14];
+        var df21Frame = new ValueTuple<ushort, ushort>[7];
         df21Frame[0] = new ValueTuple<ushort, ushort>(DF21_111_96_InternAddr, (ushort)((df21[0] << 8) | df21[1]));
         df21Frame[1] = new ValueTuple<ushort, ushort>(DF21_95_80_InternAddr, (ushort)((df21[2] << 8) | df21[3]));
         df21Frame[2] = new ValueTuple<ushort, ushort>(DF21_79_64_InternAddr, (ushort)((df21[4] << 8) | df21[5]));
@@ -927,7 +923,7 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
             return Task.CompletedTask;
         }
 
-        var df20Frame = new ValueTuple<ushort, ushort>[14];
+        var df20Frame = new ValueTuple<ushort, ushort>[7];
         df20Frame[0] = new ValueTuple<ushort, ushort>(DF20_111_96_InternAddr, (ushort)((df20[0] << 8) | df20[1]));
         df20Frame[1] = new ValueTuple<ushort, ushort>(DF20_95_80_InternAddr, (ushort)((df20[2] << 8) | df20[3]));
         df20Frame[2] = new ValueTuple<ushort, ushort>(DF20_79_64_InternAddr, (ushort)((df20[4] << 8) | df20[5]));
@@ -943,7 +939,7 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
             return Task.CompletedTask;
         }
 
-        var df21Frame = new ValueTuple<ushort, ushort>[14];
+        var df21Frame = new ValueTuple<ushort, ushort>[7];
         df21Frame[0] = new ValueTuple<ushort, ushort>(DF21_111_96_InternAddr, (ushort)((df21[0] << 8) | df21[1]));
         df21Frame[1] = new ValueTuple<ushort, ushort>(DF21_95_80_InternAddr, (ushort)((df21[2] << 8) | df21[3]));
         df21Frame[2] = new ValueTuple<ushort, ushort>(DF21_79_64_InternAddr, (ushort)((df21[4] << 8) | df21[5]));
