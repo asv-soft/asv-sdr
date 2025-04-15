@@ -149,10 +149,11 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
             .ContinueWith(x => x.Result != 0, cancel);
     }
 
-    public Task AdsbSetIsEnabled(bool enabled, CancellationToken cancel = default)
+    public async Task AdsbSetIsEnabled(bool enabled, CancellationToken cancel = default)
     {
         _logger.ZLogDebug($"Setting ADS-B mode to {enabled}");
-        return this.WriteFpgaRegisterBits(ControlAddress, 0, 1, (ushort)(enabled ? 1 : 0), cancel);
+        await this.WriteFpgaRegisterBits(ControlAddress, 0, 1, (ushort)(enabled ? 1 : 0), cancel).ConfigureAwait(false);
+        await Task.Delay(1000, cancel);
     }
 
     public Task<bool> AdsbDf11ReplyIsEnabled(CancellationToken cancel = default)

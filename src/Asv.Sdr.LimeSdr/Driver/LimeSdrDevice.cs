@@ -425,7 +425,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.ZLogInformation($"Set FPGA register [{address:X2}]={value}");
+                _logger.ZLogTrace($"Set FPGA register [{address:X2}]={value}");
                 Check(LMS_WriteFPGAReg(_device, address, value),nameof(LMS_WriteFPGAReg));
             }, cancel);
         }
@@ -456,7 +456,7 @@ namespace Asv.Sdr.LimeSdr
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                _logger.ZLogInformation($"Set LMS register {address:X2}={value:X2}");
+                _logger.ZLogTrace($"Set LMS register {address:X2}={value:X2}");
                 Check(LMS_WriteLMSReg(_device, address, value),nameof(LMS_WriteLMSReg));
             }, cancel);
         }
@@ -596,7 +596,7 @@ namespace Asv.Sdr.LimeSdr
 
         internal void InternalWriteFPGAReg(ushort addr, ushort val)
         {
-            _logger.ZLogInformation($"Set FPGA register [{addr:X2}]={val}");
+            _logger.ZLogTrace($"Set FPGA register [{addr:X2}]={val}");
             Check(LMS_WriteFPGAReg(_device, addr, val),nameof(LMS_WriteFPGAReg));
         }
 
