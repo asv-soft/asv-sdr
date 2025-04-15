@@ -17,9 +17,9 @@ public abstract class ModeSFormatBase : ISizedSpanSerializable
         AllAddressParity = new uint[0xFFFFFF];
         
         var readSuccess = false;
-        if (File.Exists($"Resources{Path.DirectorySeparatorChar}AddressParityDb.bin"))
+        if (File.Exists($"resources{Path.DirectorySeparatorChar}AddressParityDb.bin"))
         {
-            using var fs = new FileStream($"Resources{Path.DirectorySeparatorChar}AddressParityDb.bin", FileMode.Open);
+            using var fs = new FileStream($"resources{Path.DirectorySeparatorChar}AddressParityDb.bin", FileMode.Open);
             if (fs.Length == 0xFFFFFF * 3)
             {
                 var buffer = new byte[0xFFFFFF * 3];
@@ -41,10 +41,10 @@ public abstract class ModeSFormatBase : ISizedSpanSerializable
         
         if (readSuccess) return;
 
-        if (!Directory.Exists("Resources"))
-            Directory.CreateDirectory("Resources");
+        if (!Directory.Exists("resources"))
+            Directory.CreateDirectory("resources");
         
-        using var newFs = new FileStream($"Resources{Path.DirectorySeparatorChar}AddressParityDb.bin", FileMode.OpenOrCreate, FileAccess.Write);
+        using var newFs = new FileStream($"resources{Path.DirectorySeparatorChar}AddressParityDb.bin", FileMode.OpenOrCreate, FileAccess.Write);
         var newBuffer = new byte[0xFFFFFF * 3];
         var newSpan = new ReadOnlySpan<byte>(newBuffer);
         for (uint i = 0x0; i < 0xFFFFFF; i++)
