@@ -11,13 +11,126 @@ public class ModeSUF5 : ModeSUFormatBase
     public byte RR { get; set; }
     public byte DI { get; set; }
     public byte SD { get; set; }
+    
+    public bool IsShortReply { get; set; }
+    
+    public byte BDS1 { get; set; }
+
+    public byte BDS2 { get; set; } = 0;
+    
+    /// <summary>
+    /// Interrogator Identifier Subfield contains the self-identification
+    /// code of the interrogator which is numerically identical to the II code transmitted by the
+    /// same interrogator in the Mode S-Only All-Call. IIS codes are assigned to interrogators
+    /// and range from 0 through 15; IIS=0 is not a valid interrogator identifier for multisite
+    /// purposes.
+    /// DI code is 0, 1 or 7
+    /// </summary>
+    public byte? InterrogatorIdentifier { get; set; }
+    
+    /// <summary>
+    /// Multisite Comm-B Subfield.
+    /// DI=1
+    /// </summary>
+    public MultisiteCommBEnum? MultisiteCommB { get; set; }
+
+    /// <summary>
+    /// Multisite ELM Subfield contains reservation and closeout commands for ELM.
+    /// DI=1
+    /// </summary>
+    public MultisiteELMEnum? MultisiteELM { get; set; }
+    
+    /// <summary>
+    /// Reservation Status Subfield can request the transponder to report its reservation status in the UM field.
+    /// DI=1
+    /// </summary>
+    public ReservationStatusEnum? ReservationStatus { get; set; }
+    
+    /// <summary>
+    /// Lockout Subfield, if set to ONE, initiates a multisite All-Call lockout to Mode S-Only All-Calls (UF=11)
+    /// from the interrogator indicated in IIS of the same interrogation. If lockout is set to ZERO no change in
+    /// lockout state is commanded.
+    /// DI code is 1 or 7
+    /// </summary>
+    public bool? Lockout { get; set; }
+
+    /// <summary>
+    /// Tactical message is used for identifying linkage of Comm-A messages, with “0” indicating an unlinked message.
+    /// DI code is 1 or 7
+    /// </summary>
+    public byte? TacticalMessage { get; set; }
+    
+    /// <summary>
+    /// Reply Request (BDS2).
+    /// DI code is 1, 3 or 7
+    /// </summary>
+    public byte? ReplyRequest { get; set; }
+    
+    /// <summary>
+    /// Surveillance identifier subfield in SD contains an assigned SI code of the interrogator.
+    /// DI=3
+    /// </summary>
+    public byte? SurveillanceIdentifier  { get; set; }
+    
+    /// <summary>
+    /// Lockout surveillance subfield if set to TRUE signifies a multisite lockout command from the interrogator
+    /// indicated in SIS. LSS set to FALSE is used to signify that no change in lockout state is commanded.
+    /// DI=3
+    /// </summary>
+    public bool? LockoutSurveillance { get; set; }
+    
+    /// <summary>
+    /// If the Overlay Command is equal to “TRUE” then the reply to the interrogation shall contain the
+    /// “DP” (Data Parity) field in accordance with §2.2.14.4.12. If the “OVC” is equal to “FALSE”
+    /// then the reply to the interrogation shall contain the “AP”.
+    /// DI code is 0, 3 or 7
+    /// </summary>
+    public bool? OverlayCommand { get; set; }
 
     protected override void InternalDeserialize(ReadOnlySpan<byte> buffer, ref int pos)
     {
         PC = (byte)ModeSHelper.GetBitU(buffer, ref pos, 3);
         RR = (byte)ModeSHelper.GetBitU(buffer, ref pos, 5);
+        if (RR < 16)
+        {
+            IsShortReply = true;
+        }
+        else
+        {
+            IsShortReply = false;
+            BDS1 = (byte)(RR & 0xF);
+        }
         DI = (byte)ModeSHelper.GetBitU(buffer, ref pos, 3);
         SD = (byte)ModeSHelper.GetBitU(buffer, ref pos, 16);
+
+        switch (DI)
+        {
+            case 0:
+                InterrogatorIdentifier = (byte?)((SD & 0xF000) >> 12);
+                OverlayCommand = (SD & 0x10) != 0;
+                break;
+            case 1:
+                InterrogatorIdentifier = (byte?)((SD & 0xF000) >> 12);
+                MultisiteCommB = (MultisiteCommBEnum)((SD & 0xC00) >> 10);
+                MultisiteELM = (MultisiteELMEnum)((SD & 0x380) >> 7);
+                Lockout = (SD & 0x40) != 0;
+                ReservationStatus = (ReservationStatusEnum)((SD & 0x30) >> 4);
+                TacticalMessage = (byte?)(SD & 0xF);
+                break;
+            case 3:
+                SurveillanceIdentifier = (byte?)((SD & 0xFC00) >> 10);
+                LockoutSurveillance = (SD & 0x200) != 0;
+                ReplyRequest = BDS2 = (byte)((SD & 0x1E0) >> 5);
+                OverlayCommand = (SD & 0x10) != 0;
+                break;
+            case 7:
+                InterrogatorIdentifier = (byte?)((SD & 0xF000) >> 12);
+                ReplyRequest = BDS2 = (byte)((SD & 0xF00) >> 8);
+                Lockout = (SD & 0x40) != 0;
+                OverlayCommand = (SD & 0x10) != 0;
+                TacticalMessage = (byte?)(SD & 0xF);
+                break;
+        }
     }
 
     protected override void InternalSerialize(Span<byte> buffer, ref int pos)
@@ -81,7 +194,7 @@ public class ModeSDF5 : ModeSDFormatBase
 
     protected override void InternalDeserialize(ReadOnlySpan<byte> buffer, ref int pos)
     {
-        throw new NotImplementedException();
+        
     }
 
     protected override void InternalSerialize(Span<byte> buffer, ref int pos)

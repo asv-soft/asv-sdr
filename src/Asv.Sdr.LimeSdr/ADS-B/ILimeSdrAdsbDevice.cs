@@ -64,11 +64,13 @@ public interface ILimeSdrAdsbDevice : ILimeSdrDevice
     
     Task<byte[]> ReadUF5Message(CancellationToken cancel = default);
 
-    public Task<byte[]> ReadUF20Message(CancellationToken cancel = default);
+    Task<byte[]> ReadUF20Message(CancellationToken cancel = default);
 
-    public Task<byte[]> ReadUF21Message(CancellationToken cancel = default);
+    Task<byte[]> ReadUF21Message(CancellationToken cancel = default);
 
     Task<byte[]> ReadUF11Message(CancellationToken cancel = default);
+    
+    Task<(byte[] UF4, byte[] UF5, byte[] UF20, byte[] UF21, byte[] UF11)> ReadAllUFMessage(CancellationToken cancel = default);
 
     Task SetAnyUFType(ushort type, CancellationToken cancel);
     
@@ -159,6 +161,15 @@ public interface ILimeSdrAdsbDevice : ILimeSdrDevice
     /// <returns>[DF4, DF5] cnt</returns>
     Task<byte[]> GetDF4DF5Stat(CancellationToken cancel = default);
 
+    /// <summary>
+    /// RX UF4/UF5/UF20/UF21/UF11 Message Statistic
+    /// TX DF4/DF5/DF20/DF21/DF11 Message Statistic
+    /// </summary>
+    /// <param name="cancel"></param>
+    /// <returns>[UF4, UF5, UF20, UF21, UF11, DF4, DF5, DF20, DF21, DF11] cnt</returns>
+    Task<(byte UF4, byte UF5, byte UF20, byte UF21, byte UF11, byte DF4, byte DF5, byte DF20, byte DF21, byte
+        DF11)> GetAllStat(CancellationToken cancel = default);
+    
     /// <summary>
     /// TX DF20/DF21 Message Statistic
     /// </summary>

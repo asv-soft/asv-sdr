@@ -379,6 +379,64 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
         return result;
     }
 
+    public async Task<(byte[] UF4, byte[] UF5, byte[] UF20, byte[] UF21, byte[] UF11)> ReadAllUFMessage(CancellationToken cancel = default)
+    {
+        var addrs = new[]
+        {
+            UF4_55_40_InternAddr, UF4_39_24_InternAddr, UF4_23_08_InternAddr, UF4_07_00_InternAddr,
+            UF5_55_40_InternAddr, UF5_39_24_InternAddr, UF5_23_08_InternAddr, UF5_07_00_InternAddr,
+            UF20_111_96_InternAddr, UF20_95_80_InternAddr, UF20_79_64_InternAddr, UF20_63_48_InternAddr,
+            UF20_47_32_InternAddr, UF20_31_16_InternAddr, UF20_15_0_InternAddr,
+            UF21_111_96_InternAddr, UF21_95_80_InternAddr, UF21_79_64_InternAddr, UF21_63_48_InternAddr,
+            UF21_47_32_InternAddr, UF21_31_16_InternAddr, UF21_15_0_InternAddr,
+            UF11_55_40_InternAddr, UF11_39_24_InternAddr, UF11_23_08_InternAddr, UF11_07_00_InternAddr
+        };
+        var values = await ReadAdsbFrame(addrs, cancel).ConfigureAwait(false);
+        
+        var uf4 = new byte[7];
+        var uf5 = new byte[7];
+        var uf20 = new byte[14];
+        var uf21 = new byte[14];
+        var uf11 = new byte[7];
+        uf4[0] = (byte)((values[0] >> 8) & 0xFF);
+        uf4[1] = (byte)(values[0] & 0xFF);
+        uf4[2] = (byte)((values[1] >> 8) & 0xFF);
+        uf4[3] = (byte)(values[1] & 0xFF);
+        uf4[4] = (byte)((values[2] >> 8) & 0xFF);
+        uf4[5] = (byte)(values[2] & 0xFF);
+        uf4[6] = (byte)((values[3] >> 8) & 0xFF);
+
+        uf5[0] = (byte)((values[4] >> 8) & 0xFF);
+        uf5[1] = (byte)(values[4] & 0xFF);
+        uf5[2] = (byte)((values[5] >> 8) & 0xFF);
+        uf5[3] = (byte)(values[5] & 0xFF);
+        uf5[4] = (byte)((values[6] >> 8) & 0xFF);
+        uf5[5] = (byte)(values[6] & 0xFF);
+        uf5[6] = (byte)((values[7] >> 8) & 0xFF);
+        
+        for (var i = 0; i < 7; i++)
+        {
+            uf20[2 * i] = (byte)((values[i + 8] >> 8) & 0xFF);
+            uf20[2 * i + 1] = (byte)(values[i + 8] & 0xFF);
+        }
+        
+        for (var i = 0; i < 7; i++)
+        {
+            uf21[2 * i] = (byte)((values[i + 15] >> 8) & 0xFF);
+            uf21[2 * i + 1] = (byte)(values[i + 15] & 0xFF);
+        }
+        
+        uf11[0] = (byte)((values[22] >> 8) & 0xFF);
+        uf11[1] = (byte)(values[22] & 0xFF);
+        uf11[2] = (byte)((values[23] >> 8) & 0xFF);
+        uf11[3] = (byte)(values[23] & 0xFF);
+        uf11[4] = (byte)((values[24] >> 8) & 0xFF);
+        uf11[5] = (byte)(values[24] & 0xFF);
+        uf11[6] = (byte)((values[25] >> 8) & 0xFF);
+        
+        return (uf4, uf5, uf20, uf21, uf11);
+    }
+
     public Task SetAnyUFType(ushort type, CancellationToken cancel)
     {
         var frame = new[] { new ValueTuple<ushort, ushort>(UFxxType_InternAddr, type)};
@@ -760,7 +818,31 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
         var reg = await ReadFpgaRegister(DF4_DF5_CNT_Address, cancel).ConfigureAwait(false);
         return [(byte)((reg >> 8) & 0xFF), (byte)(reg & 0xFF)];
     }
-    
+
+    public async Task<(byte UF4, byte UF5, byte UF20, byte UF21, byte UF11, byte DF4, byte DF5, byte DF20, byte DF21, byte
+        DF11)> GetAllStat(CancellationToken cancel = default)
+    {
+        var regUF420 = await ReadFpgaRegister(UF4_UF20_CNT_Address, cancel).ConfigureAwait(false);
+        var regUF521 = await ReadFpgaRegister(UF5_UF21_CNT_Address, cancel).ConfigureAwait(false);
+        var regfUF11 = await ReadFpgaRegister(UF11_UFxx_CNT_Address, cancel).ConfigureAwait(false);
+        var regDF45 = await ReadFpgaRegister(DF4_DF5_CNT_Address, cancel).ConfigureAwait(false);
+        var regDF2021 = await ReadFpgaRegister(DF20_DF21_CNT_Address, cancel).ConfigureAwait(false);
+        var regDF11 = await ReadFpgaRegister(DF11_CNT_Address, cancel).ConfigureAwait(false);
+        
+        var uf4 = (byte)((regUF420 >> 8) & 0xFF);
+        var uf5 = (byte)((regUF521 >> 8) & 0xFF);
+        var uf20 = (byte)(regUF420 & 0xFF);
+        var uf21 = (byte)(regUF521 & 0xFF);
+        var uf11 = (byte)((regfUF11 >> 8) & 0xFF);
+        var df4 = (byte)((regDF45 >> 8) & 0xFF);
+        var df5 = (byte)(regDF45 & 0xFF);
+        var df20 = (byte)((regDF2021 >> 8) & 0xFF);
+        var df21 = (byte)(regDF2021 & 0xFF);
+        var df11 = (byte)((regDF11 >> 8) & 0xFF);
+
+        return (uf4, uf5, uf20, uf21, uf11, df4, df5, df20, df21, df11);
+    }
+
     public async Task<byte[]> GetDF20DF21Stat(CancellationToken cancel = default)
     {
         var reg = await ReadFpgaRegister(DF20_DF21_CNT_Address, cancel).ConfigureAwait(false);
