@@ -66,7 +66,7 @@ namespace Asv.Sdr.LimeSdr
         private readonly bool _isThreadSafe;
         private readonly HashSet<string> _ignoreLogLmsParams;
         private readonly ILogger _logger;
-        private ILmsRegisterEditor _registerEditorEditor;
+        private readonly ILmsRegisterEditor _registerEditor;
 
 
         public LimeSdrDevice(string deviceId, bool isThreadSave = true, ILoggerFactory? logFactory = null)
@@ -77,7 +77,7 @@ namespace Asv.Sdr.LimeSdr
         public LimeSdrDevice(string deviceId, bool isThreadSave,ILogger logger, params LMS7Parameter[] ignoreLogLmsParams)
         {
             ArgumentNullException.ThrowIfNull(logger);
-            _registerEditorEditor = new LmsRegisterEditor(this);
+            _registerEditor = new LmsRegisterEditor(this);
             _logger = logger;
             DeviceId = deviceId;
             _isThreadSafe = isThreadSave;
@@ -540,12 +540,12 @@ namespace Asv.Sdr.LimeSdr
 
         #region Single task
 
-        public Task AtomicEditRegister(Action<ILmsRegisterEditor> edit, CancellationToken cancel)
+        protected Task AtomicEditRegister(Action<ILmsRegisterEditor> edit, CancellationToken cancel)
         {
             return _taskFactory.StartNew(() =>
             {
                 if (IsDisposed) return;
-                edit(_registerEditorEditor);
+                edit(_registerEditor);
             }, cancel);
         }
 

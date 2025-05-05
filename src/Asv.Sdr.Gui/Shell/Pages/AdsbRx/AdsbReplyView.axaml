@@ -82,7 +82,8 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="DF5:" VerticalAlignment="Center"/>
                         <TextBlock Text="{CompiledBinding DF5Message}" VerticalAlignment="Center" Margin="5,0"/>
-                        <TextBlock Text="{CompiledBinding DF5Cnt}" VerticalAlignment="Center"/>
+                        <!-- <TextBlock Text="{CompiledBinding DF5Cnt}" VerticalAlignment="Center"/> -->
+                        <TextBlock Text="{CompiledBinding DF4Cnt}" VerticalAlignment="Center"/>
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal">
@@ -93,19 +94,37 @@
                         <TextBlock Text="{CompiledBinding UF20Icao}" VerticalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="DF20:" VerticalAlignment="Center"/>
-                        <TextBlock Text="{CompiledBinding DF20Message}" VerticalAlignment="Center" Margin="5,0,0,0"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
                         <TextBlock Text="UF21:" VerticalAlignment="Center"/>
                         <TextBlock Text="{CompiledBinding UF21Message}" VerticalAlignment="Center" Margin="5,0"/>
                         <TextBlock Text="{CompiledBinding UF21Cnt}" VerticalAlignment="Center"/>
                         <TextBlock Text="ICAO:" VerticalAlignment="Center" Margin="5,0"/>
                         <TextBlock Text="{CompiledBinding UF21Icao}" VerticalAlignment="Center"/>
                     </StackPanel>
+                    
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="DF21:" VerticalAlignment="Center"/>
-                        <TextBlock Text="{CompiledBinding DF21Message}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                        <TextBlock Text="BDS1.0:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding BDS10Message}" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding BDSCnt}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="BDS2.0:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding BDS20Message}" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding BDSCnt}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="BDS4.0:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding BDS40Message}" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding BDSCnt}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="BDS5.0:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding BDS50Message}" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding BDSCnt}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="BDS6.0:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding BDS60Message}" VerticalAlignment="Center" Margin="5,0"/>
+                        <TextBlock Text="{CompiledBinding BDSCnt}" VerticalAlignment="Center"/>
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal">

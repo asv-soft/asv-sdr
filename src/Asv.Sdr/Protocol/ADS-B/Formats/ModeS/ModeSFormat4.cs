@@ -10,7 +10,7 @@ public class ModeSUF4 : ModeSUFormatBase
     public byte PC { get; set; }
     public byte RR { get; set; }
     public byte DI { get; set; }
-    public byte SD { get; set; }
+    public ushort SD { get; set; }
     
     public bool IsShortReply { get; set; }
     
@@ -102,7 +102,7 @@ public class ModeSUF4 : ModeSUFormatBase
             BDS1 = (byte)(RR & 0xF);
         }
         DI = (byte)ModeSHelper.GetBitU(buffer, ref pos, 3);
-        SD = (byte)ModeSHelper.GetBitU(buffer, ref pos, 16);
+        SD = (ushort)ModeSHelper.GetBitU(buffer, ref pos, 16);
 
         switch (DI)
         {
@@ -175,7 +175,7 @@ public class ModeSDF4 : ModeSDFormatBase
     protected override int FormatLength => 7;
     public override byte FormatId => 4;
 
-    public byte FS { get; set; } = 0x1;
+    public byte FS { get; set; } = 0x0;
     public byte DR { get; set; } = 0x0;
     public byte UM { get; set; } = 0x0;
     private ushort AC { get; set; } = (ushort)SetAltitude(0.0);
@@ -189,7 +189,10 @@ public class ModeSDF4 : ModeSDFormatBase
 
     protected override void InternalDeserialize(ReadOnlySpan<byte> buffer, ref int pos)
     {
-        throw new NotImplementedException();
+        FS = (byte)ModeSHelper.GetBitU(buffer, ref pos, 3);
+        DR = (byte)ModeSHelper.GetBitU(buffer, ref pos, 5);
+        UM = (byte)ModeSHelper.GetBitU(buffer, ref pos, 6);
+        AC = (ushort)ModeSHelper.GetBitU(buffer, ref pos, 13);
     }
 
     protected override void InternalSerialize(Span<byte> buffer, ref int pos)

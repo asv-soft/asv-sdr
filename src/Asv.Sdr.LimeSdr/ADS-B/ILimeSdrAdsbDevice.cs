@@ -16,6 +16,14 @@ public interface ILimeSdrAdsbDevice : ILimeSdrDevice
     /// Sets the ADS-B mode.
     /// </summary>
     Task AdsbSetIsEnabled(bool enabled, CancellationToken cancel = default);
+    
+    /// <summary>
+    /// Set ADS-B, ModeS or ADS-B + ModeS
+    /// </summary>
+    /// <param name="mode">0 - ADS-B; 1 - ModeS; 2 - ADS-B + ModeS</param>
+    /// <param name="cancel"></param>
+    /// <returns></returns>
+    Task AdsbSetMode(byte mode, CancellationToken cancel = default);
 
     Task<bool> AdsbDf11ReplyIsEnabled(CancellationToken cancel = default);
     
@@ -88,9 +96,12 @@ public interface ILimeSdrAdsbDevice : ILimeSdrDevice
     /// <param name="message">DF5 message</param>
     Task WriteDF5Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
 
-    Task WriteDF20Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
+    Task WriteBDS10Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
+    Task WriteBDS20Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
+    Task WriteBDS40Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
+    Task WriteBDS50Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
+    Task WriteBDS60Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
     
-    Task WriteDF21Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
     
     /// <summary>
     /// Write DF11 ADS-B message
@@ -101,15 +112,18 @@ public interface ILimeSdrAdsbDevice : ILimeSdrDevice
 #if DEBUG
     Task<byte[]> ReadDF4Message(CancellationToken cancel = default);
     Task<byte[]> ReadDF5Message(CancellationToken cancel = default);
-    Task<byte[]> ReadDF20Message(CancellationToken cancel = default);
-    Task<byte[]> ReadDF21Message(CancellationToken cancel = default);
+    Task<byte[]> ReadBDS10Message(CancellationToken cancel = default);
+    Task<byte[]> ReadBDS20Message(CancellationToken cancel = default);
+    Task<byte[]> ReadBDS40Message(CancellationToken cancel = default);
+    Task<byte[]> ReadBDS50Message(CancellationToken cancel = default);
+    Task<byte[]> ReadBDS60Message(CancellationToken cancel = default);
     Task<byte[]> ReadDF11Message(CancellationToken cancel = default);
     Task<byte[]> ReadDF17IdMessage(CancellationToken cancel = default);
     Task<(byte[] Even, byte[] Odd)> ReadDF17PositionMessage(CancellationToken cancel = default);
     Task<byte[]> ReadDF17VelocityMessage(CancellationToken cancel = default);
 #endif
     
-
+    
     Task WriteDF17IdMessage(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
     Task WriteDF17PositionMessage(ReadOnlyMemory<byte> evenMessage, ReadOnlyMemory<byte> oddMessage,
         CancellationToken cancel = default);
@@ -185,37 +199,20 @@ public interface ILimeSdrAdsbDevice : ILimeSdrDevice
     Task<byte[]> GetDF11ReserveStat(CancellationToken cancel = default);
 
     /// <summary>
-    /// Update ICAO address to all messages
-    /// </summary>
-    /// <param name="df11">New df11 message</param>
-    /// <param name="df20">New df20 message</param>
-    /// <param name="df21">New df21 message</param>
-    /// <param name="cancel"></param>
-    /// <returns></returns>
-    Task UpdateIcaoAddr(ReadOnlySpan<byte> df11, ReadOnlySpan<byte> df20, ReadOnlySpan<byte> df21, CancellationToken cancel = default);
-
-    /// <summary>
-    /// Update Squawk to all messages
-    /// </summary>
-    /// <param name="df5">New df5 message</param>
-    /// <param name="df21">New df21 message</param>
-    /// <param name="cancel"></param>
-    /// <returns></returns>
-    Task UpdateSquawk(ReadOnlySpan<byte> df5, ReadOnlySpan<byte> df21, CancellationToken cancel = default);
-
-    /// <summary>
     /// Update All DF messages
     /// </summary>
     /// <param name="df11">New df11 message</param>
     /// <param name="df4">New df4 message</param>
     /// <param name="df5">New df5 message</param>
-    /// <param name="df20">New df20 message</param>
-    /// <param name="df21">New df21 message</param>
+    /// <param name="bds10">New bds10 message</param>
+    /// <param name="bds40">New bds40 message</param>
+    /// <param name="bds50">New bds50 message</param>
+    /// <param name="bds60">New bds60 message</param>
     /// <param name="df17Id">New df17Id message</param>
     /// <param name="cancel"></param>
     /// <returns></returns>
     Task InitAllMessage(ReadOnlySpan<byte> df11, ReadOnlySpan<byte> df4, ReadOnlySpan<byte> df5,
-        ReadOnlySpan<byte> df20, ReadOnlySpan<byte> df21, ReadOnlySpan<byte> df17Id, CancellationToken cancel);
+        ReadOnlySpan<byte> bds10, ReadOnlySpan<byte> bds20, ReadOnlySpan<byte> bds40, ReadOnlySpan<byte> bds50, ReadOnlySpan<byte> bds60, ReadOnlySpan<byte> df17Id, CancellationToken cancel);
     
     public bool IsDisposed { get; }
     

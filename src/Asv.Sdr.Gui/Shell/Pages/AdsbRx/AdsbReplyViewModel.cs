@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Composition;
 using System.Globalization;
 using System.IO;
@@ -13,6 +14,9 @@ using Asv.Common;
 using Asv.Sdr.LimeSdr;
 using Material.Icons;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using ScottPlot.Avalonia;
@@ -40,6 +44,8 @@ public class AdsbReplyViewModel:ShellPage
 
     private const int IcaoAddress = 0x150777; //0x112149; //0x151F1A;
 
+    private ulong _DF20Cnt = 0;
+    private ulong _DF21Cnt = 0;
     private ulong _prevUF4Stat = 0;
     private ulong _prevUF5Stat = 0;
     private ulong _prevUF20Stat = 0;
@@ -63,7 +69,10 @@ public class AdsbReplyViewModel:ShellPage
     private bool _isDF17PosZeroWrited;
     private bool _isDF17VelZeroWrited;
     private bool _isDF11ZeroWrited;
-    
+    private int _txGainFlag;
+    private int _rxGainFlag;
+    private int _readUfFlag;
+
 
     public AdsbReplyViewModel() : base(WellKnownUri.Shell + ".adsbReply")
     {
@@ -121,22 +130,40 @@ public class AdsbReplyViewModel:ShellPage
             .Throttle(TimeSpan.FromMilliseconds(100))
             .Subscribe(x =>
             {
-                var gain = Math.Round(x, 2);
-                _device?.SetNormalizedGain(LmsChannel.Tx, 0, gain, default).Wait();
-                _cfg.TxGain = gain;
-                _cfgSrv.Set(_cfg);
-                TxGainStr = gain.ToString("F2", CultureInfo.InvariantCulture);
+                if (Interlocked.CompareExchange(ref _txGainFlag, 1, 0) != 0) return;
+                try
+                {
+                    var gain = Math.Round(x, 2);
+                    _device?.SetNormalizedGain(LmsChannel.Tx, 0, gain, CancellationToken.None).Wait();
+                    _cfg.TxGain = gain;
+                    _cfgSrv.Set(_cfg);
+                    TxGainStr = gain.ToString("F2", CultureInfo.InvariantCulture);
+                }
+                finally
+                {
+                    Interlocked.Exchange(ref _txGainFlag, 0);
+                }
+                
             }).DisposeItWith(Disposable);
         
         this.WhenAnyValue(x => x.RxGain)
             .Throttle(TimeSpan.FromMilliseconds(100))
             .Subscribe(x =>
             {
-                var gain = Math.Round(x, 2);
-                _device?.SetNormalizedGain(LmsChannel.Rx, 0, gain, default).Wait();
-                _cfg.RxGain = gain;
-                _cfgSrv.Set(_cfg);
-                RxGainStr = gain.ToString("F2", CultureInfo.InvariantCulture);
+                if (Interlocked.CompareExchange(ref _rxGainFlag, 1, 0) != 0) return;
+                try
+                {
+                    var gain = Math.Round(x, 2);
+                    _device?.SetNormalizedGain(LmsChannel.Rx, 0, gain, CancellationToken.None).Wait();
+                    _cfg.RxGain = gain;
+                    _cfgSrv.Set(_cfg);
+                    RxGainStr = gain.ToString("F2", CultureInfo.InvariantCulture);
+                }
+                finally
+                {
+                    Interlocked.Exchange(ref _rxGainFlag, 0);
+                }
+                
             }).DisposeItWith(Disposable);
 
         this.WhenAnyValue(x => x.DfDelay)
@@ -208,14 +235,22 @@ public class AdsbReplyViewModel:ShellPage
             .ObserveOn(Scheduler.Default)
             .Subscribe(isOn =>
             {
-                UpdateMessageDF20(CancellationToken.None).Wait();
+                UpdateBDS10(CancellationToken.None).Wait();
+                UpdateBDS20(CancellationToken.None).Wait();
+                UpdateBDS40(CancellationToken.None).Wait();
+                UpdateBDS50(CancellationToken.None).Wait();
+                UpdateBDS60(CancellationToken.None).Wait();
                 _device?.SetDf20IsEnabled(isOn).Wait();
             }).DisposeItWith(Disposable);
         this.WhenAnyValue(x => x.OnOffDf21Reply)
             .ObserveOn(Scheduler.Default)
             .Subscribe(isOn =>
             {
-                UpdateMessageDF21(CancellationToken.None).Wait();
+                UpdateBDS10(CancellationToken.None).Wait();
+                UpdateBDS20(CancellationToken.None).Wait();
+                UpdateBDS40(CancellationToken.None).Wait();
+                UpdateBDS50(CancellationToken.None).Wait();
+                UpdateBDS60(CancellationToken.None).Wait();
                 _device?.SetDf21IsEnabled(isOn).Wait();
             }).DisposeItWith(Disposable);
         // *********************
@@ -233,8 +268,6 @@ public class AdsbReplyViewModel:ShellPage
             .Subscribe(icao =>
             {
                 UpdateMessageDF11(CancellationToken.None).Wait();
-                UpdateMessageDF5(CancellationToken.None).Wait();
-                UpdateMessageDF21(CancellationToken.None).Wait();
             }).DisposeItWith(Disposable);
         
         Observable.Timer(TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(100))
@@ -267,8 +300,9 @@ public class AdsbReplyViewModel:ShellPage
         if (_device is { IsDisposed: false })
         {
             var statDF20_21 = await _device.GetDF20DF21Stat(cancel).ConfigureAwait(false);
-            DF20Cnt += _prevDF20Stat <= statDF20_21[0] ? statDF20_21[0] - _prevDF20Stat : 256U + statDF20_21[0] - _prevDF20Stat;
-            DF21Cnt += _prevDF21Stat <= statDF20_21[1] ? statDF20_21[1] - _prevDF21Stat : 256U + statDF20_21[1] - _prevDF21Stat;
+            _DF20Cnt += _prevDF20Stat <= statDF20_21[0] ? statDF20_21[0] - _prevDF20Stat : 256U + statDF20_21[0] - _prevDF20Stat;
+            BDSCnt = _DF20Cnt;
+            _DF21Cnt += _prevDF21Stat <= statDF20_21[1] ? statDF20_21[1] - _prevDF21Stat : 256U + statDF20_21[1] - _prevDF21Stat;
             _prevDF20Stat = statDF20_21[0];
             _prevDF21Stat = statDF20_21[1];
         }
@@ -395,26 +429,20 @@ public class AdsbReplyViewModel:ShellPage
     private async Task UpdateMessageDF4(CancellationToken cancel)
     {
         var buffDF4 = new byte[7];
-        if (OnOffDf4Reply)
+        var msgD4 = new ModeSDF4
         {
-            var msgD4 = new ModeSDF4
-            {
-                IcaoAddress = MyIcao,
-                Altitude = 45.72
-            };
-            var spanD4 = new Span<byte>(buffDF4);
-            msgD4.Serialize(ref spanD4);
-            DF4Message = string.Join("", buffDF4.Select(x => $"{x:X2}"));
-        }
-        else
-        {
-            DF4Message = string.Join("", buffDF4.Select(x => $"{x:X2}"));
-        }
+            IcaoAddress = MyIcao,
+            Altitude = 45.72
+        };
+        var spanD4 = new Span<byte>(buffDF4);
+        msgD4.Serialize(ref spanD4);
+        DF4Message = string.Join("", buffDF4.Select(x => $"{x:X2}"));
+
 
         if (_device == null || _device.IsDisposed) return;
         await _device.WriteDF4Message(buffDF4, cancel).ConfigureAwait(false);
     }
-    
+
     private async Task UpdateMessageUF5(CancellationToken cancel)
     {
         if (_device == null || _device.IsDisposed) return;
@@ -442,21 +470,14 @@ public class AdsbReplyViewModel:ShellPage
     private async Task UpdateMessageDF5(CancellationToken cancel)
     {
         var buffDF5 = new byte[7];
-        if (OnOffDf5Reply)
+        var msgDF5 = new ModeSDF5
         {
-            var msgDF5 = new ModeSDF5
-            {
-                IcaoAddress = MyIcao,
-                Squawk = 5124
-            };
-            var spanD4 = new Span<byte>(buffDF5);
-            msgDF5.Serialize(ref spanD4);
-            DF5Message = string.Join("", buffDF5.Select(x => $"{x:X2}"));
-        }
-        else
-        {
-            DF5Message = string.Join("", buffDF5.Select(x => $"{x:X2}"));
-        }
+            IcaoAddress = MyIcao,
+            Squawk = 777
+        };
+        var spanD4 = new Span<byte>(buffDF5);
+        msgDF5.Serialize(ref spanD4);
+        DF5Message = string.Join("", buffDF5.Select(x => $"{x:X2}"));
 
         if (_device == null || _device.IsDisposed) return;
         await _device.WriteDF5Message(buffDF5, cancel).ConfigureAwait(false);
@@ -486,74 +507,72 @@ public class AdsbReplyViewModel:ShellPage
         }
     }
     
-    private async Task UpdateMessageDF20(CancellationToken cancel)
+    private async Task UpdateBDS10(CancellationToken cancel)
     {
-        var buffDF20 = new byte[14];
-        if (OnOffDf20Reply)
-        {
-            var msgD20 = new ModeSDF20
-            {
-                IcaoAddress = MyIcao,
-                Altitude = 45.72
-            };
-            var spanD20 = new Span<byte>(buffDF20);
-            msgD20.Serialize(ref spanD20);
-            DF20Message = string.Join("", buffDF20.Select(x => $"{x:X2}"));
-        }
-        else
-        {
-            DF20Message = string.Join("", buffDF20.Select(x => $"{x:X2}"));
-        }
+        var buffBDS10 = new byte[7];
+        
+        var bds20 = new Bds10();
+        var span20 = new Span<byte>(buffBDS10);
+        bds20.Serialize(ref span20);
+        BDS10Message = string.Join("", buffBDS10.Select(x => $"{x:X2}"));
 
         if (_device == null || _device.IsDisposed) return;
-        await _device.WriteDF20Message(buffDF20, cancel).ConfigureAwait(false);
+        await _device.WriteBDS10Message(buffBDS10, cancel).ConfigureAwait(false);
     }
     
-    private async Task UpdateMessageUF21(CancellationToken cancel)
+    private async Task UpdateBDS20(CancellationToken cancel)
     {
-        if (_device == null || _device.IsDisposed) return;
-        var statUF5_21 = await _device.GetUF5UF21Stat(cancel).ConfigureAwait(false);
-        var needsToBeUpdatedUF21 = _prevUF21Stat != statUF5_21[1];
-
-        if (needsToBeUpdatedUF21)
+        var buffBDS20 = new byte[7];
+        
+        var bds20 = new Bds20
         {
-            UF21Cnt += _prevUF21Stat <= statUF5_21[1] ? statUF5_21[1] - _prevUF21Stat : 256U + statUF5_21[1] - _prevUF21Stat;
-            _prevUF21Stat = statUF5_21[1];
-            
-            if (_device == null || _device.IsDisposed) return;
-            var uf21 = await _device.ReadUF21Message(cancel).ConfigureAwait(false);
-            
-            UF21Message = string.Join("", uf21.Select(x => $"{x:X2}"));
-                    
-            var msgU21 = new ModeSUF21();
-            var spanU21 = new ReadOnlySpan<byte>(uf21);
-            msgU21.Deserialize(ref spanU21);
-            UF21Icao = msgU21.IcaoAddress.ToString("X6");
-            await _writer.WriteLineAsync($"\"{DateTime.UtcNow:u}\" UF21: 0x{UF21Message} 0x{UF21Icao}").ConfigureAwait(false);
-        }
+            AircraftIdentification = "CURSIR"
+        };
+        var span20 = new Span<byte>(buffBDS20);
+        bds20.Serialize(ref span20);
+        BDS20Message = string.Join("", buffBDS20.Select(x => $"{x:X2}"));
+
+        if (_device == null || _device.IsDisposed) return;
+        await _device.WriteBDS20Message(buffBDS20, cancel).ConfigureAwait(false);
     }
     
-    private async Task UpdateMessageDF21(CancellationToken cancel)
+    private async Task UpdateBDS40(CancellationToken cancel)
     {
-        var buffDF21 = new byte[14];
-        if (OnOffDf21Reply)
-        {
-            var msgD21 = new ModeSDF21
-            {
-                IcaoAddress = MyIcao,
-                Squawk = 5124
-            };
-            var spanD21 = new Span<byte>(buffDF21);
-            msgD21.Serialize(ref spanD21);
-            DF21Message = string.Join("", buffDF21.Select(x => $"{x:X2}"));
-        }
-        else
-        {
-            DF21Message = string.Join("", buffDF21.Select(x => $"{x:X2}"));
-        }
+        var buffBDS40 = new byte[7];
+        
+        var bds40 = new BdsAny(4, 0);
+        var span40 = new Span<byte>(buffBDS40);
+        bds40.Serialize(ref span40);
+        BDS40Message = string.Join("", buffBDS40.Select(x => $"{x:X2}"));
 
         if (_device == null || _device.IsDisposed) return;
-        await _device.WriteDF21Message(buffDF21, cancel).ConfigureAwait(false);
+        await _device.WriteBDS40Message(buffBDS40, cancel).ConfigureAwait(false);
+    }
+    
+    private async Task UpdateBDS50(CancellationToken cancel)
+    {
+        var buffBDS50 = new byte[7];
+        
+        var bds50 = new BdsAny(5, 0);
+        var span50 = new Span<byte>(buffBDS50);
+        bds50.Serialize(ref span50);
+        BDS50Message = string.Join("", buffBDS50.Select(x => $"{x:X2}"));
+
+        if (_device == null || _device.IsDisposed) return;
+        await _device.WriteBDS50Message(buffBDS50, cancel).ConfigureAwait(false);
+    }
+    
+    private async Task UpdateBDS60(CancellationToken cancel)
+    {
+        var buffBDS60 = new byte[7];
+        
+        var bds60 = new BdsAny(6, 0);
+        var span60 = new Span<byte>(buffBDS60);
+        bds60.Serialize(ref span60);
+        BDS60Message = string.Join("", buffBDS60.Select(x => $"{x:X2}"));
+
+        if (_device == null || _device.IsDisposed) return;
+        await _device.WriteBDS60Message(buffBDS60, cancel).ConfigureAwait(false);
     }
     
     private async Task UpdateMessageDF17Id(CancellationToken cancel)
@@ -587,8 +606,8 @@ public class AdsbReplyViewModel:ShellPage
     {
         var buffDF17Even = new byte[14];
         var buffDF17Odd = new byte[14];
-        if (OnOffDf17Pos)
-        {
+        // if (OnOffDf17Pos)
+        // {
             var msgD17Even = new AdsbAirbornePositionWithBaroAlt
             {
                 AircraftAddress = (int)MyIcao,
@@ -622,12 +641,12 @@ public class AdsbReplyViewModel:ShellPage
             var spanD17Odd = new Span<byte>(buffDF17Odd);
             msgD17Odd.Serialize(ref spanD17Odd);
             DF17PosOddMessage = string.Join("", buffDF17Odd.Select(x => $"{x:X2}"));
-        }
-        else
-        {
-            DF17PosEvenMessage = string.Join("", buffDF17Even.Select(x => $"{x:X2}"));
-            DF17PosOddMessage = string.Join("", buffDF17Odd.Select(x => $"{x:X2}"));
-        }
+        // }
+        // else
+        // {
+        //     DF17PosEvenMessage = string.Join("", buffDF17Even.Select(x => $"{x:X2}"));
+        //     DF17PosOddMessage = string.Join("", buffDF17Odd.Select(x => $"{x:X2}"));
+        // }
 
         if (_device == null || _device.IsDisposed) return;
         await _device.WriteDF17PositionMessage(buffDF17Even, buffDF17Odd, cancel).ConfigureAwait(false);
@@ -636,8 +655,8 @@ public class AdsbReplyViewModel:ShellPage
     private async Task UpdateMessageDF17Velocity(CancellationToken cancel)
     {
         var buffDF17 = new byte[14];
-        if (OnOffDf17Vel)
-        {
+        // if (OnOffDf17Vel)
+        // {
             var msgD17 = new AdsbGroundSpeed
             {
                 AircraftAddress = (int)MyIcao,
@@ -655,35 +674,246 @@ public class AdsbReplyViewModel:ShellPage
             var spanD17 = new Span<byte>(buffDF17);
             msgD17.Serialize(ref spanD17);
             DF17VelMessage = string.Join("", buffDF17.Select(x => $"{x:X2}"));
-        }
-        else
-        {
-            DF17VelMessage = string.Join("", buffDF17.Select(x => $"{x:X2}"));
-        }
+        // }
+        // else
+        // {
+        //     DF17VelMessage = string.Join("", buffDF17.Select(x => $"{x:X2}"));
+        // }
 
         if (_device == null || _device.IsDisposed) return;
         await _device.WriteDF17VelocityMessage(buffDF17, cancel).ConfigureAwait(false);
     }
 
     #endregion
-    
-    
+
+
     private void UpdateUFMessage(long x)
     {
-        if (_device == null || _device.IsDisposed) return;
-        PeakAmp = _device.AdsbGetPeakAmplitude().Result.ToString();
-        UpdateMessageUF4(CancellationToken.None).Wait();
-        UpdateMessageUF5(CancellationToken.None).Wait();
-        UpdateMessageUF20(CancellationToken.None).Wait();
-        UpdateMessageUF21(CancellationToken.None).Wait();
-        UpdateMessageUF11(CancellationToken.None).Wait();
-        UpdateMessageAnyUF(CancellationToken.None).Wait();
-        UpdateMessageDFCnt(CancellationToken.None).Wait();
+        if (Interlocked.CompareExchange(ref _readUfFlag, 1, 0) != 0) return;
+        try
+        {
+            if (_device == null || _device.IsDisposed) return;
+            PeakAmp = _device.AdsbGetPeakAmplitude().Result.ToString();
+
+            if (_device == null || _device.IsDisposed) return;
+            var allStat = _device.GetAllStat(CancellationToken.None).Result;
+
+            var needsToBeUpdatedUF4 = _prevDF4Stat != allStat.DF4;
+            var needsToBeUpdatedUF5 = needsToBeUpdatedUF4;
+            // var needsToBeUpdatedUF5 = _prevDF5Stat != allStat.DF5;
+            var needsToBeUpdatedUF20 = _prevDF20Stat != allStat.DF20;
+            var needsToBeUpdatedUF21 = needsToBeUpdatedUF20;
+            // var needsToBeUpdatedUF21 = _prevDF21Stat != allStat.DF21;
+            var needsToBeUpdatedUF11 = _prevDF11Stat != allStat.DF11;
+
+            UF4Cnt += _prevUF4Stat <= allStat.UF4 ? allStat.UF4 - _prevUF4Stat : 256U + allStat.UF4 - _prevUF4Stat;
+            _prevUF4Stat = allStat.UF4;
+            UF5Cnt += _prevUF5Stat <= allStat.UF5 ? allStat.UF5 - _prevUF5Stat : 256U + allStat.UF5 - _prevUF5Stat;
+            _prevUF5Stat = allStat.UF5;
+            UF20Cnt += _prevUF20Stat <= allStat.UF20 ? allStat.UF20 - _prevUF20Stat : 256U + allStat.UF20 - _prevUF20Stat;
+            _prevUF20Stat = allStat.UF20;
+            UF21Cnt += _prevUF21Stat <= allStat.UF21 ? allStat.UF21 - _prevUF21Stat : 256U + allStat.UF21 - _prevUF21Stat;
+            _prevUF21Stat = allStat.UF21;
+            UF11Cnt += _prevUF11Stat <= allStat.UF11 ? allStat.UF11 - _prevUF11Stat : 256U + allStat.UF11 - _prevUF11Stat;
+            _prevUF11Stat = allStat.UF11;
+            
+            
+            if (!needsToBeUpdatedUF4 && !needsToBeUpdatedUF5 && !needsToBeUpdatedUF20 && !needsToBeUpdatedUF21 &&
+                !needsToBeUpdatedUF11) return;
+
+            if (_device == null || _device.IsDisposed) return;
+            var allMsg = _device.ReadAllUFMessage(CancellationToken.None).Result;
+
+            if (needsToBeUpdatedUF4)
+            {
+                DF4Cnt += _prevDF4Stat <= allStat.DF4 ? allStat.DF4 - _prevDF4Stat : 256U + allStat.DF4 - _prevDF4Stat;
+                _prevDF4Stat = allStat.DF4;
+
+                UF4Message = string.Join("", allMsg.UF4.Select(m => $"{m:X2}"));
+                var msgU4 = new ModeSUF4();
+                var spanU4 = new ReadOnlySpan<byte>(allMsg.UF4);
+                msgU4.Deserialize(ref spanU4);
+                UF4Icao = msgU4.IcaoAddress.ToString("X6");
+                _writer.WriteLine($"\"{DateTime.UtcNow:u}\" UF4: 0x{UF4Message} 0x{UF4Icao}");
+            }
+
+            if (needsToBeUpdatedUF5)
+            {
+                DF5Cnt += _prevDF5Stat <= allStat.DF5 ? allStat.DF5 - _prevDF5Stat : 256U + allStat.DF5 - _prevDF5Stat;
+                _prevDF5Stat = allStat.DF5;
+
+                UF5Message = string.Join("", allMsg.UF5.Select(m => $"{m:X2}"));
+                var msgU5 = new ModeSUF5();
+                var spanU5 = new ReadOnlySpan<byte>(allMsg.UF5);
+                msgU5.Deserialize(ref spanU5);
+                UF5Icao = msgU5.IcaoAddress.ToString("X6");
+                _writer.WriteLine($"\"{DateTime.UtcNow:u}\" UF5: 0x{UF5Message} 0x{UF5Icao}");
+            }
+
+            if (needsToBeUpdatedUF20)
+            {
+                _DF20Cnt += _prevDF20Stat <= allStat.DF20
+                    ? allStat.DF20 - _prevDF20Stat
+                    : 256U + allStat.DF20 - _prevDF20Stat;
+                _prevDF20Stat = allStat.DF20;
+                BDSCnt = _DF20Cnt;
+                
+                UF20Message = string.Join("", allMsg.UF20.Select(m => $"{m:X2}"));
+                var msgU20 = new ModeSUF20();
+                var spanU20 = new ReadOnlySpan<byte>(allMsg.UF20);
+                msgU20.Deserialize(ref spanU20);
+                UF20Icao = msgU20.IcaoAddress.ToString("X6");
+                _writer.WriteLine($"\"{DateTime.UtcNow:u}\" UF20: 0x{UF20Message} 0x{UF20Icao}");
+            }
+
+            if (needsToBeUpdatedUF21)
+            {
+                _DF21Cnt += _prevDF21Stat <= allStat.DF21
+                    ? allStat.DF21 - _prevDF21Stat
+                    : 256U + allStat.DF21 - _prevDF21Stat;
+                _prevDF21Stat = allStat.DF21;
+
+                UF21Message = string.Join("", allMsg.UF21.Select(m => $"{m:X2}"));
+                var msgU21 = new ModeSUF21();
+                var spanU21 = new ReadOnlySpan<byte>(allMsg.UF21);
+                msgU21.Deserialize(ref spanU21);
+                UF21Icao = msgU21.IcaoAddress.ToString("X6");
+                _writer.WriteLine($"\"{DateTime.UtcNow:u}\" UF21: 0x{UF21Message} 0x{UF21Icao}");
+            }
+
+            if (needsToBeUpdatedUF11)
+            {
+                DF11Cnt += _prevDF11Stat <= allStat.DF11
+                    ? allStat.DF11 - _prevDF11Stat
+                    : 256U + allStat.DF11 - _prevDF11Stat;
+                _prevDF11Stat = allStat.DF11;
+
+                UF11Message = string.Join("", allMsg.UF11.Select(m => $"{m:X2}"));
+                var msgU11 = new ModeSUF11();
+                var spanU11 = new ReadOnlySpan<byte>(allMsg.UF11);
+                msgU11.Deserialize(ref spanU11);
+                UF11Icao = msgU11.IcaoAddress.ToString("X6");
+                _writer.WriteLine($"\"{DateTime.UtcNow:u}\" UF11: 0x{UF11Message} 0x{UF11Icao}");
+            }
+
+            _writer?.Flush();
+            _strem?.Flush();
+
+            // UpdateMessageUF4(CancellationToken.None).Wait();
+            // UpdateMessageUF5(CancellationToken.None).Wait();
+            // UpdateMessageUF20(CancellationToken.None).Wait();
+            // UpdateMessageUF21(CancellationToken.None).Wait();
+            // UpdateMessageUF11(CancellationToken.None).Wait();
+            // UpdateMessageAnyUF(CancellationToken.None).Wait();
+            // UpdateMessageDFCnt(CancellationToken.None).Wait();
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _readUfFlag, 0);
+        }
+
+
     }
-    
-    
+
+
+    private class MyClass
+    {
+        public string rawMessage { get; set; }
+    }
     private async void ConnectLmsImpl()
     {
+        // var stream = new FileStream("C:\\Users\\lobanov\\Documents\\МПСН\\AllUFMessages.txt", FileMode.Open, FileAccess.Read);
+        // var stream = new FileStream("C:\\Users\\lobanov\\Install\\lime_adsb\\20170109_16_anonymized.avro\\msr804_20160519.json", FileMode.Open, FileAccess.Read);
+        // var reader = new StreamReader(stream);
+        //
+        // var df4Msg = new List<ModeSDF4>();
+        // var df5Msg = new List<ModeSDF5>();
+        // var df20Msg = new List<ModeSDF20>();
+        // var df21Msg = new List<ModeSDF21>();
+        //
+        // while (!reader.EndOfStream)
+        // {
+        //     try
+        //     {
+        //         
+        //         var m = JsonConvert.DeserializeObject<MyClass>(await reader.ReadLineAsync() ?? string.Empty);
+        //         if (m == null || string.IsNullOrEmpty(m.rawMessage)) continue;
+        //         var data = new byte[m.rawMessage.Length / 2];
+        //         for (var i = 0; i < m.rawMessage.Length / 2; i++)
+        //         {
+        //             data[i] = byte.Parse(m.rawMessage.AsSpan(2 * i, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+        //         }
+        //         var span = new ReadOnlySpan<byte>(data);
+        //         var msgNum = data[0] >> 3;
+        //         switch (msgNum)
+        //         {
+        //             case 4:
+        //                 var df4 = new ModeSDF4();
+        //                 df4.Deserialize(ref span);
+        //                 df4Msg.Add(df4);
+        //                 break;
+        //             case 5:
+        //                 var df5 = new ModeSDF5();
+        //                 df5.Deserialize(ref span);
+        //                 df5Msg.Add(df5);
+        //                 break;
+        //             case 20:
+        //                 var df20 = new ModeSDF20();
+        //                 df20.Deserialize(ref span);
+        //                 if (df20.BDS.Bds1 is 0 or 1 or 2 or 3 or 4 or 5 or 6)
+        //                     df20Msg.Add(df20);
+        //                 break;
+        //             case 21:
+        //                 var df21 = new ModeSDF21();
+        //                 df21.Deserialize(ref span);
+        //                 if (df21.BDS.Bds1 is 0 or 1 or 2 or 3 or 4 or 5 or 6)
+        //                     df21Msg.Add(df21);
+        //                 break;
+        //         }
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         
+        //     }
+        //     
+        // }
+        //
+        //
+        // var uf4Msg = new List<ModeSUF4>();
+        // var uf5Msg = new List<ModeSUF5>();
+        //
+        // while (!reader.EndOfStream)
+        // {
+        //     var line = (await reader.ReadLineAsync()).Split(" ");
+        //     var type = line[2];
+        //     var str = line[3][2..];
+        //     var data = new byte[7];
+        //     for (var i = 0; i < 7; i++)
+        //     {
+        //         data[i] = byte.Parse(str.AsSpan(2 * i, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+        //     }
+        //     var span = new ReadOnlySpan<byte>(data);
+        //     if (string.Equals(type, "UF4:"))
+        //     {
+        //         var uf4 = new ModeSUF4();
+        //         uf4.Deserialize(ref span);
+        //         uf4Msg.Add(uf4);
+        //     }
+        //     if (string.Equals(type, "UF5:"))
+        //     {
+        //         var uf5 = new ModeSUF5();
+        //         uf5.Deserialize(ref span);
+        //         uf5Msg.Add(uf5);
+        //     }
+        // }
+        //
+        //
+        //
+        // var ff4 = uf4Msg.GroupBy(uf4 => uf4.SD);
+        // var ff5 = uf5Msg.GroupBy(uf5 => uf5.SD);
+        
+        
+        
         if (Environment.Is64BitProcess)
         {
             _logger.LogInformation($"LMS use 64 bit native library");
@@ -709,8 +939,8 @@ public class AdsbReplyViewModel:ShellPage
             
             DF4Cnt = _prevDF4Stat = 0;
             DF5Cnt = _prevDF5Stat = 0;
-            DF20Cnt = _prevDF20Stat = 0;
-            DF21Cnt = _prevDF21Stat = 0;
+            BDSCnt = _DF20Cnt = _prevDF20Stat = 0;
+            _DF21Cnt = _prevDF21Stat = 0;
             DF11Cnt = _prevDF11Stat = 0;
             
             var dev = !string.IsNullOrWhiteSpace(_cfg.SerialNumber)
@@ -749,8 +979,11 @@ public class AdsbReplyViewModel:ShellPage
 
             await UpdateMessageDF4(CancellationToken.None).ConfigureAwait(false);
             await UpdateMessageDF5(CancellationToken.None).ConfigureAwait(false);
-            await UpdateMessageDF20(CancellationToken.None).ConfigureAwait(false);
-            await UpdateMessageDF21(CancellationToken.None).ConfigureAwait(false);
+            await UpdateBDS10(CancellationToken.None).ConfigureAwait(false);
+            await UpdateBDS20(CancellationToken.None).ConfigureAwait(false);
+            await UpdateBDS40(CancellationToken.None).ConfigureAwait(false);
+            await UpdateBDS50(CancellationToken.None).ConfigureAwait(false);
+            await UpdateBDS60(CancellationToken.None).ConfigureAwait(false);
             await UpdateMessageDF11(CancellationToken.None).ConfigureAwait(false);
             
             _strem = new FileStream("AllUFMessages.txt", FileMode.Append);
@@ -806,9 +1039,13 @@ public class AdsbReplyViewModel:ShellPage
     [Reactive] public string UF5Message { get; set; } = string.Empty;
     [Reactive] public string DF5Message { get; set; } = string.Empty;
     [Reactive] public string UF20Message { get; set; } = string.Empty;
-    [Reactive] public string DF20Message { get; set; } = string.Empty;
+    
+    [Reactive] public string BDS10Message { get; set; } = string.Empty;
+    [Reactive] public string BDS20Message { get; set; } = string.Empty;
+    [Reactive] public string BDS40Message { get; set; } = string.Empty;
+    [Reactive] public string BDS50Message { get; set; } = string.Empty;
+    [Reactive] public string BDS60Message { get; set; } = string.Empty;
     [Reactive] public string UF21Message { get; set; } = string.Empty;
-    [Reactive] public string DF21Message { get; set; } = string.Empty;
     [Reactive] public string UF11Message { get; set; } = string.Empty;
     [Reactive] public string DF11Message { get; set; } = string.Empty;
     [Reactive] public string DF17IdMessage { get; set; } = string.Empty;
@@ -847,8 +1084,7 @@ public class AdsbReplyViewModel:ShellPage
     [Reactive] public ulong AnyUFCnt { get; set; }
     [Reactive] public ulong DF4Cnt { get; set; }
     [Reactive] public ulong DF5Cnt { get; set; }
-    [Reactive] public ulong DF20Cnt { get; set; }
-    [Reactive] public ulong DF21Cnt { get; set; }
+    [Reactive] public ulong BDSCnt { get; set; }
     [Reactive] public ulong DF11Cnt { get; set; }
     [Reactive] public string UF4Icao { get; set; }
     [Reactive] public string UF5Icao { get; set; }

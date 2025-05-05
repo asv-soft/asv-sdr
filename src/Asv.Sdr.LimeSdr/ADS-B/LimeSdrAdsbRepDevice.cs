@@ -19,6 +19,10 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
 {
     private readonly LimeSdrAdsbRepDeviceConfig _config;
     private const ushort ControlAddress        = 0x00D0;
+    
+    private const ushort MODE_OFF_MASK         = 0xF901;
+    private const ushort ADS_B_MASK            = 0xE0;
+    private const ushort MODE_S_MASK           = 0x61E;
 
     private const ushort ADDRESS_WR_Address    = 0x00D1; // Address for internal write memory address
     private const ushort DATA_WR_Address       = 0x00D2; // Address for internal write data address
@@ -74,21 +78,24 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
     private const ushort DelayDF_InternAddr             = 0x0016; // Delay DF Reply
     private const ushort UFxxType_InternAddr            = 0x0017; // UFxx output message type registers
     
-    private const ushort DF20_111_96_InternAddr         = 0x0039; // DF20(111:96)
-    private const ushort DF20_95_80_InternAddr          = 0x003A; // DF20(95:80)
-    private const ushort DF20_79_64_InternAddr          = 0x003B; // DF20(79:64)
-    private const ushort DF20_63_48_InternAddr          = 0x003C; // DF20(63:48)
-    private const ushort DF20_47_32_InternAddr          = 0x003D; // DF20(47:32)
-    private const ushort DF20_31_16_InternAddr          = 0x003E; // DF20(31:16)
-    private const ushort DF20_15_0_InternAddr           = 0x003F; // DF20(15:0)
-
-    private const ushort DF21_111_96_InternAddr         = 0x0040; // DF21(111:96)
-    private const ushort DF21_95_80_InternAddr          = 0x0041; // DF21(95:80)
-    private const ushort DF21_79_64_InternAddr          = 0x0042; // DF21(79:64)
-    private const ushort DF21_63_48_InternAddr          = 0x0043; // DF21(63:48)
-    private const ushort DF21_47_32_InternAddr          = 0x0044; // DF21(47:32)
-    private const ushort DF21_31_16_InternAddr          = 0x0045; // DF21(31:16)
-    private const ushort DF21_15_0_InternAddr           = 0x0046; // DF21(15:0)
+    private const ushort BDS10_71_56_InternAddr         = 0x0039; // BDS10(71:56)
+    private const ushort BDS10_55_40_InternAddr         = 0x003A; // BDS10(55:40)
+    private const ushort BDS10_39_24_InternAddr         = 0x003B; // BDS10(39:24)
+    
+    private const ushort BDS40_71_56_InternAddr         = 0x003C; // BDS40(71:56)
+    private const ushort BDS40_55_40_InternAddr         = 0x003D; // BDS40(55:40)
+    private const ushort BDS40_39_24_InternAddr         = 0x003E; // BDS40(39:24)
+    
+    private const ushort BDS50_71_56_InternAddr         = 0x003F; // BDS50(71:56)
+    private const ushort BDS50_55_40_InternAddr         = 0x0040; // BDS50(55:40)
+    private const ushort BDS50_39_24_InternAddr         = 0x0041; // BDS50(39:24)
+    
+    private const ushort BDS60_71_56_InternAddr         = 0x0042; // BDS60(71:56)
+    private const ushort BDS60_55_40_InternAddr         = 0x0043; // BDS60(55:40)
+    private const ushort BDS60_39_24_InternAddr         = 0x0044; // BDS60(39:24)
+    
+    private const ushort Reserved1_15_0_InternAddr      = 0x0045; // Reserved1(15:0)
+    private const ushort Reserved2_15_0_InternAddr      = 0x0046; // Reserved2(15:0)
     
     
     // Read
@@ -154,6 +161,26 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
         _logger.ZLogDebug($"Setting ADS-B mode to {enabled}");
         await this.WriteFpgaRegisterBits(ControlAddress, 0, 1, (ushort)(enabled ? 1 : 0), cancel).ConfigureAwait(false);
         await Task.Delay(1000, cancel);
+    }
+
+    public Task AdsbSetMode(byte mode, CancellationToken cancel = default)
+    {
+        if (mode > 2) throw new ArgumentOutOfRangeException(nameof(mode));
+        return AtomicEditRegister(edit =>
+        {
+            var reg = edit.RaedFPGAReg(ControlAddress);
+            ushort mask = mode switch
+            {
+                0 => ADS_B_MASK,
+                1 => MODE_S_MASK,
+                2 => ADS_B_MASK | MODE_S_MASK,
+                _ => ADS_B_MASK | MODE_S_MASK
+            };
+
+            reg = (ushort)(reg & MODE_OFF_MASK);
+            reg = (ushort)(reg | mask);
+            edit.WriteFPGAReg(ControlAddress, reg);
+        }, cancel);
     }
 
     public Task<bool> AdsbDf11ReplyIsEnabled(CancellationToken cancel = default)
@@ -510,76 +537,173 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
         return result;
     }
 
-    public Task WriteDF20Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default)
+    public Task WriteBDS10Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default)
     {
-        if (message.Length != 14)
+        if (message.Length != 7)
         {
             _logger.ZLogDebug(
-                $"Error writing ADS-B DF20 message. Expected length greater than or equal to 14 bytes, but length {message.Length} bytes.");
+                $"Error writing ADS-B BDS10 register. Expected length greater than or equal to 7 bytes, but length {message.Length} bytes.");
             return Task.CompletedTask;
         }
 
-        var frame = new ValueTuple<ushort, ushort>[7];
-        frame[0] = new ValueTuple<ushort, ushort>(DF20_111_96_InternAddr, (ushort)((message.Span[0] << 8) | message.Span[1]));
-        frame[1] = new ValueTuple<ushort, ushort>(DF20_95_80_InternAddr, (ushort)((message.Span[2] << 8) | message.Span[3]));
-        frame[2] = new ValueTuple<ushort, ushort>(DF20_79_64_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
-        frame[3] = new ValueTuple<ushort, ushort>(DF20_63_48_InternAddr, (ushort)((message.Span[6] << 8) | message.Span[7]));
-        frame[4] = new ValueTuple<ushort, ushort>(DF20_47_32_InternAddr, (ushort)((message.Span[8] << 8) | message.Span[9]));
-        frame[5] = new ValueTuple<ushort, ushort>(DF20_31_16_InternAddr, (ushort)((message.Span[10] << 8) | message.Span[11]));
-        frame[6] = new ValueTuple<ushort, ushort>(DF20_15_0_InternAddr, (ushort)((message.Span[12] << 8) | message.Span[13]));
+        var frame = new ValueTuple<ushort, ushort>[3];
+        frame[0] = new ValueTuple<ushort, ushort>(BDS10_71_56_InternAddr, (ushort)((message.Span[1] << 8) | message.Span[2]));
+        frame[1] = new ValueTuple<ushort, ushort>(BDS10_55_40_InternAddr, (ushort)((message.Span[3] << 8) | message.Span[4]));
+        frame[2] = new ValueTuple<ushort, ushort>(BDS10_39_24_InternAddr, (ushort)((message.Span[5] << 8) | message.Span[6]));
         return WriteAdsbFrame(frame, cancel);
     }
-    
-    public async Task<byte[]> ReadDF20Message(CancellationToken cancel = default)
+
+    public async Task<byte[]> ReadBDS10Message(CancellationToken cancel = default)
     {
         var addrs = new[]
         {
-            DF20_111_96_InternAddr, DF20_95_80_InternAddr, DF20_79_64_InternAddr, DF20_63_48_InternAddr,
-            DF20_47_32_InternAddr, DF20_31_16_InternAddr, DF20_15_0_InternAddr
+            BDS10_71_56_InternAddr, BDS10_55_40_InternAddr, BDS10_39_24_InternAddr
         };
         var values = await ReadAdsbFrame(addrs, cancel).ConfigureAwait(false);
-        var result = new byte[values.Length * 2];
+        var result = new byte[values.Length * 2 + 1];
+        result[0] = (1 << 4) | 0;
         for (var i = 0; i < values.Length; i++)
         {
-            result[2 * i] = (byte)((values[i] >> 8) & 0xFF);
-            result[2 * i + 1] = (byte)(values[i] & 0xFF);
+            result[2 * i + 1] = (byte)((values[i] >> 8) & 0xFF);
+            result[2 * i + 2] = (byte)(values[i] & 0xFF);
         }
         return result;
     }
 
-    public Task WriteDF21Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default)
+    public async Task WriteBDS20Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default)
     {
-        if (message.Length != 14)
+        if (message.Length != 7)
         {
             _logger.ZLogDebug(
-                $"Error writing ADS-B DF21 message. Expected length greater than or equal to 14 bytes, but length {message.Length} bytes.");
-            return Task.CompletedTask;
+                $"Error writing ADS-B BDS20 register. Expected length greater than or equal to 14 bytes, but length {message.Length} bytes.");
+            return;
         }
-
-        var frame = new ValueTuple<ushort, ushort>[7];
-        frame[0] = new ValueTuple<ushort, ushort>(DF21_111_96_InternAddr, (ushort)((message.Span[0] << 8) | message.Span[1]));
-        frame[1] = new ValueTuple<ushort, ushort>(DF21_95_80_InternAddr, (ushort)((message.Span[2] << 8) | message.Span[3]));
-        frame[2] = new ValueTuple<ushort, ushort>(DF21_79_64_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
-        frame[3] = new ValueTuple<ushort, ushort>(DF21_63_48_InternAddr, (ushort)((message.Span[6] << 8) | message.Span[7]));
-        frame[4] = new ValueTuple<ushort, ushort>(DF21_47_32_InternAddr, (ushort)((message.Span[8] << 8) | message.Span[9]));
-        frame[5] = new ValueTuple<ushort, ushort>(DF21_31_16_InternAddr, (ushort)((message.Span[10] << 8) | message.Span[11]));
-        frame[6] = new ValueTuple<ushort, ushort>(DF21_15_0_InternAddr, (ushort)((message.Span[12] << 8) | message.Span[13]));
-        return WriteAdsbFrame(frame, cancel);
-    }
-    
-    public async Task<byte[]> ReadDF21Message(CancellationToken cancel = default)
-    {
-        var addrs = new[]
+        
+        byte df17FirstByte = 0;
+        await AtomicEditRegister(edit =>
         {
-            DF21_111_96_InternAddr, DF21_95_80_InternAddr, DF21_79_64_InternAddr, DF21_63_48_InternAddr,
-            DF21_47_32_InternAddr, DF21_31_16_InternAddr, DF21_15_0_InternAddr
-        };
+            df17FirstByte = (byte)((ReadAdsbRegister(edit, DF17_ID_79_64_InternAddr) >> 8) & 0xFF);
+        }, cancel).ConfigureAwait(false);
+        
+        var frame = new ValueTuple<ushort, ushort>[4];
+        frame[0] = new ValueTuple<ushort, ushort>(DF17_ID_79_64_InternAddr, (ushort)((df17FirstByte << 8) | message.Span[1]));
+        frame[1] = new ValueTuple<ushort, ushort>(DF17_ID_63_48_InternAddr, (ushort)((message.Span[2] << 8) | message.Span[3]));
+        frame[2] = new ValueTuple<ushort, ushort>(DF17_ID_47_32_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
+        frame[3] = new ValueTuple<ushort, ushort>(DF17_ID_31_24_InternAddr, (ushort)(message.Span[6] << 8));
+        await WriteAdsbFrame(frame, cancel);
+    }
+    public async Task<byte[]> ReadBDS20Message(CancellationToken cancel = default)
+    {
+        var addrs = new[] { DF17_ID_79_64_InternAddr, DF17_ID_63_48_InternAddr, DF17_ID_47_32_InternAddr, DF17_ID_31_24_InternAddr };
         var values = await ReadAdsbFrame(addrs, cancel).ConfigureAwait(false);
-        var result = new byte[values.Length * 2];
-        for (var i = 0; i < values.Length; i++)
+        var result = new byte[7];
+
+        for (var i = 0; i < 3; i++)
         {
             result[2 * i] = (byte)((values[i] >> 8) & 0xFF);
             result[2 * i + 1] = (byte)(values[i] & 0xFF);
+        }
+        result[6] = (byte)((values[3] >> 8) & 0xFF);
+        result[0] = 2 << 4 | 0;
+
+        return result;
+    }
+
+    public Task WriteBDS40Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default)
+    {
+        if (message.Length != 7)
+        {
+            _logger.ZLogDebug(
+                $"Error writing ADS-B BDS40 register. Expected length greater than or equal to 7 bytes, but length {message.Length} bytes.");
+            return Task.CompletedTask;
+        }
+
+        var frame = new ValueTuple<ushort, ushort>[3];
+        frame[0] = new ValueTuple<ushort, ushort>(BDS40_71_56_InternAddr, (ushort)((message.Span[1] << 8) | message.Span[2]));
+        frame[1] = new ValueTuple<ushort, ushort>(BDS40_55_40_InternAddr, (ushort)((message.Span[3] << 8) | message.Span[4]));
+        frame[2] = new ValueTuple<ushort, ushort>(BDS40_39_24_InternAddr, (ushort)((message.Span[5] << 8) | message.Span[6]));
+        return WriteAdsbFrame(frame, cancel);
+    }
+    
+    public async Task<byte[]> ReadBDS40Message(CancellationToken cancel = default)
+    {
+        var addrs = new[]
+        {
+            BDS40_71_56_InternAddr, BDS40_55_40_InternAddr, BDS40_39_24_InternAddr
+        };
+        var values = await ReadAdsbFrame(addrs, cancel).ConfigureAwait(false);
+        var result = new byte[values.Length * 2 + 1];
+        result[0] = (4 << 4) | 0;
+        for (var i = 0; i < values.Length; i++)
+        {
+            result[2 * i + 1] = (byte)((values[i] >> 8) & 0xFF);
+            result[2 * i + 2] = (byte)(values[i] & 0xFF);
+        }
+        return result;
+    }
+    
+    public Task WriteBDS50Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default)
+    {
+        if (message.Length != 7)
+        {
+            _logger.ZLogDebug(
+                $"Error writing ADS-B BDS50 register. Expected length greater than or equal to 7 bytes, but length {message.Length} bytes.");
+            return Task.CompletedTask;
+        }
+
+        var frame = new ValueTuple<ushort, ushort>[3];
+        frame[0] = new ValueTuple<ushort, ushort>(BDS50_71_56_InternAddr, (ushort)((message.Span[1] << 8) | message.Span[2]));
+        frame[1] = new ValueTuple<ushort, ushort>(BDS50_55_40_InternAddr, (ushort)((message.Span[3] << 8) | message.Span[4]));
+        frame[2] = new ValueTuple<ushort, ushort>(BDS50_39_24_InternAddr, (ushort)((message.Span[5] << 8) | message.Span[6]));
+        return WriteAdsbFrame(frame, cancel);
+    }
+    
+    public async Task<byte[]> ReadBDS50Message(CancellationToken cancel = default)
+    {
+        var addrs = new[]
+        {
+            BDS50_71_56_InternAddr, BDS50_55_40_InternAddr, BDS50_39_24_InternAddr
+        };
+        var values = await ReadAdsbFrame(addrs, cancel).ConfigureAwait(false);
+        var result = new byte[values.Length * 2 + 1];
+        result[0] = (5 << 4) | 0;
+        for (var i = 0; i < values.Length; i++)
+        {
+            result[2 * i + 1] = (byte)((values[i] >> 8) & 0xFF);
+            result[2 * i + 2] = (byte)(values[i] & 0xFF);
+        }
+        return result;
+    }
+    
+    public Task WriteBDS60Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default)
+    {
+        if (message.Length != 7)
+        {
+            _logger.ZLogDebug(
+                $"Error writing ADS-B BDS60 register. Expected length greater than or equal to 7 bytes, but length {message.Length} bytes.");
+            return Task.CompletedTask;
+        }
+
+        var frame = new ValueTuple<ushort, ushort>[3];
+        frame[0] = new ValueTuple<ushort, ushort>(BDS60_71_56_InternAddr, (ushort)((message.Span[1] << 8) | message.Span[2]));
+        frame[1] = new ValueTuple<ushort, ushort>(BDS60_55_40_InternAddr, (ushort)((message.Span[3] << 8) | message.Span[4]));
+        frame[2] = new ValueTuple<ushort, ushort>(BDS60_39_24_InternAddr, (ushort)((message.Span[5] << 8) | message.Span[6]));
+        return WriteAdsbFrame(frame, cancel);
+    }
+    
+    public async Task<byte[]> ReadBDS60Message(CancellationToken cancel = default)
+    {
+        var addrs = new[]
+        {
+            BDS60_71_56_InternAddr, BDS60_55_40_InternAddr, BDS60_39_24_InternAddr
+        };
+        var values = await ReadAdsbFrame(addrs, cancel).ConfigureAwait(false);
+        var result = new byte[values.Length * 2 + 1];
+        result[0] = (6 << 4) | 0;
+        for (var i = 0; i < values.Length; i++)
+        {
+            result[2 * i + 1] = (byte)((values[i] >> 8) & 0xFF);
+            result[2 * i + 2] = (byte)(values[i] & 0xFF);
         }
         return result;
     }
@@ -777,9 +901,7 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
         var delNorm = (int)Math.Round(delayUs * 40.0);
         if (delNorm > short.MaxValue) delNorm = short.MaxValue;
         if (delNorm < short.MinValue) delNorm = short.MinValue;
-
-        var del = delNorm >= 0 ? (ushort)delNorm : (ushort)~Math.Abs(delNorm - 1);
-
+        var del = (ushort)delNorm;
         return WriteAdsbFrame([new ValueTuple<ushort, ushort>(DelayDF_InternAddr, del)], cancel);
     }
 
@@ -855,8 +977,8 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
         return [(byte)((reg >> 8) & 0xFF), (byte)(reg & 0xFF)];
     }
 
-    public Task UpdateIcaoAddr(ReadOnlySpan<byte> df11, ReadOnlySpan<byte> df20, ReadOnlySpan<byte> df21,
-        CancellationToken cancel)
+    public Task InitAllMessage(ReadOnlySpan<byte> df11, ReadOnlySpan<byte> df4, ReadOnlySpan<byte> df5, ReadOnlySpan<byte> bds10, ReadOnlySpan<byte> bds20,
+        ReadOnlySpan<byte> bds40, ReadOnlySpan<byte> bds50, ReadOnlySpan<byte> bds60, ReadOnlySpan<byte> df17Id, CancellationToken cancel)
     {
         if (df11.Length != 7)
         {
@@ -864,119 +986,11 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
                 $"Error writing ADS-B DF11 message. Expected length greater than or equal to 7 bytes, but length {df11.Length} bytes.");
             return Task.CompletedTask;
         }
+
         var df11Frame = new ValueTuple<ushort, ushort>[2];
         df11Frame[0] = new ValueTuple<ushort, ushort>(DF11_55_40_InternAddr, (ushort)((df11[0] << 8) | df11[1]));
         df11Frame[1] = new ValueTuple<ushort, ushort>(DF11_39_24_InternAddr, (ushort)((df11[2] << 8) | df11[3]));
-        
-        if (df20.Length != 14)
-        {
-            _logger.ZLogDebug(
-                $"Error writing ADS-B DF20 message. Expected length greater than or equal to 14 bytes, but length {df20.Length} bytes.");
-            return Task.CompletedTask;
-        }
 
-        var df20Frame = new ValueTuple<ushort, ushort>[7];
-        df20Frame[0] = new ValueTuple<ushort, ushort>(DF20_111_96_InternAddr, (ushort)((df20[0] << 8) | df20[1]));
-        df20Frame[1] = new ValueTuple<ushort, ushort>(DF20_95_80_InternAddr, (ushort)((df20[2] << 8) | df20[3]));
-        df20Frame[2] = new ValueTuple<ushort, ushort>(DF20_79_64_InternAddr, (ushort)((df20[4] << 8) | df20[5]));
-        df20Frame[3] = new ValueTuple<ushort, ushort>(DF20_63_48_InternAddr, (ushort)((df20[6] << 8) | df20[7]));
-        df20Frame[4] = new ValueTuple<ushort, ushort>(DF20_47_32_InternAddr, (ushort)((df20[8] << 8) | df20[9]));
-        df20Frame[5] = new ValueTuple<ushort, ushort>(DF20_31_16_InternAddr, (ushort)((df20[10] << 8) | df20[11]));
-        df20Frame[6] = new ValueTuple<ushort, ushort>(DF20_15_0_InternAddr, (ushort)((df20[12] << 8) | df20[13]));
-        
-        if (df21.Length != 14)
-        {
-            _logger.ZLogDebug(
-                $"Error writing ADS-B DF21 message. Expected length greater than or equal to 14 bytes, but length {df21.Length} bytes.");
-            return Task.CompletedTask;
-        }
-
-        var df21Frame = new ValueTuple<ushort, ushort>[7];
-        df21Frame[0] = new ValueTuple<ushort, ushort>(DF21_111_96_InternAddr, (ushort)((df21[0] << 8) | df21[1]));
-        df21Frame[1] = new ValueTuple<ushort, ushort>(DF21_95_80_InternAddr, (ushort)((df21[2] << 8) | df21[3]));
-        df21Frame[2] = new ValueTuple<ushort, ushort>(DF21_79_64_InternAddr, (ushort)((df21[4] << 8) | df21[5]));
-        df21Frame[3] = new ValueTuple<ushort, ushort>(DF21_63_48_InternAddr, (ushort)((df21[6] << 8) | df21[7]));
-        df21Frame[4] = new ValueTuple<ushort, ushort>(DF21_47_32_InternAddr, (ushort)((df21[8] << 8) | df21[9]));
-        df21Frame[5] = new ValueTuple<ushort, ushort>(DF21_31_16_InternAddr, (ushort)((df21[10] << 8) | df21[11]));
-        df21Frame[6] = new ValueTuple<ushort, ushort>(DF21_15_0_InternAddr, (ushort)((df21[12] << 8) | df21[13]));
-        
-        return AtomicEditRegister(edit =>
-        {
-            foreach (var addressValuePair in df11Frame)
-            {
-                WriteAdsbRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            }
-            foreach (var addressValuePair in df20Frame)
-            {
-                WriteAdsbRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            }
-            foreach (var addressValuePair in df21Frame)
-            {
-                WriteAdsbRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            }
-            edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 1);
-            edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 0);
-        }, cancel);
-    }
-
-    public Task UpdateSquawk(ReadOnlySpan<byte> df5, ReadOnlySpan<byte> df21, CancellationToken cancel)
-    {
-        if (df5.Length != 7)
-        {
-            _logger.ZLogDebug(
-                $"Error writing ADS-B DF5 message. Expected length greater than or equal to 7 bytes, but length {df5.Length} bytes.");
-            return Task.CompletedTask;
-        }
-
-        var df5Frame = new ValueTuple<ushort, ushort>[2];
-        df5Frame[0] = new ValueTuple<ushort, ushort>(DF5_55_40_InternAddr, (ushort)((df5[0] << 8) | df5[1]));
-        df5Frame[1] = new ValueTuple<ushort, ushort>(DF5_39_24_InternAddr, (ushort)((df5[2] << 8) | df5[3]));
-        
-        
-        if (df21.Length != 14)
-        {
-            _logger.ZLogDebug(
-                $"Error writing ADS-B DF21 message. Expected length greater than or equal to 14 bytes, but length {df21.Length} bytes.");
-            return Task.CompletedTask;
-        }
-
-        var df21Frame = new ValueTuple<ushort, ushort>[7];
-        df21Frame[0] = new ValueTuple<ushort, ushort>(DF21_111_96_InternAddr, (ushort)((df21[0] << 8) | df21[1]));
-        df21Frame[1] = new ValueTuple<ushort, ushort>(DF21_95_80_InternAddr, (ushort)((df21[2] << 8) | df21[3]));
-        df21Frame[2] = new ValueTuple<ushort, ushort>(DF21_79_64_InternAddr, (ushort)((df21[4] << 8) | df21[5]));
-        df21Frame[3] = new ValueTuple<ushort, ushort>(DF21_63_48_InternAddr, (ushort)((df21[6] << 8) | df21[7]));
-        df21Frame[4] = new ValueTuple<ushort, ushort>(DF21_47_32_InternAddr, (ushort)((df21[8] << 8) | df21[9]));
-        df21Frame[5] = new ValueTuple<ushort, ushort>(DF21_31_16_InternAddr, (ushort)((df21[10] << 8) | df21[11]));
-        df21Frame[6] = new ValueTuple<ushort, ushort>(DF21_15_0_InternAddr, (ushort)((df21[12] << 8) | df21[13]));
-        
-        return AtomicEditRegister(edit =>
-        {
-            foreach (var addressValuePair in df5Frame)
-            {
-                WriteAdsbRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            }
-            foreach (var addressValuePair in df21Frame)
-            {
-                WriteAdsbRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            }
-            edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 1);
-            edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 0);
-        }, cancel);
-    }
-
-    public Task InitAllMessage(ReadOnlySpan<byte> df11, ReadOnlySpan<byte> df4, ReadOnlySpan<byte> df5, ReadOnlySpan<byte> df20, ReadOnlySpan<byte> df21,
-        ReadOnlySpan<byte> df17Id, CancellationToken cancel)
-    {
-        if (df11.Length != 7)
-        {
-            _logger.ZLogDebug(
-                $"Error writing ADS-B DF11 message. Expected length greater than or equal to 7 bytes, but length {df11.Length} bytes.");
-            return Task.CompletedTask;
-        }
-        var df11Frame = new ValueTuple<ushort, ushort>[2];
-        df11Frame[0] = new ValueTuple<ushort, ushort>(DF11_55_40_InternAddr, (ushort)((df11[0] << 8) | df11[1]));
-        df11Frame[1] = new ValueTuple<ushort, ushort>(DF11_39_24_InternAddr, (ushort)((df11[2] << 8) | df11[3]));
-        
         if (df4.Length != 7)
         {
             _logger.ZLogDebug(
@@ -987,7 +1001,7 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
         var df4Frame = new ValueTuple<ushort, ushort>[2];
         df4Frame[0] = new ValueTuple<ushort, ushort>(DF4_55_40_InternAddr, (ushort)((df4[0] << 8) | df4[1]));
         df4Frame[1] = new ValueTuple<ushort, ushort>(DF4_39_24_InternAddr, (ushort)((df4[2] << 8) | df4[3]));
-        
+
         if (df5.Length != 7)
         {
             _logger.ZLogDebug(
@@ -998,38 +1012,57 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
         var df5Frame = new ValueTuple<ushort, ushort>[2];
         df5Frame[0] = new ValueTuple<ushort, ushort>(DF5_55_40_InternAddr, (ushort)((df5[0] << 8) | df5[1]));
         df5Frame[1] = new ValueTuple<ushort, ushort>(DF5_39_24_InternAddr, (ushort)((df5[2] << 8) | df5[3]));
-        
-        if (df20.Length != 14)
+
+        if (bds10.Length != 7)
         {
             _logger.ZLogDebug(
-                $"Error writing ADS-B DF20 message. Expected length greater than or equal to 14 bytes, but length {df20.Length} bytes.");
+                $"Error writing ADS-B BDS10 register. Expected length greater than or equal to 7 bytes, but length {bds10.Length} bytes.");
             return Task.CompletedTask;
         }
 
-        var df20Frame = new ValueTuple<ushort, ushort>[7];
-        df20Frame[0] = new ValueTuple<ushort, ushort>(DF20_111_96_InternAddr, (ushort)((df20[0] << 8) | df20[1]));
-        df20Frame[1] = new ValueTuple<ushort, ushort>(DF20_95_80_InternAddr, (ushort)((df20[2] << 8) | df20[3]));
-        df20Frame[2] = new ValueTuple<ushort, ushort>(DF20_79_64_InternAddr, (ushort)((df20[4] << 8) | df20[5]));
-        df20Frame[3] = new ValueTuple<ushort, ushort>(DF20_63_48_InternAddr, (ushort)((df20[6] << 8) | df20[7]));
-        df20Frame[4] = new ValueTuple<ushort, ushort>(DF20_47_32_InternAddr, (ushort)((df20[8] << 8) | df20[9]));
-        df20Frame[5] = new ValueTuple<ushort, ushort>(DF20_31_16_InternAddr, (ushort)((df20[10] << 8) | df20[11]));
-        df20Frame[6] = new ValueTuple<ushort, ushort>(DF20_15_0_InternAddr, (ushort)((df20[12] << 8) | df20[13]));
+        var bds10Frame = new ValueTuple<ushort, ushort>[3];
+        bds10Frame[0] = new ValueTuple<ushort, ushort>(BDS10_71_56_InternAddr, (ushort)((bds10[1] << 8) | bds10[2]));
+        bds10Frame[1] = new ValueTuple<ushort, ushort>(BDS10_55_40_InternAddr, (ushort)((bds10[3] << 8) | bds10[4]));
+        bds10Frame[2] = new ValueTuple<ushort, ushort>(BDS10_39_24_InternAddr, (ushort)((bds10[5] << 8) | bds10[6]));
+
+        // ToDo Если у нас будут отдельные регистры для BDS20, записываем их тоже
+        // ToDo Пока пользуемся регистрами DF17 Id
         
-        if (df21.Length != 14)
+        if (bds40.Length != 7)
         {
             _logger.ZLogDebug(
-                $"Error writing ADS-B DF21 message. Expected length greater than or equal to 14 bytes, but length {df21.Length} bytes.");
+                $"Error writing ADS-B BDS40 register. Expected length greater than or equal to 7 bytes, but length {bds40.Length} bytes.");
             return Task.CompletedTask;
         }
 
-        var df21Frame = new ValueTuple<ushort, ushort>[7];
-        df21Frame[0] = new ValueTuple<ushort, ushort>(DF21_111_96_InternAddr, (ushort)((df21[0] << 8) | df21[1]));
-        df21Frame[1] = new ValueTuple<ushort, ushort>(DF21_95_80_InternAddr, (ushort)((df21[2] << 8) | df21[3]));
-        df21Frame[2] = new ValueTuple<ushort, ushort>(DF21_79_64_InternAddr, (ushort)((df21[4] << 8) | df21[5]));
-        df21Frame[3] = new ValueTuple<ushort, ushort>(DF21_63_48_InternAddr, (ushort)((df21[6] << 8) | df21[7]));
-        df21Frame[4] = new ValueTuple<ushort, ushort>(DF21_47_32_InternAddr, (ushort)((df21[8] << 8) | df21[9]));
-        df21Frame[5] = new ValueTuple<ushort, ushort>(DF21_31_16_InternAddr, (ushort)((df21[10] << 8) | df21[11]));
-        df21Frame[6] = new ValueTuple<ushort, ushort>(DF21_15_0_InternAddr, (ushort)((df21[12] << 8) | df21[13]));
+        var bds40Frame = new ValueTuple<ushort, ushort>[3];
+        bds40Frame[0] = new ValueTuple<ushort, ushort>(BDS40_71_56_InternAddr, (ushort)((bds40[1] << 8) | bds40[2]));
+        bds40Frame[1] = new ValueTuple<ushort, ushort>(BDS40_55_40_InternAddr, (ushort)((bds40[3] << 8) | bds40[4]));
+        bds40Frame[2] = new ValueTuple<ushort, ushort>(BDS40_39_24_InternAddr, (ushort)((bds40[5] << 8) | bds40[6]));
+        
+        if (bds50.Length != 7)
+        {
+            _logger.ZLogDebug(
+                $"Error writing ADS-B BDS50 register. Expected length greater than or equal to 7 bytes, but length {bds50.Length} bytes.");
+            return Task.CompletedTask;
+        }
+
+        var bds50Frame = new ValueTuple<ushort, ushort>[3];
+        bds50Frame[0] = new ValueTuple<ushort, ushort>(BDS50_71_56_InternAddr, (ushort)((bds50[1] << 8) | bds50[2]));
+        bds50Frame[1] = new ValueTuple<ushort, ushort>(BDS50_55_40_InternAddr, (ushort)((bds50[3] << 8) | bds50[4]));
+        bds50Frame[2] = new ValueTuple<ushort, ushort>(BDS50_39_24_InternAddr, (ushort)((bds50[5] << 8) | bds50[6]));
+        
+        if (bds60.Length != 7)
+        {
+            _logger.ZLogDebug(
+                $"Error writing ADS-B BDS60 register. Expected length greater than or equal to 7 bytes, but length {bds60.Length} bytes.");
+            return Task.CompletedTask;
+        }
+
+        var bds60Frame = new ValueTuple<ushort, ushort>[3];
+        bds60Frame[0] = new ValueTuple<ushort, ushort>(BDS60_71_56_InternAddr, (ushort)((bds60[1] << 8) | bds60[2]));
+        bds60Frame[1] = new ValueTuple<ushort, ushort>(BDS60_55_40_InternAddr, (ushort)((bds60[3] << 8) | bds60[4]));
+        bds60Frame[2] = new ValueTuple<ushort, ushort>(BDS60_39_24_InternAddr, (ushort)((bds60[5] << 8) | bds60[6]));
         
         if (df17Id.Length != 14)
         {
@@ -1037,39 +1070,55 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
                 $"Error writing ADS-B DF17 Identification message. Expected length greater than or equal to 14 bytes, but length {df17Id.Length} bytes.");
             return Task.CompletedTask;
         }
-        
+
         var df17IdFrame = new ValueTuple<ushort, ushort>[4];
         df17IdFrame[0] = new ValueTuple<ushort, ushort>(DF17_ID_79_64_InternAddr, (ushort)((df17Id[4] << 8) | df17Id[5]));
         df17IdFrame[1] = new ValueTuple<ushort, ushort>(DF17_ID_63_48_InternAddr, (ushort)((df17Id[6] << 8) | df17Id[7]));
         df17IdFrame[2] = new ValueTuple<ushort, ushort>(DF17_ID_47_32_InternAddr, (ushort)((df17Id[8] << 8) | df17Id[9]));
         df17IdFrame[3] = new ValueTuple<ushort, ushort>(DF17_ID_31_24_InternAddr, (ushort)(df17Id[10] << 8));
-        
+
         return AtomicEditRegister(edit =>
         {
             foreach (var addressValuePair in df11Frame)
             {
                 WriteAdsbRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
             }
+
             foreach (var addressValuePair in df4Frame)
             {
                 WriteAdsbRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
             }
+
             foreach (var addressValuePair in df5Frame)
             {
                 WriteAdsbRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
             }
-            foreach (var addressValuePair in df20Frame)
+
+            foreach (var addressValuePair in bds10Frame)
             {
                 WriteAdsbRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
             }
-            foreach (var addressValuePair in df21Frame)
+
+            foreach (var addressValuePair in bds40Frame)
             {
                 WriteAdsbRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
             }
+            
+            foreach (var addressValuePair in bds50Frame)
+            {
+                WriteAdsbRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
+            }
+
+            foreach (var addressValuePair in bds60Frame)
+            {
+                WriteAdsbRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
+            }
+
             foreach (var addressValuePair in df17IdFrame)
             {
                 WriteAdsbRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
             }
+
             edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 1);
             edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 0);
         }, cancel);
