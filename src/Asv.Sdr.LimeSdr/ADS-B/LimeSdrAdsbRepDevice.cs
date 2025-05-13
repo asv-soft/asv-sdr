@@ -12,7 +12,7 @@ public class LimeSdrAdsbRepDeviceConfig
 {
     public int RfRelayGpio { get; set; } = 0;
     public bool RfRelayRxIsHigh { get; set; } = true;
-    public string SerialNumber { get; set; } = string.Empty;
+    public string SerialNumber { get; set; }
 }
 
 public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
