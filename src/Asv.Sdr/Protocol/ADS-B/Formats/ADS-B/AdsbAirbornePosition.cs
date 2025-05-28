@@ -5,7 +5,6 @@ namespace Asv.Sdr;
 
 public abstract class AdsbAirbornePosition : AdsbExtendedSquitterBase
 {
-    public override ushort Id  => (ushort)((17 << 8) | ((ushort)MessageType << 3));
     public uint NCprLat { get; set; }
     public uint NCprLon { get; set; }
 

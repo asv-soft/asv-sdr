@@ -40,7 +40,9 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
 
     private const ushort PEAK_AMP_Address      = 0x00DC; // Address Rx PEAK_AMP (15:0)
     
-    private const ushort DF20_DF21_CNT_Address = 0x00DD; // Address for DF20 Cnt (7:0) | DF21 Cnt (7:0)
+    private const ushort DF20_DF21_CNT_Address = 0x00DD; // Address for DF20 Cnt (7:0) | DF21 Cnt (7:0) 0x00DE
+    
+    private const ushort PEAK_AMP2_Address      = 0x00DE; // Address Rx PEAK_AMP2 (15:0), received request amplitude
 
 
     #region Internal registers
@@ -94,8 +96,8 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
     private const ushort BDS60_55_40_InternAddr         = 0x0043; // BDS60(55:40)
     private const ushort BDS60_39_24_InternAddr         = 0x0044; // BDS60(39:24)
     
-    private const ushort Reserved1_15_0_InternAddr      = 0x0045; // Reserved1(15:0)
-    private const ushort Reserved2_15_0_InternAddr      = 0x0046; // Reserved2(15:0)
+    private const ushort Time_15_8_ReqCnt_7_0_InternAddr= 0x0045; // Timestamp(15:8) & Request count(7:0)
+    private const ushort Reserved_15_0_InternAddr       = 0x0046; // Reserved(15:0)
     
     
     // Read
@@ -174,7 +176,7 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
                 0 => ADS_B_MASK,
                 1 => MODE_S_MASK,
                 2 => ADS_B_MASK | MODE_S_MASK,
-                _ => ADS_B_MASK | MODE_S_MASK
+                _ => reg
             };
 
             reg = (ushort)(reg & MODE_OFF_MASK);
@@ -896,6 +898,11 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
         return ReadFpgaRegister(PEAK_AMP_Address, cancel);
     }
 
+    public Task<ushort> AdsbGetReceivedPeakAmplitude(CancellationToken cancel = default)
+    {
+        return ReadFpgaRegister(PEAK_AMP2_Address, cancel);
+    }
+
     public Task SetDfDelay(double delayUs, CancellationToken cancel = default)
     {
         var delNorm = (int)Math.Round(delayUs * 40.0);
@@ -1122,6 +1129,19 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
             edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 1);
             edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 0);
         }, cancel);
+    }
+
+    public async Task<(byte, byte)> GetRequestCountPerSecond(CancellationToken cancel = default)
+    {
+        (byte, byte) result = (0, 0);
+
+        await AtomicEditRegister(edit =>
+        {
+            var reg = ReadAdsbRegister(edit, Time_15_8_ReqCnt_7_0_InternAddr);
+            result = ((byte)(reg >> 8), (byte)(reg & 0xFF));
+        }, cancel).ConfigureAwait(false);
+        
+        return result;
     }
 
     public new bool IsDisposed => base.IsDisposed;

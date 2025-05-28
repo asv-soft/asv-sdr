@@ -136,6 +136,12 @@ public interface ILimeSdrAdsbDevice : ILimeSdrDevice
     Task<ushort> AdsbGetPeakAmplitude(CancellationToken cancel = default);
     
     /// <summary>
+    /// Gets the P_AMP2 value, which represents the maximum signal amplitude over the last 100 milliseconds.
+    /// The gain should be adjusted to keep P_AMP2 within the range from 0x10 P_AMP2 to 0x80
+    /// </summary>
+    Task<ushort> AdsbGetReceivedPeakAmplitude(CancellationToken cancel = default);
+    
+    /// <summary>
     /// Sets the DF delay reply value.
     /// </summary>
     /// <param name="delayUs">Delay DM reply in micro seconds</param>
@@ -214,6 +220,7 @@ public interface ILimeSdrAdsbDevice : ILimeSdrDevice
     Task InitAllMessage(ReadOnlySpan<byte> df11, ReadOnlySpan<byte> df4, ReadOnlySpan<byte> df5,
         ReadOnlySpan<byte> bds10, ReadOnlySpan<byte> bds20, ReadOnlySpan<byte> bds40, ReadOnlySpan<byte> bds50, ReadOnlySpan<byte> bds60, ReadOnlySpan<byte> df17Id, CancellationToken cancel);
     
+    Task<(byte, byte)> GetRequestCountPerSecond(CancellationToken cancel = default);
     public bool IsDisposed { get; }
     
 }

@@ -1,18 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Composition;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Asv.Cfg;
 using Asv.Common;
 using Asv.Sdr.LimeSdr;
-using Avalonia.Threading;
 using Material.Icons;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
@@ -45,7 +39,6 @@ public class AdsbInterrogateViewModel : ShellPage
     private AvaPlot _avaPlotSh;
     private CancellationTokenSource? _cancelStream;
     private ILimeSdrDevice? _device;
-    private ILimeSdrDevice _adsbReplyDevice;
     private ILmsStream _txStream;
     private readonly AdsbInterrogateConfig _cfg;
     private readonly ILogger<AdsbInterrogateViewModel> _logger;
@@ -84,13 +77,6 @@ public class AdsbInterrogateViewModel : ShellPage
             }).DisposeItWith(Disposable);
     }
 
-    private Task AdsbSetIsEnabled(bool enabled, CancellationToken cancel = default)
-    {
-        _logger.ZLogDebug($"Setting DME mode to {enabled}");
-        return _adsbReplyDevice.WriteFpgaRegisterBits(208, 0, 1, (ushort)(enabled ? 1 : 0), cancel);
-    }
-
-    
     private ILimeSdrDevice? CreateDevice()
     {
         
@@ -104,11 +90,6 @@ public class AdsbInterrogateViewModel : ShellPage
         _logger.ZLogInformation($"Create LMS device {dev}");
         _device = new LimeSdrDevice(dev, true, _logger);
         
-        // var dev1 = devs.FirstOrDefault(id => id.Contains("1D90E8D5A1BB43"));
-        // if (dev1 == null) throw new Exception("LMS device not found");
-        // _logger.ZLogInformation($"Create LMS device {dev1}");
-        // _adsbReplyDevice = new LimeSdrDevice(dev1,true,_logger);
-
         return _device;
     }
 
@@ -188,7 +169,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU4RR17 = new ModeSUF4
             {
                 IcaoAddress = IcaoAddress,
-                RR = 17
+                RR = 1
             };
             var spanU4RR17 = new Span<byte>(buffU4RR17);
             msgU4RR17.Serialize(ref spanU4RR17);
@@ -196,7 +177,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU4RR18 = new ModeSUF4
             {
                 IcaoAddress = IcaoAddress,
-                RR = 18
+                RR = 1
             };
             var spanU4RR18 = new Span<byte>(buffU4RR18);
             msgU4RR18.Serialize(ref spanU4RR18);
@@ -204,7 +185,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU4RR20 = new ModeSUF4
             {
                 IcaoAddress = IcaoAddress,
-                RR = 20
+                RR = 1
             };
             var spanU4RR20 = new Span<byte>(buffU4RR20);
             msgU4RR20.Serialize(ref spanU4RR20);
@@ -212,7 +193,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU4RR21 = new ModeSUF4
             {
                 IcaoAddress = IcaoAddress,
-                RR = 21
+                RR = 1
             };
             var spanU4RR21 = new Span<byte>(buffU4RR21);
             msgU4RR21.Serialize(ref spanU4RR21);
@@ -220,7 +201,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU4RR22 = new ModeSUF4
             {
                 IcaoAddress = IcaoAddress,
-                RR = 22
+                RR = 1
             };
             var spanU4RR22 = new Span<byte>(buffU4RR22);
             msgU4RR22.Serialize(ref spanU4RR22);
@@ -228,7 +209,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU5RR17 = new ModeSUF5
             {
                 IcaoAddress = IcaoAddress,
-                RR = 17
+                RR = 1
             };
             var spanU5RR17 = new Span<byte>(buffU5RR17);
             msgU5RR17.Serialize(ref spanU5RR17);
@@ -236,7 +217,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU5RR18 = new ModeSUF5
             {
                 IcaoAddress = IcaoAddress,
-                RR = 18
+                RR = 1
             };
             var spanU5RR18 = new Span<byte>(buffU5RR18);
             msgU5RR18.Serialize(ref spanU5RR18);
@@ -244,7 +225,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU5RR20 = new ModeSUF5
             {
                 IcaoAddress = IcaoAddress,
-                RR = 20
+                RR = 1
             };
             var spanU5RR20 = new Span<byte>(buffU5RR20);
             msgU5RR20.Serialize(ref spanU5RR20);
@@ -252,7 +233,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU5RR21 = new ModeSUF5
             {
                 IcaoAddress = IcaoAddress,
-                RR = 21
+                RR = 1
             };
             var spanU5RR21 = new Span<byte>(buffU5RR21);
             msgU5RR21.Serialize(ref spanU5RR21);
@@ -260,7 +241,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU5RR22 = new ModeSUF5
             {
                 IcaoAddress = IcaoAddress,
-                RR = 22
+                RR = 1
             };
             var spanU5RR22 = new Span<byte>(buffU5RR22);
             msgU5RR22.Serialize(ref spanU5RR22);
@@ -368,20 +349,7 @@ public class AdsbInterrogateViewModel : ShellPage
             _txStream = await _device.CreateStream(LmsChannel.Tx, 0, (uint)messages[0].Length,
                 throughputVsLatency: 1.0f, cancel: _cancelStream!.Token).DisposeItWith(Disposable);
             await _txStream.Start(_cancelStream.Token);
-            Observable.Timer(TimeSpan.FromSeconds(0.5), TimeSpan.FromSeconds(1))
-                .Subscribe(x =>
-                {
-                    _flag = true;
-                    // if (_cancelStream is not { Token.IsCancellationRequested: false }) return;
-                    // _txStream.Write(messages[msgIdx], 10_000, _cancelStream.Token).Wait();
-                    // msgIdx = ++msgIdx % 5;
-                    // for (var i = 0; i < 2 && _cancelStream is { Token.IsCancellationRequested: false }; i++)
-                    // {
-                    //     _txStream.Write(zeroBuff, 10_000, _cancelStream.Token).Wait();
-                    // }
-
-                }).DisposeItWith(Disposable);
-
+            
             var thread = new Thread(() =>
             {
                 while (_cancelStream is { Token.IsCancellationRequested: false })
