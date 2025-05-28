@@ -2,14 +2,14 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <FileVersion>$(ProductVersion)</FileVersion>
-    <Version>1.5.1-dev.1</Version>
+    <Version>$(ProductVersion)</Version>
+    <PackageVersion>$(ProductVersion)</PackageVersion>
     <LangVersion>latest</LangVersion>
-    <Authors>https://github.com/asvol</Authors>
-    <Company>https://github.com/asvol</Company>
-    <Copyright>https://github.com/asvol</Copyright>
-    <PackageProjectUrl>https://github.com/asvol/asv-sdr</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/asvol/asv-sdr</RepositoryUrl>
-    <PackageTags />
+    <Authors>https://github.com/asv-soft</Authors>
+    <Company>https://github.com/asv-soft</Company>
+    <Copyright>https://github.com/asv-soft</Copyright>
+    <PackageProjectUrl>https://github.com/asv-soft/asv-sdr</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/asv-soft/asv-sdr</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
