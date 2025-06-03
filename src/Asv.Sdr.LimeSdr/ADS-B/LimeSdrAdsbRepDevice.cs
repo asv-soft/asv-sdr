@@ -101,8 +101,8 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
     private const ushort BDS60_55_40_InternAddr         = 0x0043; // BDS60(55:40)
     private const ushort BDS60_39_24_InternAddr         = 0x0044; // BDS60(39:24)
     
-    private const ushort Time_15_8_ReqCnt_7_0_InternAddr= 0x0045; // Timestamp(15:8) & Request count(7:0)
-    private const ushort Reserved_15_0_InternAddr       = 0x0046; // Reserved(15:0)
+    private const ushort Time_15_8_RecReqCnt_7_0_InternAddr= 0x0045; // Timestamp(15:8) & Recognized Request count per/sec(7:0)
+    private const ushort Time_15_8_AllReqCnt_7_0_InternAddr= 0x0046; // Timestamp(15:8) & All Request count per/sec(7:0)
     
     
     // Read
@@ -1136,20 +1136,40 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
         }, cancel);
     }
 
-    public async Task<(byte, byte)> GetRequestCountPerSecond(CancellationToken cancel = default)
+    public async Task<(byte, byte)> GetRecognizedRequestsCountPerSecond(CancellationToken cancel = default)
     {
-        (byte, byte) result = (0, 0);
+        var reg = await ReadAdsbRegister(Time_15_8_RecReqCnt_7_0_InternAddr, cancel).ConfigureAwait(false);
+        var result = ((byte)(reg >> 8), (byte)(reg & 0xFF));
+        return result;
+    }
 
-        await AtomicEditRegister(edit =>
-        {
-            var reg = ReadAdsbRegister(edit, Time_15_8_ReqCnt_7_0_InternAddr);
-            result = ((byte)(reg >> 8), (byte)(reg & 0xFF));
-        }, cancel).ConfigureAwait(false);
-        
+    public async Task<(byte, byte)> GetAllRequestsCountPerSecond(CancellationToken cancel = default)
+    {
+        var reg = await ReadAdsbRegister(Time_15_8_AllReqCnt_7_0_InternAddr, cancel).ConfigureAwait(false);
+        var result = ((byte)(reg >> 8), (byte)(reg & 0xFF));
         return result;
     }
 
     public new bool IsDisposed => base.IsDisposed;
+    public async Task<ushort> ReadAdsbRegister(ushort address, CancellationToken cancel = default)
+    {
+        ushort result = 0;
+        await AtomicEditRegister(edit =>
+        {
+            result = ReadAdsbRegister(edit, address);
+        }, cancel).ConfigureAwait(false);
+        return result;
+    }
+
+    public Task WriteAdsbRegister(ushort address, ushort value, CancellationToken cancel = default)
+    {
+        return AtomicEditRegister(edit =>
+        {
+            WriteAdsbRegister(edit, address, value);
+            edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 1);
+            edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 0);
+        }, cancel);
+    }
 
     private void WriteAdsbRegister(ILmsRegisterEditor edit, ushort address, ushort value)
     {
@@ -1170,7 +1190,6 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
             edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 1);
             edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 0);
         }, cancel);
-        
     }
 
     private void SetIsHoldingFrame(ILmsRegisterEditor edit, bool enabled)
