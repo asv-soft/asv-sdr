@@ -16,7 +16,7 @@
             <Button Command="{Binding DisconnectLms}">Disconnect Lms</Button>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="TX Gain" VerticalAlignment="Center"/>
-                <Slider Minimum="0" Width="200" Maximum="1" Value="{CompiledBinding TxGain}"/>
+                <Slider Minimum="-69" Width="200" Maximum="10" Value="{CompiledBinding TxGain}"/>
                 <TextBlock Text="{CompiledBinding TxGain}" VerticalAlignment="Center"/>
             </StackPanel>
         </StackPanel>

@@ -13,6 +13,12 @@ public class LimeSdrDmeDeviceConfig
     public int RfRelayGpio { get; set; } = 0;
     public bool RfRelayRxIsHigh { get; set; } = true;
     public string SerialNumber { get; set; }
+    
+    public SignalThreshold[] SignalLevels { get; set; } = [];
+    public double InterrogatorRxLevelOffset { get; set; }
+    public uint InterrogatorTxLevelOffset { get; set; }
+    public double ReplyRxLevelOffset { get; set; }
+    public uint ReplyTxLevelOffset { get; set; }
 }
 
 public class LimeSdrDmeDevice:LimeSdrDevice, ILimeSdrDmeDevice

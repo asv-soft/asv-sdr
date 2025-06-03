@@ -4,6 +4,19 @@ using System.Linq;
 namespace Asv.Sdr.LimeSdr;
 
 
+public class SignalThreshold
+{
+    public double Gain { get; set; }
+    public double[] Limits { get; set; }
+
+    public int ValidateLevel(double levelDBm)
+    {
+        if (levelDBm < Limits[0]) return -1;
+        if (levelDBm > Limits[1]) return 1;
+        return 0;
+    }
+}
+
 public class DmeChannelInfo
 {
     public DmeChannel Channel { get; set; }

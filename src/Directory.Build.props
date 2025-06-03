@@ -1,15 +1,15 @@
 <Project>
   <PropertyGroup>
     <Nullable>enable</Nullable>
-    <ProductVersion>1.5.1-dev.1</ProductVersion>
-    <AvaloniaVersion>11.0.10</AvaloniaVersion>
-    <AsvCommonVersion>3.1.1-dev.3</AsvCommonVersion>
+    <ProductVersion>1.5.1</ProductVersion>
+    <AvaloniaVersion>11.2.5</AvaloniaVersion>
+    <AsvCommonVersion>3.2.1</AsvCommonVersion>
     <AsvAvaloniaToolkitVersion>0.1.7</AsvAvaloniaToolkitVersion>
     <FluentAvaloniaUIVersion>2.0.5</FluentAvaloniaUIVersion>
-    <ReactiveUIVersion>19.5.41</ReactiveUIVersion>
+    <ReactiveUIVersion>20.1.1</ReactiveUIVersion>
     <SystemReactiveVersion>6.0.0</SystemReactiveVersion>
     <MaterialIconsAvaloniaVersion>2.0.1</MaterialIconsAvaloniaVersion>
-    <ReactiveUIValidationVersion>3.1.6</ReactiveUIValidationVersion>
+    <ReactiveUIValidationVersion>4.0.9</ReactiveUIValidationVersion>
     <CompositionVersion>8.0.0</CompositionVersion>
     <ZLoggerVersion>2.5.5</ZLoggerVersion>
   </PropertyGroup>

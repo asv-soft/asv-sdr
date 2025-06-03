@@ -26,7 +26,7 @@ public class AdsbInterrogateConfig
 
     public double Amplitude { get; set; } = 1.0;
     
-    public double Gain { get; set; } = 0.69;
+    public int Gain { get; set; } = -30;
     
     public string SerialNumber { get; set; } = string.Empty;
 }
@@ -70,7 +70,8 @@ public class AdsbInterrogateViewModel : ShellPage
             .Throttle(TimeSpan.FromMilliseconds(500))
             .Subscribe(x =>
             {
-                _device?.SetNormalizedGain(LmsChannel.Tx, 0, x, CancellationToken.None).Wait();
+                var gain = (uint)(x + 69);
+                _device?.SetNormalizedGainDbm(LmsChannel.Tx, 0, gain, CancellationToken.None).Wait();
                 _cfg.Gain = x;
                 cfg.Set(_cfg);
 
@@ -387,7 +388,7 @@ public class AdsbInterrogateViewModel : ShellPage
 
     public ReactiveCommand<Unit, Unit> DisconnectLms { get; set; }
     
-    [Reactive] public double TxGain { get; set; } = 0.0;
+    [Reactive] public int TxGain { get; set; } = -30;
 
     public void InitCharts(AvaPlot avaPlotLms, AvaPlot avaPlotSh)
     {
