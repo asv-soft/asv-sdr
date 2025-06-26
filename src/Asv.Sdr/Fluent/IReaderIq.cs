@@ -343,6 +343,11 @@ namespace Asv.Sdr
         {
             return new ReaderIqAm2Subject(src, sampleRate, am1Freq,am2Freq);
         }
+        
+        public static IObservable<(double,double, double)> GetAm(this IReaderIqSubject<double> src, int sampleRate, int am1Freq, int am2Freq, int am3Freq)
+        {
+            return new ReaderIqAm3Subject(src, sampleRate, am1Freq, am2Freq, am3Freq);
+        }
 
         public static IObservable<TResult> ParallelJoin<TFirst, TSecond, TResult>(this IObservable<TFirst> first, IObservable<TSecond> second, Func<TFirst,TSecond,TResult> resultSelector)
         {
