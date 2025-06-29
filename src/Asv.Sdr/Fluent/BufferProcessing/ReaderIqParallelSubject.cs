@@ -103,7 +103,7 @@ namespace Asv.Sdr
                 for (var i = 0; i < parallelTasks.Length; i++)
                 {
                     var i1 = i;
-                    parallelTasks[i] = Task.Factory.StartNew(() =>_subscribers[i1].OnNext(memory),DisposeCancel, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                    parallelTasks[i] = Task.Factory.StartNew(() =>_subscribers[i1].OnNext(memory),DisposeCancel);
                 }
                 Task.WaitAll(parallelTasks, DisposeCancel);
             }
