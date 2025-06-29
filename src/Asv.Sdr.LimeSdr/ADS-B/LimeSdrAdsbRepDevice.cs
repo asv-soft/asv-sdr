@@ -151,7 +151,7 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
     private readonly ILogger _logger;
     
     public LimeSdrAdsbRepDevice(string deviceId, LimeSdrAdsbRepDeviceConfig config, ILogger? logger = null)
-        : base(deviceId, true, logger ?? NullLogger.Instance)
+        : base(deviceId, true, logger ?? NullLogger.Instance, LimeSdrParams.LMS7_CAPSEL,LimeSdrParams.LMS7_CAPTURE)
     {
         _config = config;
         _logger = logger ?? NullLogger.Instance; 
