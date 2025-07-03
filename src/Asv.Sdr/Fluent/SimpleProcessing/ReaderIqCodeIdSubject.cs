@@ -9,7 +9,24 @@ using Asv.Common;
 namespace Asv.Sdr
 {
 
-    public class ReaderIqCodeIdSubject:DisposableOnce, IObservable<string>
+    public readonly struct CodeId(
+        string value, 
+        double dashTimeMs, 
+        double dotTimeMs, 
+        double symbolPauseMs, 
+        double charPauseMs,
+        double minAm,
+        double maxAm)
+    {
+        public string Value => value;
+        public double DashTimeMs => dashTimeMs;
+        public double DotTimeMs => dotTimeMs;
+        public double SymbolPauseMs => symbolPauseMs;
+        public double CharPauseMs => charPauseMs;
+        public double MinAm => minAm;
+        public double MaxAm => maxAm;
+    }
+    public class ReaderIqCodeIdSubject:DisposableOnce, IObservable<CodeId>
     {
 
         private static ReadOnlyDictionary<string, char> AlphabetData { get; } = new(new Dictionary<string, char>()
@@ -222,32 +239,39 @@ namespace Asv.Sdr
 
         private readonly double _amMin;
         private readonly double _amMax;
-        private readonly Subject<string> _subject = new();
+        private readonly int _dotTimeMs;
+        private readonly Subject<CodeId> _subject = new();
         private readonly IDisposable _subscribe;
         private State _state = State.SignalUp;
         private readonly double _oneSampleTimeMs;
         private double _signalTime;
         private double _noSignalTime;
 
-        private const int BetweenWordTime = 1000;
-        private const double DotTimeTime = 150.0;
         private readonly List<char> _symbols = new();
         private readonly List<char> _word = new();
+        
         private double _statDotTimeMs;
         private int _statDotCount;
+        
         private double _statDashTimeMs;
         private int _statDashCount;
-        private double _statCharPause;
-        private int _statCharPauseCound;
-        private double _statSymbolPause;
-        private int _statSymbolPauseCound;
+        
+        private double _statCharPauseMs;
+        private int _statCharPauseCount;
+        
+        private double _statSymbolPauseMs;
+        private double _statSymbolCount;
+        
+        private double _amMaxValue;
+        private double _amMinValue;
+        
 
 
-
-        public ReaderIqCodeIdSubject(IObservable<double> amSubject, double amMin, double amMax, int fftBufferSize, int sampleRate)
+        public ReaderIqCodeIdSubject(IObservable<double> amSubject, double amMin, double amMax, int dotTimeMs, int fftBufferSize, int sampleRate)
         {
             _amMin = amMin;
             _amMax = amMax;
+            _dotTimeMs = dotTimeMs;
             _subscribe = amSubject.Subscribe(OnNext);
             _oneSampleTimeMs = (fftBufferSize * 1000.0 / sampleRate);
         }
@@ -260,6 +284,15 @@ namespace Asv.Sdr
 
         private void OnNext(double am)
         {
+            if (am > _amMaxValue)
+            {
+                _amMaxValue = am;
+            }
+            if (am < _amMinValue)
+            {
+                _amMinValue = am;
+            }
+            
             switch (_state)
             {
                 case State.SignalDown:
@@ -267,38 +300,53 @@ namespace Asv.Sdr
                     {
                         _signalTime = _oneSampleTimeMs;
                         _state = State.SignalUp;
-                        var delay = (int)Math.Round(_noSignalTime / DotTimeTime,0);
+                        var delay = (int)Math.Round(_noSignalTime / _dotTimeMs,0);
                         switch (delay)
                         {
-                            case <= 2:
-                                _statSymbolPause += _noSignalTime;
-                                ++_statCharPauseCound;
+                            case <= 1:
+                                _statSymbolPauseMs += _noSignalTime;
+                                ++_statSymbolCount;
                                 break;
-                            case <= 4:
+                            case <= 3:
                             {
                                 var str = new string(_symbols.ToArray());
-                                _word.Add(AlphabetData.TryGetValue(str, out var ch) ? ch : '\0');
+                                _word.Add(AlphabetData.GetValueOrDefault(str, '\0'));
                                 _symbols.Clear();
-                                _statCharPause += _noSignalTime;
+                                _statCharPauseMs += _noSignalTime;
+                                ++_statCharPauseCount;
                                 break;
                             }
                             default:
                             {
                                 var str = new string(_symbols.ToArray());
-                                _word.Add(AlphabetData.TryGetValue(str, out var ch) ? ch : '\0');
+                                _word.Add(AlphabetData.GetValueOrDefault(str, '\0'));
                                 _symbols.Clear();
                                 if (_word.Count != 0)
                                 {
                                     var str1 = new string(_word.ToArray());
-                                    _subject.OnNext(str1);
+                                    _subject.OnNext(new CodeId(str1, 
+                                        _statDashTimeMs / _statDashCount, 
+                                        _statDotTimeMs / _statDotCount,
+                                        _statSymbolPauseMs / _statSymbolCount,
+                                        _statCharPauseCount / _statCharPauseMs,
+                                        _amMinValue,
+                                        _amMaxValue
+                                        ));
                                     _word.Clear();
                                     _symbols.Clear();
                                     _statDashCount = 0;
                                     _statDashTimeMs = 0;
+                                    
                                     _statDotCount = 0;
                                     _statDotTimeMs = 0;
-                                    _statSymbolPause = 0;
-                                    _statCharPause = 0;
+                                    
+                                    _statSymbolPauseMs = 0;
+                                    _statSymbolCount = 0;
+                                    
+                                    _statCharPauseMs = 0;
+                                    _statCharPauseCount = 0;
+                                    _amMaxValue = 0;
+                                    _amMinValue = 1.0;
                                 }
                                 break;
                             }
@@ -318,8 +366,8 @@ namespace Asv.Sdr
                     {
                         _noSignalTime = _oneSampleTimeMs;
                         _state = State.SignalDown;
-                        var delay = (int)Math.Round(_signalTime / DotTimeTime, 0);
-                        if (delay <= 2)
+                        var delay = (int)Math.Round(_signalTime / _dotTimeMs, 0);
+                        if (delay <= 1)
                         {
                             _symbols.Add('.');
                             _statDotTimeMs +=(int)_signalTime;
@@ -344,9 +392,11 @@ namespace Asv.Sdr
             _subject.Dispose();
         }
 
-        public IDisposable Subscribe(IObserver<string> observer)
+        public IDisposable Subscribe(IObserver<CodeId> observer)
         {
             return _subject.Subscribe(observer);
         }
+
+        
     }
 }

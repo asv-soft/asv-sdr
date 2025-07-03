@@ -11,9 +11,10 @@ namespace Asv.Sdr
         private readonly Memory<T> _memory;
         private int _freeSpace;
         private readonly int _sourceSize;
-        public ReaderIqSplitSample(IReaderIqSubject<T> src, int samplesCnt, bool useArrayPool = false)
+        public ReaderIqSplitSample(IReaderIqSubject<T> src, int iqPairs, bool useArrayPool = false)
         {
             T[] buffer;
+            var samplesCnt = iqPairs * 2;
             if (samplesCnt <= 0) throw new ArgumentOutOfRangeException(nameof(samplesCnt));
             OutputBufferSize = samplesCnt;
             _freeSpace = samplesCnt;
