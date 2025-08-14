@@ -2,6 +2,7 @@
   <PropertyGroup>
     <Nullable>enable</Nullable>
     <ProductVersion>1.5.12</ProductVersion>
+    <TargetFrameworksValue>net8.0;net9.0</TargetFrameworksValue>
     <AvaloniaVersion>11.2.5</AvaloniaVersion>
     <AsvCommonVersion>3.2.8</AsvCommonVersion>
     <AsvAvaloniaToolkitVersion>0.1.7</AsvAvaloniaToolkitVersion>
