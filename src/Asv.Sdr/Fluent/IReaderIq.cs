@@ -120,9 +120,9 @@ namespace Asv.Sdr
             return new ReaderIqParallelSubject<T>(src);
         }
 
-        public static IReaderIqSubject<T> SplitSample<T>(this IReaderIqSubject<T> src, int samplesCnt, bool useArrayPool = false)
+        public static IReaderIqSubject<T> SplitSample<T>(this IReaderIqSubject<T> src, int iqPairs, bool useArrayPool = false)
         {
-            return new ReaderIqSplitSample<T>(src, samplesCnt, useArrayPool);
+            return new ReaderIqSplitSample<T>(src, iqPairs, useArrayPool);
         }
         
         public static IReaderIqSubject<TOut> IqZip<TIn1, TIn2, TOut>(this IReaderIqSubject<TIn1> src, IReaderIqSubject<TIn2> second, ProcessDelegate<TIn1, TIn2, TOut> processCallback, int outputSize, bool useArrayPool = false)
@@ -242,6 +242,11 @@ namespace Asv.Sdr
         }
 
         #endregion
+
+        public static IObservable<double> AmplitudeI(this IReaderIqSubject<double> src)
+        {
+            return new ReaderIqAmplitudeI(src);
+        }
 
         #region Overlap
 
@@ -427,6 +432,11 @@ namespace Asv.Sdr
         {
             return new ReactiveDsp2ArgsFilter(src, new MovingAverageDspFilter(windowSize1), new MovingAverageDspFilter(windowSize2));
         }
+        
+        public static IObservable<(double, double, double)> AverageFilter(this IObservable<(double, double, double)> src, int windowSize1, int windowSize2, int windowSize3)
+        {
+            return new ReactiveDsp3ArgsFilter(src, new MovingAverageDspFilter(windowSize1), new MovingAverageDspFilter(windowSize2), new MovingAverageDspFilter(windowSize3));
+        }
 
         public static IObservable<double> AverageRadianFilter(this IObservable<double> src, int windowSize)
         {
@@ -468,9 +478,9 @@ namespace Asv.Sdr
 
         #region Code ID
 
-        public static IObservable<string> CodeId(this IObservable<double> src, double amMin, double amMax, int fftBufferSize, int sampleRate)
+        public static IObservable<CodeId> CodeId(this IObservable<double> src, double amMin, double amMax, int fftBufferSize, int sampleRate, int dotTime = 150)
         {
-            return new ReaderIqCodeIdSubject(src, amMin, amMax, fftBufferSize, sampleRate);
+            return new ReaderIqCodeIdSubject(src, amMin, amMax, dotTime, fftBufferSize, sampleRate);
         }
 
         #endregion
@@ -505,4 +515,5 @@ namespace Asv.Sdr
 
     }
 
+    
 }

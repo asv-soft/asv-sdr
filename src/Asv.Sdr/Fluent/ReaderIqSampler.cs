@@ -41,7 +41,7 @@ namespace Asv.Sdr
                 }
                 catch (Exception ex)
                 {
-                    Debug.Assert(false);
+                    //Debug.Assert(false);
                     break;
                 }
             }
