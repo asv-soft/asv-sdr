@@ -103,8 +103,8 @@ namespace Asv.Sdr.LimeSdr
         Task WriteLMSParam(LMS7Parameter param, ushort value, CancellationToken cancel);
         Task<ushort> ReadLMSParam(LMS7Parameter param, CancellationToken cancel);
 
-        Task WriteCustomRegister(ushort addr, ushort val, CancellationToken cancel);
-        Task<ushort> ReadCustomRegister(ushort addr, CancellationToken cancel);
+        // Task WriteCustomRegister(ushort addr, ushort val, CancellationToken cancel);
+        // Task<ushort> ReadCustomRegister(ushort addr, CancellationToken cancel);
 
         
         Task WriteGpioDirection(ReadOnlyMemory<byte> val, CancellationToken cancel);

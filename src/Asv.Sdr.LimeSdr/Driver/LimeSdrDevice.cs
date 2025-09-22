@@ -553,34 +553,34 @@ namespace Asv.Sdr.LimeSdr
         
         #region CustomRegister
 
-            public Task WriteCustomRegister(ushort addr, ushort val, CancellationToken cancel)
-        {
-            return _taskFactory.StartNew(() =>
-            {
-                if (IsDisposed) return;
-                Check(LMS_WriteFPGAReg(_device, 21, addr), nameof(LMS_WriteFPGAReg));
-                Check(LMS_WriteFPGAReg(_device, 22, val), nameof(LMS_WriteFPGAReg));
-            }, cancel);
-        }
-
-        public Task<ushort> ReadCustomRegister(ushort addr, CancellationToken cancel)
-        {
-            return _taskFactory.StartNew(() =>
-            {
-                unsafe
-                {
-                    if (IsDisposed) return ushort.MaxValue;
-                    Check(LMS_WriteFPGAReg(_device, 21, addr), nameof(LMS_WriteFPGAReg));
-                    var buffer = new ushort[1];
-                    fixed (ushort* buf = &buffer[0])
-                    {
-                        Check(LMS_ReadFPGAReg(_device, 22, buf), nameof(LMS_ReadFPGAReg));
-                    }
-                    return buffer[0];
-                }
-            }, cancel);
-
-        }
+        // public Task WriteCustomRegister(ushort addr, ushort val, CancellationToken cancel)
+        // {
+        //     return _taskFactory.StartNew(() =>
+        //     {
+        //         if (IsDisposed) return;
+        //         Check(LMS_WriteFPGAReg(_device, 21, addr), nameof(LMS_WriteFPGAReg));
+        //         Check(LMS_WriteFPGAReg(_device, 22, val), nameof(LMS_WriteFPGAReg));
+        //     }, cancel);
+        // }
+        //
+        // public Task<ushort> ReadCustomRegister(ushort addr, CancellationToken cancel)
+        // {
+        //     return _taskFactory.StartNew(() =>
+        //     {
+        //         unsafe
+        //         {
+        //             if (IsDisposed) return ushort.MaxValue;
+        //             Check(LMS_WriteFPGAReg(_device, 21, addr), nameof(LMS_WriteFPGAReg));
+        //             var buffer = new ushort[1];
+        //             fixed (ushort* buf = &buffer[0])
+        //             {
+        //                 Check(LMS_ReadFPGAReg(_device, 22, buf), nameof(LMS_ReadFPGAReg));
+        //             }
+        //             return buffer[0];
+        //         }
+        //     }, cancel);
+        //
+        // }
 
         #endregion
 
