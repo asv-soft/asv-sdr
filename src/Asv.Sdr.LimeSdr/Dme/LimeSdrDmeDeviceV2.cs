@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using ZLogger;
 
 namespace Asv.Sdr.LimeSdr;
 
@@ -71,14 +72,14 @@ public interface ILimeSdrDmeDeviceV2 : ILimeSdrCustomDevice
     Task DmeSetRelayInvert(bool isInvert, CancellationToken cancel = default);
     
     Task<bool> DmeGetRelayInvert(CancellationToken cancel = default);
-    
+
+    Task RfRelaySelectOutput(bool isTx, CancellationToken cancel = default);
     /// <summary>
     /// Gets measured distance in meters (AIR mode).
     /// </summary>
     Task<int> DmeGetMeasuredDistance(CancellationToken cancel = default);
     /// <summary>
     /// Gets the HIP period in microseconds.
-    /// Returns 0xFFFF if HIPs are disabled.
     /// </summary>
     Task<ushort> DmeGetHipPeriod(CancellationToken cancel = default);
     /// <summary>
@@ -151,7 +152,15 @@ public interface ILimeSdrDmeDeviceV2 : ILimeSdrCustomDevice
     Task<ushort> DmeGetCodeTimeMean(CancellationToken cancel = default);
     Task<ushort> DmeGetCodeTimeSigma(CancellationToken cancel = default);
     
-    Task<ushort> DmeGetResponseRate(CancellationToken cancel = default);
+    
+    // Task<ushort> DmeGetResponseRate(CancellationToken cancel = default);
+    
+    
+    /// <summary>
+    /// Frequency of all pulse pairs, in Hz
+    /// </summary>
+    /// <param name="cancel"></param>
+    /// <returns></returns>
     Task<ushort> DmeGetPulsePairFrequency(CancellationToken cancel = default);
     
     Task DmeSetIso(string iso, CancellationToken cancel = default);
@@ -165,11 +174,14 @@ public interface ILimeSdrDmeDeviceV2 : ILimeSdrCustomDevice
 public class LimeSdrDmeDeviceV2 : LimeSdrCustomDevice, ILimeSdrDmeDeviceV2
 {
     private readonly DmeWorkMode _mode;
+    private readonly LimeSdrDmeDeviceConfig _config;
     private readonly ILogger? _logger;
 
-    public LimeSdrDmeDeviceV2(string deviceId, DmeWorkMode mode, ILogger? logger = null) : base(deviceId, logger)
+    public LimeSdrDmeDeviceV2(string deviceId, DmeWorkMode mode, LimeSdrDmeDeviceConfig config,
+        ILogger? logger = null) : base(deviceId, logger)
     {
         _mode = mode;
+        _config = config;
         _logger = logger;
     }
 
@@ -253,6 +265,30 @@ public class LimeSdrDmeDeviceV2 : LimeSdrCustomDevice, ILimeSdrDmeDeviceV2
     public Task<bool> DmeGetRelayInvert(CancellationToken cancel = default)
     {
         return GetInvertsGpioAmplifierControl(cancel);
+    }
+    
+    public async Task RfRelaySelectOutput(bool isTx, CancellationToken cancel = default)
+    {
+        var value = isTx ? !_config.RfRelayRxIsHigh : _config.RfRelayRxIsHigh;
+        _logger?.ZLogDebug($"Setting RF relay to {(isTx ? "TX" : "RX")} (GPIO[{_config.RfRelayGpio}]={value})");
+        var arr = new byte[1] ;
+        await ReadGpioDirection(arr, cancel);
+        var dir = arr[0];
+        await ReadGpio(arr, cancel);
+        var gpio = arr[0];
+        var dirMask = (byte)(1 << _config.RfRelayGpio);
+        arr[0] = (byte)(dir | dirMask);
+        await WriteGpioDirection(arr, cancel);
+        
+        if (value)
+        {
+            arr[0] = (byte)(gpio | dirMask);
+        }
+        else
+        {
+            arr[0] = (byte)(gpio & ~dirMask);
+        }
+        await WriteGpio(arr, cancel);
     }
 
     public async Task<int> DmeGetMeasuredDistance(CancellationToken cancel = default)
@@ -359,10 +395,10 @@ public class LimeSdrDmeDeviceV2 : LimeSdrCustomDevice, ILimeSdrDmeDeviceV2
         return ReadCustomRegisterBits(0x010D, 0, 8, cancel);
     }
 
-    public Task<ushort> DmeGetResponseRate(CancellationToken cancel = default)
-    {
-        return ReadCustomRegister(0x010E, cancel);
-    }
+    // public Task<ushort> DmeGetResponseRate(CancellationToken cancel = default)
+    // {
+    //     return ReadCustomRegister(0x010E, cancel);
+    // }
 
     public Task<ushort> DmeGetPulsePairFrequency(CancellationToken cancel = default)
     {
