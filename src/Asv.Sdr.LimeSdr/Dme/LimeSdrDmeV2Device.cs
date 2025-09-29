@@ -8,7 +8,7 @@ using ZLogger;
 
 namespace Asv.Sdr.LimeSdr;
 
-public interface ILimeSdrDmeDeviceV2 : ILimeSdrCustomDevice
+public interface ILimeSdrDmeV2Device : ILimeSdrCustomDevice
 {
     /// <summary>
     /// Gets the DME mode.
@@ -111,13 +111,13 @@ public interface ILimeSdrDmeDeviceV2 : ILimeSdrCustomDevice
 
     /// <summary>
     /// Gets the FREQ_ZD value, which represents the query frequency in Hz.
-    /// The default is 100 Hz for AIR mode.
     /// </summary>
     Task<ushort> DmeGetRequestFrequency(CancellationToken cancel = default);
 
     /// <summary>
     /// Sets the FREQ_ZD value, which is the query frequency in Hz.
     /// Valid range: 1 Hz to 20,000 Hz.
+    /// The default is 100 Hz for AIR mode.
     /// </summary>
     Task DmeSetRequestFrequency(ushort freqZd, CancellationToken cancel = default);
 
@@ -143,41 +143,44 @@ public interface ILimeSdrDmeDeviceV2 : ILimeSdrCustomDevice
     /// <returns></returns>
     Task<ushort> DmeGetAllPairsFrequency(CancellationToken cancel = default);
     
-    Task<ushort> DmeGetPulseRisingMean(CancellationToken cancel = default);
-    Task<ushort> DmeGetPulseRisingSigma(CancellationToken cancel = default);
-    Task<ushort> DmeGetPulseFallingMean(CancellationToken cancel = default);
-    Task<ushort> DmeGetPulseFallingSigma(CancellationToken cancel = default);
-    Task<ushort> DmeGetPulseDurationMean(CancellationToken cancel = default);
-    Task<ushort> DmeGetPulseDurationSigma(CancellationToken cancel = default);
-    Task<ushort> DmeGetCodeTimeMean(CancellationToken cancel = default);
-    Task<ushort> DmeGetCodeTimeSigma(CancellationToken cancel = default);
-    
-    
-    // Task<ushort> DmeGetResponseRate(CancellationToken cancel = default);
-    
+    // Task<ushort> DmeGetPulseRisingMean(CancellationToken cancel = default);
+    // Task<ushort> DmeGetPulseRisingSigma(CancellationToken cancel = default);
+    // Task<ushort> DmeGetPulseFallingMean(CancellationToken cancel = default);
+    // Task<ushort> DmeGetPulseFallingSigma(CancellationToken cancel = default);
+    // Task<ushort> DmeGetPulseDurationMean(CancellationToken cancel = default);
+    // Task<ushort> DmeGetPulseDurationSigma(CancellationToken cancel = default);
+    // Task<ushort> DmeGetCodeTimeMean(CancellationToken cancel = default);
+    // Task<ushort> DmeGetCodeTimeSigma(CancellationToken cancel = default);
     
     /// <summary>
-    /// Frequency of all pulse pairs, in Hz
+    /// Responce rate
+    /// Only Air mode
     /// </summary>
     /// <param name="cancel"></param>
     /// <returns></returns>
-    Task<ushort> DmeGetPulsePairFrequency(CancellationToken cancel = default);
+    Task<ushort> DmeGetResponseRate(CancellationToken cancel = default);
+    
     
     Task DmeSetIso(string iso, CancellationToken cancel = default);
     
     Task<string> DmeGetIso(CancellationToken cancel = default);
     
-    Task<double[]> DmeGetFirstPulseShape(CancellationToken cancel = default);
-    Task<double[]> DmeGetSecondPulseShape(CancellationToken cancel = default);
-    
+    // Task<double[]> DmeGetFirstPulseShape(CancellationToken cancel = default);
+    // Task<double[]> DmeGetSecondPulseShape(CancellationToken cancel = default);
+
+    Task<PulseCharacteristics> DmeGetPulseCharacteristics(CancellationToken cancel = default);
+
+    Task<PulseShape> DmeGetPulseShape(CancellationToken cancel = default);
+
 }
-public class LimeSdrDmeDeviceV2 : LimeSdrCustomDevice, ILimeSdrDmeDeviceV2
+public class LimeSdrDmeV2Device : LimeSdrCustomDevice, ILimeSdrDmeV2Device
 {
     private readonly DmeWorkMode _mode;
     private readonly LimeSdrDmeDeviceConfig _config;
     private readonly ILogger? _logger;
+    private DmeChannel _channel;
 
-    public LimeSdrDmeDeviceV2(string deviceId, DmeWorkMode mode, LimeSdrDmeDeviceConfig config,
+    public LimeSdrDmeV2Device(string deviceId, DmeWorkMode mode, LimeSdrDmeDeviceConfig config,
         ILogger? logger = null) : base(deviceId, logger)
     {
         _mode = mode;
@@ -191,9 +194,17 @@ public class LimeSdrDmeDeviceV2 : LimeSdrCustomDevice, ILimeSdrDmeDeviceV2
         return IsEnabled(cancel);
     }
 
-    public Task DmeSetIsEnabled(bool enabled, CancellationToken cancel = default)
+    public async Task DmeSetIsEnabled(bool enabled, CancellationToken cancel = default)
     {
-        return enabled ? TurnOnMode(cancel) : TurnOffMode(cancel);
+        if (enabled)
+        {
+            await TurnOnMode(cancel).ConfigureAwait(false);
+            _channel = await DmeGetChannel(cancel).ConfigureAwait(false);
+        }
+        else
+        {
+            await TurnOffMode(cancel).ConfigureAwait(false);    
+        }
     }
 
     public async Task<DmeWorkMode> DmeGetMode(CancellationToken cancel = default)
@@ -232,6 +243,7 @@ public class LimeSdrDmeDeviceV2 : LimeSdrCustomDevice, ILimeSdrDmeDeviceV2
 
     public Task DmeSetChannel(DmeChannel value, CancellationToken cancel = default)
     {
+        _channel = value;
         return WriteCustomRegisterBits(0x0100, 1, 1, (ushort)value, cancel);
     }
 
@@ -355,52 +367,55 @@ public class LimeSdrDmeDeviceV2 : LimeSdrCustomDevice, ILimeSdrDmeDeviceV2
         return ReadCustomRegister(0x0102, cancel);
     }
 
-    public Task<ushort> DmeGetPulseRisingMean(CancellationToken cancel = default)
-    {
-        return ReadCustomRegisterBits(0x010A, 8, 8, cancel);
-    }
-
-    public Task<ushort> DmeGetPulseRisingSigma(CancellationToken cancel = default)
-    {
-        return ReadCustomRegisterBits(0x010A, 0, 8, cancel);
-    }
-
-    public Task<ushort> DmeGetPulseFallingMean(CancellationToken cancel = default)
-    {
-        return ReadCustomRegisterBits(0x010B, 8, 8, cancel);
-    }
-
-    public Task<ushort> DmeGetPulseFallingSigma(CancellationToken cancel = default)
-    {
-        return ReadCustomRegisterBits(0x010B, 0, 8, cancel);
-    }
-
-    public Task<ushort> DmeGetPulseDurationMean(CancellationToken cancel = default)
-    {
-        return ReadCustomRegisterBits(0x010C, 8, 8, cancel);
-    }
-
-    public Task<ushort> DmeGetPulseDurationSigma(CancellationToken cancel = default)
-    {
-        return ReadCustomRegisterBits(0x010C, 0, 8, cancel);
-    }
-
-    public Task<ushort> DmeGetCodeTimeMean(CancellationToken cancel = default)
-    {
-        return ReadCustomRegisterBits(0x010D, 8, 8, cancel);
-    }
-
-    public Task<ushort> DmeGetCodeTimeSigma(CancellationToken cancel = default)
-    {
-        return ReadCustomRegisterBits(0x010D, 0, 8, cancel);
-    }
-
-    // public Task<ushort> DmeGetResponseRate(CancellationToken cancel = default)
+    // public async Task<ushort> DmeGetPulseRisingMean(CancellationToken cancel = default)
     // {
-    //     return ReadCustomRegister(0x010E, cancel);
+    //     var result = await ReadCustomRegisterBits(0x010A, 8, 8, cancel).ConfigureAwait(false);
+    //     return (ushort)(result * 20);
+    // }
+    //
+    // public async Task<ushort> DmeGetPulseRisingSigma(CancellationToken cancel = default)
+    // {
+    //     var result = await ReadCustomRegisterBits(0x010A, 0, 8, cancel).ConfigureAwait(false);
+    //     return (ushort)(result * 20);
+    // }
+    //
+    // public async Task<ushort> DmeGetPulseFallingMean(CancellationToken cancel = default)
+    // {
+    //     var result = await ReadCustomRegisterBits(0x010B, 8, 8, cancel).ConfigureAwait(false);
+    //     return (ushort)(result * 20);
+    // }
+    //
+    // public async Task<ushort> DmeGetPulseFallingSigma(CancellationToken cancel = default)
+    // {
+    //     var result = await ReadCustomRegisterBits(0x010B, 0, 8, cancel).ConfigureAwait(false);
+    //     return (ushort)(result * 20);
+    // }
+    //
+    // public async Task<ushort> DmeGetPulseDurationMean(CancellationToken cancel = default)
+    // {
+    //     var result = await ReadCustomRegisterBits(0x010C, 8, 8, cancel).ConfigureAwait(false);
+    //     return (ushort)(result * 20);
+    // }
+    //
+    // public async Task<ushort> DmeGetPulseDurationSigma(CancellationToken cancel = default)
+    // {
+    //     var result = await ReadCustomRegisterBits(0x010C, 0, 8, cancel).ConfigureAwait(false);
+    //     return (ushort)(result * 20);
+    // }
+    //
+    // public async Task<ushort> DmeGetCodeTimeMean(CancellationToken cancel = default)
+    // {
+    //     var result = await ReadCustomRegisterBits(0x010D, 8, 8, cancel).ConfigureAwait(false);
+    //     return (ushort)(result * 20);
+    // }
+    //
+    // public async Task<ushort> DmeGetCodeTimeSigma(CancellationToken cancel = default)
+    // {
+    //     var result = await ReadCustomRegisterBits(0x010D, 0, 8, cancel).ConfigureAwait(false);
+    //     return (ushort)(result * 20);
     // }
 
-    public Task<ushort> DmeGetPulsePairFrequency(CancellationToken cancel = default)
+    public Task<ushort> DmeGetResponseRate(CancellationToken cancel = default)
     {
         return ReadCustomRegister(0x010E, cancel);
     }
@@ -426,26 +441,57 @@ public class LimeSdrDmeDeviceV2 : LimeSdrCustomDevice, ILimeSdrDmeDeviceV2
         return Encoding.ASCII.GetString(buffer);
     }
 
-    public async Task<double[]> DmeGetFirstPulseShape(CancellationToken cancel = default)
+    // public async Task<double[]> DmeGetFirstPulseShape(CancellationToken cancel = default)
+    // {
+    //     var addr = new ushort[45];
+    //     for (var i = 0; i < 45; i++)
+    //     {
+    //         addr[i] = (ushort)(0x0111 + i);
+    //     }
+    //     var frame = await ReadCustomRegistersFrame(addr, cancel).ConfigureAwait(false);
+    //     return frame.Select(f => f / 2048.0).ToArray();
+    // }
+    //
+    // public async Task<double[]> DmeGetSecondPulseShape(CancellationToken cancel = default)
+    // {
+    //     var addr = new ushort[45];
+    //     for (var i = 0; i < 45; i++)
+    //     {
+    //         addr[i] = (ushort)(0x013E + i);
+    //     }
+    //     var frame = await ReadCustomRegistersFrame(addr, cancel).ConfigureAwait(false);
+    //     return frame.Select(f => f / 2048.0).ToArray();
+    // }
+
+    public async Task<PulseCharacteristics> DmeGetPulseCharacteristics(CancellationToken cancel = default)
     {
-        var addr = new ushort[45];
-        for (var i = 0; i < 45; i++)
+        var frame = await ReadCustomRegistersFrame([0x010A, 0x010B, 0x010C, 0x010D], cancel).ConfigureAwait(false);
+        var riseMean = (ushort)((frame[0] >> 8) * 20);
+        var riseSigma = (ushort)((frame[0] & 0xFF) * 20);
+        var decayMean = (ushort)((frame[1] >> 8) * 20);
+        var decaySigma = (ushort)((frame[1] & 0xFF) * 20);
+        var durationMean = (ushort)((frame[2] >> 8) * 20);
+        var durationSigma = (ushort)((frame[2] & 0xFF) * 20);
+        var spacingOffset = (short)((sbyte)(frame[3] >> 8) * 20);
+        var spacingSigma = (ushort)((frame[3] & 0xFF) * 20);
+        
+        return new PulseCharacteristics(_channel, riseMean, riseSigma, decayMean, decaySigma, durationMean, durationSigma, spacingOffset, spacingSigma);
+    }
+    
+    public async Task<PulseShape> DmeGetPulseShape(CancellationToken cancel = default)
+    {
+        var addr = new ushort[91];
+        addr[0] = 0x010D; // Spacing offset
+        for (var i = 1; i < 91; i++)
         {
             addr[i] = (ushort)(0x0111 + i);
         }
         var frame = await ReadCustomRegistersFrame(addr, cancel).ConfigureAwait(false);
-        return frame.Select(f => f / 2048.0).ToArray();
-    }
-
-    public async Task<double[]> DmeGetSecondPulseShape(CancellationToken cancel = default)
-    {
-        var addr = new ushort[45];
-        for (var i = 0; i < 45; i++)
-        {
-            addr[i] = (ushort)(0x013E + i);
-        }
-        var frame = await ReadCustomRegistersFrame(addr, cancel).ConfigureAwait(false);
-        return frame.Select(f => f / 2048.0).ToArray();
+        var spacingOffset = (short)((sbyte)(frame[0] >> 8) * 20);
+        var pulse1 = new ReadOnlySpan<ushort>(frame, 1, 45);
+        var pulse2 = new ReadOnlySpan<ushort>(frame, 46, 45);
+        
+        return new PulseShape(_channel, spacingOffset, pulse1, pulse2);
     }
 
     protected override CustomWorkMode InternalGetMode()
@@ -457,4 +503,88 @@ public class LimeSdrDmeDeviceV2 : LimeSdrCustomDevice, ILimeSdrDmeDeviceV2
             _ => throw new ArgumentOutOfRangeException()
         };
     }
+}
+
+public class PulseCharacteristics(
+    DmeChannel channel,
+    ushort riseMean,
+    ushort riseSigma,
+    ushort decayMean,
+    ushort decaySigma,
+    ushort durationMean,
+    ushort durationSigma,
+    short spacingOffset,
+    ushort spacingSigma)
+{
+    private const ushort XChannelSpacing = 12000;
+    private const ushort YChannelSpacing = 30000;
+
+    /// <summary>
+    /// Pulse rise mean, in nanoseconds
+    /// </summary>
+    public ushort RiseMean { get; } = riseMean;
+
+    /// <summary>
+    /// Pulse rise standard deviation, in nanoseconds
+    /// </summary>
+    public ushort RiseSigma { get; } = riseSigma;
+
+    /// <summary>
+    /// Pulse decay mean, in nanoseconds
+    /// </summary>
+    public ushort DecayMean { get; } = decayMean;
+
+    /// <summary>
+    /// Pulse decay standard deviation, in nanoseconds
+    /// </summary>
+    public ushort DecaySigma { get; } = decaySigma;
+
+    /// <summary>
+    /// Pulse duration mean, in nanoseconds
+    /// </summary>
+    public ushort DurationMean { get; } = durationMean;
+
+    /// <summary>
+    /// Pulse duration standard deviation, in nanoseconds
+    /// </summary>
+    public ushort DurationSigma { get; } = durationSigma;
+
+    /// <summary>
+    /// Pulse spacing mean, in nanoseconds
+    /// </summary>
+    public ushort SpacingMean { get; } =
+        (ushort)((channel == DmeChannel.XChannel ? XChannelSpacing : YChannelSpacing) + spacingOffset);
+
+    /// <summary>
+    /// Pulse spacing standard deviation, in nanoseconds
+    /// </summary>
+    public ushort SpacingSigma { get; } = spacingSigma;
+}
+
+public class PulseShape
+{
+    private const ushort XChannelSpacing = 12000;
+    private const ushort YChannelSpacing = 30000;
+    public const double MaxAmplitude = 2896.31; // 12 bit 2^11 * 2^(0.5): (2^22 + 2^22)^(0.5) = (2^22)^(0.5) * 2^(0.5) = 2^11 + 2^(0.5)
+    public PulseShape(DmeChannel channel,
+        short spacingOffset,
+        ReadOnlySpan<ushort> pulse1,
+        ReadOnlySpan<ushort> pulse2)
+    {
+        var spacing = (ushort)((channel == DmeChannel.XChannel ? XChannelSpacing : YChannelSpacing) + spacingOffset);
+        var space = (ushort)Math.Round(spacing / 200.0) - (pulse1.Length / 2 + pulse2.Length / 2);
+        var count = space + pulse1.Length + pulse2.Length;
+        Shape = new double[count];
+        
+        for (var i = 0; i < pulse1.Length; i++)
+        {
+            Shape[i] = pulse1[i] / MaxAmplitude;
+        }
+        for (var i = 0; i < pulse2.Length; i++)
+        {
+            Shape[i + pulse1.Length + space] = pulse2[i] / MaxAmplitude;
+        }
+    }
+
+    public double[] Shape { get; }
 }

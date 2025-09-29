@@ -48,7 +48,8 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
         var mode = InternalGetMode();
         return AtomicEditRegister(edit =>
         {
-            var reg = edit.RaedFPGAReg(ControlAddress);
+            // var reg = edit.RaedFPGAReg(ControlAddress);
+            ushort reg = 0x0;
             var mask = ((ushort)mode << 4) | 1;
             reg = (ushort)(reg & MODE_OFF_MASK);
             reg = (ushort)(reg | mask);
