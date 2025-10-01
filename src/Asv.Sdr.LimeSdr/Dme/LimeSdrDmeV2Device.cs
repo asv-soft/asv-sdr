@@ -179,7 +179,7 @@ public class LimeSdrDmeV2Device : LimeSdrCustomDevice, ILimeSdrDmeV2Device
     private readonly LimeSdrDmeDeviceConfig _config;
     private readonly ILogger? _logger;
     private DmeChannel _channel;
-
+    
     public LimeSdrDmeV2Device(string deviceId, DmeWorkMode mode, LimeSdrDmeDeviceConfig config,
         ILogger? logger = null) : base(deviceId, logger)
     {
@@ -480,18 +480,39 @@ public class LimeSdrDmeV2Device : LimeSdrCustomDevice, ILimeSdrDmeV2Device
     
     public async Task<PulseShape> DmeGetPulseShape(CancellationToken cancel = default)
     {
-        var addr = new ushort[91];
+        // var addr = new ushort[91];
+        // addr[0] = 0x010D; // Spacing offset
+        //
+        // for (var i = 1; i < 45 + 1; i++)
+        // {
+        //     addr[i] = (ushort)(0x0200 + i + 32);
+        // }
+        //
+        // var skip = _channel == DmeChannel.XChannel ? 60 - (45 - 32) : 106 - (45 - 32);
+        // for (var i = 46; i < 91; i++)
+        // {
+        //     addr[i] = (ushort)(0x0200 + i + skip);
+        // }
+        
+        var addr = new ushort[201];
         addr[0] = 0x010D; // Spacing offset
-        for (var i = 1; i < 91; i++)
+        
+        for (var i = 1; i < 201; i++)
         {
-            addr[i] = (ushort)(0x0111 + i);
+            addr[i] = (ushort)(0x0200 + i + 32);
         }
+
         var frame = await ReadCustomRegistersFrame(addr, cancel).ConfigureAwait(false);
         var spacingOffset = (short)((sbyte)(frame[0] >> 8) * 20);
-        var pulse1 = new ReadOnlySpan<ushort>(frame, 1, 45);
-        var pulse2 = new ReadOnlySpan<ushort>(frame, 46, 45);
         
-        return new PulseShape(_channel, spacingOffset, pulse1, pulse2);
+        // var pulse1 = new ReadOnlySpan<ushort>(frame, 1, 45);
+        // var pulse2 = new ReadOnlySpan<ushort>(frame, 46, 45);
+        //
+        // return new PulseShape(_channel, spacingOffset, pulse1, pulse2);
+
+        var shape = new ReadOnlySpan<ushort>(frame, 1, 200);
+        var max = frame.Skip(1).Max() * 0.55;
+        return new PulseShape(shape, max);
     }
 
     protected override CustomWorkMode InternalGetMode()
@@ -583,6 +604,15 @@ public class PulseShape
         for (var i = 0; i < pulse2.Length; i++)
         {
             Shape[i + pulse1.Length + space] = pulse2[i] / MaxAmplitude;
+        }
+    }
+
+    public PulseShape(ReadOnlySpan<ushort> shape, double maxHalfAmplitude)
+    {
+        Shape = new double[shape.Length];
+        for (var i = 0; i < shape.Length; i++)
+        {
+            Shape[i] = shape[i] / maxHalfAmplitude;
         }
     }
 
