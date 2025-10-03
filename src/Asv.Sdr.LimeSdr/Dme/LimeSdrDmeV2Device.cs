@@ -511,8 +511,7 @@ public class LimeSdrDmeV2Device : LimeSdrCustomDevice, ILimeSdrDmeV2Device
         // return new PulseShape(_channel, spacingOffset, pulse1, pulse2);
 
         var shape = new ReadOnlySpan<ushort>(frame, 1, 200);
-        var max = frame.Skip(1).Max() * 0.55;
-        return new PulseShape(shape, max);
+        return new PulseShape(shape, PulseShape.MaxAmplitude);
     }
 
     protected override CustomWorkMode InternalGetMode()
