@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <Nullable>enable</Nullable>
-    <ProductVersion>1.5.20</ProductVersion>
+    <ProductVersion>1.5.21</ProductVersion>
     <TargetFrameworksValue>net9.0</TargetFrameworksValue>
     <AvaloniaVersion>11.2.5</AvaloniaVersion>
     <AsvCommonVersion>3.3.0-dev.4</AsvCommonVersion>

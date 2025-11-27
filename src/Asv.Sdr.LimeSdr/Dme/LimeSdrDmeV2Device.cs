@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -432,13 +434,47 @@ public class LimeSdrDmeV2Device : LimeSdrCustomDevice, ILimeSdrDmeV2Device
 
     public async Task<string> DmeGetIso(CancellationToken cancel = default)
     {
-        var frame = await ReadCustomRegistersFrame([0x010F, 0x0110], cancel).ConfigureAwait(false);
-        var buffer = new byte[4];
-        buffer[0] = (byte)(frame[0] >> 8);
-        buffer[1] = (byte)(frame[0] & 0xFF);
-        buffer[2] = (byte)(frame[1] >> 8);
-        buffer[3] = (byte)(frame[1] & 0xFF);
-        return Encoding.ASCII.GetString(buffer);
+        var frame = await ReadCustomRegistersFrame([0x010F, 0x0110, 0x0111, 0x0112], cancel).ConfigureAwait(false);
+        var morseCode = new string[4];
+        for (var i = 0; i < 4; i++)
+        {
+            if (frame[i] == 0)
+            {
+                morseCode[i] = " ";
+            }
+            else
+            {
+                var symbols = new List<char>();
+                var mask = (ushort)0xC000;
+                for (var j = 0; j < 16; j += 2)
+                {
+                    var val = (frame[i] & (mask >> j)) >> (14 - j);
+                    if (val is 0 or 0b01)
+                    {
+                        symbols.Add(' ');
+                    }
+                    else
+                    {
+                        switch (val)
+                        {
+                            case 0b10:
+                                symbols.Add('.');
+                                break;
+                            case 0b11:
+                                symbols.Add('-');
+                                break;
+                        }    
+                    }
+                }
+                morseCode[i] = new string(symbols.ToArray());
+            }
+        }
+        var chars = new char[4];
+        for (var i = 0; i < 4; i++)
+        {
+            chars[i] = MorseSymbols.AlphabetData.GetValueOrDefault(morseCode[i], '?');
+        }
+        return new string(chars);
     }
 
     // public async Task<double[]> DmeGetFirstPulseShape(CancellationToken cancel = default)
@@ -524,6 +560,219 @@ public class LimeSdrDmeV2Device : LimeSdrCustomDevice, ILimeSdrDmeV2Device
         };
     }
 }
+
+internal static class MorseSymbols
+{
+    public static ReadOnlyDictionary<string, char> AlphabetData { get; } = new ReadOnlyDictionary<string, char>(
+        (IDictionary<string, char>)new Dictionary<string, char>()
+        {
+            {
+                ".-",
+                'A'
+            },
+            {
+                "-...",
+                'B'
+            },
+            {
+                "-.-.",
+                'C'
+            },
+            {
+                "-..",
+                'D'
+            },
+            {
+                ".",
+                'E'
+            },
+            {
+                "..-.",
+                'F'
+            },
+            {
+                "--.",
+                'G'
+            },
+            {
+                "....",
+                'H'
+            },
+            {
+                "..",
+                'I'
+            },
+            {
+                ".---",
+                'J'
+            },
+            {
+                "-.-",
+                'K'
+            },
+            {
+                ".-..",
+                'L'
+            },
+            {
+                "--",
+                'M'
+            },
+            {
+                "-.",
+                'N'
+            },
+            {
+                "---",
+                'O'
+            },
+            {
+                ".--.",
+                'P'
+            },
+            {
+                "--.-",
+                'Q'
+            },
+            {
+                ".-.",
+                'R'
+            },
+            {
+                "...",
+                'S'
+            },
+            {
+                "-",
+                'T'
+            },
+            {
+                "..-",
+                'U'
+            },
+            {
+                "...-",
+                'V'
+            },
+            {
+                ".--",
+                'W'
+            },
+            {
+                "-..-",
+                'X'
+            },
+            {
+                "-.--",
+                'Y'
+            },
+            {
+                "--..",
+                'Z'
+            },
+            {
+                ".----",
+                '1'
+            },
+            {
+                "..---",
+                '2'
+            },
+            {
+                "...--",
+                '3'
+            },
+            {
+                "....-",
+                '4'
+            },
+            {
+                ".....",
+                '5'
+            },
+            {
+                "-....",
+                '6'
+            },
+            {
+                "--...",
+                '7'
+            },
+            {
+                "---..",
+                '8'
+            },
+            {
+                "----.",
+                '9'
+            },
+            {
+                "-----",
+                '0'
+            },
+            {
+                "--..--",
+                ','
+            },
+            {
+                "..--..",
+                '?'
+            },
+            {
+                "---...",
+                ':'
+            },
+            {
+                "-....-",
+                '-'
+            },
+            {
+                ".-..-.",
+                '"'
+            },
+            {
+                "-.--.",
+                '('
+            },
+            {
+                "-...-",
+                '='
+            },
+            {
+                ".-.-.-",
+                '.'
+            },
+            {
+                "-.-.-.",
+                ';'
+            },
+            {
+                "-..-.",
+                '/'
+            },
+            {
+                ".----.",
+                '\''
+            },
+            {
+                "_.__._",
+                ')'
+            },
+            {
+                ".-.-.",
+                '+'
+            },
+            {
+                ".__._.",
+                '@'
+            },
+            {
+                " ",
+                ' '
+            }
+        });
+}
+
 
 public class PulseCharacteristics(
     DmeChannel channel,
