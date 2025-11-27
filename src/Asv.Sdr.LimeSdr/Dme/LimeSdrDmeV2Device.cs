@@ -472,7 +472,8 @@ public class LimeSdrDmeV2Device : LimeSdrCustomDevice, ILimeSdrDmeV2Device
         var chars = new char[4];
         for (var i = 0; i < 4; i++)
         {
-            chars[i] = MorseSymbols.AlphabetData.GetValueOrDefault(morseCode[i], '?');
+            if (string.Equals(morseCode[i], " ")) chars[i] = ' ';
+            else chars[i] = MorseSymbols.AlphabetData.GetValueOrDefault(morseCode[i].Trim(), '?');
         }
         return new string(chars);
     }
