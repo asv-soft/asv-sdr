@@ -30,7 +30,7 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
         _logger = logger ?? NullLogger.Instance;
     }
 
-    public async Task<bool> IsEnabled(CancellationToken cancel = default)
+    public async Task<bool> IsModeEnabled(CancellationToken cancel = default)
     {
         var reg = await this.ReadFpgaRegisterBits(ControlAddress, 0, 1, cancel).ConfigureAwait(false);
         return reg != 0;
@@ -39,10 +39,10 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
     public async Task<CustomWorkMode> GetMode(CancellationToken cancel = default)
     {
         var reg = await ReadFpgaRegister(ControlAddress, cancel).ConfigureAwait(false);
-        return (CustomWorkMode)((reg & 0xF0) >> 4);
+        return (CustomWorkMode)((reg >> 4) & 0xF);
     }
 
-    public Task TurnOnMode(CancellationToken cancel = default)
+    protected Task TurnOnMode(CancellationToken cancel = default)
     {
         _logger.ZLogInformation($"Turn on custom mode");
         var mode = InternalGetMode();
@@ -57,7 +57,7 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
         }, cancel);
     }
 
-    public Task TurnOffMode(CancellationToken cancel = default)
+    protected Task TurnOffMode(CancellationToken cancel = default)
     {
         _logger.ZLogInformation($"Turn off custom mode");
         return AtomicEditRegister(edit =>

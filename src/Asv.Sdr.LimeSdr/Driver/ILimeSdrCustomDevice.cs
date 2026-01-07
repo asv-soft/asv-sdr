@@ -9,7 +9,8 @@ public enum CustomWorkMode
     Normal = 0,
     DmeAir = 1,
     DmeGround = 2,
-    AdsB = 3
+    AdsBModeSRep = 3,
+    AdsBModeACRep = 4
 }
 
 public interface ILimeSdrCustomDevice : ILimeSdrDevice
@@ -17,24 +18,12 @@ public interface ILimeSdrCustomDevice : ILimeSdrDevice
     /// <summary>
     /// Get the Custom Mode.
     /// </summary>
-    Task<bool> IsEnabled(CancellationToken cancel = default);
+    Task<bool> IsModeEnabled(CancellationToken cancel = default);
 
     /// <summary>
     /// Get Custom Mode Type
     /// </summary>
     Task<CustomWorkMode> GetMode(CancellationToken cancel = default);
-
-    /// <summary>
-    /// Turn on Custom Mode
-    /// </summary>
-    /// <returns></returns>
-    Task TurnOnMode(CancellationToken cancel = default);
-    
-    /// <summary>
-    /// Turn off Custom Mode
-    /// </summary>
-    /// <returns></returns>
-    Task TurnOffMode(CancellationToken cancel = default);
 
     /// <summary>
     /// Resets the Custom Mode

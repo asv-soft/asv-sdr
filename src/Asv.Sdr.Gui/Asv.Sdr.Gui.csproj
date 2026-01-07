@@ -48,5 +48,6 @@
       <ProjectReference Include="..\Asv.Sdr.AdSdr\Asv.Sdr.AdSdr.csproj" />
       <ProjectReference Include="..\Asv.Sdr.LimeSdr\Asv.Sdr.LimeSdr.csproj" />
       <ProjectReference Include="..\Asv.Sdr.SignalHound\Asv.Sdr.SignalHound.csproj" />
+      <ProjectReference Include="..\Asv.Sdr\Asv.Sdr.csproj" />
     </ItemGroup>
 </Project>

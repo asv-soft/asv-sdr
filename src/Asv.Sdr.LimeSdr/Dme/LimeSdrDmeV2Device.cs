@@ -191,7 +191,7 @@ public class LimeSdrDmeV2Device : LimeSdrCustomDevice, ILimeSdrDmeV2Device
 
     public Task<bool> DmeIsEnabled(CancellationToken cancel = default)
     {
-        return IsEnabled(cancel);
+        return IsModeEnabled(cancel);
     }
 
     public async Task DmeSetIsEnabled(bool enabled, CancellationToken cancel = default)
