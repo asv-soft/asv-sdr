@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -5,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace Asv.Sdr.LimeSdr;
 
 
-public interface ILimeSdrModeSRepDevice
+public interface ILimeSdrModeSRepDevice : ILimeSdrAdsbTransponderDevice
 {
     /// <summary>
     /// Turn On/Off ADS-B
@@ -34,9 +35,9 @@ public class LimeSdrModeSRepDevice : LimeSdrAdsbTransponderDevice, ILimeSdrModeS
         {
             var val = _isAdsbEnabled ? (ushort)(ADSB_MASK | MODES_LEVEL1_MASK) : MODES_LEVEL1_MASK;
             // Включаем ответы на любые запросы DF11, DF4, DF5, если нужно включаем отправку ADS-B
-            await WriteCustomRegister(0x0046, val, cancel).ConfigureAwait(false);
+            // await WriteCustomRegister(0x0046, val, cancel).ConfigureAwait(false);
             await TurnOnMode(cancel);
-            await Task.Delay(1500, cancel).ConfigureAwait(false);
+            await Task.Delay(500, cancel).ConfigureAwait(false);
             // На всякий пож еще раз: Включаем ответы на любые запросы DF11, DF4, DF5, если нужно включаем отправку ADS-B
             await WriteCustomRegister(0x0046, val, cancel).ConfigureAwait(false);
         }
@@ -45,7 +46,6 @@ public class LimeSdrModeSRepDevice : LimeSdrAdsbTransponderDevice, ILimeSdrModeS
             await TurnOffMode(cancel).ConfigureAwait(false);
         }
     }
-
     public Task TurnOnOffAdsB(bool enabled, CancellationToken cancel = default)
     {
         return enabled

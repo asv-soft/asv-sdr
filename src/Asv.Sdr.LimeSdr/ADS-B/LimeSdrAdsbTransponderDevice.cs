@@ -23,6 +23,19 @@ public interface ILimeSdrAdsbTransponderDevice : ILimeSdrCustomDevice
     /// 
     /// </summary>
     Task RfRelaySelectOutput(bool isTx, CancellationToken cancel = default);
+
+    /// <summary>
+    /// Set transponder capability
+    /// </summary>
+    /// <param name="ca">Transponder capability (3 bit)</param>
+    /// <param name="cancel"></param>
+    Task SetCapability(CapabilityEnum ca, CancellationToken cancel = default);
+    
+    /// <summary>
+    /// Set ICAO aircraft address
+    /// </summary>
+    /// <param name="address">ICAO aircraft address (24 bit)</param>
+    Task SetIcaoAddress(uint address, CancellationToken cancel = default);
     
     /// <summary>
     /// DF17 Id message
@@ -128,7 +141,7 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
             // Выключаем ответы на любые запросы, оставляем включенным только отправку ADS-B
             await WriteCustomRegister(0x0046, 0x70, cancel).ConfigureAwait(false);
             await TurnOnMode(cancel);
-            await Task.Delay(1500, cancel).ConfigureAwait(false);
+            await Task.Delay(500, cancel).ConfigureAwait(false);
             // На всякий пож еще раз: Выключаем ответы на любые запросы, оставляем включенным только отправку ADS-B
             await WriteCustomRegister(0x0046, 0x70, cancel).ConfigureAwait(false);
         }
@@ -160,6 +173,30 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
             arr[0] = (byte)(gpio & ~dirMask);
         }
         await WriteGpio(arr, cancel);
+    }
+
+    public Task SetCapability(CapabilityEnum ca, CancellationToken cancel = default)
+    {
+        var rawCa = (byte)TransponderHelper.SetCapability(ca);
+        var reg = (ushort)((0xB << 3) | rawCa);
+        return WriteCustomRegisterBits(DF11_55_40_InternAddr, 8, 8, reg, cancel);
+    }
+
+    public async Task SetIcaoAddress(uint address, CancellationToken cancel = default)
+    {
+        if ((address & 0x00FFFFFF) != 0) throw new ArgumentOutOfRangeException(nameof(address));
+        
+        var reg1 = await ReadCustomRegister(DF11_55_40_InternAddr, cancel).ConfigureAwait(false);
+        reg1 &= 0x0700; // save previous capability
+        reg1 |= 0xB << 11; // DF11 number
+        reg1 |= (ushort)((address & 0x00FF0000) >> 16); // upper 8 bits of the address
+        var reg2 = (ushort)(address & 0x0000FFFF); // lower 16 bits of the address
+        await WriteCustomRegistersFrame(
+        [
+            new ValueTuple<ushort, ushort>(DF11_55_40_InternAddr, reg1),
+            new ValueTuple<ushort, ushort>(DF11_39_24_InternAddr, reg2)
+        ], cancel).ConfigureAwait(false);
+
     }
 
     public async Task<bool> IsDF17IdEnabled(CancellationToken cancel = default)
@@ -223,16 +260,6 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
         frame[0] = new ValueTuple<ushort, ushort>(DF11_55_40_InternAddr, (ushort)((message.Span[0] << 8) | message.Span[1]));
         frame[1] = new ValueTuple<ushort, ushort>(DF11_39_24_InternAddr, (ushort)((message.Span[2] << 8) | message.Span[3]));
         return WriteCustomRegistersFrame(frame, cancel);
-    }
-
-    private async Task ChangeAndUpdateCapabilityAndIcao(ReadOnlyMemory<byte> message, CancellationToken cancel = default)
-    {
-        var df11 = await InternalReadDF11(cancel).ConfigureAwait(false);
-        var id = (byte)((message.Span[0] & 0x7) | (0xB << 3));
-        if (id == df11[0] && message.Span[1] == df11[1] && message.Span[2] == df11[2] && message.Span[3] == df11[3]) return;
-
-        var newDf11 = new byte[] {id, message.Span[1], message.Span[2], message.Span[3], 0, 0, 0};
-        await InternalWriteDF11(newDf11, cancel).ConfigureAwait(false);
     }
 
     #endregion
@@ -333,8 +360,6 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
             return;
         }
         
-        await ChangeAndUpdateCapabilityAndIcao(message, cancel).ConfigureAwait(false);
-        
         var frame = new ValueTuple<ushort, ushort>[4];
         frame[0] = new ValueTuple<ushort, ushort>(DF17_ID_79_64_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
         frame[1] = new ValueTuple<ushort, ushort>(DF17_ID_63_48_InternAddr, (ushort)((message.Span[6] << 8) | message.Span[7]));
@@ -359,7 +384,6 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
             return;
         }
         
-        await ChangeAndUpdateCapabilityAndIcao(evenMessage, cancel).ConfigureAwait(false);
         var frame = new ValueTuple<ushort, ushort>[8];
         frame[0] = new ValueTuple<ushort, ushort>(DF17_POS_EVEN_79_64_InternAddr, (ushort)((evenMessage.Span[4] << 8) | evenMessage.Span[5]));
         frame[1] = new ValueTuple<ushort, ushort>(DF17_POS_EVEN_63_48_InternAddr, (ushort)((evenMessage.Span[6] << 8) | evenMessage.Span[7]));
@@ -383,7 +407,6 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
             return;
         }
         
-        await ChangeAndUpdateCapabilityAndIcao(message, cancel).ConfigureAwait(false);
         var frame = new ValueTuple<ushort, ushort>[4];
         frame[0] = new ValueTuple<ushort, ushort>(DF17_VLS_79_64_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
         frame[1] = new ValueTuple<ushort, ushort>(DF17_VLS_63_48_InternAddr, (ushort)((message.Span[6] << 8) | message.Span[7]));
