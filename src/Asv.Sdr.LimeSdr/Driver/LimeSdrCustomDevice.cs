@@ -10,7 +10,7 @@ namespace Asv.Sdr.LimeSdr;
 public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
 {
     private readonly ILogger _logger;
-    private ushort MODE_OFF_MASK = 0xFF0E;
+    private ushort MODE_OFF_MASK = 0xFF0C;
 
     private const ushort ControlAddress     = 0x00D0;
     
@@ -45,12 +45,16 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
     protected Task TurnOnMode(CancellationToken cancel = default)
     {
         _logger.ZLogInformation($"Turn on custom mode");
-        var mode = InternalGetMode();
+        var mode = (ushort)InternalGetMode();
         return AtomicEditRegister(edit =>
         {
             // var reg = edit.RaedFPGAReg(ControlAddress);
             ushort reg = 0x0;
-            var mask = ((ushort)mode << 4) | 1;
+            var mask = (ushort)((mode << 4) | 0x3);
+            var regReset = (ushort)(reg & MODE_OFF_MASK);
+            regReset = (ushort)(regReset | mask);
+            edit.WriteFPGAReg(ControlAddress, regReset);
+            mask = (ushort)((mode << 4) | 0x1);
             reg = (ushort)(reg & MODE_OFF_MASK);
             reg = (ushort)(reg | mask);
             edit.WriteFPGAReg(ControlAddress, reg);
@@ -69,12 +73,27 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
     }
     protected abstract CustomWorkMode InternalGetMode();
 
-    public async Task CustomModeReset(CancellationToken cancel = default)
+    // public async Task CustomModeReset(CancellationToken cancel = default)
+    // {
+    //     _logger.ZLogInformation($"Resetting custom mode");
+    //     await this.WriteFpgaRegisterBits(ControlAddress, 1, 1, 1, cancel);
+    //     await Task.Delay(500, cancel);
+    //     await this.WriteFpgaRegisterBits(ControlAddress, 1, 1, 0, cancel);
+    // }
+    
+    public Task CustomModeReset(CancellationToken cancel = default)
     {
         _logger.ZLogInformation($"Resetting custom mode");
-        await this.WriteFpgaRegisterBits(ControlAddress, 1, 1, 1, cancel);
-        await Task.Delay(100, cancel);
-        await this.WriteFpgaRegisterBits(ControlAddress, 1, 1, 0, cancel);
+        return AtomicEditRegister(edit =>
+        {
+            edit.InternalWriteFpgaRegisterBits(ControlAddress, 1, 1, 1);
+            edit.InternalWriteFpgaRegisterBits(ControlAddress, 1, 1, 0);
+        }, cancel);
+    }
+
+    public Task SwitchMode(bool isCustom, CancellationToken cancel = default)
+    {
+        return this.WriteFpgaRegisterBits(ControlAddress, 0, 1, (ushort)(isCustom ? 1 : 0), cancel);
     }
 
     public async Task<bool> GetInvertsGpioAmplifierControl(CancellationToken cancel = default)
@@ -194,7 +213,7 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
     {
         if (length is <= 0 or > 16) throw new Exception("Error length");
         var reg = ReadCustomRegister(edit, address);
-        var mask = ~(ushort)0u >> (sizeof(ushort) * 8 - length);
+        var mask = (ushort)(unchecked((ushort)~0u) >> (sizeof(ushort) * 8 - length));
         return (ushort)((reg >> index) & mask);
     }
 

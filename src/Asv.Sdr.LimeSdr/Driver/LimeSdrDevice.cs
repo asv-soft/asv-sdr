@@ -267,6 +267,18 @@ namespace Asv.Sdr.LimeSdr
                 Check(LMS_SetLOFrequency(_device, type == LmsChannel.Tx, channel, freq),nameof(LMS_SetLOFrequency));
             }, cancel);
         }
+        
+        public async Task<double> GetFrequency(LmsChannel type, uint channel, CancellationToken cancel)
+        {
+            double freq = 0;
+            await _taskFactory.StartNew(() =>
+            {
+                if (IsDisposed) return;
+                _logger.ZLogInformation($"Set {type:G}{channel} LO frequency {freq} ");
+                Check(LMS_GetLOFrequency(_device, type == LmsChannel.Tx, channel, ref freq),nameof(LMS_SetLOFrequency));
+            }, cancel);
+            return freq;
+        }
 
         public Task SetAntenna(LmsChannel type, uint channel, uint index, CancellationToken cancel)
         {

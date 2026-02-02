@@ -79,6 +79,7 @@ namespace Asv.Sdr.LimeSdr
         Task SetSampleRate(double rate, uint oversample, CancellationToken cancel);
         Task SetSampleRateDir(LmsChannel type, double rate, uint oversample, CancellationToken cancel);
         Task SetFrequency(LmsChannel type, uint channel, double freq, CancellationToken cancel);
+        Task<double> GetFrequency(LmsChannel type, uint channel, CancellationToken cancel);
         Task SetAntenna(LmsChannel type, uint channel, uint index, CancellationToken cancel);
 
         Task SetNormalizedGain(LmsChannel type, uint channel, double normalizedGain, CancellationToken cancel);
@@ -189,6 +190,7 @@ namespace Asv.Sdr.LimeSdr
             var mask = (ushort)((unchecked((ushort)~0u) << (index + length)) | (unchecked((ushort)~0u) >> (sizeof(ushort) * 8 - index)));
             var reg = await src.ReadFpgaRegister(address, cancel);
             reg = (ushort)((reg & mask) | ((value << index) & ~mask));
+            await Task.Delay(100, cancel);
             await src.WriteFpgaRegister(address, reg, cancel);
         }
 
@@ -196,7 +198,7 @@ namespace Asv.Sdr.LimeSdr
         {
             if (length is <= 0 or > 16) throw new Exception("Error length");
             var reg = await src.ReadFpgaRegister(address, cancel);
-            var mask = ~(ushort)0u >> (sizeof(ushort) * 8 - length);
+            var mask = (ushort)(unchecked((ushort)~0u) >> (sizeof(ushort) * 8 - length));
             return (ushort)((reg >> index) & mask);
         }
         
@@ -213,7 +215,7 @@ namespace Asv.Sdr.LimeSdr
         {
             if (length is <= 0 or > 16) throw new Exception("Error length");
             var reg = src.RaedFPGAReg(address);
-            var mask = ~(ushort)0u >> (sizeof(ushort) * 8 - length);
+            var mask = (ushort)(unchecked((ushort)~0u) >> (sizeof(ushort) * 8 - length));
             return (ushort)((reg >> index) & mask);
         }
     }

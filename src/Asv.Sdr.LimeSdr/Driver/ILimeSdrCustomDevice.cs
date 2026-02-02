@@ -31,6 +31,11 @@ public interface ILimeSdrCustomDevice : ILimeSdrDevice
     Task CustomModeReset(CancellationToken cancel = default);
 
     /// <summary>
+    /// Switches the multiplexer without completely stopping the custom mode
+    /// </summary>
+    Task SwitchMode(bool isCustom, CancellationToken cancel = default);
+    
+    /// <summary>
     /// Is inverts the GPIO amplifier control signal
     /// </summary>
     Task<bool> GetInvertsGpioAmplifierControl(CancellationToken cancel = default);
