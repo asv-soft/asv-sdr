@@ -12,14 +12,57 @@ public enum CapabilityEnum
 
 public enum AdsbMessageTypeEnum
 {
+    /// <summary>
+    /// TC = 1–4 для BDS 0,8 — Extended Squitter Identification and Category
+    /// </summary>
     AircraftIdentification = 1,
+    
+    /// <summary>
+    /// TC = 5–8 для BDS 0,6 — Extended Squitter Surface Position
+    /// </summary>
     SurfacePosition = 5,
+    
+    /// <summary>
+    /// TC = 9–18 для airborne position с баро-высотой
+    /// </summary>
     AirborneBarometricPosition = 9,
+    
+    /// <summary>
+    /// TC = 19 для BDS 0,9 — Extended Squitter Airborne Velocity.
+    /// SubType = 1 или 2 для Velocity over ground,
+    /// SubType = 3 или 4 для Airspeed / Heading
+    /// </summary>
     AirborneVelocities = 19,
+    
+    /// <summary>
+    /// TC = 20–22 для airborne position с GNSS-высотой
+    /// </summary>
     AirborneGnssPosition = 20,
-    Reserved = 23,
+    
+    /// <summary>
+    /// TC = 23 для BDS 0,A — Extended Squitter Event-Driven Register
+    /// </summary>
+    EventDriven = 23,
+    
+    /// <summary>
+    /// TC = 28 для BDS 6,1 — Extended Squitter Aircraft Status.
+    /// SubType = 1 для Emergency/Priority Status,
+    /// SubType = 2 для TCAS RA Broadcast
+    /// </summary>
     AircraftStatus = 28,
+    
+    /// <summary>
+    /// TC = 29 для BDS 6,2 — Target State and Status Information
+    /// SubType = 0 для старого формата TSS,
+    /// SubType = 1  для нового формата TSS
+    /// </summary>
     TargetStateAndStatusInformation = 29,
+    
+    /// <summary>
+    /// TC = 31 для BDS 6,5 — Aircraft Operational Status
+    /// SubType = 0 для Airborne,
+    /// SubType = 1  для Surface
+    /// </summary>
     AircraftOperationStatus = 31
 }
 
@@ -134,6 +177,12 @@ public enum VelocitySubTypeEnum
     SubType2 = 2,
     SubType3 = 3,
     SubType4 = 4
+}
+
+public enum AircraftOperationalStatusEnum
+{
+    SubType1 = 0,
+    SubType2 = 1,
 }
 
 public enum NavigationUncertaintyCategoryEnum

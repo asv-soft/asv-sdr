@@ -48,10 +48,69 @@ public class ModeACInterrogateViewModel : ShellPage
     private int _p2 = 0;
     private int _msgIdx = 0;
 
+    private void GetMessage(byte[] buffer)
+    {
+        for (var i = 0; i < buffer.Length; i++)
+        {
+            Console.Write($@"0x{buffer[i]:X2} ");
+        }
+    }
     public ModeACInterrogateViewModel() : base(WellKnownUri.Shell + ".modeACInter")
     {
         Title = "Mode A/C Interrogate";
         Icon = MaterialIconKind.ChartFinance;
+
+        byte[] bds17Buff1 = [0xa0, 0x00, 0x10, 0xb8, 0x02, 0x81, 0x01, 0x00, 0x00, 0x00, 0x00, 0xb2, 0xb5, 0xdd];
+        var bds17Span1 = new ReadOnlySpan<byte>(bds17Buff1);
+        byte[] bds17Buff2 = [0xa0, 0x00, 0x04, 0x14, 0x9f, 0x44, 0x02, 0xc0, 0x00, 0x00, 0x00, 0x5f, 0xcc, 0x50];
+        var bds17Span2 = new ReadOnlySpan<byte>(bds17Buff2);
+        byte[] bds17Buff3 = [0xaa, 0x00, 0x1f, 0x3b, 0xc2, 0x38, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x8e, 0xc4];
+        var bds17Span3 = new ReadOnlySpan<byte>(bds17Buff3);
+        byte[] bds17Buff4 = [0xa0, 0x28, 0x01, 0x33, 0xfe, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x59, 0xa6, 0x46];
+        var bds17Span4 = new ReadOnlySpan<byte>(bds17Buff4); 
+        
+        var df20_1 = new ModeSDF20();
+        df20_1.Deserialize(ref bds17Span1);
+        var df20_2 = new ModeSDF20();
+        df20_2.Deserialize(ref bds17Span2);
+        var df21_3 = new ModeSDF21();
+        df21_3.Deserialize(ref bds17Span3);
+        var df20_4 = new ModeSDF20();
+        df20_4.Deserialize(ref bds17Span4);
+
+
+        // var df4_s = new ModeSUF5
+        // {
+        //     PC = 0, RR = 0, DI = 1, InterrogatorIdentifier = 1, Lockout = false, IcaoAddress = 0xF0F0F0
+        // };
+        // var b1_4 = new byte[7];
+        // var sp1_4t = new Span<byte>(b1_4);
+        // var sp1_4s = new ReadOnlySpan<byte>(b1_4);
+        // df4_s.Serialize(ref sp1_4t);
+        // var df4t = new ModeSUF5();
+        // df4t.Deserialize(ref sp1_4s);
+        // GetMessage(b1_4);
+        
+        var df4_s = new ModeSUF4
+        {
+            RR = 0, DI = 1, BDS2 = 0, InterrogatorIdentifier = 1, Lockout = true, IcaoAddress = 0xF0F0F0
+        };
+        var b1_4 = new byte[7];
+        var sp1_4t = new Span<byte>(b1_4);
+        var sp1_4s = new ReadOnlySpan<byte>(b1_4);
+        df4_s.Serialize(ref sp1_4t);
+        var df4t = new ModeSUF4();
+        df4t.Deserialize(ref sp1_4s);
+        GetMessage(b1_4);
+        
+        var b = new byte[7];
+        var bufferOut = new Span<byte>(b);
+        var bufferIn = new ReadOnlySpan<byte>(b);
+        var df4_1 = new ModeSDF4 { Altitude = 3261.36, FS = 0, IcaoAddress = 0xAC3421 };
+        df4_1.Serialize(ref bufferOut);
+        var df4_2 = new ModeSDF4();
+        df4_2.Deserialize(ref bufferIn);
+        
         ConnectLms = ReactiveCommand.CreateRunInBackground(ConnectLmsImpl);
         DisconnectLms = ReactiveCommand.CreateRunInBackground(DisconnectLmsImpl);
     }

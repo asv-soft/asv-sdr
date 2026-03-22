@@ -2,12 +2,11 @@ using System;
 
 namespace Asv.Sdr;
 
-
-public class ModeSUF20 : ModeSUF4
+public class ModeSUF16 : ModeSUF0
 {
+    public override byte FormatId => 16;
     protected override int FormatLength => 14;
-    public override byte FormatId => 20;
-    
+
     protected override void InternalDeserialize(ReadOnlySpan<byte> buffer, ref int pos)
     {
         base.InternalDeserialize(buffer, ref pos);
@@ -21,10 +20,10 @@ public class ModeSUF20 : ModeSUF4
     }
 }
 
-public class ModeSDF20 : ModeSDF4
+public class ModeSDF16 : ModeSDF0
 {
+    public override byte FormatId => 16;
     protected override int FormatLength => 14;
-    public override byte FormatId => 20;
 
     protected override void InternalDeserialize(ReadOnlySpan<byte> buffer, ref int pos)
     {

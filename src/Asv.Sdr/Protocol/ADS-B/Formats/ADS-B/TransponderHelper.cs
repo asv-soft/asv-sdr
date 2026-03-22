@@ -62,11 +62,11 @@ public static class TransponderHelper
             <= 18 => AdsbMessageTypeEnum.AirborneBarometricPosition,
             19 => AdsbMessageTypeEnum.AirborneVelocities,
             <= 22 => AdsbMessageTypeEnum.AirborneGnssPosition,
-            <= 27 => AdsbMessageTypeEnum.Reserved,
+            <= 27 => AdsbMessageTypeEnum.EventDriven,
             28 => AdsbMessageTypeEnum.AircraftStatus,
             29 => AdsbMessageTypeEnum.TargetStateAndStatusInformation,
             31 => AdsbMessageTypeEnum.AircraftOperationStatus,
-            _ => AdsbMessageTypeEnum.Reserved
+            _ => AdsbMessageTypeEnum.EventDriven
         };
     }
 
@@ -95,20 +95,23 @@ public static class TransponderHelper
             case AdsbMessageTypeEnum.SurfacePosition:
             case AdsbMessageTypeEnum.AirborneBarometricPosition:
             case AdsbMessageTypeEnum.AirborneGnssPosition:
+            case AdsbMessageTypeEnum.EventDriven:
+                return (ushort)((17 << 8) | ((ushort)tc << 3));
             case AdsbMessageTypeEnum.AircraftStatus:
+                var st0 = (ushort)GetExtendedSquitterSybType(buffer);
+                return (ushort)((17 << 8) | ((ushort)tc << 3) | st0);
             case AdsbMessageTypeEnum.TargetStateAndStatusInformation:
                 return (ushort)((17 << 8) | ((ushort)tc << 3));
             case AdsbMessageTypeEnum.AirborneVelocities:
-                var st = (VelocitySubTypeEnum)GetExtendedSquitterSybType(buffer);
-                if (st is VelocitySubTypeEnum.SubType1 or VelocitySubTypeEnum.SubType2)
+                var st1 = (VelocitySubTypeEnum)GetExtendedSquitterSybType(buffer);
+                if (st1 is VelocitySubTypeEnum.SubType1 or VelocitySubTypeEnum.SubType2)
                     return (ushort)((17 << 8) | ((ushort)tc << 3) | ((ushort)VelocitySubTypeEnum.SubType1 & 0x7));
-                if (st is VelocitySubTypeEnum.SubType3 or VelocitySubTypeEnum.SubType4)
+                if (st1 is VelocitySubTypeEnum.SubType3 or VelocitySubTypeEnum.SubType4)
                     return (ushort)((17 << 8) | ((ushort)tc << 3) | ((ushort)VelocitySubTypeEnum.SubType3 & 0x7));
                 throw new ArgumentOutOfRangeException();
             case AdsbMessageTypeEnum.AircraftOperationStatus:
-                return (ushort)((17 << 8) | ((ushort)tc << 3) | (ushort)AdsbVersionNumberEnum.AppendixC);
-            case AdsbMessageTypeEnum.Reserved:
-                return 0;
+                var st2 = (AircraftOperationalStatusEnum)GetExtendedSquitterSybType(buffer);
+                return (ushort)((17 << 8) | ((ushort)tc << 3) | (ushort)st2);
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -273,6 +276,18 @@ public static class TransponderHelper
         return result;
     }
 
+    public static bool CheckCallsign(ReadOnlySpan<byte> data)
+    {
+        var stringLen = data.Length * 8 / 6;
+        var bitIndex = 0;
+        for (var i = 0; i < stringLen; i++)
+        {
+            var ch = (byte)SpanBitHelper.GetBitU(data, ref bitIndex, 6);
+            if (ch is 0x20 or >= 0x1 and <= 0x1A or >= 0x30 and <= 0x39) continue;
+            return false;
+        }
+        return true;
+    }
     public static string AircraftIdDecoding(ReadOnlySpan<byte> data)
     {
         var stringLen = (data.Length * 8) / 6;

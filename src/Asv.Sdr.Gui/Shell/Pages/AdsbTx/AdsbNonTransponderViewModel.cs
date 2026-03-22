@@ -42,10 +42,13 @@ public class AdsbNonTransponderViewModel:ShellPage
     private bool _flag = false;
     private readonly ILogger<AdsbNonTransponderViewModel> _logger;
     private readonly double[] _zeroBuffer = new double[10_000];
-    private double[] _bitsId;
-    private double[] _bitsPosEv;
-    private double[] _bitsPosOdd;
-    private double[] _bitsVel;
+    private double[] _bitsId; //airborne
+    private double[] _bitsAirbornePosEv;
+    private double[] _bitsAirbornePosOdd;
+    private double[] _bitsSurfacePosEv;
+    private double[] _bitsSurfacePosOdd;
+    private double[] _bitsVelOverGround;
+    private double[] _bitsVelAirSpeed;
     private ulong _msgIdx;
     private DateTime _lastTime;
 
@@ -118,19 +121,19 @@ public class AdsbNonTransponderViewModel:ShellPage
             var df17Id = new AdsbAircraftIdentification
             {
                 AircraftAddress = IcaoAddress,
-                Capability = CapabilityEnum.Level1,
-                SquitterType = SquitterTypeEnum.NonTransponder,
+                Capability = CapabilityEnum.Level2OnGroundOrAirborne,
+                SquitterType = SquitterTypeEnum.WithTransponder,
                 AircraftIdentification = "CURSIR",
                 AircraftCategory = AircraftCategoryEnum.Large
             };
             var df17IdSpan = new Span<byte>(df17IdBuff);
             df17Id.Serialize(ref df17IdSpan);
 
-            AdsbExtendedSquitterBase posEven = new AdsbAirbornePositionWithBaroAlt
+            AdsbExtendedSquitterBase airbornePosEven = new AdsbAirbornePositionWithBaroAlt
             {
                 AircraftAddress = IcaoAddress,
-                Capability = CapabilityEnum.Level1,
-                SquitterType = SquitterTypeEnum.NonTransponder,
+                Capability = CapabilityEnum.Level2OnGroundOrAirborne,
+                SquitterType = SquitterTypeEnum.WithTransponder,
                 AirbornePositionType = AirbornePositionBaroAltTypeCode.BasicPositionHighUpdateRate,
                 Latitude = point.Latitude,
                 Longitude = point.Longitude,
@@ -138,11 +141,11 @@ public class AdsbNonTransponderViewModel:ShellPage
                 IsSingleAntenna = true,
                 CprFormat = CprFormatEnum.Even
             };
-            AdsbExtendedSquitterBase posOdd = new AdsbAirbornePositionWithBaroAlt
+            AdsbExtendedSquitterBase airbornePosOdd = new AdsbAirbornePositionWithBaroAlt
             {
                 AircraftAddress = IcaoAddress,
-                Capability = CapabilityEnum.Level1,
-                SquitterType = SquitterTypeEnum.NonTransponder,
+                Capability = CapabilityEnum.Level2OnGroundOrAirborne,
+                SquitterType = SquitterTypeEnum.WithTransponder,
                 AirbornePositionType = AirbornePositionBaroAltTypeCode.BasicPositionHighUpdateRate,
                 Latitude = point.Latitude,
                 Longitude = point.Longitude,
@@ -150,12 +153,38 @@ public class AdsbNonTransponderViewModel:ShellPage
                 IsSingleAntenna = true,
                 CprFormat = CprFormatEnum.Odd
             };
-
-            var velocity = new AdsbGroundSpeed
+            
+            AdsbExtendedSquitterBase surfacePosEven = new AdsbSurfacePosition
             {
                 AircraftAddress = IcaoAddress,
-                Capability = CapabilityEnum.Level1,
-                SquitterType = SquitterTypeEnum.NonTransponder,
+                Capability = CapabilityEnum.Level2OnGroundOrAirborne,
+                SquitterType = SquitterTypeEnum.WithTransponder, 
+                Movement = 15,
+                GroundTrackStatus = GroundTrackStatusEnum.Valid, 
+                GroundTrack = 175,
+                Latitude = point.Latitude,
+                Longitude = point.Longitude,
+                CprFormat = CprFormatEnum.Even
+            };
+            
+            AdsbExtendedSquitterBase surfacePosOdd = new AdsbSurfacePosition
+            {
+                AircraftAddress = IcaoAddress,
+                Capability = CapabilityEnum.Level2OnGroundOrAirborne,
+                SquitterType = SquitterTypeEnum.WithTransponder,
+                Movement = 15,
+                GroundTrackStatus = GroundTrackStatusEnum.Valid, 
+                GroundTrack = 175,
+                Latitude = point.Latitude,
+                Longitude = point.Longitude,
+                CprFormat = CprFormatEnum.Odd
+            };
+
+            var velocityOverGround = new AdsbGroundSpeed
+            {
+                AircraftAddress = IcaoAddress,
+                Capability = CapabilityEnum.Level2OnGroundOrAirborne,
+                SquitterType = SquitterTypeEnum.WithTransponder,
                 SubType = VelocitySubTypeEnum.SubType1,
                 GroundSpeed = 15,
                 GroundTrackAngle = 270,
@@ -165,27 +194,56 @@ public class AdsbNonTransponderViewModel:ShellPage
                 NavigationUncertaintyCategory = NavigationUncertaintyCategoryEnum.AdsbVersion0
             };
             
-            var posEvenBuff = new byte[14];
-            var posOddBuff = new byte[14];
-            var velocityBuff = new byte[14];
-            var posEvenSpan = new Span<byte>(posEvenBuff);
-            var posOddSpan = new Span<byte>(posOddBuff);
-            var velocitySpan = new Span<byte>(velocityBuff);
-            posEven.Serialize(ref posEvenSpan);
-            posOdd.Serialize(ref posOddSpan);
-            velocity.Serialize(ref velocitySpan);
+            var velocityAirSpeed = new AdsbGroundSpeed
+            {
+                AircraftAddress = IcaoAddress,
+                Capability = CapabilityEnum.Level2OnGroundOrAirborne,
+                SquitterType = SquitterTypeEnum.WithTransponder,
+                SubType = VelocitySubTypeEnum.SubType3,
+                GroundSpeed = 15,
+                GroundTrackAngle = 270,
+                VrSrc = VerticalRateSourceEnum.Gnss,
+                GnssBaroAltDiff = 0,
+                VerticalRate = 0,
+                NavigationUncertaintyCategory = NavigationUncertaintyCategoryEnum.AdsbVersion0
+            };
+            
+            var airbornePosEvenBuff = new byte[14];
+            var airbornePosOddBuff = new byte[14];
+            var surfacePosEvenBuff = new byte[14];
+            var surfacePosOddBuff = new byte[14];
+            var velocityOverGroundBuff = new byte[14];
+            var velocityAirSpeedBuff = new byte[14];
+            var airbornePosEvenSpan = new Span<byte>(airbornePosEvenBuff);
+            var airbornePosOddSpan = new Span<byte>(airbornePosOddBuff);
+            var surfacePosEvenSpan = new Span<byte>(surfacePosEvenBuff);
+            var surfacePosOddSpan = new Span<byte>(surfacePosOddBuff);
+            var velocityOverGroundSpan = new Span<byte>(velocityOverGroundBuff);
+            var velocityAirSpeedSpan = new Span<byte>(velocityAirSpeedBuff);
+            airbornePosEven.Serialize(ref airbornePosEvenSpan);
+            airbornePosOdd.Serialize(ref airbornePosOddSpan);
+            surfacePosEven.Serialize(ref surfacePosEvenSpan);
+            surfacePosOdd.Serialize(ref surfacePosOddSpan);
+            velocityOverGround.Serialize(ref velocityOverGroundSpan);
+            velocityAirSpeed.Serialize(ref velocityAirSpeedSpan);
             
             _bitsId = new double[500];
-            _bitsPosEv = new double[500];
-            _bitsPosOdd = new double[500];
-            _bitsVel = new double[500];
+            _bitsAirbornePosEv = new double[500];
+            _bitsAirbornePosOdd = new double[500];
+            _bitsSurfacePosEv = new double[500];
+            _bitsSurfacePosOdd = new double[500];
+            _bitsVelOverGround = new double[500];
+            _bitsVelAirSpeed = new double[500];
             
             for (var i = 0; i < preamble.Length; i++)
             {
                 _bitsId[i] = preamble[i];
-                _bitsPosEv[i] = preamble[i];
-                _bitsPosOdd[i] = preamble[i];
-                _bitsVel[i] = preamble[i];
+                _bitsAirbornePosEv[i] = preamble[i];
+                _bitsAirbornePosOdd[i] = preamble[i];
+                _bitsSurfacePosEv[i] = preamble[i];
+                _bitsSurfacePosOdd[i] = preamble[i];
+                _bitsVelOverGround[i] = preamble[i];
+                _bitsVelAirSpeed[i] = preamble[i];
             }
             for (uint i = 0; i < df17IdBuff.Length*8; i++)
             {
@@ -200,38 +258,72 @@ public class AdsbNonTransponderViewModel:ShellPage
                     _bitsId[i * 2 + preamble.Length + 1] = 1;
                 }
                 
-                if (BitHelper.GetBitU(posEvenBuff, i, 1) > 0)
+                if (BitHelper.GetBitU(airbornePosEvenBuff, i, 1) > 0)
                 {
-                    _bitsPosEv[i * 2 + preamble.Length] = 1;
-                    _bitsPosEv[i * 2 + preamble.Length + 1] = 0;
+                    _bitsAirbornePosEv[i * 2 + preamble.Length] = 1;
+                    _bitsAirbornePosEv[i * 2 + preamble.Length + 1] = 0;
                 }
                 else
                 {
-                    _bitsPosEv[i * 2 + preamble.Length] = 0;
-                    _bitsPosEv[i * 2 + preamble.Length + 1] = 1;
+                    _bitsAirbornePosEv[i * 2 + preamble.Length] = 0;
+                    _bitsAirbornePosEv[i * 2 + preamble.Length + 1] = 1;
                 }
                 
-                if (BitHelper.GetBitU(posOddBuff, i, 1) > 0)
+                if (BitHelper.GetBitU(airbornePosOddBuff, i, 1) > 0)
                 {
-                    _bitsPosOdd[i * 2 + preamble.Length] = 1;
-                    _bitsPosOdd[i * 2 + preamble.Length + 1] = 0;
+                    _bitsAirbornePosOdd[i * 2 + preamble.Length] = 1;
+                    _bitsAirbornePosOdd[i * 2 + preamble.Length + 1] = 0;
                 }
                 else
                 {
-                    _bitsPosOdd[i * 2 + preamble.Length] = 0;
-                    _bitsPosOdd[i * 2 + preamble.Length + 1] = 1;
+                    _bitsAirbornePosOdd[i * 2 + preamble.Length] = 0;
+                    _bitsAirbornePosOdd[i * 2 + preamble.Length + 1] = 1;
                 }
                 
-                if (BitHelper.GetBitU(velocityBuff, i, 1) > 0)
+                if (BitHelper.GetBitU(surfacePosEvenBuff, i, 1) > 0)
                 {
-                    _bitsVel[i * 2 + preamble.Length] = 1;
-                    _bitsVel[i * 2 + preamble.Length + 1] = 0;
+                    _bitsSurfacePosEv[i * 2 + preamble.Length] = 1;
+                    _bitsSurfacePosEv[i * 2 + preamble.Length + 1] = 0;
                 }
                 else
                 {
-                    _bitsVel[i * 2 + preamble.Length] = 0;
-                    _bitsVel[i * 2 + preamble.Length + 1] = 1;
+                    _bitsSurfacePosEv[i * 2 + preamble.Length] = 0;
+                    _bitsSurfacePosEv[i * 2 + preamble.Length + 1] = 1;
                 }
+                
+                if (BitHelper.GetBitU(surfacePosOddBuff, i, 1) > 0)
+                {
+                    _bitsSurfacePosOdd[i * 2 + preamble.Length] = 1;
+                    _bitsSurfacePosOdd[i * 2 + preamble.Length + 1] = 0;
+                }
+                else
+                {
+                    _bitsSurfacePosOdd[i * 2 + preamble.Length] = 0;
+                    _bitsSurfacePosOdd[i * 2 + preamble.Length + 1] = 1;
+                }
+                
+                if (BitHelper.GetBitU(velocityOverGroundBuff, i, 1) > 0)
+                {
+                    _bitsVelOverGround[i * 2 + preamble.Length] = 1;
+                    _bitsVelOverGround[i * 2 + preamble.Length + 1] = 0;
+                }
+                else
+                {
+                    _bitsVelOverGround[i * 2 + preamble.Length] = 0;
+                    _bitsVelOverGround[i * 2 + preamble.Length + 1] = 1;
+                }
+                
+                if (BitHelper.GetBitU(velocityAirSpeedBuff, i, 1) > 0)
+                {
+                    _bitsVelAirSpeed[i * 2 + preamble.Length] = 1;
+                    _bitsVelAirSpeed[i * 2 + preamble.Length + 1] = 0;
+                }
+                else
+                {
+                    _bitsVelAirSpeed[i * 2 + preamble.Length] = 0;
+                    _bitsVelAirSpeed[i * 2 + preamble.Length + 1] = 1;
+                }
+                
             }
             
             
@@ -274,43 +366,89 @@ public class AdsbNonTransponderViewModel:ShellPage
                 }
             }
             _txStream.Write(bufferMemory, 10_000, CancellationToken.None).Wait();
+            SendZero(bufferMemory, buffer, bitLength);
         }
-
+        
         if (_msgIdx % 2 == 0) // Even
         {
-            for (var i = 0; i < _bitsPosEv.Length; i++)
+            for (var i = 0; i < _bitsAirbornePosEv.Length; i++)
             {
                 for (var j = 0; j < bitLength; j++)
                 {
-                    buffer[i*2 * bitLength + j] = (float)_bitsPosEv[i];
-                    buffer[i*2 * bitLength + j + 1] = (float)_bitsPosEv[i];
+                    buffer[i*2 * bitLength + j] = (float)_bitsAirbornePosEv[i];
+                    buffer[i*2 * bitLength + j + 1] = (float)_bitsAirbornePosEv[i];
                 }
             }
         }
         else // Odd
         {
-            for (var i = 0; i < _bitsPosOdd.Length; i++)
+            for (var i = 0; i < _bitsAirbornePosOdd.Length; i++)
             {
                 for (var j = 0; j < bitLength; j++)
                 {
-                    buffer[i*2 * bitLength + j] = (float)_bitsPosOdd[i];
-                    buffer[i*2 * bitLength + j + 1] = (float)_bitsPosOdd[i];
+                    buffer[i*2 * bitLength + j] = (float)_bitsAirbornePosOdd[i];
+                    buffer[i*2 * bitLength + j + 1] = (float)_bitsAirbornePosOdd[i];
                 }
             }
         }
         _txStream.Write(bufferMemory, 10_000, CancellationToken.None).Wait();
+        SendZero(bufferMemory, buffer, bitLength);
 
-        for (var i = 0; i < _bitsVel.Length; i++)
+        if (_msgIdx % 2 == 0) // Even
         {
-            for (var j = 0; j < bitLength; j++)
+            for (var i = 0; i < _bitsSurfacePosEv.Length; i++)
             {
-                buffer[i*2 * bitLength + j] = (float)_bitsVel[i];
-                buffer[i*2 * bitLength + j + 1] = (float)_bitsVel[i];
+                for (var j = 0; j < bitLength; j++)
+                {
+                    buffer[i*2 * bitLength + j] = (float)_bitsSurfacePosEv[i];
+                    buffer[i*2 * bitLength + j + 1] = (float)_bitsSurfacePosEv[i];
+                }
+            }
+        }
+        else // Odd
+        {
+            for (var i = 0; i < _bitsSurfacePosOdd.Length; i++)
+            {
+                for (var j = 0; j < bitLength; j++)
+                {
+                    buffer[i*2 * bitLength + j] = (float)_bitsSurfacePosOdd[i];
+                    buffer[i*2 * bitLength + j + 1] = (float)_bitsSurfacePosOdd[i];
+                }
             }
         }
         _txStream.Write(bufferMemory, 10_000, CancellationToken.None).Wait();
+        SendZero(bufferMemory, buffer, bitLength);
+        
+        for (var i = 0; i < _bitsVelOverGround.Length; i++)
+        {
+            for (var j = 0; j < bitLength; j++)
+            {
+                buffer[i*2 * bitLength + j] = (float)_bitsVelOverGround[i];
+                buffer[i*2 * bitLength + j + 1] = (float)_bitsVelOverGround[i];
+            }
+        }
+        _txStream.Write(bufferMemory, 10_000, CancellationToken.None).Wait();
+        SendZero(bufferMemory, buffer, bitLength);
+        
+        for (var i = 0; i < _bitsVelAirSpeed.Length; i++)
+        {
+            for (var j = 0; j < bitLength; j++)
+            {
+                buffer[i*2 * bitLength + j] = (float)_bitsVelAirSpeed[i];
+                buffer[i*2 * bitLength + j + 1] = (float)_bitsVelAirSpeed[i];
+            }
+        }
+        _txStream.Write(bufferMemory, 10_000, CancellationToken.None).Wait();
+        SendZero(bufferMemory, buffer, bitLength);
         
         
+        _msgIdx++;
+        _device.SetAntenna(LmsChannel.Tx, 0, 0, CancellationToken.None).Wait();
+
+    }
+
+    private void SendZero(ReadOnlyMemory<float> bufferMemory, float[] buffer, int bitLength)
+    {
         for (var i = 0; i < 500; i++)
         {
             for (var j = 0; j < bitLength; j++)
@@ -320,10 +458,6 @@ public class AdsbNonTransponderViewModel:ShellPage
             }
         }
         _txStream.Write(bufferMemory, 10_000, CancellationToken.None).Wait();
-
-        _msgIdx++;
-        _device.SetAntenna(LmsChannel.Tx, 0, 0, CancellationToken.None).Wait();
-
     }
     
     private ILimeSdrDevice? CreateDevice()

@@ -61,6 +61,42 @@ public class ModeSUF5 : ModeSUFormatBase
     public byte? TacticalMessage { get; set; }
     
     /// <summary>
+    /// TCS, the 3-bit (21-23) type control subfield in SD shall control the extended squitter airborne and surface format
+    /// types reported by the transponder and its response to Mode A/C, Mode A/C/S all-call and Mode S-only all-call
+    /// interrogations. The following codes have been assigned:
+    /// 0 signifies no surface format types or reply inhibit command
+    /// 1 signifies surface format types for the next 15 seconds (see 3.1.2.6.1.4.2)
+    /// 2 signifies surface format types for the next 60 seconds (see 3.1.2.6.1.4.3)
+    /// 3 signifies cancel surface format types and reply inhibit commands
+    /// 4-7 reserved
+    /// </summary>
+    public byte? TypeControl { get; set; }
+
+    /// <summary>
+    /// RCS, the 3-bit (24-26) rate control subfield in SD shall control the squitter rate of the transponder when it is
+    /// reporting the extended squitter surface type formats. This subfield shall have no effect on the transponder squitter
+    /// rate when it is reporting the extended squitter airborne type formats. The following codes have been assigned: 
+    /// 0 signifies no surface extended squitter rate command;
+    /// 1 signifies report high surface extended squitter rate for 60 seconds;
+    /// 2 signifies report low surface extended squitter rate for 60 seconds;
+    /// 3-7 reserved. 
+    /// </summary>
+    public byte? RateControl { get; set; }
+
+    /// <summary>
+    /// SAS, the 2-bit (27-28) surface antenna subfield in SD shall control the selection of the transponder diversity antenna
+    /// that is used for (1) the extended squitter when the transponder is reporting the surface type formats, and (2) the
+    /// acquisition squitter when the transponder is reporting the on-the-ground status. This subfield shall have no effect on
+    /// the transponder diversity antenna selection when it is reporting the airborne status. The following codes have been
+    /// assigned: 
+    /// 0 signifies no antenna command
+    /// 1 signifies alternate top and bottom antennas for 120 seconds
+    /// 2 signifies use bottom antenna for 120 seconds
+    /// 3 signifies return to the defaul
+    /// </summary>
+    public byte? SurfaceAntenna { get; set; }
+    
+    /// <summary>
     /// Reply Request (BDS2).
     /// DI code is 1, 3 or 7
     /// </summary>
@@ -117,15 +153,20 @@ public class ModeSUF5 : ModeSUFormatBase
                 ReservationStatus = (ReservationStatusEnum)((SD & 0x30) >> 4);
                 TacticalMessage = (byte?)(SD & 0xF);
                 break;
+            case 2:
+                TypeControl = (byte?)((SD & 0xE00) >> 9);
+                RateControl = (byte?)((SD & 0x1C0) >> 6);
+                SurfaceAntenna = (byte?)((SD & 0x30) >> 4);
+                break;
             case 3:
                 SurveillanceIdentifier = (byte?)((SD & 0xFC00) >> 10);
                 LockoutSurveillance = (SD & 0x200) != 0;
-                ReplyRequest = BDS2 = (byte)((SD & 0x1E0) >> 5);
+                ReplyRequest = (byte)((SD & 0x1E0) >> 5);
                 OverlayCommand = (SD & 0x10) != 0;
                 break;
             case 7:
                 InterrogatorIdentifier = (byte?)((SD & 0xF000) >> 12);
-                ReplyRequest = BDS2 = (byte)((SD & 0xF00) >> 8);
+                ReplyRequest = (byte)((SD & 0xF00) >> 8);
                 Lockout = (SD & 0x40) != 0;
                 OverlayCommand = (SD & 0x10) != 0;
                 TacticalMessage = (byte?)(SD & 0xF);
@@ -138,6 +179,57 @@ public class ModeSUF5 : ModeSUFormatBase
         ModeSHelper.SetBitU(buffer, ref pos, 3, PC);
         ModeSHelper.SetBitU(buffer, ref pos, 5, RR);
         ModeSHelper.SetBitU(buffer, ref pos, 3, DI);
+        var interrogatorIdentifier = InterrogatorIdentifier ?? 0;
+        var overlayCommand = OverlayCommand != null ? (OverlayCommand.Value ? 1 : 0) : 0;
+        var multisiteCommB = MultisiteCommB != null ? (byte)MultisiteCommB.Value : 0;
+        var multisiteELM = MultisiteELM != null ? (byte)MultisiteELM.Value : 0;
+        var lockout = Lockout != null ? (Lockout.Value ? 1 : 0) : 0;
+        var reservationStatus = ReservationStatus != null ? (byte)ReservationStatus.Value : 0;
+        var tacticalMessage = TacticalMessage ?? 0;
+        SD = 0;
+        switch (DI)
+        {
+            case 0:
+                SD = (ushort)(SD | 
+                              ((interrogatorIdentifier & 0xF) << 12) | 
+                              (overlayCommand << 4));
+                break;
+            case 1:
+                SD = (ushort)(SD | 
+                              ((interrogatorIdentifier & 0xF) << 12) | 
+                              ((multisiteCommB & 0x3) << 10) |
+                              ((multisiteELM & 0x7) << 7) | 
+                              (lockout << 6) | 
+                              ((reservationStatus & 0x3) << 4) |
+                              (tacticalMessage & 0xF));
+                break;
+            case 2:
+                var typeControl = TypeControl ?? 0;
+                var rateControl = RateControl ?? 0;
+                var surfaceAntenna = SurfaceAntenna ?? 0;
+                SD = (ushort)(SD | 
+                              ((typeControl & 0x7) << 9) | 
+                              ((rateControl & 0x7) << 6) | 
+                              ((surfaceAntenna & 0x3) << 4));
+                break;
+            case 3:
+                var surveillanceIdentifier = SurveillanceIdentifier ?? 0;
+                var lockoutSurveillance = LockoutSurveillance != null ? LockoutSurveillance.Value ? 1 : 0 : 0;
+                SD = (ushort)(SD | 
+                              ((surveillanceIdentifier & 0x3F) << 10) | 
+                              (lockoutSurveillance << 9) | 
+                              ((BDS2 & 0xF) << 5) | 
+                              (overlayCommand << 4));
+                break;
+            case 7:
+                SD = (ushort)(SD | 
+                              ((interrogatorIdentifier & 0xF) << 12) | 
+                              ((BDS2 & 0xF) << 8) | 
+                              (lockout << 6) | 
+                              (overlayCommand << 4) | 
+                              (tacticalMessage & 0xF));
+                break;
+        }
         ModeSHelper.SetBitU(buffer, ref pos, 16, SD);
     }
 }
@@ -150,7 +242,7 @@ public class ModeSDF5 : ModeSDFormatBase
     public byte FS { get; set; } = 0x0;
     public byte DR { get; set; } = 0x0;
     public byte UM { get; set; } = 0x0;
-    private ushort ID { get; set; } = SetSquawk(5124); // Squawk 5124
+    private ushort ID { get; set; } = SetSquawk(3168); // Squawk 0777
 
     
     public ushort Squawk
@@ -173,15 +265,16 @@ public class ModeSDF5 : ModeSDFormatBase
         var c = (byte)(((id & (1 << 12)) >> 12) | ((id & (1 << 10)) >> 9) | ((id & (1 << 8)) >> 6));
         var d = (byte)(((id & (1 << 4)) >> 4) | ((id & (1 << 2)) >> 1) | ((id & 1) << 2));
 
-        return (ushort)(a * 1000 + b * 100 + c * 10 + d);
+        return (ushort)((a << 9) | (b << 6) | (c << 3) | d);
     }
     
     private static ushort SetSquawk(uint squawk)
     {
-        var a = (byte)((squawk / 1000) % 10);
-        var b = (byte)((squawk / 100) % 10);
-        var c = (byte)((squawk / 10) % 10);
-        var d = (byte)(squawk % 10);
+        squawk &= 0xFFF;
+        var a = (byte)((squawk >> 9) & 0x7);
+        var b = (byte)((squawk >> 6) & 0x7);
+        var c = (byte)((squawk >> 3) & 0x7);
+        var d = (byte)(squawk & 0x7);
 
         SetBits(out var a1, out var a2, out var a4, a);
         SetBits(out var b1, out var b2, out var b4, b);

@@ -3,6 +3,9 @@ using Asv.IO;
 
 namespace Asv.Sdr;
 
+/// <summary>
+/// BDS 6,5 — Aircraft Operational Status
+/// </summary>
 public class AdsbAircraftOperationStatus : AdsbExtendedSquitterBase
 {
     protected override void InternalDeserialize(ref ReadOnlySpan<byte> buffer)

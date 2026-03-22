@@ -27,11 +27,12 @@ public abstract class AdsbExtendedSquitterBase : AdsbDfMessageBase
             <= 18 => AdsbMessageTypeEnum.AirborneBarometricPosition,
             19 => AdsbMessageTypeEnum.AirborneVelocities,
             <= 22 => AdsbMessageTypeEnum.AirborneGnssPosition,
-            <= 27 => AdsbMessageTypeEnum.Reserved,
+            23 => AdsbMessageTypeEnum.EventDriven,
+            <= 27 => AdsbMessageTypeEnum.EventDriven,
             28 => AdsbMessageTypeEnum.AircraftStatus,
             29 => AdsbMessageTypeEnum.TargetStateAndStatusInformation,
             31 => AdsbMessageTypeEnum.AircraftOperationStatus,
-            _ => AdsbMessageTypeEnum.Reserved
+            _ => throw new ArgumentOutOfRangeException()
         };
         
         if (msgType != MessageType)

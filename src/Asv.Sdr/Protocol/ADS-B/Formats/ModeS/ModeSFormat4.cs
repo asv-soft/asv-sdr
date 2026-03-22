@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 
 namespace Asv.Sdr;
 
 public class ModeSUF4 : ModeSUFormatBase
 {
+    private byte? _replyRequest;
+    private byte _BDS2;
     protected override int FormatLength => 7;
     public override byte FormatId => 4;
 
@@ -16,8 +19,16 @@ public class ModeSUF4 : ModeSUFormatBase
     
     public byte BDS1 { get; set; }
 
-    public byte BDS2 { get; set; } = 0;
-    
+    public byte BDS2
+    {
+        get => _BDS2;
+        set
+        {
+            _BDS2 = value;
+            _replyRequest = value;
+        }
+    }
+
     /// <summary>
     /// Interrogator Identifier Subfield contains the self-identification
     /// code of the interrogator which is numerically identical to the II code transmitted by the
@@ -59,13 +70,57 @@ public class ModeSUF4 : ModeSUFormatBase
     /// DI code is 1 or 7
     /// </summary>
     public byte? TacticalMessage { get; set; }
-    
+
+    /// <summary>
+    /// TCS, the 3-bit (21-23) type control subfield in SD shall control the extended squitter airborne and surface format
+    /// types reported by the transponder and its response to Mode A/C, Mode A/C/S all-call and Mode S-only all-call
+    /// interrogations. The following codes have been assigned:
+    /// 0 signifies no surface format types or reply inhibit command
+    /// 1 signifies surface format types for the next 15 seconds (see 3.1.2.6.1.4.2)
+    /// 2 signifies surface format types for the next 60 seconds (see 3.1.2.6.1.4.3)
+    /// 3 signifies cancel surface format types and reply inhibit commands
+    /// 4-7 reserved
+    /// </summary>
+    public byte? TypeControl { get; set; }
+
+    /// <summary>
+    /// RCS, the 3-bit (24-26) rate control subfield in SD shall control the squitter rate of the transponder when it is
+    /// reporting the extended squitter surface type formats. This subfield shall have no effect on the transponder squitter
+    /// rate when it is reporting the extended squitter airborne type formats. The following codes have been assigned: 
+    /// 0 signifies no surface extended squitter rate command;
+    /// 1 signifies report high surface extended squitter rate for 60 seconds;
+    /// 2 signifies report low surface extended squitter rate for 60 seconds;
+    /// 3-7 reserved. 
+    /// </summary>
+    public byte? RateControl { get; set; }
+
+    /// <summary>
+    /// SAS, the 2-bit (27-28) surface antenna subfield in SD shall control the selection of the transponder diversity antenna
+    /// that is used for (1) the extended squitter when the transponder is reporting the surface type formats, and (2) the
+    /// acquisition squitter when the transponder is reporting the on-the-ground status. This subfield shall have no effect on
+    /// the transponder diversity antenna selection when it is reporting the airborne status. The following codes have been
+    /// assigned: 
+    /// 0 signifies no antenna command
+    /// 1 signifies alternate top and bottom antennas for 120 seconds
+    /// 2 signifies use bottom antenna for 120 seconds
+    /// 3 signifies return to the defaul
+    /// </summary>
+    public byte? SurfaceAntenna { get; set; }
+
     /// <summary>
     /// Reply Request (BDS2).
     /// DI code is 1, 3 or 7
     /// </summary>
-    public byte? ReplyRequest { get; set; }
-    
+    public byte? ReplyRequest
+    {
+        get => _replyRequest;
+        set
+        {
+            _replyRequest = value;
+            _BDS2 = value ?? 0;
+        }
+    }
+
     /// <summary>
     /// Surveillance identifier subfield in SD contains an assigned SI code of the interrogator.
     /// DI=3
@@ -118,15 +173,20 @@ public class ModeSUF4 : ModeSUFormatBase
                 ReservationStatus = (ReservationStatusEnum)((SD & 0x30) >> 4);
                 TacticalMessage = (byte?)(SD & 0xF);
                 break;
+            case 2:
+                TypeControl = (byte?)((SD & 0xE00) >> 9);
+                RateControl = (byte?)((SD & 0x1C0) >> 6);
+                SurfaceAntenna = (byte?)((SD & 0x30) >> 4);
+                break;
             case 3:
                 SurveillanceIdentifier = (byte?)((SD & 0xFC00) >> 10);
                 LockoutSurveillance = (SD & 0x200) != 0;
-                ReplyRequest = BDS2 = (byte)((SD & 0x1E0) >> 5);
+                ReplyRequest = (byte)((SD & 0x1E0) >> 5);
                 OverlayCommand = (SD & 0x10) != 0;
                 break;
             case 7:
                 InterrogatorIdentifier = (byte?)((SD & 0xF000) >> 12);
-                ReplyRequest = BDS2 = (byte)((SD & 0xF00) >> 8);
+                ReplyRequest = (byte)((SD & 0xF00) >> 8);
                 Lockout = (SD & 0x40) != 0;
                 OverlayCommand = (SD & 0x10) != 0;
                 TacticalMessage = (byte?)(SD & 0xF);
@@ -139,6 +199,57 @@ public class ModeSUF4 : ModeSUFormatBase
         ModeSHelper.SetBitU(buffer, ref pos, 3, PC);
         ModeSHelper.SetBitU(buffer, ref pos, 5, RR);
         ModeSHelper.SetBitU(buffer, ref pos, 3, DI);
+        var interrogatorIdentifier = InterrogatorIdentifier ?? 0;
+        var overlayCommand = OverlayCommand != null ? (OverlayCommand.Value ? 1 : 0) : 0;
+        var multisiteCommB = MultisiteCommB != null ? (byte)MultisiteCommB.Value : 0;
+        var multisiteELM = MultisiteELM != null ? (byte)MultisiteELM.Value : 0;
+        var lockout = Lockout != null ? (Lockout.Value ? 1 : 0) : 0;
+        var reservationStatus = ReservationStatus != null ? (byte)ReservationStatus.Value : 0;
+        var tacticalMessage = TacticalMessage ?? 0;
+        SD = 0;
+        switch (DI)
+        {
+            case 0:
+                SD = (ushort)(SD | 
+                              ((interrogatorIdentifier & 0xF) << 12) | 
+                              (overlayCommand << 4));
+                break;
+            case 1:
+                SD = (ushort)(SD | 
+                              ((interrogatorIdentifier & 0xF) << 12) | 
+                              ((multisiteCommB & 0x3) << 10) |
+                              ((multisiteELM & 0x7) << 7) | 
+                              (lockout << 6) | 
+                              ((reservationStatus & 0x3) << 4) |
+                              (tacticalMessage & 0xF));
+                break;
+            case 2:
+                var typeControl = TypeControl ?? 0;
+                var rateControl = RateControl ?? 0;
+                var surfaceAntenna = SurfaceAntenna ?? 0;
+                SD = (ushort)(SD | 
+                              ((typeControl & 0x7) << 9) | 
+                              ((rateControl & 0x7) << 6) | 
+                              ((surfaceAntenna & 0x3) << 4));
+                break;
+            case 3:
+                var surveillanceIdentifier = SurveillanceIdentifier ?? 0;
+                var lockoutSurveillance = LockoutSurveillance != null ? LockoutSurveillance.Value ? 1 : 0 : 0;
+                SD = (ushort)(SD | 
+                              ((surveillanceIdentifier & 0x3F) << 10) | 
+                              (lockoutSurveillance << 9) | 
+                              ((BDS2 & 0xF) << 5) | 
+                              (overlayCommand << 4));
+                break;
+            case 7:
+                SD = (ushort)(SD | 
+                              ((interrogatorIdentifier & 0xF) << 12) | 
+                              ((BDS2 & 0xF) << 8) | 
+                              (lockout << 6) | 
+                              (overlayCommand << 4) | 
+                              (tacticalMessage & 0xF));
+                break;
+        }
         ModeSHelper.SetBitU(buffer, ref pos, 16, SD);
     }
 }
@@ -172,18 +283,34 @@ public enum MultisiteCommBEnum
 
 public class ModeSDF4 : ModeSDFormatBase
 {
+    private double _altitude;
+    private ushort _ac;
     protected override int FormatLength => 7;
     public override byte FormatId => 4;
 
     public byte FS { get; set; } = 0x0;
     public byte DR { get; set; } = 0x0;
     public byte UM { get; set; } = 0x0;
-    private ushort AC { get; set; } = (ushort)SetAltitude(0.0);
+
+    private ushort AC
+    {
+        get => _ac;
+        set
+        {
+            _ac = value;
+            _altitude = GetAltitude(value);
+        }
+    }
+
 
     public double Altitude
     {
-        get => GetAltitude(AC);
-        set => AC = (ushort)SetAltitude(value);
+        get => _altitude;
+        set
+        {
+            _altitude = value; 
+            _ac = (ushort)SetAltitude(value);
+        }
     }
 
 
@@ -203,7 +330,7 @@ public class ModeSDF4 : ModeSDFormatBase
         ModeSHelper.SetBitU(buffer, ref pos, 13, AC);
     }
     
-    private static double GetAltitude(uint nAlt)
+    private static double GetAltitude(ushort nAlt)
     {
         if (nAlt == 0) return double.NaN;
         
@@ -211,34 +338,27 @@ public class ModeSDF4 : ModeSDFormatBase
         
         if (m == 1) // meter
         {
-            return GetAltitudeInMeters(((nAlt & 0x1F80) >> 1) | (nAlt & 0x3F));
+            return GetAltitudeInMeters((ushort)(((nAlt & 0x1F80) >> 1) | (nAlt & 0x3F)));
         }
         
         var q = (nAlt & 0x10) != 0 ? 1 : 0;
-        nAlt = ((nAlt & 0x1F80) >> 2) | ((nAlt & 0x20) >> 1) | (nAlt & 0xF);
         if (q == 1)
         {
+            nAlt = (ushort)(((nAlt & 0x1F80) >> 2) | ((nAlt & 0x20) >> 1) | (nAlt & 0xF));
             return (nAlt * 25.0 - 1000.0) / 3.28084;
         }
-        return GetAltitudeFromModeC((int)nAlt) / 3.28084;
-    }
 
-    private static double GetAltitudeFromModeC(int nAlt)
-    {
-        return 0;
+        var modeCAl = ModeSHelper.GetAltitudeFromModeCAltitudeCode(nAlt);
+        return  modeCAl != null ? modeCAl.Value / 3.28084 : double.NaN;
     }
     
-    private static int SetAltitudeToModeC(double altitude)
-    {
-        return 0;
-    }
 
     /// <summary>
     /// Сам придумал этот метод, в Icao пока кодирование в метрах не описано
     /// </summary>
     /// <param name="nAlt"></param>
     /// <returns></returns>
-    private static double GetAltitudeInMeters(uint nAlt)
+    private static double GetAltitudeInMeters(ushort nAlt)
     {
         return nAlt * 4.0 - 304.0;
     }
@@ -250,15 +370,15 @@ public class ModeSDF4 : ModeSDFormatBase
         alt *= 3.28084;
         var altNorm = alt switch
         {
-            > 50187.5 => (int)Math.Round(alt / 100.0, 0) * 100,
+            >= 50187.5 => (int)Math.Round(alt / 100.0, 0) * 100,
             < -1000.0 => -1000,
+            >= -1000.0 and < 0 => (int)Math.Round(Math.Abs(alt) / 25.0) * -25,
             _ => (int)Math.Round(alt / 25.0) * 25
         };
     
-        if (altNorm > 50175)
+        if (altNorm >= 50200)
         {
-            var nAlt = SetAltitudeToModeC(altNorm);
-            return (uint)(((nAlt & 0x7E0) << 2) | ((nAlt & 0x10) << 1) | (nAlt & 0xF));
+            return ModeSHelper.GetModeCAltitudeCodeFromAltitude(altNorm);
         }
     
         altNorm = (altNorm + 1000) / 25;
