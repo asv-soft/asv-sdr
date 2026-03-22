@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Asv.IO;
 
 namespace Asv.Sdr;
-
 
 public abstract class BdsBase : ISizedSpanSerializable
 {
@@ -10,6 +10,17 @@ public abstract class BdsBase : ISizedSpanSerializable
     
     public abstract byte Bds2 { get; }
 
+
+    
+    public virtual bool IsThisMyData(ReadOnlySpan<byte> buffer)
+    {
+        var pos = 0;
+        var bds1 = ModeSHelper.GetBitU(buffer, ref pos, 4);
+        var bds2 = ModeSHelper.GetBitU(buffer, ref pos, 4);
+        return bds1 == Bds1 && bds2 == Bds2;
+    }
+    
+    public byte DataSelector => (byte)((Bds1 << 0x4) | (Bds2 & 0xF));
     public virtual void Deserialize(ref ReadOnlySpan<byte> buffer)
     {
         var pos = 0;
@@ -44,16 +55,35 @@ public class BdsAny(byte bds1, byte bds2) : BdsBase
     public override byte Bds1 { get; } = bds1;
     public override byte Bds2 { get; } = bds2;
 
+    public byte[] Data { get; } = new byte[7];
+    public override void Deserialize(ref ReadOnlySpan<byte> buffer)
+    {
+        InternalDeserialize(ref buffer);
+    }
+
+    public override void Serialize(ref Span<byte> buffer)
+    {
+        InternalSerialize(ref buffer);
+    }
+
     protected override void InternalDeserialize(ref ReadOnlySpan<byte> buffer)
     {
-        buffer = buffer[6..];
+        var len = Math.Min(buffer.Length, 7);
+        for (var i = 0; i < len; i++)
+        {
+            Data[i] = buffer[i];
+        }
+        buffer = buffer[len..];
     }
 
     protected override void InternalSerialize(ref Span<byte> buffer)
     {
-        for (var i = 0; i < 6; i++)
+        var len = Math.Min(buffer.Length, 7);
+        for (var i = 0; i < len; i++)
         {
-            BinSerialize.WriteByte(ref buffer, 0);
+            Data[i] = buffer[i];
+            BinSerialize.WriteByte(ref buffer, Data[i]);
         }
+        buffer = buffer[len..];
     }
 }
