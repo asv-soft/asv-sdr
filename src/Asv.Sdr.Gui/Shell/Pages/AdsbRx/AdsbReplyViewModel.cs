@@ -473,7 +473,7 @@ public class AdsbReplyViewModel:ShellPage
         var msgDF5 = new ModeSDF5
         {
             IcaoAddress = MyIcao,
-            Squawk = 777
+            Squawk = "0777"
         };
         var spanD4 = new Span<byte>(buffDF5);
         msgDF5.Serialize(ref spanD4);

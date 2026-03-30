@@ -2846,4 +2846,41 @@ public static class ModeSHelper
                         ((code & 0x100) << 3) | ((code & 0x80) << 2) | ((code & 0x40) << 1) |
                         ((code & 0x400) >> 8) | ((code & 0x200) << 9));
     }
+    
+    private static void SetBits(out byte x1, out byte x2, out byte x4, byte value)
+    {
+        if ((value & 0xF8) != 0) throw new ArgumentOutOfRangeException(nameof(value));
+        x1 = (byte)(value & 0x1);
+        x2 = (byte)((value & 0x2) >> 1);
+        x4 = (byte)((value & 0x4) >> 2);
+    }
+    public static string GetSquawk(ushort id)
+    {
+        var a = (byte)(((id & (1 << 11)) >> 11) | ((id & (1 << 9)) >> 8) | ((id & (1 << 7)) >> 5));
+        var b = (byte)(((id & (1 << 5)) >> 5) | ((id & (1 << 3)) >> 2) | ((id & (1 << 1)) << 1));
+        var c = (byte)(((id & (1 << 12)) >> 12) | ((id & (1 << 10)) >> 9) | ((id & (1 << 8)) >> 6));
+        var d = (byte)(((id & (1 << 4)) >> 4) | ((id & (1 << 2)) >> 1) | ((id & 1) << 2));
+
+        var squawk = (ushort)((a << 9) | (b << 6) | (c << 3) | d);
+        return Convert.ToString(squawk, 8).PadLeft(4, '0');
+    }
+    
+    public static ushort SetSquawk(string squawk)
+    {
+        var sq = Convert.ToUInt16(squawk, 8);
+        
+        sq &= 0xFFF;
+        var a = (byte)((sq >> 9) & 0x7);
+        var b = (byte)((sq >> 6) & 0x7);
+        var c = (byte)((sq >> 3) & 0x7);
+        var d = (byte)(sq & 0x7);
+
+        SetBits(out var a1, out var a2, out var a4, a);
+        SetBits(out var b1, out var b2, out var b4, b);
+        SetBits(out var c1, out var c2, out var c4, c);
+        SetBits(out var d1, out var d2, out var d4, d);
+
+        return (ushort)((c1 << 12) | (a1 << 11) | (c2 << 10) | (a2 << 9) | (c4 << 8) | (a4 << 7) | (b1 << 5) | (d1 << 4) |
+                        (b2 << 3) | (d2 << 2) | (b4 << 1) | d4);
+    }
 }
