@@ -18,7 +18,7 @@ public class LimeSdrModeACRepDevice : LimeSdrAdsbTransponderDevice, ILimeSdrMode
 {
     private bool _isAdsbEnabled;
 
-    public LimeSdrModeACRepDevice(string deviceId, LimeSdrAdsbRepDeviceConfig config, bool isAdsbEnabled = true, ILogger? logger = null) : base(deviceId, config, logger)
+    public LimeSdrModeACRepDevice(string deviceId, LimeSdrDeviceConfig config, bool isAdsbEnabled = true, ILogger? logger = null) : base(deviceId, config, logger)
     {
         _isAdsbEnabled = isAdsbEnabled;
     }

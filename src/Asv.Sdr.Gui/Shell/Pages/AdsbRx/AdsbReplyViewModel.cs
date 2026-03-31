@@ -949,7 +949,7 @@ public class AdsbReplyViewModel:ShellPage
             if (dev == null) throw new Exception("LMS device not found");
             
             _logger.ZLogInformation($"Create LMS device {dev}");
-            var device = new LimeSdrAdsbRepDevice(dev, new LimeSdrAdsbRepDeviceConfig(), _logger);
+            var device = new LimeSdrAdsbRepDevice(dev, new LimeSdrDeviceConfig(), _logger);
             
             // ADS-B
             await device.EnableChannel(LmsChannel.Rx, 0, true, DisposeCancel).ConfigureAwait(false);

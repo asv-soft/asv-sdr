@@ -4,6 +4,9 @@ namespace Asv.Sdr.LimeSdr;
 
 public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
 {
+    Task RfRelaySelectOutput(bool isTx);
+    
+    
     // Mode A/C
     Task WriteDelayOffsetModeAC(double offset);
     Task<(float ModeA, float ModeC)> ModeACCReadReplyRatio();

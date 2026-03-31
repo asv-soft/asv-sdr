@@ -1,17 +1,16 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using ZLogger;
 
 namespace Asv.Sdr.LimeSdr;
 
 
-public class LimeSdrIfr6000DeviceConfig
-{
-    
-}
-
 public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
 {
+    private readonly LimeSdrDeviceConfig _config;
+    private readonly ILogger _logger;
     private const ushort ModeAResp_15_0_InternAddr          = 0x0301; // (0,0,С1,А1,С2,А2,С4,А4,Х,В1,D1,В2,D2,В4,D4,SPI) -- RD
     private const ushort ModeCResp_15_0_InternAddr          = 0x0302; // (0,0,С1,А1,С2,А2,С4,А4,Х,В1,D1,В2,D2,В4,D4,0) -- RD
     private const ushort DelayOffsetAC_15_0_InternAddr      = 0x0303; // калибровочный коэффициент по дальности принятых сообщений A/C, signed -- WR
@@ -27,15 +26,40 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private const ushort Reply_Delay_A_7_0_C_15_8 = 0x030A;  // Отклонение задержки ответов от нулевой дальности (нулевая дальность = 3 мкс), signed, в тактах, один такт 0,025 мкс	-- RD
     private const ushort Reply_Jitter_A_7_0_C_15_8 = 0x030B;  // Джиттер задержки ответов (Разница между самой длинной и короткой задержкой в серии запрос-ответов(200шт например))-- RD
     
-    public LimeSdrIfr6000Device(string deviceId, LimeSdrIfr6000DeviceConfig config, ILogger? logger = null) : base(deviceId, logger)
+    public LimeSdrIfr6000Device(string deviceId, LimeSdrDeviceConfig config, ILogger? logger = null) : base(deviceId, logger)
     {
-        
+        _config = config;
+        _logger = logger ?? NullLogger.Instance;
     }
 
 
     protected override CustomWorkMode InternalGetMode()
     {
         return CustomWorkMode.Ifr6000;
+    }
+
+    public async Task RfRelaySelectOutput(bool isTx)
+    {
+        var value = isTx ? !_config.RfRelayRxIsHigh : _config.RfRelayRxIsHigh;
+        _logger?.ZLogDebug($"Setting RF relay to {(isTx ? "TX" : "RX")} (GPIO[{_config.RfRelayGpio}]={value})");
+        var arr = new byte[1] ;
+        await ReadGpioDirection(arr, DisposeCancel);
+        var dir = arr[0];
+        await ReadGpio(arr, DisposeCancel);
+        var gpio = arr[0];
+        var dirMask = (byte)(1 << _config.RfRelayGpio);
+        arr[0] = (byte)(dir | dirMask);
+        await WriteGpioDirection(arr, DisposeCancel);
+        
+        if (value)
+        {
+            arr[0] = (byte)(gpio | dirMask);
+        }
+        else
+        {
+            arr[0] = (byte)(gpio & ~dirMask);
+        }
+        await WriteGpio(arr, DisposeCancel);
     }
 
     public Task WriteDelayOffsetModeAC(double offset)

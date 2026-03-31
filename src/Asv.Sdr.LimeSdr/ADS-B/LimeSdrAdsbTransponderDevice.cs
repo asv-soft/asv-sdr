@@ -95,7 +95,7 @@ public interface ILimeSdrAdsbTransponderDevice : ILimeSdrCustomDevice
 
 public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTransponderDevice
 {
-    private readonly LimeSdrAdsbRepDeviceConfig _config;
+    private readonly LimeSdrDeviceConfig _config;
     private readonly ILogger _logger;
     
     // DF (down)
@@ -122,7 +122,7 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
     private const ushort DF17_VLS_47_32_InternAddr      = 0x0014; // DF17_VLS(47:32)
     private const ushort DF17_VLS_31_24_InternAddr      = 0x0015; // DF17_VLS(31:24) & "00"
 
-    public LimeSdrAdsbTransponderDevice(string deviceId, LimeSdrAdsbRepDeviceConfig config, ILogger? logger = null) : base(deviceId, logger)
+    public LimeSdrAdsbTransponderDevice(string deviceId, LimeSdrDeviceConfig config, ILogger? logger = null) : base(deviceId, logger)
     {
         _config = config;
         _logger = logger ?? NullLogger.Instance;

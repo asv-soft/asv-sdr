@@ -24,7 +24,7 @@ public class LimeSdrModeSRepDevice : LimeSdrAdsbTransponderDevice, ILimeSdrModeS
     private const ushort MODES_LEVEL1_MASK = 0x000F;
     private const ushort MODES_LEVEL2_MASK = 0x0300;
     
-    public LimeSdrModeSRepDevice(string deviceId, LimeSdrAdsbRepDeviceConfig config, bool isAdsbEnabled = true, ILogger? logger = null) : base(deviceId, config, logger)
+    public LimeSdrModeSRepDevice(string deviceId, LimeSdrDeviceConfig config, bool isAdsbEnabled = true, ILogger? logger = null) : base(deviceId, config, logger)
     {
         _isAdsbEnabled = isAdsbEnabled;
     }

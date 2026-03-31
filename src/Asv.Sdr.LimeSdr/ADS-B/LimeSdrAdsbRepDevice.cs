@@ -8,7 +8,7 @@ using ZLogger;
 
 namespace Asv.Sdr.LimeSdr;
 
-public class LimeSdrAdsbRepDeviceConfig
+public class LimeSdrDeviceConfig
 {
     public int RfRelayGpio { get; set; } = 0;
     public bool RfRelayRxIsHigh { get; set; } = true;
@@ -22,7 +22,7 @@ public class LimeSdrAdsbRepDeviceConfig
 
 public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
 {
-    private readonly LimeSdrAdsbRepDeviceConfig _config;
+    private readonly LimeSdrDeviceConfig _config;
     private const ushort ControlAddress        = 0x00D0;
     
     private const ushort MODE_OFF_MASK         = 0xF901;
@@ -150,7 +150,7 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
 
     private readonly ILogger _logger;
     
-    public LimeSdrAdsbRepDevice(string deviceId, LimeSdrAdsbRepDeviceConfig config, ILogger? logger = null)
+    public LimeSdrAdsbRepDevice(string deviceId, LimeSdrDeviceConfig config, ILogger? logger = null)
         : base(deviceId, true, logger ?? NullLogger.Instance, LimeSdrParams.LMS7_CAPSEL,LimeSdrParams.LMS7_CAPTURE)
     {
         _config = config;
