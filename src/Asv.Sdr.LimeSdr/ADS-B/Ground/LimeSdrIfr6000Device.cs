@@ -38,6 +38,17 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         return CustomWorkMode.Ifr6000;
     }
 
+    public async Task TurnOn()
+    {
+        await TurnOnMode(DisposeCancel);
+        await Task.Delay(500, DisposeCancel).ConfigureAwait(false);
+    }
+
+    public Task TurnOff()
+    {
+        return TurnOffMode(DisposeCancel);
+    }
+
     public async Task RfRelaySelectOutput(bool isTx)
     {
         var value = isTx ? !_config.RfRelayRxIsHigh : _config.RfRelayRxIsHigh;

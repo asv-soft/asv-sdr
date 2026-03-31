@@ -4,6 +4,9 @@ namespace Asv.Sdr.LimeSdr;
 
 public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
 {
+
+    Task TurnOn();
+    Task TurnOff();
     Task RfRelaySelectOutput(bool isTx);
     
     
