@@ -14,17 +14,17 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private const ushort ModeAResp_15_0_InternAddr          = 0x0301; // (0,0,С1,А1,С2,А2,С4,А4,Х,В1,D1,В2,D2,В4,D4,SPI) -- RD
     private const ushort ModeCResp_15_0_InternAddr          = 0x0302; // (0,0,С1,А1,С2,А2,С4,А4,Х,В1,D1,В2,D2,В4,D4,0) -- RD
     private const ushort DelayOffsetAC_15_0_InternAddr      = 0x0303; // калибровочный коэффициент по дальности принятых сообщений A/C, signed -- WR
-    private const ushort ReplyRatio_A_7_0_C_15_8_InternAddr = 0x0304; // процент ответов A/C	(по 0,5% т.е. количество ответов на 200 запросов) -- RD
+    private const ushort ReplyRatio_A_15_8_C_7_0_InternAddr = 0x0304; // процент ответов A/C	(по 0,5% т.е. количество ответов на 200 запросов) -- RD
     
-    private const ushort P1_P3_SpacingOffset_A_7_0_C_15_8_InternAddr = 0x0305; // Отклонение от кодового расстояния 8/21 мкс кода A/C для запросов, signed, в тактах, один такт 0,025 мкс  -- WR
+    private const ushort P1_P3_SpacingOffset_A_15_8_C_7_0_InternAddr = 0x0305; // Отклонение от кодового расстояния 8/21 мкс кода A/C для запросов, signed, в тактах, один такт 0,025 мкс  -- WR
     
     private const ushort ModeA_C_Control = 0x0306; // 
     
-    private const ushort Width_A_F1_7_0_F2_15_8 = 0x0307;  // средняя ширина ответных кадрирующих импульсов для кода A, в тактах, один такт 0,025 мкс	-- RD
-    private const ushort Width_C_F1_7_0_F2_15_8 = 0x0308;  // ширина ответных кадрирующих импульсов для кода C, в тактах, один такт 0,025 мкс	-- RD
-    private const ushort F1_F2_Spacing_A_7_0_C_15_8 = 0x0309;  // Отклонение ответных кадрирующих импульсов от кодового расстояния 20,3 мкс, signed, в тактах, один такт 0,025 мкс  -- RD
-    private const ushort Reply_Delay_A_7_0_C_15_8 = 0x030A;  // Отклонение задержки ответов от нулевой дальности (нулевая дальность = 3 мкс), signed, в тактах, один такт 0,025 мкс	-- RD
-    private const ushort Reply_Jitter_A_7_0_C_15_8 = 0x030B;  // Джиттер задержки ответов (Разница между самой длинной и короткой задержкой в серии запрос-ответов(200шт например))-- RD
+    private const ushort Width_A_F1_15_8_F2_7_0 = 0x0307;  // средняя ширина ответных кадрирующих импульсов для кода A, в тактах, один такт 0,025 мкс	-- RD
+    private const ushort Width_C_F1_15_8_F2_7_0 = 0x0308;  // ширина ответных кадрирующих импульсов для кода C, в тактах, один такт 0,025 мкс	-- RD
+    private const ushort F1_F2_Spacing_A_15_8_C_7_0 = 0x0309;  // Отклонение ответных кадрирующих импульсов от кодового расстояния 20,3 мкс, signed, в тактах, один такт 0,025 мкс  -- RD
+    private const ushort Reply_Delay_A_15_8_C_7_0 = 0x030A;  // Отклонение задержки ответов от нулевой дальности (нулевая дальность = 3 мкс), signed, в тактах, один такт 0,025 мкс	-- RD
+    private const ushort Reply_Jitter_A_15_8_C_7_0 = 0x030B;  // Джиттер задержки ответов (Разница между самой длинной и короткой задержкой в серии запрос-ответов(200шт например))-- RD
     
     public LimeSdrIfr6000Device(string deviceId, LimeSdrDeviceConfig config, ILogger? logger = null) : base(deviceId, logger)
     {
@@ -36,6 +36,11 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     protected override CustomWorkMode InternalGetMode()
     {
         return CustomWorkMode.Ifr6000;
+    }
+
+    public Task<bool> IsTurnOn()
+    {
+        return IsModeEnabled(DisposeCancel);
     }
 
     public async Task TurnOn()
@@ -82,10 +87,10 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         return WriteCustomRegister(DelayOffsetAC_15_0_InternAddr, del, DisposeCancel);
     }
 
-    public async Task<(float ModeA, float ModeC)> ModeACCReadReplyRatio()
+    public async Task<(float ModeA, float ModeC)> ReadReplyRatioModeAC()
     {
-        var rRatio = await ReadCustomRegister(ReplyRatio_A_7_0_C_15_8_InternAddr, DisposeCancel).ConfigureAwait(false);
-        return (ModeA: (rRatio & 0xFF) * 0.5f, ModeC: (rRatio >> 8) * 0.5f);
+        var rRatio = await ReadCustomRegister(ReplyRatio_A_15_8_C_7_0_InternAddr, DisposeCancel).ConfigureAwait(false);
+        return (ModeA: (rRatio >> 8) * 0.5f, ModeC: (rRatio & 0xFF) * 0.5f);
     }
 
     public Task WriteP1P3SpacingOffset(float modeAOffset, float modeCOffset)
@@ -97,8 +102,8 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         if (cOffset > sbyte.MaxValue) cOffset = sbyte.MaxValue;
         if (cOffset < sbyte.MinValue) cOffset = sbyte.MinValue;
 
-        var reg = (ushort)((byte)aOffset | (byte)cOffset << 8);
-        return WriteCustomRegister(P1_P3_SpacingOffset_A_7_0_C_15_8_InternAddr, reg,  DisposeCancel);
+        var reg = (ushort)((byte)cOffset | (byte)aOffset << 8);
+        return WriteCustomRegister(P1_P3_SpacingOffset_A_15_8_C_7_0_InternAddr, reg,  DisposeCancel);
     }
 
     public Task WriteModeACControl(bool modeAP2SlsPulseEn, bool modeCP2SlsPulseEn, bool modeAP2SlsPulseAtt,
@@ -118,41 +123,41 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
 
     public async Task<(float F1, float F2)> ReadModeAPulseWidth()
     {
-        var reg = await ReadCustomRegister(Width_A_F1_7_0_F2_15_8, DisposeCancel).ConfigureAwait(false);
-        var f1 = (reg & 0xFF) * 0.025f;
-        var f2 = (reg >> 8) * 0.025f;
+        var reg = await ReadCustomRegister(Width_A_F1_15_8_F2_7_0, DisposeCancel).ConfigureAwait(false);
+        var f1 = (reg >> 8) * 0.025f;
+        var f2 = (reg & 0xFF) * 0.025f;
         return (f1, f2);
     }
 
     public async Task<(float F1, float F2)> ReadModeCPulseWidth()
     {
-        var reg = await ReadCustomRegister(Width_C_F1_7_0_F2_15_8, DisposeCancel).ConfigureAwait(false);
-        var f1 = (reg & 0xFF) * 0.025f;
-        var f2 = (reg >> 8) * 0.025f;
+        var reg = await ReadCustomRegister(Width_C_F1_15_8_F2_7_0, DisposeCancel).ConfigureAwait(false);
+        var f1 = (reg >> 8) * 0.025f;
+        var f2 = (reg & 0xFF) * 0.025f;
         return (f1, f2);
     }
 
     public async Task<(float ModeA, float ModeC)> ReadModeACPulseSpacing()
     {
-        var reg = await ReadCustomRegister(F1_F2_Spacing_A_7_0_C_15_8, DisposeCancel).ConfigureAwait(false);
-        var a = (sbyte)(reg & 0xFF) * 0.025f;
-        var c = (sbyte)(reg >> 8) * 0.025f;
+        var reg = await ReadCustomRegister(F1_F2_Spacing_A_15_8_C_7_0, DisposeCancel).ConfigureAwait(false);
+        var a = (sbyte)(reg >> 8) * 0.025f;
+        var c = (sbyte)(reg & 0xFF) * 0.025f;
         return (a, c);
     }
 
-    public async Task<(float ModeA, float ModeC)> ReadModeACReplayDelay()
+    public async Task<(float ModeA, float ModeC)> ReadModeACReplyDelay()
     {
-        var reg = await ReadCustomRegister(Reply_Delay_A_7_0_C_15_8, DisposeCancel).ConfigureAwait(false);
-        var a = (sbyte)(reg & 0xFF) * 0.025f;
-        var c = (sbyte)(reg >> 8) * 0.025f;
+        var reg = await ReadCustomRegister(Reply_Delay_A_15_8_C_7_0, DisposeCancel).ConfigureAwait(false);
+        var a = (sbyte)(reg >> 8) * 0.025f;
+        var c = (sbyte)(reg & 0xFF) * 0.025f;
         return (a, c);
     }
 
-    public async Task<(float ModeA, float ModeC)> ReadModeACReplayJitter()
+    public async Task<(float ModeA, float ModeC)> ReadModeACReplyJitter()
     {
-        var reg = await ReadCustomRegister(Reply_Jitter_A_7_0_C_15_8, DisposeCancel).ConfigureAwait(false);
-        var a = (reg & 0xFF) * 0.025f;
-        var c = (reg >> 8) * 0.025f;
+        var reg = await ReadCustomRegister(Reply_Jitter_A_15_8_C_7_0, DisposeCancel).ConfigureAwait(false);
+        var a = (reg >> 8) * 0.025f;
+        var c = (reg & 0xFF) * 0.025f;
         return (a, c);
     }
 

@@ -5,6 +5,7 @@ namespace Asv.Sdr.LimeSdr;
 public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
 {
 
+    Task<bool> IsTurnOn();
     Task TurnOn();
     Task TurnOff();
     Task RfRelaySelectOutput(bool isTx);
@@ -12,7 +13,7 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     
     // Mode A/C
     Task WriteDelayOffsetModeAC(double offset);
-    Task<(float ModeA, float ModeC)> ModeACCReadReplyRatio();
+    Task<(float ModeA, float ModeC)> ReadReplyRatioModeAC();
 
     Task WriteP1P3SpacingOffset(float modeAOffset, float modeCOffset);
     Task WriteModeACControl(bool modeAP2SlsPulseEn, bool modeCP2SlsPulseEn, bool modeAP2SlsPulseAtt, bool modeCP2SlsPulseAtt, bool allCallModeAC_A, bool allCallModeAC_C, bool allCallModeS_A, bool allCallModeS_C);
@@ -20,8 +21,8 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     Task<(float F1, float F2)> ReadModeAPulseWidth();
     Task<(float F1, float F2)> ReadModeCPulseWidth();
     Task<(float ModeA, float ModeC)> ReadModeACPulseSpacing();
-    Task<(float ModeA, float ModeC)> ReadModeACReplayDelay();
-    Task<(float ModeA, float ModeC)> ReadModeACReplayJitter();
+    Task<(float ModeA, float ModeC)> ReadModeACReplyDelay();
+    Task<(float ModeA, float ModeC)> ReadModeACReplyJitter();
     
     Task<(string Squawk, bool Spi)> ReadModeASquawkCode();
     Task<int> ReadModeCAltitude();
