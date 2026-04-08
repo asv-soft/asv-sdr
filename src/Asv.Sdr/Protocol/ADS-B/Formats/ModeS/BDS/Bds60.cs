@@ -10,6 +10,17 @@ public class Bds60 : BdsBase
 {
     public override byte Bds1 => 6;
     public override byte Bds2 => 0;
+    
+    public override void Deserialize(ref ReadOnlySpan<byte> buffer)
+    {
+        InternalDeserialize(ref buffer);
+    }
+
+    public override void Serialize(ref Span<byte> buffer)
+    {
+        InternalSerialize(ref buffer);
+    }
+    
     protected override void InternalDeserialize(ref ReadOnlySpan<byte> buffer)
     {
         var pos = 0;
