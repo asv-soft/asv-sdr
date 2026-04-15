@@ -118,18 +118,6 @@ public class ModeACInterrogateViewModel : ShellPage
     [ImportingConstructor]
     public ModeACInterrogateViewModel(IConfiguration cfg, ILoggerFactory loggerFactory) : this()
     {
-        // var alt = SetAltitude(14630.4);
-
-        foreach (var tuple in ModeCGillham.Table)
-        {
-            var bits = ModeCGillham.Encode(tuple.Item1);
-            if (!bits.Equals(tuple.Item2)) {}
-        }
-        
-        
-        // var bits = ModeCGillham.Encode(106200);
-        // Console.WriteLine(bits); // A/B/C/D биты
-        
         _logger = loggerFactory.CreateLogger<ModeACInterrogateViewModel>();
         _cfg = cfg.Get<ModeACInterrogateConfig>();
         TxGain = _cfg.Gain;
@@ -302,7 +290,7 @@ public class ModeACInterrogateViewModel : ShellPage
 
             await _device.EnableChannel(LmsChannel.Tx, 0, true, CancellationToken.None);
             await _device.SetSampleRate(sampleRate, 1U, CancellationToken.None);
-            await _device.SetAntenna(LmsChannel.Tx, 0, (uint)LmsPathTx.LMS_PATH_TX1, CancellationToken.None);
+            await _device.SetAntenna(LmsChannel.Tx, 0, (uint)LmsPathTx.LMS_PATH_TX2, CancellationToken.None);
             await _device.SetBandWidth(LmsChannel.Tx, 0, bandWidth, CancellationToken.None);
 
             await _device.SetFrequency(LmsChannel.Tx, 0, freq, CancellationToken.None);

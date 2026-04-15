@@ -540,7 +540,7 @@ public class AdsbReplyViewModel:ShellPage
     {
         var buffBDS40 = new byte[7];
         
-        var bds40 = new BdsAny(4, 0);
+        var bds40 = new Bds40();
         var span40 = new Span<byte>(buffBDS40);
         bds40.Serialize(ref span40);
         BDS40Message = string.Join("", buffBDS40.Select(x => $"{x:X2}"));
@@ -553,7 +553,7 @@ public class AdsbReplyViewModel:ShellPage
     {
         var buffBDS50 = new byte[7];
         
-        var bds50 = new BdsAny(5, 0);
+        var bds50 = new Bds50();
         var span50 = new Span<byte>(buffBDS50);
         bds50.Serialize(ref span50);
         BDS50Message = string.Join("", buffBDS50.Select(x => $"{x:X2}"));
@@ -566,7 +566,7 @@ public class AdsbReplyViewModel:ShellPage
     {
         var buffBDS60 = new byte[7];
         
-        var bds60 = new BdsAny(6, 0);
+        var bds60 = new Bds60();
         var span60 = new Span<byte>(buffBDS60);
         bds60.Serialize(ref span60);
         BDS60Message = string.Join("", buffBDS60.Select(x => $"{x:X2}"));
