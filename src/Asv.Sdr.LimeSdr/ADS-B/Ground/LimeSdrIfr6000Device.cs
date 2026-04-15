@@ -23,8 +23,10 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private const ushort Width_A_F1_15_8_F2_7_0 = 0x0307;  // средняя ширина ответных кадрирующих импульсов для кода A, в тактах, один такт 0,025 мкс	-- RD
     private const ushort Width_C_F1_15_8_F2_7_0 = 0x0308;  // ширина ответных кадрирующих импульсов для кода C, в тактах, один такт 0,025 мкс	-- RD
     private const ushort F1_F2_Spacing_A_15_8_C_7_0 = 0x0309;  // Отклонение ответных кадрирующих импульсов от кодового расстояния 20,3 мкс, signed, в тактах, один такт 0,025 мкс  -- RD
-    private const ushort Reply_Delay_A_15_8_C_7_0 = 0x030A;  // Отклонение задержки ответов от нулевой дальности (нулевая дальность = 3 мкс), signed, в тактах, один такт 0,025 мкс	-- RD
-    private const ushort Reply_Jitter_A_15_8_C_7_0 = 0x030B;  // Джиттер задержки ответов (Разница между самой длинной и короткой задержкой в серии запрос-ответов(200шт например))-- RD
+    private const ushort Reply_Delay_A_15_0 = 0x030A;  // Отклонение задержки ответов от нулевой дальности ModeA (нулевая дальность = 3 мкс), signed, в тактах, один такт 0,025 мкс	-- RD
+    private const ushort Reply_Delay_C_15_0 = 0x030B;  // Отклонение задержки ответов от нулевой дальности ModeC (нулевая дальность = 3 мкс), signed, в тактах, один такт 0,025 мкс	-- RD
+    private const ushort Reply_Jitter_A_15_0 = 0x030C;  // Джиттер задержки ответов ModeA (Разница между самой длинной и короткой задержкой в серии запрос-ответов(200шт например))-- RD
+    private const ushort Reply_Jitter_C_15_0 = 0x030D;  // Джиттер задержки ответов ModeC (Разница между самой длинной и короткой задержкой в серии запрос-ответов(200шт например))-- RD
     
     public LimeSdrIfr6000Device(string deviceId, LimeSdrDeviceConfig config, ILogger? logger = null) : base(deviceId, logger)
     {
@@ -145,20 +147,28 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         return (a, c);
     }
 
-    public async Task<(float ModeA, float ModeC)> ReadModeACReplyDelay()
+    public async Task<float> ReadModeAReplyDelay()
     {
-        var reg = await ReadCustomRegister(Reply_Delay_A_15_8_C_7_0, DisposeCancel).ConfigureAwait(false);
-        var a = (sbyte)(reg >> 8) * 0.025f;
-        var c = (sbyte)(reg & 0xFF) * 0.025f;
-        return (a, c);
+        var reg = await ReadCustomRegister(Reply_Delay_A_15_0, DisposeCancel).ConfigureAwait(false);
+        return reg * 0.025f;
+    }
+    
+    public async Task<float> ReadModeCReplyDelay()
+    {
+        var reg = await ReadCustomRegister(Reply_Delay_C_15_0, DisposeCancel).ConfigureAwait(false);
+        return reg * 0.025f;
     }
 
-    public async Task<(float ModeA, float ModeC)> ReadModeACReplyJitter()
+    public async Task<float> ReadModeAReplyJitter()
     {
-        var reg = await ReadCustomRegister(Reply_Jitter_A_15_8_C_7_0, DisposeCancel).ConfigureAwait(false);
-        var a = (reg >> 8) * 0.025f;
-        var c = (reg & 0xFF) * 0.025f;
-        return (a, c);
+        var reg = await ReadCustomRegister(Reply_Jitter_A_15_0, DisposeCancel).ConfigureAwait(false);
+        return reg * 0.025f;
+    }
+    
+    public async Task<float> ReadModeCReplyJitter()
+    {
+        var reg = await ReadCustomRegister(Reply_Jitter_C_15_0, DisposeCancel).ConfigureAwait(false);
+        return reg * 0.025f;
     }
 
     public async Task<(string Squawk, bool Spi)> ReadModeASquawkCode()

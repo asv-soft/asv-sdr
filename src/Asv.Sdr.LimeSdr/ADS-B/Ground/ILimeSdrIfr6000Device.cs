@@ -21,8 +21,10 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     Task<(float F1, float F2)> ReadModeAPulseWidth();
     Task<(float F1, float F2)> ReadModeCPulseWidth();
     Task<(float ModeA, float ModeC)> ReadModeACPulseSpacing();
-    Task<(float ModeA, float ModeC)> ReadModeACReplyDelay();
-    Task<(float ModeA, float ModeC)> ReadModeACReplyJitter();
+    Task<float> ReadModeAReplyDelay();
+    Task<float> ReadModeCReplyDelay();
+    Task<float> ReadModeAReplyJitter();
+    Task<float> ReadModeCReplyJitter();
     
     Task<(string Squawk, bool Spi)> ReadModeASquawkCode();
     Task<int> ReadModeCAltitude();
