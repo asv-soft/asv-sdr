@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace Asv.Sdr.LimeSdr;
@@ -31,6 +32,13 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     
     
     // Mode S
+
+    Task<bool> WriteUfMessage(ModeSUFormatBase msg);
+    Task<ModeSDFormatBase?> ReadDfMessage(Func<ModeSDFormatBase> factory, int attempts = 3);
+    Task<ModeSDFormatBase?> ReadDfMessage(ModeSUFormatBase reqMsg, Func<ModeSDFormatBase> respFactory, int attempts = 3);
+    
+    Task<float> ReadReplyRatioModeS();
+    
     Task<(ModeSDF11 Msg, byte Req, byte Resp)> ReadModeSDf11IcaoAddress();
     Task<ModeSDF4> ReadModeSDf4Altitude();
     Task<ModeSDF20> ReadModeSDf20Altitude();
