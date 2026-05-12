@@ -220,9 +220,7 @@ public interface ILimeSdrAdsbDevice : ILimeSdrDevice
     Task InitAllMessage(ReadOnlySpan<byte> df11, ReadOnlySpan<byte> df4, ReadOnlySpan<byte> df5,
         ReadOnlySpan<byte> bds10, ReadOnlySpan<byte> bds20, ReadOnlySpan<byte> bds40, ReadOnlySpan<byte> bds50, ReadOnlySpan<byte> bds60, ReadOnlySpan<byte> df17Id, CancellationToken cancel);
     
-    Task<(byte, byte)> GetRecognizedRequestsCountPerSecond(CancellationToken cancel = default);
-    
-    Task<(byte, byte)> GetAllRequestsCountPerSecond(CancellationToken cancel = default);
+    Task<(byte, byte)> GetRecognizedAndAllRequestsCountPerSecond(CancellationToken cancel = default);
     
     public bool IsDisposed { get; }
 

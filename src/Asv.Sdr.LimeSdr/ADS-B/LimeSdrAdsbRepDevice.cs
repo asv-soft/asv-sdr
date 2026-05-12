@@ -101,9 +101,7 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
     private const ushort BDS60_55_40_InternAddr         = 0x0043; // BDS60(55:40)
     private const ushort BDS60_39_24_InternAddr         = 0x0044; // BDS60(39:24)
     
-    private const ushort Time_15_8_RecReqCnt_7_0_InternAddr= 0x0045; // Timestamp(15:8) & Recognized Request count per/sec(7:0)
-    private const ushort Time_15_8_AllReqCnt_7_0_InternAddr= 0x0046; // Timestamp(15:8) & All Request count per/sec(7:0)
-    
+    private const ushort RecReqCnt_7_0_AllReqCnt_7_0_InternAddr= 0x0045; // Recognized Request count per/sec(7:0) & All Request count per/sec(7:0)
     
     // Read
     private const ushort UF11_55_40_InternAddr          = 0x0018; // UF11(55:40)
@@ -1136,16 +1134,9 @@ public class LimeSdrAdsbRepDevice : LimeSdrDevice, ILimeSdrAdsbDevice
         }, cancel);
     }
 
-    public async Task<(byte, byte)> GetRecognizedRequestsCountPerSecond(CancellationToken cancel = default)
+    public async Task<(byte, byte)> GetRecognizedAndAllRequestsCountPerSecond(CancellationToken cancel = default)
     {
-        var reg = await ReadAdsbRegister(Time_15_8_RecReqCnt_7_0_InternAddr, cancel).ConfigureAwait(false);
-        var result = ((byte)(reg >> 8), (byte)(reg & 0xFF));
-        return result;
-    }
-
-    public async Task<(byte, byte)> GetAllRequestsCountPerSecond(CancellationToken cancel = default)
-    {
-        var reg = await ReadAdsbRegister(Time_15_8_AllReqCnt_7_0_InternAddr, cancel).ConfigureAwait(false);
+        var reg = await ReadAdsbRegister(RecReqCnt_7_0_AllReqCnt_7_0_InternAddr, cancel).ConfigureAwait(false);
         var result = ((byte)(reg >> 8), (byte)(reg & 0xFF));
         return result;
     }
