@@ -288,8 +288,35 @@ public class ModeSDF4 : ModeSDFormatBase
     protected override int FormatLength => 7;
     public override byte FormatId => 4;
 
+    /// <summary>
+    /// 0 signifies no alert and no SPI, aircraft is airborne
+    /// 1 signifies no alert and no SPI, aircraft is on the ground
+    /// 2 signifies alert, no SPI, aircraft is airborne
+    /// 3 signifies alert, no SPI, aircraft is on the ground
+    /// 4 signifies alert and SPI, aircraft is airborne or on the ground
+    /// 5 signifies no alert and SPI, aircraft is airborne or on the ground
+    /// 6 reserved
+    /// 7 not assigne
+    /// </summary>
     public byte FS { get; set; } = 0x0;
+    
+    /// <summary>
+    /// 0 signifies no downlink request
+    /// 1 signifies request to send Comm-B message
+    /// 2 reserved for ACAS
+    /// 3 reserved for ACAS
+    /// 4 signifies Comm-B broadcast message 1 available
+    /// 5 signifies Comm-B broadcast message 2 available
+    /// 6 reserved for ACAS
+    /// 7 reserved for ACAS
+    /// 8-15 not assigned
+    /// 16-31 see downlink ELM 
+    /// </summary>
     public byte DR { get; set; } = 0x0;
+    
+    /// <summary>
+    /// 
+    /// </summary>
     public byte UM { get; set; } = 0x0;
 
     private ushort AC

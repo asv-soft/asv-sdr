@@ -446,4 +446,15 @@ public static class TransponderHelper
 
         return (Lat: nLat, Lon: nLon);
     }
+
+    // public static (byte? NicA, byte? NicB, byte? NicC, byte? Nic, ) GetNic(byte typeCode)
+    // {
+    //     switch (typeCode)
+    //     {
+    //         case 5: return (0, null);
+    //         case 10: return 0;
+    //         case 11: return 1;
+    //         
+    //     }
+    // }
 }

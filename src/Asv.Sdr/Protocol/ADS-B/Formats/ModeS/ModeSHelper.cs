@@ -2844,7 +2844,7 @@ public static class ModeSHelper
         return (ushort)(((code & 0x4) << 10) | ((code & 0x2) << 9) | ((code & 0x1) << 8) |
                         (code & 0x20) | ((code & 0x10) >> 1) | ((code & 0x08) >> 2) |
                         ((code & 0x100) << 3) | ((code & 0x80) << 2) | ((code & 0x40) << 1) |
-                        ((code & 0x400) >> 8) | ((code & 0x200) << 9));
+                        ((code & 0x400) >> 8) | ((code & 0x200) >> 9));
     }
     
     private static void SetBits(out byte x1, out byte x2, out byte x4, byte value)

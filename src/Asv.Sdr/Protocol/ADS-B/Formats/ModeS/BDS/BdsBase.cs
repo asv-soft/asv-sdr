@@ -11,15 +11,6 @@ public abstract class BdsBase : ISizedSpanSerializable
     public abstract byte Bds2 { get; }
 
 
-    
-    public virtual bool IsThisMyData(ReadOnlySpan<byte> buffer)
-    {
-        var pos = 0;
-        var bds1 = ModeSHelper.GetBitU(buffer, ref pos, 4);
-        var bds2 = ModeSHelper.GetBitU(buffer, ref pos, 4);
-        return bds1 == Bds1 && bds2 == Bds2;
-    }
-    
     public byte DataSelector => (byte)((Bds1 << 0x4) | (Bds2 & 0xF));
     public virtual void Deserialize(ref ReadOnlySpan<byte> buffer)
     {
