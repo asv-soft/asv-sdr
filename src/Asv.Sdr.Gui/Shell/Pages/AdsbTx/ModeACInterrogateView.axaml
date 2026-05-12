@@ -18,6 +18,11 @@
                 <TextBlock Text="TX Gain" VerticalAlignment="Center"/>
                 <Slider Minimum="-69" Width="200" Maximum="10" Value="{CompiledBinding TxGain}"/>
                 <TextBlock Text="{CompiledBinding TxGain}" VerticalAlignment="Center"/>
+                <TextBlock Text="RX Gain" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                <Slider Minimum="-69" Width="200" Maximum="10" Value="{CompiledBinding RxGain}"/>
+                <TextBlock Text="{CompiledBinding RxGain}" VerticalAlignment="Center"/>
+                <TextBlock Text="Delay" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                <TextBlock Text="{CompiledBinding Dt}" VerticalAlignment="Center"/>
                 <ToggleSwitch OffContent="P2 Off" OnContent="P2 On" IsChecked="{CompiledBinding OnOffP2}" VerticalAlignment="Center" Margin="10,0,0,0"/>
                 <ToggleSwitch OffContent="Mode A" OnContent="Mode A/C" IsChecked="{CompiledBinding Modes}" VerticalAlignment="Center" Margin="10,0,0,0"/>
             </StackPanel>

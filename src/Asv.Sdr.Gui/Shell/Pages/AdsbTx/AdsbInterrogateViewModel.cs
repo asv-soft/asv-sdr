@@ -21,8 +21,8 @@ public class AdsbInterrogateConfig
 {
     public ulong Frequency { get; set; } = 1030000000;
     public ulong FrequencyOffset { get; set; } = 35000;
-    public ulong SampleRate { get; set; } = 16000000;
-    public LmsPathTx LmsPathTx { get; set; } = LmsPathTx.LMS_PATH_TX1;
+    public ulong SampleRate { get; set; } = 40000000;
+    public LmsPathTx LmsPathTx { get; set; } = LmsPathTx.LMS_PATH_TX2;
 
     public double Amplitude { get; set; } = 1.0;
     
