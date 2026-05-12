@@ -32,6 +32,12 @@ public interface ILimeSdrAdsbTransponderDevice : ILimeSdrCustomDevice
     Task SetCapability(CapabilityEnum ca, CancellationToken cancel = default);
     
     /// <summary>
+    /// Get transponder capability
+    /// </summary>
+    /// <param name="cancel"></param>
+    Task<CapabilityEnum> GetCapability(CancellationToken cancel = default);
+    
+    /// <summary>
     /// Set ICAO aircraft address
     /// </summary>
     /// <param name="address">ICAO aircraft address (24 bit)</param>
@@ -78,34 +84,23 @@ public interface ILimeSdrAdsbTransponderDevice : ILimeSdrCustomDevice
         CancellationToken cancel = default);
     Task WriteDF17Velocity(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
 
-    /// <summary>
-    /// Gets the PEAK_AMP value, which represents the maximum signal amplitude over the last 100 milliseconds.
-    /// The gain should be adjusted to keep PEAK_AMP within the range from 0x10 PEAK_AMP to 0x80
-    /// </summary>
-    Task<ushort> GetPeakAmplitude(CancellationToken cancel = default);
-    
-    /// <summary>
-    /// Gets the P_AMP2 value, which represents the maximum signal amplitude over the last 100 milliseconds.
-    /// The gain should be adjusted to keep P_AMP2 within the range from 0x10 P_AMP2 to 0x80
-    /// </summary>
-    Task<ushort> GetReceivedPeakAmplitude(CancellationToken cancel = default);
-    
 }
 
 
 public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTransponderDevice
 {
     private readonly LimeSdrDeviceConfig _config;
-    private readonly ILogger _logger;
+    protected CapabilityEnum capability;
+    protected readonly ILogger logger;
     
     // DF (down)
     private const ushort DF11_55_40_InternAddr          = 0x0000; // DF11(55:40)
     private const ushort DF11_39_24_InternAddr          = 0x0001; // DF11(39:24)
     
-    private const ushort DF17_ID_79_64_InternAddr       = 0x0006; // DF17_ID(79:64)
-    private const ushort DF17_ID_63_48_InternAddr       = 0x0007; // DF17_ID(63:48)
-    private const ushort DF17_ID_47_32_InternAddr       = 0x0008; // DF17_ID(47:32)
-    private const ushort DF17_ID_31_24_InternAddr       = 0x0009; // DF17_ID(31:24) & "00"
+    protected const ushort DF17_ID_79_64_InternAddr       = 0x0006; // DF17_ID(79:64)
+    protected const ushort DF17_ID_63_48_InternAddr       = 0x0007; // DF17_ID(63:48)
+    protected const ushort DF17_ID_47_32_InternAddr       = 0x0008; // DF17_ID(47:32)
+    protected const ushort DF17_ID_31_24_InternAddr       = 0x0009; // DF17_ID(31:24) & "00"
     
     private const ushort DF17_POS_EVEN_79_64_InternAddr = 0x000A; // DF17_POS_EVEN(79:64)
     private const ushort DF17_POS_EVEN_63_48_InternAddr = 0x000B; // DF17_POS_EVEN(63:48)
@@ -122,10 +117,11 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
     private const ushort DF17_VLS_47_32_InternAddr      = 0x0014; // DF17_VLS(47:32)
     private const ushort DF17_VLS_31_24_InternAddr      = 0x0015; // DF17_VLS(31:24) & "00"
 
-    public LimeSdrAdsbTransponderDevice(string deviceId, LimeSdrDeviceConfig config, ILogger? logger = null) : base(deviceId, logger)
+    public LimeSdrAdsbTransponderDevice(string deviceId, LimeSdrDeviceConfig config, CapabilityEnum capability = CapabilityEnum.Level1, ILogger? logger = null) : base(deviceId, logger)
     {
         _config = config;
-        _logger = logger ?? NullLogger.Instance;
+        this.capability = capability;
+        this.logger = logger ?? NullLogger.Instance;
     }
 
     protected override CustomWorkMode InternalGetMode()
@@ -144,6 +140,7 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
             await Task.Delay(500, cancel).ConfigureAwait(false);
             // На всякий пож еще раз: Выключаем ответы на любые запросы, оставляем включенным только отправку ADS-B
             await WriteCustomRegister(0x0046, 0x70, cancel).ConfigureAwait(false);
+            await SetCapability(capability, cancel).ConfigureAwait(false);
         }
         else
         {
@@ -154,7 +151,7 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
     public async Task RfRelaySelectOutput(bool isTx, CancellationToken cancel = default)
     {
         var value = isTx ? !_config.RfRelayRxIsHigh : _config.RfRelayRxIsHigh;
-        _logger?.ZLogDebug($"Setting RF relay to {(isTx ? "TX" : "RX")} (GPIO[{_config.RfRelayGpio}]={value})");
+        logger?.ZLogDebug($"Setting RF relay to {(isTx ? "TX" : "RX")} (GPIO[{_config.RfRelayGpio}]={value})");
         var arr = new byte[1] ;
         await ReadGpioDirection(arr, cancel);
         var dir = arr[0];
@@ -177,9 +174,17 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
 
     public Task SetCapability(CapabilityEnum ca, CancellationToken cancel = default)
     {
+        capability = ca;
         var rawCa = (byte)TransponderHelper.SetCapability(ca);
         var reg = (ushort)((0xB << 3) | rawCa);
         return WriteCustomRegisterBits(DF11_55_40_InternAddr, 8, 8, reg, cancel);
+    }
+
+    public async Task<CapabilityEnum> GetCapability(CancellationToken cancel = default)
+    {
+        var reg = await ReadCustomRegisterBits(DF11_55_40_InternAddr, 8, 8, cancel);
+        var ca = reg & 0x7;
+        return TransponderHelper.GetCapability(ca);
     }
 
     public async Task SetIcaoAddress(uint address, CancellationToken cancel = default)
@@ -251,7 +256,7 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
     {
         if (message.Length != 7)
         {
-            _logger.ZLogDebug(
+            logger.ZLogDebug(
                 $"Error writing ADS-B DF11 message. Expected length greater than or equal to 7 bytes, but length {message.Length} bytes.");
             return Task.CompletedTask;
         }
@@ -355,7 +360,7 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
     {
         if (message.Length != 14)
         {
-            _logger.ZLogDebug(
+            logger.ZLogDebug(
                 $"Error writing ADS-B DF17 Identification message. Expected length greater than or equal to 14 bytes, but length {message.Length} bytes.");
             return;
         }
@@ -372,14 +377,14 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
     {
         if (evenMessage.Length != 14)
         {
-            _logger.ZLogDebug(
+            logger.ZLogDebug(
                 $"Error writing ADS-B DF17 Position Even message. Expected length greater than or equal to 14 bytes, but length {evenMessage.Length} bytes.");
             return;
         }
         
         if (oddMessage.Length != 14)
         {
-            _logger.ZLogDebug(
+            logger.ZLogDebug(
                 $"Error writing ADS-B DF17 Position Odd message. Expected length greater than or equal to 14 bytes, but length {oddMessage.Length} bytes.");
             return;
         }
@@ -402,7 +407,7 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
     {
         if (message.Length != 14)
         {
-            _logger.ZLogDebug(
+            logger.ZLogDebug(
                 $"Error writing ADS-B DF17 Velocity message. Expected length greater than or equal to 14 bytes, but length {message.Length} bytes.");
             return;
         }
@@ -413,10 +418,5 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
         frame[2] = new ValueTuple<ushort, ushort>(DF17_VLS_47_32_InternAddr, (ushort)((message.Span[8] << 8) | message.Span[9]));
         frame[3] = new ValueTuple<ushort, ushort>(DF17_VLS_31_24_InternAddr, (ushort)(message.Span[10] << 8));
         await WriteCustomRegistersFrame(frame, cancel).ConfigureAwait(false);
-    }
-
-    public Task<ushort> GetReceivedPeakAmplitude(CancellationToken cancel = default)
-    {
-        return GetPeakAmplitude(cancel);
     }
 }

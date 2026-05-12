@@ -16,7 +16,7 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
     
     private const ushort ADDRESS_WR_Address = 0x00D1;
     private const ushort DATA_WR_Address    = 0x00D2;
-    private const ushort CONTROL_WR_Address = 0x00D3;
+    protected const ushort CONTROL_WR_Address = 0x00D3;
     private const ushort ADDRESS_RD_Address = 0x00D4;
     private const ushort DATA_RD_Address    = 0x00D5;
     private const ushort CONTROL_RD_Address = 0x00D6;
@@ -203,7 +203,7 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
         return result;
     }
 
-    private ushort ReadCustomRegister(ILmsRegisterEditor edit, ushort address)
+    protected ushort ReadCustomRegister(ILmsRegisterEditor edit, ushort address)
     {
         edit.WriteFPGAReg(ADDRESS_RD_Address, address);
         return edit.RaedFPGAReg(DATA_RD_Address);
@@ -217,7 +217,7 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
         return (ushort)((reg >> index) & mask);
     }
 
-    private void WriteCustomRegister(ILmsRegisterEditor edit, ushort address, ushort value)
+    protected void WriteCustomRegister(ILmsRegisterEditor edit, ushort address, ushort value)
     {
         edit.WriteFPGAReg(ADDRESS_WR_Address, address);
         edit.WriteFPGAReg(DATA_WR_Address, value);

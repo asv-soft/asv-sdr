@@ -8,6 +8,7 @@ namespace Asv.Sdr.LimeSdr;
 
 public interface ILimeSdrModeACRepDevice : ILimeSdrAdsbTransponderDevice
 {
+    bool IsAdsbEnabled { get; }
     /// <summary>
     /// Turn On/Off ADS-B
     /// </summary>
@@ -26,28 +27,40 @@ public class LimeSdrModeACRepDevice : LimeSdrAdsbTransponderDevice, ILimeSdrMode
     private const ushort DelayOffsetAC_15_0_InternAddr      = 0x0050; // калибровочный коэффициент по дальности принятых сообщений A/C, signed -- WR
     private const ushort A_CNT_15_8_C_CNT_7_0_InternAddr    = 0x0051; // счетчики принятого сообщения A и С соответственно		--RD
 
-    public LimeSdrModeACRepDevice(string deviceId, LimeSdrDeviceConfig config, bool isAdsbEnabled = true, ILogger? logger = null) : base(deviceId, config, logger)
+    public LimeSdrModeACRepDevice(string deviceId, LimeSdrDeviceConfig config, CapabilityEnum capability, bool isAdsbEnabled = true, ILogger? logger = null) : base(deviceId, config, capability, logger)
     {
         _isAdsbEnabled = isAdsbEnabled;
-        if (_isAdsbEnabled)
-        {
-            WriteCustomRegister(0x0046, 0x70, DisposeCancel).Wait(DisposeCancel);
-        }
-        else
-        {
-            WriteCustomRegister(0x0046, 0x00, DisposeCancel).Wait(DisposeCancel);
-        }
     }
     
     protected override CustomWorkMode InternalGetMode()
     {
         return CustomWorkMode.AdsBModeACRep;
     }
+
+    public bool IsAdsbEnabled => _isAdsbEnabled;
+
+    public override async Task TurnOnOffMode(bool enabled, CancellationToken cancel = default)
+    {
+        if (enabled)
+        {
+            // Выключаем ответы на любые запросы, оставляем включенным только отправку ADS-B
+            await WriteCustomRegister(0x0046, (ushort)(_isAdsbEnabled ? 0x70 : 0x00), cancel).ConfigureAwait(false);
+            await TurnOnMode(cancel);
+            await Task.Delay(500, cancel).ConfigureAwait(false);
+            // На всякий пож еще раз: Выключаем ответы на любые запросы, оставляем включенным только отправку ADS-B
+            await WriteCustomRegister(0x0046, (ushort)(_isAdsbEnabled ? 0x70 : 0x00), cancel).ConfigureAwait(false);
+            
+        }
+        else
+        {
+            await TurnOffMode(cancel).ConfigureAwait(false);
+        }
+    }
+
     public async Task TurnOnOffAdsB(bool enabled, CancellationToken cancel = default)
     {
-        await TurnOnOffDF17Id(enabled, cancel).ConfigureAwait(false);
-        await TurnOnOffDF17Position(enabled, cancel).ConfigureAwait(false);
-        await TurnOnOffDF17Velocity(enabled, cancel).ConfigureAwait(false);
+        await WriteCustomRegisterBits(0x0046, 4, 3, (ushort)(enabled ? 0x7 : 0x0), DisposeCancel);
+        _isAdsbEnabled = enabled;
     }
 
     public Task WriteModeASquawkCode(string squawk, bool spi)
