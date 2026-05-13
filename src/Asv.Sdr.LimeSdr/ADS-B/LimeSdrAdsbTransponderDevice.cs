@@ -84,6 +84,7 @@ public interface ILimeSdrAdsbTransponderDevice : ILimeSdrCustomDevice
         CancellationToken cancel = default);
     Task WriteDF17Velocity(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
 
+    bool IsDisposed { get; }
 }
 
 
@@ -174,7 +175,7 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
         await WriteGpio(arr, cancel);
     }
 
-    public Task SetCapability(CapabilityEnum ca, CancellationToken cancel = default)
+    public virtual Task SetCapability(CapabilityEnum ca, CancellationToken cancel = default)
     {
         capability = ca;
         var rawCa = (byte)TransponderHelper.SetCapability(ca);
@@ -421,4 +422,6 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
         frame[3] = new ValueTuple<ushort, ushort>(DF17_VLS_31_24_InternAddr, (ushort)(message.Span[10] << 8));
         await WriteCustomRegistersFrame(frame, cancel).ConfigureAwait(false);
     }
+
+    public new bool IsDisposed => base.IsDisposed;
 }

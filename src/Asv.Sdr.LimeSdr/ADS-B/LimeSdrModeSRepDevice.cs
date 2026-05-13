@@ -284,7 +284,14 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
             await TurnOffMode(cancel).ConfigureAwait(false);
         }
     }
-    
+
+    public override async Task SetCapability(CapabilityEnum ca, CancellationToken cancel = default)
+    {
+        await base.SetCapability(ca, cancel).ConfigureAwait(false);
+        await SetDf20IsEnabled(ca != CapabilityEnum.Level1, cancel).ConfigureAwait(false);
+        await SetDf21IsEnabled(ca != CapabilityEnum.Level1, cancel).ConfigureAwait(false);
+    }
+
     public Task SetDf11ReplyIsEnabled(bool enabled, CancellationToken cancel = default)
     {
         logger.ZLogDebug($"Setting ADS-B DF11 Reply to {enabled}");
