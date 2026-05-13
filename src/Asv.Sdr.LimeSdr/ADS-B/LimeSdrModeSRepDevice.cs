@@ -171,14 +171,15 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
     private const ushort MODES_LEVEL1_MASK = 0x000F;
     private const ushort MODES_LEVEL2_MASK = 0x0300;
     
-    private const ushort ControlAddress        = 0x00D0;
+    // private const ushort ControlAddress        = 0x00D0;
     
-    private const ushort UF4_UF20_CNT_Address  = 0x00D7; // Address for UF4 Cnt (7:0) | UF20 Cnt (7:0)
-    private const ushort UF5_UF21_CNT_Address  = 0x00D8; // Address for UF5 Cnt (7:0) | UF21 Cnt (7:0)
-    private const ushort UF11_UFxx_CNT_Address = 0x00D9; // Address for UF11 Cnt (7:0) | UFxx Cnt (7:0)
-    private const ushort DF4_DF5_CNT_Address   = 0x00DA; // Address for DF4 Cnt (7:0) | DF5 Cnt (7:0)
-    private const ushort DF11_CNT_Address      = 0x00DB; // Address for DF11 Cnt (7:0) | 0x00 (7:0)
-    private const ushort DF20_DF21_CNT_Address = 0x00DD; // Address for DF20 Cnt (7:0) | DF21 Cnt (7:0) 0x00DE
+    private const ushort CONTROL_DF_Address = 0x0046;
+    private const ushort UF4_UF20_CNT_Address  = 0x0047; // Address for UF4 Cnt (7:0) | UF20 Cnt (7:0)
+    private const ushort UF5_UF21_CNT_Address  = 0x0048; // Address for UF5 Cnt (7:0) | UF21 Cnt (7:0)
+    private const ushort UF11_UFxx_CNT_Address = 0x0049; // Address for UF11 Cnt (7:0) | UFxx Cnt (7:0)
+    private const ushort DF4_DF5_CNT_Address   = 0x004A; // Address for DF4 Cnt (7:0) | DF5 Cnt (7:0)
+    private const ushort DF11_CNT_Address      = 0x004B; // Address for DF11 Cnt (7:0) | 0x00 (7:0)
+    private const ushort DF20_DF21_CNT_Address = 0x004C; // Address for DF20 Cnt (7:0) | DF21 Cnt (7:0) 0x00DE
     
     #region Internal registers
 
@@ -268,23 +269,15 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
     {
         if (enabled)
         {
-            // Выключаем ответы на любые запросы, оставляем включенным только отправку ADS-B
-            await WriteCustomRegister(0x0046, (ushort)(IsAdsbEnabled ? 0x70 : 0x00), cancel).ConfigureAwait(false);
-            await TurnOnMode(cancel);
-            await Task.Delay(500, cancel).ConfigureAwait(false);
-            // На всякий пож еще раз: Выключаем ответы на любые запросы, оставляем включенным только отправку ADS-B
-            await WriteCustomRegister(0x0046, 0x70, cancel).ConfigureAwait(false);
-
-
             var val = (ushort)(IsAdsbEnabled ? ADSB_MASK : 0x0);
             val = (ushort)(val | (ushort)(capability == CapabilityEnum.Level1
                 ? MODES_LEVEL1_MASK
                 : MODES_LEVEL1_MASK | MODES_LEVEL2_MASK));
-            // Включаем ответы на любые запросы DF11, DF4, DF5, если нужно включаем отправку ADS-B. Если уровень выше первого, ключаем DF20, DF21
             await TurnOnMode(cancel);
             await Task.Delay(500, cancel).ConfigureAwait(false);
-            // На всякий пож еще раз: Включаем ответы на любые запросы DF11, DF4, DF5, если нужно включаем отправку ADS-B
+            // Включаем ответы на любые запросы DF11, DF4, DF5, если нужно включаем отправку ADS-B. Если уровень выше первого, включаем DF20, DF21
             await WriteCustomRegister(0x0046, val, cancel).ConfigureAwait(false);
+            await SetCapability(capability, cancel).ConfigureAwait(false);
         }
         else
         {
@@ -295,37 +288,37 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
     public Task SetDf11ReplyIsEnabled(bool enabled, CancellationToken cancel = default)
     {
         logger.ZLogDebug($"Setting ADS-B DF11 Reply to {enabled}");
-        return this.WriteFpgaRegisterBits(ControlAddress, 1, 1, (ushort)(enabled ? 1 : 0), cancel);
+        return this.WriteFpgaRegisterBits(CONTROL_DF_Address, 0, 1, (ushort)(enabled ? 1 : 0), cancel);
     }
 
     public Task SetDf11BroadcastIsEnabled(bool enabled, CancellationToken cancel = default)
     {
         logger.ZLogDebug($"Setting ADS-B DF11 Squitter to {enabled}");
-        return this.WriteFpgaRegisterBits(ControlAddress, 2, 1, (ushort)(enabled ? 1 : 0), cancel);
+        return this.WriteFpgaRegisterBits(CONTROL_DF_Address, 1, 1, (ushort)(enabled ? 1 : 0), cancel);
     }
 
     public Task SetDf4IsEnabled(bool enabled, CancellationToken cancel = default)
     {
         logger.ZLogDebug($"Setting ADS-B DF4 Reply to {enabled}");
-        return this.WriteFpgaRegisterBits(ControlAddress, 4, 1, (ushort)(enabled ? 1 : 0), cancel);
+        return this.WriteFpgaRegisterBits(CONTROL_DF_Address, 3, 1, (ushort)(enabled ? 1 : 0), cancel);
     }
 
     public Task SetDf5IsEnabled(bool enabled, CancellationToken cancel = default)
     {
         logger.ZLogDebug($"Setting ADS-B DF5 Reply to {enabled}");
-        return this.WriteFpgaRegisterBits(ControlAddress, 3, 1, (ushort)(enabled ? 1 : 0), cancel);
+        return this.WriteFpgaRegisterBits(CONTROL_DF_Address, 2, 1, (ushort)(enabled ? 1 : 0), cancel);
     }
 
     public Task SetDf20IsEnabled(bool enabled, CancellationToken cancel = default)
     {
         logger.ZLogDebug($"Setting ADS-B DF20 Reply to {enabled}");
-        return this.WriteFpgaRegisterBits(ControlAddress, 9, 1, (ushort)(enabled ? 1 : 0), cancel);
+        return this.WriteFpgaRegisterBits(CONTROL_DF_Address, 8, 1, (ushort)(enabled ? 1 : 0), cancel);
     }
 
     public Task SetDf21IsEnabled(bool enabled, CancellationToken cancel = default)
     {
         logger.ZLogDebug($"Setting ADS-B DF21 Reply to {enabled}");
-        return this.WriteFpgaRegisterBits(ControlAddress, 10, 1, (ushort)(enabled ? 1 : 0), cancel);
+        return this.WriteFpgaRegisterBits(CONTROL_DF_Address, 9, 1, (ushort)(enabled ? 1 : 0), cancel);
     }
     
     public async Task<byte[]> ReadAnyUFMessage(CancellationToken cancel = default)

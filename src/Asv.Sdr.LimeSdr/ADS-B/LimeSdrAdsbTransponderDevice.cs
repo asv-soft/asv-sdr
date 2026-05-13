@@ -92,6 +92,8 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
     private readonly LimeSdrDeviceConfig _config;
     protected CapabilityEnum capability;
     protected readonly ILogger logger;
+
+    private const ushort CONTROL_DF_Address = 0x0046;
     
     // DF (down)
     private const ushort DF11_55_40_InternAddr          = 0x0000; // DF11(55:40)
@@ -135,11 +137,11 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
         if (enabled)
         {
             // Выключаем ответы на любые запросы, оставляем включенным только отправку ADS-B
-            await WriteCustomRegister(0x0046, 0x70, cancel).ConfigureAwait(false);
+            await WriteCustomRegister(CONTROL_DF_Address, 0x70, cancel).ConfigureAwait(false);
             await TurnOnMode(cancel);
             await Task.Delay(500, cancel).ConfigureAwait(false);
             // На всякий пож еще раз: Выключаем ответы на любые запросы, оставляем включенным только отправку ADS-B
-            await WriteCustomRegister(0x0046, 0x70, cancel).ConfigureAwait(false);
+            await WriteCustomRegister(CONTROL_DF_Address, 0x70, cancel).ConfigureAwait(false);
             await SetCapability(capability, cancel).ConfigureAwait(false);
         }
         else
