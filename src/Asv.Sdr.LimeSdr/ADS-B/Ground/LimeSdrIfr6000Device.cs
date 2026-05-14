@@ -384,7 +384,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         try
         {
             await InternalWriteUfMessage(reqMsg).ConfigureAwait(false);
-            return await ReadDfMessage(respFactory, attempts).ConfigureAwait(false);
+            return await InternalReadDfMessage(respFactory, attempts).ConfigureAwait(false);
         }
         finally
         {
