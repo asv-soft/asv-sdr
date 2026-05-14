@@ -138,7 +138,7 @@ public class AdsbInterrogateViewModel : ShellPage
 
             await _device.EnableChannel(LmsChannel.Tx, 0, true, CancellationToken.None);
             await _device.SetSampleRate(sampleRate, 1U, CancellationToken.None);
-            await _device.SetAntenna(LmsChannel.Tx, 0, (uint)LmsPathTx.LMS_PATH_TX1, CancellationToken.None);
+            await _device.SetAntenna(LmsChannel.Tx, 0, (uint)LmsPathTx.LMS_PATH_TX2, CancellationToken.None);
             await _device.SetBandWidth(LmsChannel.Tx, 0, bandWidth, CancellationToken.None);
 
             await _device.SetFrequency(LmsChannel.Tx, 0, freq, CancellationToken.None);
@@ -170,7 +170,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU4RR17 = new ModeSUF4
             {
                 IcaoAddress = IcaoAddress,
-                RR = 1
+                RR = 0
             };
             var spanU4RR17 = new Span<byte>(buffU4RR17);
             msgU4RR17.Serialize(ref spanU4RR17);
@@ -178,7 +178,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU4RR18 = new ModeSUF4
             {
                 IcaoAddress = IcaoAddress,
-                RR = 1
+                RR = 0
             };
             var spanU4RR18 = new Span<byte>(buffU4RR18);
             msgU4RR18.Serialize(ref spanU4RR18);
@@ -186,7 +186,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU4RR20 = new ModeSUF4
             {
                 IcaoAddress = IcaoAddress,
-                RR = 1
+                RR = 0
             };
             var spanU4RR20 = new Span<byte>(buffU4RR20);
             msgU4RR20.Serialize(ref spanU4RR20);
@@ -194,7 +194,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU4RR21 = new ModeSUF4
             {
                 IcaoAddress = IcaoAddress,
-                RR = 1
+                RR = 0
             };
             var spanU4RR21 = new Span<byte>(buffU4RR21);
             msgU4RR21.Serialize(ref spanU4RR21);
@@ -202,7 +202,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU4RR22 = new ModeSUF4
             {
                 IcaoAddress = IcaoAddress,
-                RR = 1
+                RR = 0
             };
             var spanU4RR22 = new Span<byte>(buffU4RR22);
             msgU4RR22.Serialize(ref spanU4RR22);
@@ -210,7 +210,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU5RR17 = new ModeSUF5
             {
                 IcaoAddress = IcaoAddress,
-                RR = 1
+                RR = 0
             };
             var spanU5RR17 = new Span<byte>(buffU5RR17);
             msgU5RR17.Serialize(ref spanU5RR17);
@@ -218,7 +218,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU5RR18 = new ModeSUF5
             {
                 IcaoAddress = IcaoAddress,
-                RR = 1
+                RR = 0
             };
             var spanU5RR18 = new Span<byte>(buffU5RR18);
             msgU5RR18.Serialize(ref spanU5RR18);
@@ -226,7 +226,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU5RR20 = new ModeSUF5
             {
                 IcaoAddress = IcaoAddress,
-                RR = 1
+                RR = 0
             };
             var spanU5RR20 = new Span<byte>(buffU5RR20);
             msgU5RR20.Serialize(ref spanU5RR20);
@@ -234,7 +234,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU5RR21 = new ModeSUF5
             {
                 IcaoAddress = IcaoAddress,
-                RR = 1
+                RR = 0
             };
             var spanU5RR21 = new Span<byte>(buffU5RR21);
             msgU5RR21.Serialize(ref spanU5RR21);
@@ -242,7 +242,7 @@ public class AdsbInterrogateViewModel : ShellPage
             var msgU5RR22 = new ModeSUF5
             {
                 IcaoAddress = IcaoAddress,
-                RR = 1
+                RR = 0
             };
             var spanU5RR22 = new Span<byte>(buffU5RR22);
             msgU5RR22.Serialize(ref spanU5RR22);
@@ -261,7 +261,7 @@ public class AdsbInterrogateViewModel : ShellPage
             // var spanU21 = new Span<byte>(buffU21);
             // msgU21.Serialize(ref spanU21);
             
-            var msgU11 = new ModeSUF11();
+            var msgU11 = new ModeSUF11 { PR = 0, IC = 1, CL = 0 };
             var spanU11 = new Span<byte>(buffU11);
             msgU11.Serialize(ref spanU11);
             
