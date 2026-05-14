@@ -7,11 +7,11 @@ public class ModeSUF11 : ModeSUFormatBase
     protected override int FormatLength => 7;
     public override byte FormatId => 11;
 
-    public byte PR { get; set; } = 1;
+    public byte PR { get; set; } = 0;
 
     public byte IC { get; set; } = 1;
 
-    public byte CL { get; set; } = 1;
+    public byte CL { get; set; } = 0;
 
     protected override void InternalDeserialize(ReadOnlySpan<byte> buffer, ref int pos)
     {

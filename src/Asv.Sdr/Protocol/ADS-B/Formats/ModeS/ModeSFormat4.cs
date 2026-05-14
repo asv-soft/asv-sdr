@@ -5,19 +5,39 @@ namespace Asv.Sdr;
 
 public class ModeSUF4 : ModeSUFormatBase
 {
-    private byte? _replyRequest;
+    private byte? _replyRequestSubfield;
+    private byte _replyRequest;
+    private byte _BDS1;
     private byte _BDS2;
     protected override int FormatLength => 7;
     public override byte FormatId => 4;
 
     public byte PC { get; set; }
-    public byte RR { get; set; }
+
+    public byte RR
+    {
+        get => _replyRequest;
+        set
+        {
+            _replyRequest = value;
+            _BDS1 = value;
+        }
+    }
+
     public byte DI { get; set; }
     public ushort SD { get; set; }
     
     public bool IsShortReply { get; set; }
-    
-    public byte BDS1 { get; set; }
+
+    public byte BDS1
+    {
+        get => _BDS1;
+        set
+        {
+            _BDS1 = value;
+            _replyRequest = value;
+        }
+    }
 
     public byte BDS2
     {
@@ -25,7 +45,7 @@ public class ModeSUF4 : ModeSUFormatBase
         set
         {
             _BDS2 = value;
-            _replyRequest = value;
+            _replyRequestSubfield = value;
         }
     }
 
@@ -111,12 +131,12 @@ public class ModeSUF4 : ModeSUFormatBase
     /// Reply Request (BDS2).
     /// DI code is 1, 3 or 7
     /// </summary>
-    public byte? ReplyRequest
+    public byte? RRS
     {
-        get => _replyRequest;
+        get => _replyRequestSubfield;
         set
         {
-            _replyRequest = value;
+            _replyRequestSubfield = value;
             _BDS2 = value ?? 0;
         }
     }
@@ -181,12 +201,12 @@ public class ModeSUF4 : ModeSUFormatBase
             case 3:
                 SurveillanceIdentifier = (byte?)((SD & 0xFC00) >> 10);
                 LockoutSurveillance = (SD & 0x200) != 0;
-                ReplyRequest = (byte)((SD & 0x1E0) >> 5);
+                RRS = (byte)((SD & 0x1E0) >> 5);
                 OverlayCommand = (SD & 0x10) != 0;
                 break;
             case 7:
                 InterrogatorIdentifier = (byte?)((SD & 0xF000) >> 12);
-                ReplyRequest = (byte)((SD & 0xF00) >> 8);
+                RRS = (byte)((SD & 0xF00) >> 8);
                 Lockout = (SD & 0x40) != 0;
                 OverlayCommand = (SD & 0x10) != 0;
                 TacticalMessage = (byte?)(SD & 0xF);
