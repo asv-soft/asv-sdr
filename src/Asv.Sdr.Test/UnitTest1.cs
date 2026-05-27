@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Threading;
 using Asv.Sdr.Simulate;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Asv.Sdr.Test
 {

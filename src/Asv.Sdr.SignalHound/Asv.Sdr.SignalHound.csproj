@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>$(TargetFrameworksValue)</TargetFrameworks>
     <FileVersion>$(ProductVersion)</FileVersion>
-    <Version>1.5.23</Version>
+    <Version>1.5.31</Version>
     <PackageVersion>$(ProductVersion)</PackageVersion>
     <LangVersion>latest</LangVersion>
     <Authors>https://github.com/asv-soft</Authors>
