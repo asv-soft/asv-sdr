@@ -110,12 +110,12 @@ public class Bds60 : BdsBase
         ModeSHelper.SetBitU(buffer, ref pos, 1, 1);
         if (BarometricAltitudeRate < -6000) BarometricAltitudeRate = -6000;
         if (BarometricAltitudeRate > 6000) BarometricAltitudeRate = 6000;
-        ModeSHelper.SetBitS(buffer, ref pos, 10, (int)Math.Round(BarometricAltitudeRate / 32.0));
+        ModeSHelper.SetBitS(buffer, ref pos, 10, (int)Math.Round(BarometricAltitudeRate / 32.0) & 0x3FF);
         
         ModeSHelper.SetBitU(buffer, ref pos, 1, 1);
         if (InertialVerticalVelocity < -6000) InertialVerticalVelocity = -6000;
         if (InertialVerticalVelocity > 6000) InertialVerticalVelocity = 6000;
-        ModeSHelper.SetBitS(buffer, ref pos, 10, (int)Math.Round(InertialVerticalVelocity / 32.0));
+        ModeSHelper.SetBitS(buffer, ref pos, 10, (int)Math.Round(InertialVerticalVelocity / 32.0) & 0x3FF);
         
         buffer = buffer[(pos/8)..];
     }
