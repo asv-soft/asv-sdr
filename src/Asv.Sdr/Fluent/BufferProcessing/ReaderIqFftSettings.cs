@@ -32,7 +32,7 @@ namespace Asv.Sdr
         void Transform(double[] buffer);
     }
 
-    internal sealed class AlglibReaderIqFftPlan : IReaderIqFftPlan
+    public sealed class AlglibReaderIqFftPlan : IReaderIqFftPlan
     {
         private readonly alglib.xparams _params;
         private readonly alglib.ftbase.fasttransformplan _plan;
@@ -51,7 +51,7 @@ namespace Asv.Sdr
         }
     }
 
-    internal class ManagedReaderIqFftPlan : IReaderIqFftPlan
+    public class ManagedReaderIqFftPlan : IReaderIqFftPlan
     {
         protected readonly int ComplexSampleCount;
         protected readonly bool IsPowerOfTwo;
@@ -212,7 +212,7 @@ namespace Asv.Sdr
         }
     }
 
-    internal sealed class ArmOptimizedReaderIqFftPlan : ManagedReaderIqFftPlan
+    public sealed class ArmOptimizedReaderIqFftPlan : ManagedReaderIqFftPlan
     {
         public ArmOptimizedReaderIqFftPlan(int complexSampleCount)
             : base(complexSampleCount)
