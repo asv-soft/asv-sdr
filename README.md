@@ -123,6 +123,30 @@ start();
 Console.ReadLine();
 ```
 
+## FFT Backend
+
+`Fft1d()` uses ALGLIB by default to preserve existing behavior. You can switch
+the FFT implementation globally before creating FFT pipeline stages:
+
+```csharp
+using Asv.Sdr;
+
+ReaderIqFftSettings.Implementation = ReaderIqFftImplementation.Alglib;
+// or
+ReaderIqFftSettings.Implementation = ReaderIqFftImplementation.Managed;
+// or
+ReaderIqFftSettings.Implementation = ReaderIqFftImplementation.ManagedArmOptimized;
+```
+
+Available implementations:
+
+- `Alglib`: existing ALGLIB-backed FFT implementation.
+- `Managed`: built-in managed FFT implementation. It uses a radix-2 FFT for
+  power-of-two transform sizes and a DFT fallback for other sizes.
+- `ManagedArmOptimized`: managed FFT with an ARM64 AdvSimd fast path for
+  radix-2 transforms. It falls back to the regular managed implementation when
+  ARM64 SIMD is not available.
+
 ## ADS-B Processing
 
 `Asv.Sdr` includes helpers for building an ADS-B processing chain from IQ
@@ -170,7 +194,7 @@ using var messages = parser.OnMessage.Subscribe(message =>
 ## Versioning
 
 Package versions are defined in project files and shared build properties under
-`src/Directory.Build.props`. The current `ProductVersion` is `1.5.32`.
+`src/Directory.Build.props`. The current `ProductVersion` is `1.5.34`.
 
 The Windows build script uses the latest Git tag via `git describe --tags` and
 the `dotnet-setversion` tool before packing the main packages.

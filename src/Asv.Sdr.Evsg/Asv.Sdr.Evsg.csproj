@@ -1,18 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFrameworks>$(TargetFrameworksValue)</TargetFrameworks>
-        <FileVersion>$(ProductVersion)</FileVersion>
-        <Version>$(ProductVersion)</Version>
-        <PackageVersion>$(ProductVersion)</PackageVersion>
-        <LangVersion>latest</LangVersion>
-        <Authors>https://github.com/asv-soft</Authors>
-        <Company>https://github.com/asv-soft</Company>
-        <Copyright>https://github.com/asv-soft</Copyright>
-        <PackageProjectUrl>https://github.com/asv-soft/asv-sdr</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/asv-soft/asv-sdr</RepositoryUrl>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    </PropertyGroup>
-
     <ItemGroup>
       <ProjectReference Include="..\Asv.Sdr\Asv.Sdr.csproj" />
     </ItemGroup>

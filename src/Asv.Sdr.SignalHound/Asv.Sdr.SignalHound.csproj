@@ -1,16 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(TargetFrameworksValue)</TargetFrameworks>
-    <FileVersion>$(ProductVersion)</FileVersion>
-    <Version>1.5.31</Version>
-    <PackageVersion>$(ProductVersion)</PackageVersion>
-    <LangVersion>latest</LangVersion>
-    <Authors>https://github.com/asv-soft</Authors>
-    <Company>https://github.com/asv-soft</Company>
-    <Copyright>https://github.com/asv-soft</Copyright>
-    <PackageProjectUrl>https://github.com/asv-soft/asv-sdr</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/asv-soft/asv-sdr</RepositoryUrl>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' " />
@@ -23,7 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Asv.Common" Version="$(AsvCommonVersion)" />
-    <PackageReference Include="ZLogger" Version="$(ZLoggerVersion)" />
+    <PackageReference Include="ZLogger" Version="2.5.10" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Libs.resx">
