@@ -274,7 +274,7 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
                 ? MODES_LEVEL1_MASK
                 : MODES_LEVEL1_MASK | MODES_LEVEL2_MASK));
             await TurnOnMode(cancel);
-            await Task.Delay(500, cancel).ConfigureAwait(false);
+            await Task.Delay(1000, cancel).ConfigureAwait(false);
             // Включаем ответы на любые запросы DF11, DF4, DF5, если нужно включаем отправку ADS-B. Если уровень выше первого, включаем DF20, DF21
             await WriteCustomRegister(0x0046, val, cancel).ConfigureAwait(false);
             await SetCapability(capability, cancel).ConfigureAwait(false);

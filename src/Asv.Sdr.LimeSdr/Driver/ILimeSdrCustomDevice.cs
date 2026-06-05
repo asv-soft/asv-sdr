@@ -64,9 +64,9 @@ public interface ILimeSdrCustomDevice : ILimeSdrDevice
 
     Task<ushort> GetPeakAmplitude(CancellationToken cancel = default);
 
-    // Task<ushort> ReadCustomRegister(ushort address, CancellationToken cancel = default);
-    // Task WriteCustomRegister(ushort address, ushort value, CancellationToken cancel = default);
-    //
-    // Task WriteCustomRegistersFrame(ValueTuple<ushort, ushort>[] addressValuePairs, CancellationToken cancel = default);
-    // Task<ushort[]> ReadCustomRegistersFrame(ushort[] address, CancellationToken cancel = default);
+    Task<ushort> ReadCustomRegister(ushort address, CancellationToken cancel = default);
+    Task WriteCustomRegister(ushort address, ushort value, CancellationToken cancel = default);
+    
+    Task WriteCustomRegistersFrame(ValueTuple<ushort, ushort>[] addressValuePairs, CancellationToken cancel = default);
+    Task<ushort[]> ReadCustomRegistersFrame(ushort[] address, CancellationToken cancel = default);
 }

@@ -32,8 +32,8 @@ public class AdsbSurfacePosition : AdsbExtendedSquitterBase
         if (!double.IsNaN(Latitude) && !double.IsNaN(Longitude))
         {
             var position = TransponderHelper.UnambiguousPositionEncoding(Latitude, Longitude, CprFormat, 90.0);
-            NCprLat = position.Lat;
-            NCprLon = position.Lon;
+            NCprLat = position.nCprLat;
+            NCprLon = position.nCprLon;
         }
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 17, NCprLat);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 17, NCprLon);

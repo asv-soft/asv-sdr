@@ -59,12 +59,14 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     Task<Bds60> ReadBds60();
     
     
-    // Mode S Extended
-    Task<AdsbAirbornePosition> ReadAdsbAirbornePosition();
-    Task<AdsbSurfacePosition> ReadAdsbSurfacePosition();
-    Task<AdsbAircraftIdentification> ReadAdsbAircraftIdentification();
-    Task<AdsbGroundSpeed> ReadAdsbGroundSpeed();
-    Task<AdsbAirspeed> ReadAdsbAirspeed();
-    Task<AdsbAircraftOperationStatus> ReadAdsbAircraftOperationStatus();
+    // ADS-B Extended
+    Task<ExSquitterStatistics> ReadExSquitterStatistics();
+    Task<AdsbAirbornePosition?> ReadExBds05Even();
+    Task<AdsbAirbornePosition?> ReadExBds05Odd();
+    Task<AdsbSurfacePosition?> ReadExBds06Even();
+    Task<AdsbSurfacePosition?> ReadExBds06Odd();
+    Task<AdsbAircraftIdentification?> ReadExBds08Id();
+    Task<AdsbGroundSpeed?> ReadExBds09GroundSpeed();
+    Task<AdsbAirspeed?> ReadExBds09Airspeed();
     
 }

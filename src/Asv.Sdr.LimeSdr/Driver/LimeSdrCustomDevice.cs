@@ -153,7 +153,7 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
         }, cancel);
     }
 
-    protected async Task<ushort> ReadCustomRegister(ushort address, CancellationToken cancel = default)
+    public async Task<ushort> ReadCustomRegister(ushort address, CancellationToken cancel = default)
     {
         ushort result = 0;
         await AtomicEditRegister(edit =>
@@ -162,9 +162,9 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
         }, cancel).ConfigureAwait(false);
         return result;
     }
-    
-    
-    protected Task WriteCustomRegister(ushort address, ushort value, CancellationToken cancel = default)
+
+
+    public Task WriteCustomRegister(ushort address, ushort value, CancellationToken cancel = default)
     {
         return AtomicEditRegister(edit =>
         {
@@ -173,8 +173,8 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
             edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 0);
         }, cancel);
     }
-    
-    protected Task WriteCustomRegistersFrame((ushort, ushort)[] addressValuePairs, CancellationToken cancel = default)
+
+    public Task WriteCustomRegistersFrame((ushort, ushort)[] addressValuePairs, CancellationToken cancel = default)
     {
         return AtomicEditRegister(edit =>
         {
@@ -187,7 +187,7 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
         }, cancel);
     }
 
-    protected async Task<ushort[]> ReadCustomRegistersFrame(ushort[] address, CancellationToken cancel = default)
+    public async Task<ushort[]> ReadCustomRegistersFrame(ushort[] address, CancellationToken cancel = default)
     {
         var result = new ushort[address.Length];
         await AtomicEditRegister(edit =>

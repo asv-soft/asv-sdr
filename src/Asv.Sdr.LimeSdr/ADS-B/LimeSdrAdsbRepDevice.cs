@@ -17,6 +17,7 @@ public class LimeSdrDeviceConfig
     public SignalThreshold[] SignalLevels { get; set; } = [];
     public double RxLevelOffset { get; set; }
     public uint TxLevelOffset { get; set; }
+
 }
 
 

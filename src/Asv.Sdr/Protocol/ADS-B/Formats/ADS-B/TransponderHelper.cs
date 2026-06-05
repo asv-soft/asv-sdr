@@ -70,7 +70,7 @@ public static class TransponderHelper
         };
     }
 
-    private static byte GetExtendedSquitterSybType(ReadOnlySpan<byte> frame)
+    public static byte GetMessageSybType(ReadOnlySpan<byte> frame)
     {
         return (byte)(frame[4] & 0x07);
     }
@@ -98,19 +98,19 @@ public static class TransponderHelper
             case AdsbMessageTypeEnum.EventDriven:
                 return (ushort)((17 << 8) | ((ushort)tc << 3));
             case AdsbMessageTypeEnum.AircraftStatus:
-                var st0 = (ushort)GetExtendedSquitterSybType(buffer);
+                var st0 = (ushort)GetMessageSybType(buffer);
                 return (ushort)((17 << 8) | ((ushort)tc << 3) | st0);
             case AdsbMessageTypeEnum.TargetStateAndStatusInformation:
                 return (ushort)((17 << 8) | ((ushort)tc << 3));
             case AdsbMessageTypeEnum.AirborneVelocities:
-                var st1 = (VelocitySubTypeEnum)GetExtendedSquitterSybType(buffer);
+                var st1 = (VelocitySubTypeEnum)GetMessageSybType(buffer);
                 if (st1 is VelocitySubTypeEnum.SubType1 or VelocitySubTypeEnum.SubType2)
                     return (ushort)((17 << 8) | ((ushort)tc << 3) | ((ushort)VelocitySubTypeEnum.SubType1 & 0x7));
                 if (st1 is VelocitySubTypeEnum.SubType3 or VelocitySubTypeEnum.SubType4)
                     return (ushort)((17 << 8) | ((ushort)tc << 3) | ((ushort)VelocitySubTypeEnum.SubType3 & 0x7));
                 throw new ArgumentOutOfRangeException();
             case AdsbMessageTypeEnum.AircraftOperationStatus:
-                var st2 = (AircraftOperationalStatusEnum)GetExtendedSquitterSybType(buffer);
+                var st2 = (AircraftOperationalStatusEnum)GetMessageSybType(buffer);
                 return (ushort)((17 << 8) | ((ushort)tc << 3) | (ushort)st2);
             default:
                 throw new ArgumentOutOfRangeException();
@@ -302,11 +302,6 @@ public static class TransponderHelper
         return Encoding.ASCII.GetString(src);
     }
 
-    private static double Mod(double x, double y)
-    {
-        return x - y * Math.Floor(x / y);
-    }
-
     /// <summary>
     /// Number of latitude zones between the equator and a pole
     /// </summary>
@@ -431,22 +426,229 @@ public static class TransponderHelper
     /// For Airborne Position = 360.0.
     /// For Surface position = 90.0.</param>
     /// <returns></returns>
-    public static (uint Lat, uint Lon) UnambiguousPositionEncoding(double lat, double lon, CprFormatEnum format,
+    // public static (uint Lat, uint Lon) UnambiguousPositionEncoding(double lat, double lon, CprFormatEnum format,
+    //     double zoneSize = 360.0)
+    // {
+    //     if (lat < 0) lat += zoneSize;
+    //     if (lon < 0) lon += 180.0;
+    //     lon %= zoneSize;
+    //     var nl = Nl(lat) - (format == CprFormatEnum.Even ? 0 : 1);
+    //     var dLon = zoneSize / Math.Max(nl, 1); // Prevent division by zero
+    //     var nLon = (uint)Math.Floor((1 << 17) * (lon % dLon) / dLon);
+    //
+    //     var dLat = format == CprFormatEnum.Even ? zoneSize / 60 : zoneSize / 59;
+    //     var nLat = (uint)Math.Floor((1 << 17) * (lat % dLat) / dLat);
+    //
+    //     return (Lat: nLat, Lon: nLon);
+    // }
+
+    
+    
+    private const int CprScale = 1 << 17; // 131072
+    private const double Eps = 1e-12;
+    
+    
+    /// <summary>
+    /// CPR encoding of latitude/longitude to 17-bit LAT-CPR and LON-CPR fields.
+    ///
+    /// zoneSize = 360.0: airborne CPR.
+    /// zoneSize = 90.0: surface CPR transmitted 17-bit lower-order representation.
+    /// </summary>
+    public static (uint nCprLat, uint nCprLon) UnambiguousPositionEncoding(
+        double lat,
+        double lon,
+        CprFormatEnum format,
         double zoneSize = 360.0)
     {
-        if (lat < 0) lat += zoneSize;
-        if (lon < 0) lon += 180.0;
-        lon %= zoneSize;
-        var nl = Nl(lat) - (format == CprFormatEnum.Even ? 0 : 1);
-        var dLon = zoneSize / Math.Max(nl, 1); // Prevent division by zero
-        var nLon = (uint)Math.Floor((1 << 17) * (lon % dLon) / dLon);
+        ValidateLatitude(lat, nameof(lat));
+        ValidateLongitude(lon, nameof(lon));
+        ValidateZoneSize(zoneSize);
 
-        var dLat = format == CprFormatEnum.Even ? zoneSize / 60 : zoneSize / 59;
-        var nLat = (uint)Math.Floor((1 << 17) * (lat % dLat) / dLat);
+        int i = FormatIndex(format);
 
-        return (Lat: nLat, Lon: nLon);
+        lon = NormalizeLongitude180(lon);
+
+        double dLat = DLat(i, zoneSize);
+
+        long yRaw = (long)Math.Floor(
+            CprScale * (Mod(lat, dLat) / dLat) + 0.5);
+
+        uint nCprLat = ModCpr17(yRaw);
+
+        // RLat is the latitude that the decoder reconstructs from the transmitted bin.
+        // It is used to calculate the longitude zone count NL(RLat).
+        double rLat = dLat * (Math.Floor(lat / dLat) + yRaw / (double)CprScale);
+        ValidateDecodedLatitude(rLat, nameof(rLat));
+
+        double dLon = DLon(rLat, i, zoneSize);
+
+        long xRaw = (long)Math.Floor(
+            CprScale * (Mod(lon, dLon) / dLon) + 0.5);
+
+        uint nCprLon = ModCpr17(xRaw);
+
+        return (nCprLat, nCprLon);
     }
 
+    private static double DLat(CprFormatEnum format, double zoneSize)
+    {
+        return DLat(FormatIndex(format), zoneSize);
+    }
+
+    private static double DLat(int formatIndex, double zoneSize)
+    {
+        return zoneSize / (4 * Nz - formatIndex);
+    }
+
+    private static double DLon(double lat, int formatIndex, double zoneSize)
+    {
+        int n = Math.Max(NL(lat) - formatIndex, 1);
+        return zoneSize / n;
+    }
+
+    /// <summary>
+    /// CPR NL(lat): number of longitude zones at the given latitude.
+    /// </summary>
+    private static int NL(double lat)
+    {
+        double a = Math.Abs(lat);
+
+        if (a < Eps)
+            return 59;
+
+        if (a > 87.0)
+            return 1;
+
+        if (Math.Abs(a - 87.0) < Eps)
+            return 2;
+
+        double latRad = a * Math.PI / 180.0;
+        double cosLat = Math.Cos(latRad);
+
+        double x =
+            1.0 -
+            (1.0 - Math.Cos(Math.PI / (2.0 * Nz))) /
+            (cosLat * cosLat);
+
+        // Guard against very small floating-point overshoot.
+        x = Math.Max(-1.0, Math.Min(1.0, x));
+
+        return (int)Math.Floor(2.0 * Math.PI / Math.Acos(x));
+    }
+
+    /// <summary>
+    /// Mathematical modulo:
+    /// mod(x, y) = x - y * floor(x / y)
+    /// Unlike C# %, this works correctly for negative coordinates.
+    /// </summary>
+    private static double Mod(double x, double y)
+    {
+        return x - y * Math.Floor(x / y);
+    }
+
+    private static int FloorMod(int x, int y)
+    {
+        return (int)(x - y * Math.Floor((double)x / y));
+    }
+
+    private static uint ModCpr17(long value)
+    {
+        long r = value % CprScale;
+
+        if (r < 0)
+            r += CprScale;
+
+        return (uint)r;
+    }
+
+    private static double NormalizeLongitude180(double lon)
+    {
+        double normalized = Mod(lon + 180.0, 360.0) - 180.0;
+
+        // Avoid returning tiny values like -0.00000000000003.
+        if (Math.Abs(normalized) < Eps)
+            return 0.0;
+
+        return normalized;
+    }
+
+    private static int FormatIndex(CprFormatEnum format)
+    {
+        return format switch
+        {
+            CprFormatEnum.Even => 0,
+            CprFormatEnum.Odd  => 1,
+            _ => throw new ArgumentOutOfRangeException(nameof(format), "Unknown CPR format.")
+        };
+    }
+
+    private static bool IsAirborneZoneSize(double zoneSize)
+    {
+        return Math.Abs(zoneSize - 360.0) < Eps;
+    }
+
+    private static bool IsSurfaceZoneSize(double zoneSize)
+    {
+        return Math.Abs(zoneSize - 90.0) < Eps;
+    }
+
+    private static void ValidateZoneSize(double zoneSize)
+    {
+        if (!IsFinite(zoneSize) || (!IsAirborneZoneSize(zoneSize) && !IsSurfaceZoneSize(zoneSize)))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(zoneSize),
+                "zoneSize must be 360.0 for airborne CPR or 90.0 for surface CPR.");
+        }
+    }
+
+    private static void ValidateCpr17(uint value, string paramName)
+    {
+        if (value >= CprScale)
+        {
+            throw new ArgumentOutOfRangeException(
+                paramName,
+                "CPR latitude/longitude value must be a 17-bit unsigned integer: 0..131071.");
+        }
+    }
+
+    private static void ValidateLatitude(double lat, string paramName)
+    {
+        if (!IsFinite(lat) || lat < -90.0 || lat > 90.0)
+        {
+            throw new ArgumentOutOfRangeException(
+                paramName,
+                "Latitude must be in range [-90, +90] degrees.");
+        }
+    }
+
+    private static void ValidateDecodedLatitude(double lat, string paramName)
+    {
+        if (!IsFinite(lat) || lat < -90.0 - 1e-9 || lat > 90.0 + 1e-9)
+        {
+            throw new InvalidOperationException(
+                $"Decoded latitude is outside valid range: {paramName} = {lat}.");
+        }
+    }
+
+    private static void ValidateLongitude(double lon, string paramName)
+    {
+        if (!IsFinite(lon) || lon < -180.0 || lon > 180.0)
+        {
+            throw new ArgumentOutOfRangeException(
+                paramName,
+                "Longitude must be in range [-180, +180] degrees.");
+        }
+    }
+
+    private static bool IsFinite(double value)
+    {
+        return !double.IsNaN(value) && !double.IsInfinity(value);
+    }
+    
+    
+    
+    
     // public static (byte? NicA, byte? NicB, byte? NicC, byte? Nic, ) GetNic(byte typeCode)
     // {
     //     switch (typeCode)
