@@ -1,23 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
-        
-        <FileVersion>$(ProductVersion)</FileVersion>
-        <Version>$(ProductVersion)</Version>
-        <LangVersion>latest</LangVersion>
-        <Authors>https://github.com/asvol</Authors>
-        <Company>https://github.com/asvol</Company>
-        <Copyright>https://github.com/asvol</Copyright>
-        <PackageProjectUrl>https://github.com/asvol/asv-sdr</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/asvol/asv-sdr</RepositoryUrl>
-        <PackageTags />
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    </PropertyGroup>
-
     <ItemGroup>
-      <PackageReference Include="System.IO.Ports" Version="6.0.0" />
-        <PackageReference Include="ZLogger" Version="$(ZLoggerVersion)" />
+      <PackageReference Include="System.IO.Ports" Version="10.0.8" />
+        <PackageReference Include="ZLogger" Version="2.5.10" />
     </ItemGroup>
 
 </Project>

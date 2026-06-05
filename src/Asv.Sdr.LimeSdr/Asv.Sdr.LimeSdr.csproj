@@ -1,17 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>$(TargetFrameworksValue)</TargetFrameworks>
-    <FileVersion>$(ProductVersion)</FileVersion>
-    <Version>1.5.31</Version>
-    <PackageVersion>$(ProductVersion)</PackageVersion>
-    <LangVersion>latest</LangVersion>
-    <Authors>https://github.com/asv-soft</Authors>
-    <Company>https://github.com/asv-soft</Company>
-    <Copyright>https://github.com/asv-soft</Copyright>
-    <PackageProjectUrl>https://github.com/asv-soft/asv-sdr</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/asv-soft/asv-sdr</RepositoryUrl>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
@@ -38,8 +25,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Asv.Common" Version="$(AsvCommonVersion)" />
-    <PackageReference Include="System.Reactive" Version="$(SystemReactiveVersion)" />
-    <PackageReference Include="ZLogger" Version="$(ZLoggerVersion)" />
+    <PackageReference Include="System.Reactive" Version="6.1.0" />
+    <PackageReference Include="ZLogger" Version="2.5.10" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Libs.Designer.cs">

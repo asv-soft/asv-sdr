@@ -1,0 +1,24 @@
+<Solution>
+  <Folder Name="/Devices/">
+    <Project Path="Asv.Sdr.AdSdr/Asv.Sdr.AdSdr.csproj" />
+    <Project Path="Asv.Sdr.Evsg/Asv.Sdr.Evsg.csproj" />
+    <Project Path="Asv.Sdr.Gspn1/Asv.Sdr.Gspn1.csproj" />
+    <Project Path="Asv.Sdr.LimeSdr/Asv.Sdr.LimeSdr.csproj" />
+    <Project Path="Asv.Sdr.Msi/Asv.Sdr.Msi.csproj" />
+    <Project Path="Asv.Sdr.SignalHound/Asv.Sdr.SignalHound.csproj" />
+    <Project Path="Asv.Sdr.Simulate/Asv.Sdr.Simulate.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="../.github/workflows/release-action.yml" />
+    <File Path="../.github/workflows/release_debug_version.yml" />
+    <File Path="../.gitignore" />
+    <File Path="../build.bat" />
+    <File Path="../LICENSE" />
+    <File Path="../publish_nuget.bat" />
+    <File Path="../README.md" />
+    <File Path=".aiassistant/rules/comments.md" />
+    <File Path="Directory.Build.props" />
+  </Folder>
+  <Project Path="Asv.Sdr.Test/Asv.Sdr.Test.csproj" />
+  <Project Path="Asv.Sdr/Asv.Sdr.csproj" />
+</Solution>

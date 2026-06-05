@@ -11,6 +11,7 @@ env:
   PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}\output\
   NUGET_SOURCE_URL: 'https://api.nuget.org/v3/index.json'
   GITHUB_PACKAGES_URL: 'https://nuget.pkg.github.com/asv-soft/index.json'
+  PROJECT_NAME: 'Asv.Sdr'
 
 jobs:
   deploy:
@@ -23,7 +24,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
-            8.x.x
+            10.x.x
 
       - name: Set version variable
         env:
@@ -51,23 +52,23 @@ jobs:
       - name: Restoring dependencies
         run: |
           cd src    
-          dotnet restore ./src/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj    
-          dotnet restore ./src/${{ env.PROJECT_NAME }}.LimeSdr/${{ env.PROJECT_NAME }}.LimeSdr.csproj
-          dotnet restore ./src/${{ env.PROJECT_NAME }}.SignalHound/${{ env.PROJECT_NAME }}.SignalHound.csproj    
+          dotnet restore ${{ env.PATH_TO_PROJECTS }}/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj    
+          dotnet restore ${{ env.PATH_TO_PROJECTS }}/${{ env.PROJECT_NAME }}.LimeSdr/${{ env.PROJECT_NAME }}.LimeSdr.csproj
+          dotnet restore ${{ env.PATH_TO_PROJECTS }}/${{ env.PROJECT_NAME }}.SignalHound/${{ env.PROJECT_NAME }}.SignalHound.csproj    
 
       - name: Building projects
         run: |
           cd src    
-          dotnet build ./src/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj -c Release --no-restore
-          dotnet build ./src/${{ env.PROJECT_NAME }}.LimeSdr/${{ env.PROJECT_NAME }}.LimeSdr.csproj -c Release --no-restore
-          dotnet build ./src/${{ env.PROJECT_NAME }}.SignalHound/${{ env.PROJECT_NAME }}.SignalHound.csproj -c Release --no-restore    
+          dotnet build ${{ env.PATH_TO_PROJECTS }}/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj -c Release --no-restore
+          dotnet build ${{ env.PATH_TO_PROJECTS }}/${{ env.PROJECT_NAME }}.LimeSdr/${{ env.PROJECT_NAME }}.LimeSdr.csproj -c Release --no-restore
+          dotnet build ${{ env.PATH_TO_PROJECTS }}/${{ env.PROJECT_NAME }}.SignalHound/${{ env.PROJECT_NAME }}.SignalHound.csproj -c Release --no-restore    
 
       - name: Packing projects to Nuget
         run: |
           cd src    
-          dotnet pack ./src/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj -c Release --no-build --no-restore -p:PackageVersion=${{ env.VERSION }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
-          dotnet pack ./src/${{ env.PROJECT_NAME }}.LimeSdr/${{ env.PROJECT_NAME }}.LimeSdr.csproj -c Release --no-build --no-restore -p:PackageVersion=${{ env.VERSION }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
-          dotnet pack ./src/${{ env.PROJECT_NAME }}.SignalHound/${{ env.PROJECT_NAME }}.SignalHound.csproj -c Release --no-build --no-restore -p:PackageVersion=${{ env.VERSION }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}    
+          dotnet pack ${{ env.PATH_TO_PROJECTS }}/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj -c Release --no-build --no-restore -p:PackageVersion=${{ env.VERSION }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+          dotnet pack ${{ env.PATH_TO_PROJECTS }}/${{ env.PROJECT_NAME }}.LimeSdr/${{ env.PROJECT_NAME }}.LimeSdr.csproj -c Release --no-build --no-restore -p:PackageVersion=${{ env.VERSION }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+          dotnet pack ${{ env.PATH_TO_PROJECTS }}/${{ env.PROJECT_NAME }}.SignalHound/${{ env.PROJECT_NAME }}.SignalHound.csproj -c Release --no-build --no-restore -p:PackageVersion=${{ env.VERSION }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}    
 
       - name: Pushing packages to Github   
         run: |    
