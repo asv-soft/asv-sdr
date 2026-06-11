@@ -15,7 +15,7 @@ namespace Asv.Sdr
         protected override double Process(ReadOnlySpan<double> input, out bool selfPublish)
         {
             selfPublish = false;
-            return Math.Atan2(input[_freqIndex*2], input[_freqIndex * 2 +1]);
+            return Math.Atan2(input[_freqIndex * 2 + 1], input[_freqIndex * 2]);
         }
     }
     
@@ -52,7 +52,7 @@ namespace Asv.Sdr
         protected override double Process(ReadOnlySpan<float> input, out bool selfPublish)
         {
             selfPublish = false;
-            return Math.Atan2(input[_freqIndex * 2], input[_freqIndex * 2 + 1]);
+            return Math.Atan2(input[_freqIndex * 2 + 1], input[_freqIndex * 2]);
         }
     }
     

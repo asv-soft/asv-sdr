@@ -13,7 +13,9 @@ namespace Asv.Sdr.Gspn1;
 public class Gspn1Api 
 {
     public const string ApiName = "gspn1";
+    private const int ReadCommandAttemptCount = 5;
     private readonly ILogger<Gspn1Api> _logger;
+    private readonly int _baudRate;
 
 
     public GspnModeInfo[] modes { get; } = {
@@ -25,9 +27,10 @@ public class Gspn1Api
         new GspnModeInfo(6, "Glide-SP50", "Глиссадный радиомаяк СП-50"),
     };
 
-    public Gspn1Api(ILogger<Gspn1Api>? logger)
+    public Gspn1Api(ILogger<Gspn1Api>? logger, int baudRate = 9600)
     {
         _logger = logger ?? NullLogger<Gspn1Api>.Instance;
+        _baudRate = baudRate;
     }
 
     public string[] set_mode(string serialPort, int mode)
@@ -289,12 +292,12 @@ public class Gspn1Api
     }
 
     private string[] InternalExecuteAndCheckAnswer(string port, int cmd, double data,
-        Func<string, bool> validateCmdResult = null, Func<string, bool> validateDataResult = null)
+        Func<string, bool>? validateCmdResult = null, Func<string, bool>? validateDataResult = null)
     {
         return InternalExecuteAndCheckAnswer(port, cmd, data.ToString(NumberFormatInfo.InvariantInfo), validateCmdResult, validateDataResult);
     }
 
-    private string[] InternalExecuteAndCheckAnswer(string port, int cmd, string data, Func<string, bool> validateCmdResult = null, Func<string, bool> validateDataResult = null)
+    private string[] InternalExecuteAndCheckAnswer(string port, int cmd, string data, Func<string, bool>? validateCmdResult = null, Func<string, bool>? validateDataResult = null)
     {
         string dataRes;
         string cmdRes;
@@ -351,19 +354,7 @@ public class Gspn1Api
             }
                 
             serial.Write("{cmd:"+ cmd + "}\n");
-            while (true)
-            {
-                try
-                {
-                    Thread.Sleep(100);
-                    cmdRes = serial.ReadLine();
-                    break;
-                }
-                catch (Exception)
-                {
-                    // ignored
-                }
-            }
+            cmdRes = ReadRequiredLine(serial, "command response");
                 
             serial.Write("{data:" + data + "}\n");
             bool l_continue = true;
@@ -401,11 +392,30 @@ public class Gspn1Api
 
     private SerialPort InternalCreateAndStart(string serialPort)
     {
-        return new SerialPort(serialPort,9600,Parity.None,8, StopBits.One)
+        return new SerialPort(serialPort,_baudRate,Parity.None,8, StopBits.One)
             {
                 ReadTimeout = 1000,
                 WriteTimeout = 1000,
             }
             ;
+    }
+
+    private static string ReadRequiredLine(SerialPort serial, string stage)
+    {
+        Exception? lastException = null;
+        for (var attempt = 0; attempt < ReadCommandAttemptCount; attempt++)
+        {
+            try
+            {
+                Thread.Sleep(100);
+                return serial.ReadLine();
+            }
+            catch (TimeoutException ex)
+            {
+                lastException = ex;
+            }
+        }
+
+        throw new TimeoutException($"Device did not send {stage}.", lastException);
     }
 }
