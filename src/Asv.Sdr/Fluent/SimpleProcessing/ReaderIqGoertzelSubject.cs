@@ -180,17 +180,21 @@ namespace Asv.Sdr
         }
     }
 
-    public class ReaderIqGoertzelFrequencyOffsetSubject : ReaderIqSimpleSubject<double, double>
+    public class ReaderIqGoertzelAmStableCarrierSubject : ReaderIqSimpleSubject<double, double>
     {
         private readonly double _sampleRate;
         private readonly double _frequencyHz;
-        private bool _hasPreviousPhase;
-        private double _previousPhase;
+        private readonly int _carrierSampleCount;
+        private readonly double[] _carrierBuffer;
+        private int _carrierBufferIndex;
+        private double _carrierMagnitude;
+        private bool _hasCarrierEstimate;
 
-        public ReaderIqGoertzelFrequencyOffsetSubject(
+        public ReaderIqGoertzelAmStableCarrierSubject(
             IReaderIqSubject<double> input,
             double sampleRate,
-            double frequencyHz
+            double frequencyHz,
+            int carrierSampleCount
         )
             : base(input)
         {
@@ -198,9 +202,112 @@ namespace Asv.Sdr
                 throw new ArgumentOutOfRangeException(nameof(sampleRate));
             if (frequencyHz < 0 || frequencyHz > sampleRate / 2.0)
                 throw new ArgumentOutOfRangeException(nameof(frequencyHz));
+            if (carrierSampleCount <= 0)
+                throw new ArgumentOutOfRangeException(nameof(carrierSampleCount));
 
             _sampleRate = sampleRate;
             _frequencyHz = frequencyHz;
+            _carrierSampleCount = carrierSampleCount;
+            _carrierBuffer = new double[carrierSampleCount * 2];
+        }
+
+        protected override double Process(ReadOnlySpan<double> input, out bool selfPublish)
+        {
+            UpdateCarrierEstimate(input);
+
+            var targetSampleCount = input.Length / 2;
+            if (
+                targetSampleCount == 0
+                || _hasCarrierEstimate == false
+                || _carrierMagnitude <= double.Epsilon
+            )
+            {
+                selfPublish = true;
+                return 0;
+            }
+
+            selfPublish = false;
+            var targetDc = ReaderIqGoertzelSubject.Calculate(input, _sampleRate, 0);
+            var target = ReaderIqGoertzelSubject.CalculateCentered(
+                input,
+                _sampleRate,
+                _frequencyHz,
+                targetDc
+            );
+            return 2.0
+                * target.Magnitude
+                * _carrierSampleCount
+                / (_carrierMagnitude * targetSampleCount);
+        }
+
+        private void UpdateCarrierEstimate(ReadOnlySpan<double> input)
+        {
+            var inputIndex = 0;
+            while (inputIndex < input.Length)
+            {
+                var copyLength = Math.Min(
+                    _carrierBuffer.Length - _carrierBufferIndex,
+                    input.Length - inputIndex
+                );
+                input
+                    .Slice(inputIndex, copyLength)
+                    .CopyTo(_carrierBuffer.AsSpan(_carrierBufferIndex, copyLength));
+
+                _carrierBufferIndex += copyLength;
+                inputIndex += copyLength;
+
+                if (_carrierBufferIndex != _carrierBuffer.Length)
+                {
+                    continue;
+                }
+
+                _carrierMagnitude = ReaderIqGoertzelSubject
+                    .Calculate(_carrierBuffer, _sampleRate, 0)
+                    .Magnitude;
+                _hasCarrierEstimate = true;
+                _carrierBufferIndex = 0;
+            }
+        }
+    }
+
+    public class ReaderIqGoertzelFrequencyOffsetSubject : ReaderIqSimpleSubject<double, double>
+    {
+        private readonly double _sampleRate;
+        private readonly double _frequencyHz;
+        private readonly double _searchRangeHz;
+        private bool _hasPreviousPhase;
+        private double _previousPhase;
+        private double _previousSearchFrequencyHz;
+
+        public ReaderIqGoertzelFrequencyOffsetSubject(
+            IReaderIqSubject<double> input,
+            double sampleRate,
+            double frequencyHz
+        )
+            : this(input, sampleRate, frequencyHz, 0) { }
+
+        public ReaderIqGoertzelFrequencyOffsetSubject(
+            IReaderIqSubject<double> input,
+            double sampleRate,
+            double frequencyHz,
+            double searchRangeHz
+        )
+            : base(input)
+        {
+            if (sampleRate <= 0)
+                throw new ArgumentOutOfRangeException(nameof(sampleRate));
+            if (frequencyHz < 0 || frequencyHz > sampleRate / 2.0)
+                throw new ArgumentOutOfRangeException(nameof(frequencyHz));
+            if (
+                searchRangeHz < 0
+                || double.IsNaN(searchRangeHz)
+                || double.IsInfinity(searchRangeHz)
+            )
+                throw new ArgumentOutOfRangeException(nameof(searchRangeHz));
+
+            _sampleRate = sampleRate;
+            _frequencyHz = frequencyHz;
+            _searchRangeHz = searchRangeHz;
         }
 
         protected override double Process(ReadOnlySpan<double> input, out bool selfPublish)
@@ -212,19 +319,65 @@ namespace Asv.Sdr
                 return 0;
             }
 
-            var phase = ReaderIqGoertzelSubject.Calculate(input, _sampleRate, _frequencyHz).Phase;
+            var searchFrequencyHz = FindPeakFrequency(input, sampleCount);
+            var phase = ReaderIqGoertzelSubject
+                .Calculate(input, _sampleRate, searchFrequencyHz)
+                .Phase;
             if (_hasPreviousPhase == false)
             {
                 _previousPhase = phase;
+                _previousSearchFrequencyHz = searchFrequencyHz;
                 _hasPreviousPhase = true;
                 selfPublish = true;
                 return 0;
             }
 
+            if (Math.Abs(searchFrequencyHz - _previousSearchFrequencyHz) > double.Epsilon)
+            {
+                _previousPhase = phase;
+                _previousSearchFrequencyHz = searchFrequencyHz;
+                selfPublish = false;
+                return searchFrequencyHz - _frequencyHz;
+            }
+
             var phaseDelta = DspMathEx.GetDistanceAngleRad(phase, _previousPhase);
             _previousPhase = phase;
+            _previousSearchFrequencyHz = searchFrequencyHz;
             selfPublish = false;
-            return phaseDelta * _sampleRate / (2.0 * Math.PI * sampleCount);
+            var fineOffsetHz = phaseDelta * _sampleRate / (2.0 * Math.PI * sampleCount);
+            return searchFrequencyHz - _frequencyHz + fineOffsetHz;
+        }
+
+        private double FindPeakFrequency(ReadOnlySpan<double> input, int sampleCount)
+        {
+            if (_searchRangeHz <= 0)
+            {
+                return _frequencyHz;
+            }
+
+            var stepHz = _sampleRate / sampleCount;
+            var minFrequencyHz = Math.Max(-_sampleRate / 2.0, _frequencyHz - _searchRangeHz);
+            var maxFrequencyHz = Math.Min(_sampleRate / 2.0, _frequencyHz + _searchRangeHz);
+            var bestFrequencyHz = _frequencyHz;
+            var bestMagnitude = double.MinValue;
+
+            for (
+                var frequencyHz = minFrequencyHz;
+                frequencyHz <= maxFrequencyHz;
+                frequencyHz += stepHz
+            )
+            {
+                var magnitude = ReaderIqGoertzelSubject
+                    .Calculate(input, _sampleRate, frequencyHz)
+                    .Magnitude;
+                if (magnitude > bestMagnitude)
+                {
+                    bestMagnitude = magnitude;
+                    bestFrequencyHz = frequencyHz;
+                }
+            }
+
+            return bestFrequencyHz;
         }
     }
 
@@ -232,13 +385,23 @@ namespace Asv.Sdr
     {
         private readonly double _sampleRate;
         private readonly double _frequencyHz;
+        private readonly double _searchRangeHz;
         private bool _hasPreviousPhase;
         private double _previousPhase;
+        private double _previousSearchFrequencyHz;
 
         public ReaderIqGoertzelFrequencyOffsetFloatSubject(
             IReaderIqSubject<float> input,
             double sampleRate,
             double frequencyHz
+        )
+            : this(input, sampleRate, frequencyHz, 0) { }
+
+        public ReaderIqGoertzelFrequencyOffsetFloatSubject(
+            IReaderIqSubject<float> input,
+            double sampleRate,
+            double frequencyHz,
+            double searchRangeHz
         )
             : base(input)
         {
@@ -246,9 +409,16 @@ namespace Asv.Sdr
                 throw new ArgumentOutOfRangeException(nameof(sampleRate));
             if (frequencyHz < 0 || frequencyHz > sampleRate / 2.0)
                 throw new ArgumentOutOfRangeException(nameof(frequencyHz));
+            if (
+                searchRangeHz < 0
+                || double.IsNaN(searchRangeHz)
+                || double.IsInfinity(searchRangeHz)
+            )
+                throw new ArgumentOutOfRangeException(nameof(searchRangeHz));
 
             _sampleRate = sampleRate;
             _frequencyHz = frequencyHz;
+            _searchRangeHz = searchRangeHz;
         }
 
         protected override double Process(ReadOnlySpan<float> input, out bool selfPublish)
@@ -260,19 +430,65 @@ namespace Asv.Sdr
                 return 0;
             }
 
-            var phase = ReaderIqGoertzelSubject.Calculate(input, _sampleRate, _frequencyHz).Phase;
+            var searchFrequencyHz = FindPeakFrequency(input, sampleCount);
+            var phase = ReaderIqGoertzelSubject
+                .Calculate(input, _sampleRate, searchFrequencyHz)
+                .Phase;
             if (_hasPreviousPhase == false)
             {
                 _previousPhase = phase;
+                _previousSearchFrequencyHz = searchFrequencyHz;
                 _hasPreviousPhase = true;
                 selfPublish = true;
                 return 0;
             }
 
+            if (Math.Abs(searchFrequencyHz - _previousSearchFrequencyHz) > double.Epsilon)
+            {
+                _previousPhase = phase;
+                _previousSearchFrequencyHz = searchFrequencyHz;
+                selfPublish = false;
+                return searchFrequencyHz - _frequencyHz;
+            }
+
             var phaseDelta = DspMathEx.GetDistanceAngleRad(phase, _previousPhase);
             _previousPhase = phase;
+            _previousSearchFrequencyHz = searchFrequencyHz;
             selfPublish = false;
-            return phaseDelta * _sampleRate / (2.0 * Math.PI * sampleCount);
+            var fineOffsetHz = phaseDelta * _sampleRate / (2.0 * Math.PI * sampleCount);
+            return searchFrequencyHz - _frequencyHz + fineOffsetHz;
+        }
+
+        private double FindPeakFrequency(ReadOnlySpan<float> input, int sampleCount)
+        {
+            if (_searchRangeHz <= 0)
+            {
+                return _frequencyHz;
+            }
+
+            var stepHz = _sampleRate / sampleCount;
+            var minFrequencyHz = Math.Max(-_sampleRate / 2.0, _frequencyHz - _searchRangeHz);
+            var maxFrequencyHz = Math.Min(_sampleRate / 2.0, _frequencyHz + _searchRangeHz);
+            var bestFrequencyHz = _frequencyHz;
+            var bestMagnitude = double.MinValue;
+
+            for (
+                var frequencyHz = minFrequencyHz;
+                frequencyHz <= maxFrequencyHz;
+                frequencyHz += stepHz
+            )
+            {
+                var magnitude = ReaderIqGoertzelSubject
+                    .Calculate(input, _sampleRate, frequencyHz)
+                    .Magnitude;
+                if (magnitude > bestMagnitude)
+                {
+                    bestMagnitude = magnitude;
+                    bestFrequencyHz = frequencyHz;
+                }
+            }
+
+            return bestFrequencyHz;
         }
     }
 }

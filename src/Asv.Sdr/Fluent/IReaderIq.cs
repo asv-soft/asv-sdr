@@ -557,12 +557,42 @@ namespace Asv.Sdr
         }
 
         public static IObservable<double> GetGoertzelFrequencyOffset(
+            this IReaderIqSubject<double> src,
+            double sampleRate,
+            double frequencyHz,
+            double searchRangeHz
+        )
+        {
+            return new ReaderIqGoertzelFrequencyOffsetSubject(
+                src,
+                sampleRate,
+                frequencyHz,
+                searchRangeHz
+            );
+        }
+
+        public static IObservable<double> GetGoertzelFrequencyOffset(
             this IReaderIqSubject<float> src,
             double sampleRate,
             double frequencyHz
         )
         {
             return new ReaderIqGoertzelFrequencyOffsetFloatSubject(src, sampleRate, frequencyHz);
+        }
+
+        public static IObservable<double> GetGoertzelFrequencyOffset(
+            this IReaderIqSubject<float> src,
+            double sampleRate,
+            double frequencyHz,
+            double searchRangeHz
+        )
+        {
+            return new ReaderIqGoertzelFrequencyOffsetFloatSubject(
+                src,
+                sampleRate,
+                frequencyHz,
+                searchRangeHz
+            );
         }
 
         public static IObservable<(double, double)> GetGoertzelPhase(
@@ -583,6 +613,21 @@ namespace Asv.Sdr
         )
         {
             return new ReaderIqGoertzelAmSubject(src, sampleRate, frequencyHz);
+        }
+
+        public static IObservable<double> GetGoertzelAmStableCarrier(
+            this IReaderIqSubject<double> src,
+            double sampleRate,
+            double frequencyHz,
+            int carrierSampleCount
+        )
+        {
+            return new ReaderIqGoertzelAmStableCarrierSubject(
+                src,
+                sampleRate,
+                frequencyHz,
+                carrierSampleCount
+            );
         }
 
         public static IObservable<(double, double)> GetGoertzelAm(
