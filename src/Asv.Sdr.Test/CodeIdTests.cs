@@ -41,7 +41,7 @@ namespace Asv.Sdr.Test
             using var done = new AutoResetEvent(false);
             var received = new List<CodeId>();
 
-            src.CodeId(0.05, 0.8, 100, 10_000, 150).Subscribe(x =>
+            src.CodeId(0.05, 0.8, 100, 10_000).Subscribe(x =>
             {
                 received.Add(x);
                 done.Set();
@@ -68,7 +68,7 @@ namespace Asv.Sdr.Test
             using var done = new AutoResetEvent(false);
             var received = new List<CodeId>();
 
-            src.CodeId(0.05, 0.8, 100, 10_000, 150).Subscribe(x =>
+            src.CodeId(0.05, 0.8, 100, 10_000).Subscribe(x =>
             {
                 received.Add(x);
                 done.Set();
@@ -77,6 +77,33 @@ namespace Asv.Sdr.Test
             Push(src, 0.0, 500);
             PushMorse(src, "... --- ... ..- ... --- ... ..-", 0.3, 0.0, 15, 30, 45);
             Push(src, 0.0, 45);
+            Push(src, 0.3, 1);
+
+            Assert.True(done.WaitOne(TimeSpan.FromSeconds(1)));
+            Assert.Single(received);
+            Assert.Equal("SOSU", received[0].Value);
+            Assert.Equal(150, received[0].DotTimeMs, 10);
+            Assert.Equal(300, received[0].DashTimeMs, 10);
+            Assert.Equal(150, received[0].SymbolPauseMs, 10);
+            Assert.Equal(450, received[0].CharPauseMs, 10);
+        }
+
+        [Fact]
+        public void CodeId_FixedDotTime_DecodesFullWord()
+        {
+            using var src = new Subject<double>();
+            using var done = new AutoResetEvent(false);
+            var received = new List<CodeId>();
+
+            src.CodeId(0.05, 0.8, 100, 10_000, 150).Subscribe(x =>
+            {
+                received.Add(x);
+                done.Set();
+            });
+
+            Push(src, 0.0, 500);
+            PushMorse(src, "... --- ... ..-", 0.3, 0.0, 15, 30, 45);
+            Push(src, 0.0, 500);
             Push(src, 0.3, 1);
 
             Assert.True(done.WaitOne(TimeSpan.FromSeconds(1)));

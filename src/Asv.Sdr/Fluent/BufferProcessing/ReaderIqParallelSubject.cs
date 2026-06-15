@@ -96,21 +96,22 @@ namespace Asv.Sdr
 
         private void OnSample(Memory<T> memory)
         {
+            IObserver<Memory<T>>[] subscribers;
             _rwLock.EnterReadLock();
             try
             {
-                var parallelTasks = new Task[_subscribers.Count];
-                for (var i = 0; i < parallelTasks.Length; i++)
-                {
-                    var i1 = i;
-                    parallelTasks[i] = Task.Factory.StartNew(() =>_subscribers[i1].OnNext(memory),DisposeCancel, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-                }
-                Task.WaitAll(parallelTasks, DisposeCancel);
+                subscribers = _subscribers.ToArray();
             }
             finally
             {
                 _rwLock.ExitReadLock();
             }
+
+            Parallel.ForEach(
+                subscribers,
+                new ParallelOptions { CancellationToken = DisposeCancel },
+                observer => observer.OnNext(memory)
+            );
         }
 
         public IDisposable Subscribe(IObserver<Memory<T>> observer)

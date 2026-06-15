@@ -843,6 +843,11 @@ namespace Asv.Sdr
             int windowSize
         )
         {
+            if (windowSize == 0)
+            {
+                return src;
+            }
+
             return new ReactiveDspFilter(src, new MovingAverageDspFilter(windowSize));
         }
 
@@ -852,10 +857,15 @@ namespace Asv.Sdr
             int windowSize2
         )
         {
+            if (windowSize1 == 0 && windowSize2 == 0)
+            {
+                return src;
+            }
+
             return new ReactiveDsp2ArgsFilter(
                 src,
-                new MovingAverageDspFilter(windowSize1),
-                new MovingAverageDspFilter(windowSize2)
+                CreateAverageFilter(windowSize1),
+                CreateAverageFilter(windowSize2)
             );
         }
 
@@ -866,11 +876,16 @@ namespace Asv.Sdr
             int windowSize3
         )
         {
+            if (windowSize1 == 0 && windowSize2 == 0 && windowSize3 == 0)
+            {
+                return src;
+            }
+
             return new ReactiveDsp3ArgsFilter(
                 src,
-                new MovingAverageDspFilter(windowSize1),
-                new MovingAverageDspFilter(windowSize2),
-                new MovingAverageDspFilter(windowSize3)
+                CreateAverageFilter(windowSize1),
+                CreateAverageFilter(windowSize2),
+                CreateAverageFilter(windowSize3)
             );
         }
 
@@ -879,7 +894,31 @@ namespace Asv.Sdr
             int windowSize
         )
         {
+            if (windowSize == 0)
+            {
+                return src;
+            }
+
             return new ReactiveDspFilter(src, new MovingAverageRadianDspFilter(windowSize));
+        }
+
+        private static IDspFilter CreateAverageFilter(int windowSize)
+        {
+            return windowSize == 0
+                ? PassThroughDspFilter.Instance
+                : new MovingAverageDspFilter(windowSize);
+        }
+
+        private sealed class PassThroughDspFilter : IDspFilter
+        {
+            public static readonly PassThroughDspFilter Instance = new();
+
+            private PassThroughDspFilter() { }
+
+            public double Process(double input)
+            {
+                return input;
+            }
         }
 
         #endregion
@@ -938,8 +977,19 @@ namespace Asv.Sdr
             double amMin,
             double amMax,
             int fftBufferSize,
+            int sampleRate
+        )
+        {
+            return new ReaderIqCodeIdSubject(src, amMin, amMax, fftBufferSize, sampleRate);
+        }
+
+        public static IObservable<CodeId> CodeId(
+            this IObservable<double> src,
+            double amMin,
+            double amMax,
+            int fftBufferSize,
             int sampleRate,
-            int dotTime = 150
+            int dotTime
         )
         {
             return new ReaderIqCodeIdSubject(src, amMin, amMax, dotTime, fftBufferSize, sampleRate);
