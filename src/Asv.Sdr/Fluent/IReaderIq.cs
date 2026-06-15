@@ -602,8 +602,41 @@ namespace Asv.Sdr
             double frequency2Hz
         )
         {
-            return src.GetGoertzelPhase(sampleRate, frequency1Hz)
-                .ParallelJoin(src.GetGoertzelPhase(sampleRate, frequency2Hz), (a, b) => (a, b));
+            return new ReaderIqGoertzelPhase2Subject(src, sampleRate, frequency1Hz, frequency2Hz);
+        }
+
+        public static IObservable<ReaderIqVorReferenceResult> GetVorReference(
+            this IReaderIqSubject<double> src,
+            double sampleRate,
+            double subcarrierHz,
+            double referenceHz,
+            double sidebandBandwidthHz
+        )
+        {
+            return new ReaderIqVorReferenceSubject(
+                src,
+                sampleRate,
+                subcarrierHz,
+                referenceHz,
+                sidebandBandwidthHz
+            );
+        }
+
+        public static IObservable<double> GetGoertzelFmSubcarrierAm(
+            this IReaderIqSubject<double> src,
+            double sampleRate,
+            double subcarrierHz,
+            double sidebandStepHz,
+            double searchBandwidthHz
+        )
+        {
+            return new ReaderIqGoertzelFmSubcarrierSubject(
+                src,
+                sampleRate,
+                subcarrierHz,
+                sidebandStepHz,
+                searchBandwidthHz
+            );
         }
 
         public static IObservable<double> GetGoertzelAm(
@@ -637,8 +670,7 @@ namespace Asv.Sdr
             double frequency2Hz
         )
         {
-            return src.GetGoertzelAm(sampleRate, frequency1Hz)
-                .ParallelJoin(src.GetGoertzelAm(sampleRate, frequency2Hz), (a, b) => (a, b));
+            return new ReaderIqGoertzelAm2Subject(src, sampleRate, frequency1Hz, frequency2Hz);
         }
 
         public static IObservable<(double, double, double)> GetGoertzelAm(
@@ -649,11 +681,13 @@ namespace Asv.Sdr
             double frequency3Hz
         )
         {
-            return src.GetGoertzelAm(sampleRate, frequency1Hz, frequency2Hz)
-                .ParallelJoin(
-                    src.GetGoertzelAm(sampleRate, frequency3Hz),
-                    (ab, c) => (ab.Item1, ab.Item2, c)
-                );
+            return new ReaderIqGoertzelAm3Subject(
+                src,
+                sampleRate,
+                frequency1Hz,
+                frequency2Hz,
+                frequency3Hz
+            );
         }
 
         #endregion
