@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using System.Reactive;
 
 namespace Asv.Sdr
@@ -7,17 +8,19 @@ namespace Asv.Sdr
     {
         private readonly double[] _filter;
 
-        public ReaderIqWindowFilterDouble(IReaderIqSubject<double> input, WindowFilterEnum type, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
+        public ReaderIqWindowFilterDouble(
+            IReaderIqSubject<double> input,
+            WindowFilterEnum type,
+            bool useArrayPool
+        )
+            : base(input, input.OutputBufferSize, useArrayPool)
         {
             _filter = WindowFilters.Create(type, input.OutputBufferSize);
         }
 
         protected override void Process(ReadOnlySpan<double> input, Span<double> output)
         {
-            for (var i = 0; i < _filter.Length; i++)
-            {
-                output[i] = input[i] * _filter[i];
-            }
+            ReaderIqWindowFilterProcessor.Process(input, _filter, output);
         }
     }
 
@@ -25,16 +28,71 @@ namespace Asv.Sdr
     {
         private readonly double[] _filter;
 
-        public ReaderIqWindowFilterFloat(IReaderIqSubject<float> input, WindowFilterEnum type, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
+        public ReaderIqWindowFilterFloat(
+            IReaderIqSubject<float> input,
+            WindowFilterEnum type,
+            bool useArrayPool
+        )
+            : base(input, input.OutputBufferSize, useArrayPool)
         {
             _filter = WindowFilters.Create(type, input.OutputBufferSize);
         }
 
         protected override void Process(ReadOnlySpan<float> input, Span<double> output)
         {
-            for (var i = 0; i < _filter.Length; i++)
+            ReaderIqWindowFilterProcessor.Process(input, _filter, output);
+        }
+    }
+
+    internal static class ReaderIqWindowFilterProcessor
+    {
+        public static void Process(ReadOnlySpan<double> input, ReadOnlySpan<double> filter, Span<double> output)
+        {
+            var index = 0;
+
+            if (Vector.IsHardwareAccelerated)
             {
-                output[i] = input[i] * _filter[i];
+                var vectorSize = Vector<double>.Count;
+                var vectorLimit = filter.Length - filter.Length % vectorSize;
+
+                for (; index < vectorLimit; index += vectorSize)
+                {
+                    (
+                        new Vector<double>(input.Slice(index))
+                        * new Vector<double>(filter.Slice(index))
+                    ).CopyTo(output.Slice(index));
+                }
+            }
+
+            for (; index < filter.Length; index++)
+            {
+                output[index] = input[index] * filter[index];
+            }
+        }
+
+        public static void Process(ReadOnlySpan<float> input, ReadOnlySpan<double> filter, Span<double> output)
+        {
+            var index = 0;
+
+            if (Vector.IsHardwareAccelerated)
+            {
+                var inputVectorSize = Vector<float>.Count;
+                var outputVectorSize = Vector<double>.Count;
+                var vectorLimit = filter.Length - filter.Length % inputVectorSize;
+
+                for (; index < vectorLimit; index += inputVectorSize)
+                {
+                    Vector.Widen(new Vector<float>(input.Slice(index)), out var lower, out var upper);
+                    (lower * new Vector<double>(filter.Slice(index))).CopyTo(output.Slice(index));
+                    (upper * new Vector<double>(filter.Slice(index + outputVectorSize))).CopyTo(
+                        output.Slice(index + outputVectorSize)
+                    );
+                }
+            }
+
+            for (; index < filter.Length; index++)
+            {
+                output[index] = input[index] * filter[index];
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,6 +34,7 @@ namespace Asv.Sdr
             else
             {
                 Process(_memory1.Value.Span, _memory2.Value.Span,Memory.Span);
+                Publish();
                 _memory1 = null;
                 _memory2 = null;
                 _autoEvent.Set();
@@ -84,19 +86,20 @@ namespace Asv.Sdr
     {
         private readonly IReaderIqSubject<T> _source;
         private readonly ReaderWriterLockSlim _rwLock = new(LockRecursionPolicy.NoRecursion);
-        private readonly List<IObserver<Memory<T>>> _subscribers = new(4);
+        private readonly List<SubscriberWorker> _subscribers = new(4);
 
         public ReaderIqParallelSubject(IReaderIqSubject<T> source)
         {
             _source = source;
             _source.Subscribe(OnSample).DisposeItWith(Disposable);
-            _rwLock.DisposeItWith(Disposable);
             source.DisposeItWith(Disposable);
         }
 
         private void OnSample(Memory<T> memory)
         {
-            IObserver<Memory<T>>[] subscribers;
+            if (IsDisposed) return;
+
+            SubscriberWorker[] subscribers;
             _rwLock.EnterReadLock();
             try
             {
@@ -107,43 +110,228 @@ namespace Asv.Sdr
                 _rwLock.ExitReadLock();
             }
 
-            Parallel.ForEach(
-                subscribers,
-                new ParallelOptions { CancellationToken = DisposeCancel },
-                observer => observer.OnNext(memory)
-            );
+            if (subscribers.Length == 0) return;
+
+            var tasks = new Task[subscribers.Length];
+            for (var i = 0; i < subscribers.Length; i++)
+            {
+                tasks[i] = subscribers[i].Publish(memory, DisposeCancel);
+            }
+
+            Task.WaitAll(tasks, DisposeCancel);
         }
 
         public IDisposable Subscribe(IObserver<Memory<T>> observer)
         {
-            _rwLock.EnterWriteLock();
+            if (observer == null) throw new ArgumentNullException(nameof(observer));
+            if (IsDisposed) return System.Reactive.Disposables.Disposable.Create(() => { });
+
+            var subscriber = new SubscriberWorker(observer, DisposeCancel);
+            var lockTaken = false;
             try
             {
-                _subscribers.Add(observer);
+                _rwLock.EnterWriteLock();
+                lockTaken = true;
+                if (IsDisposed)
+                {
+                    subscriber.Dispose();
+                    return System.Reactive.Disposables.Disposable.Create(() => { });
+                }
+
+                _subscribers.Add(subscriber);
+            }
+            catch (ObjectDisposedException)
+            {
+                subscriber.Dispose();
+                return System.Reactive.Disposables.Disposable.Create(() => { });
             }
             finally
             {
-                _rwLock.ExitWriteLock();
+                if (lockTaken)
+                {
+                    _rwLock.ExitWriteLock();
+                }
             }
+
             return System.Reactive.Disposables.Disposable.Create(() =>
             {
-                InternalUnsubscribe(observer);
+                InternalUnsubscribe(subscriber);
             });
         }
 
-        private void InternalUnsubscribe(IObserver<Memory<T>> observer)
+        private void InternalUnsubscribe(SubscriberWorker subscriber)
         {
-            _rwLock.EnterWriteLock();
+            var lockTaken = false;
             try
             {
-                _subscribers.Remove(observer);
+                _rwLock.EnterWriteLock();
+                lockTaken = true;
+                if (_subscribers.Remove(subscriber))
+                {
+                    subscriber.Dispose();
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+                subscriber.Dispose();
             }
             finally
             {
-                _rwLock.ExitWriteLock();
+                if (lockTaken)
+                {
+                    _rwLock.ExitWriteLock();
+                }
             }
         }
 
         public int OutputBufferSize => _source.OutputBufferSize;
+
+        protected override void InternalDisposeOnce()
+        {
+            base.InternalDisposeOnce();
+
+            SubscriberWorker[] subscribers;
+            _rwLock.EnterWriteLock();
+            try
+            {
+                subscribers = _subscribers.ToArray();
+                _subscribers.Clear();
+            }
+            finally
+            {
+                _rwLock.ExitWriteLock();
+            }
+
+            foreach (var subscriber in subscribers)
+            {
+                subscriber.Dispose();
+            }
+
+            _rwLock.Dispose();
+        }
+
+        private sealed class SubscriberWorker : IDisposable
+        {
+            private readonly CancellationToken _disposeCancel;
+            private readonly IObserver<Memory<T>> _observer;
+            private readonly BlockingCollection<PublishRequest> _queue = new();
+            private int _isDisposed;
+
+            public SubscriberWorker(IObserver<Memory<T>> observer, CancellationToken disposeCancel)
+            {
+                _observer = observer;
+                _disposeCancel = disposeCancel;
+                _ = Task.Factory.StartNew(
+                    Run,
+                    CancellationToken.None,
+                    TaskCreationOptions.LongRunning | TaskCreationOptions.DenyChildAttach,
+                    TaskScheduler.Default
+                );
+            }
+
+            public Task Publish(Memory<T> memory, CancellationToken cancellationToken)
+            {
+                if (Volatile.Read(ref _isDisposed) != 0 || cancellationToken.IsCancellationRequested)
+                {
+                    return Task.CompletedTask;
+                }
+
+                var completion = new TaskCompletionSource(
+                    TaskCreationOptions.RunContinuationsAsynchronously
+                );
+                var request = new PublishRequest(memory, completion);
+
+                try
+                {
+                    _queue.Add(request, cancellationToken);
+                }
+                catch (ObjectDisposedException)
+                {
+                    return Task.CompletedTask;
+                }
+                catch (InvalidOperationException)
+                {
+                    return Task.CompletedTask;
+                }
+                catch (OperationCanceledException)
+                {
+                    return Task.CompletedTask;
+                }
+
+                return completion.Task;
+            }
+
+            public void Dispose()
+            {
+                if (Interlocked.Exchange(ref _isDisposed, 1) != 0) return;
+
+                try
+                {
+                    _queue.CompleteAdding();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Owner cancellation may stop the worker and dispose the queue first.
+                }
+            }
+
+            private void Run()
+            {
+                try
+                {
+                    foreach (var request in _queue.GetConsumingEnumerable(_disposeCancel))
+                    {
+                        Notify(request);
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    CancelPending();
+                }
+                catch (ObjectDisposedException)
+                {
+                    CancelPending();
+                }
+                finally
+                {
+                    CancelPending();
+                    _queue.Dispose();
+                }
+            }
+
+            private void Notify(PublishRequest request)
+            {
+                try
+                {
+                    _observer.OnNext(request.Memory);
+                    request.Completion.TrySetResult();
+                }
+                catch (Exception ex)
+                {
+                    request.Completion.TrySetException(ex);
+                }
+            }
+
+            private void CancelPending()
+            {
+                while (_queue.TryTake(out var request))
+                {
+                    request.Completion.TrySetCanceled();
+                }
+            }
+        }
+
+        private sealed class PublishRequest
+        {
+            public PublishRequest(Memory<T> memory, TaskCompletionSource completion)
+            {
+                Memory = memory;
+                Completion = completion;
+            }
+
+            public Memory<T> Memory { get; }
+
+            public TaskCompletionSource Completion { get; }
+        }
     }
 }
