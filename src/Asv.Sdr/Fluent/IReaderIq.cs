@@ -995,6 +995,19 @@ namespace Asv.Sdr
             return new ReaderIqCodeIdSubject(src, amMin, amMax, dotTime, fftBufferSize, sampleRate);
         }
 
+        /// <summary>
+        /// Parameter-free identifier decoder: self-calibrates the AM on/off threshold and
+        /// the dot/dash/pause widths from the signal (no amMin/amMax/dotTime required).
+        /// </summary>
+        public static IObservable<CodeId> AutoCodeId(
+            this IObservable<double> src,
+            int fftBufferSize,
+            int sampleRate
+        )
+        {
+            return new ReaderIqAutoCodeIdSubject(src, fftBufferSize, sampleRate);
+        }
+
         #endregion
 
         public static IReaderIqSubject<TOut> SkipEvery<TOut>(
