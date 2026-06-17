@@ -203,6 +203,18 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
         return result;
     }
 
+    protected static byte[] ConvertRegisterFrameToBytes(ushort[] frame, int byteLength)
+    {
+        var buffer = new byte[byteLength];
+        for (var i = 0; i < buffer.Length; i++)
+        {
+            var index = i / 2;
+            buffer[i] = (byte)(i % 2 == 0 ? (frame[index] >> 8) & 0xFF : frame[index] & 0xFF);
+        }
+
+        return buffer;
+    }
+
     protected ushort ReadCustomRegister(ILmsRegisterEditor edit, ushort address)
     {
         edit.WriteFPGAReg(ADDRESS_RD_Address, address);

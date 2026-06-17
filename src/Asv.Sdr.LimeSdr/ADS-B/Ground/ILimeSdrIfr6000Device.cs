@@ -39,6 +39,12 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     Task<ModeSDFormatBase?> ReadDfMessage(ModeSUFormatBase reqMsg, Func<ModeSDFormatBase> respFactory, int attempts = 3);
     
     Task<float> ReadReplyRatioModeS();
+
+    /// <summary>
+    /// Reads the selective Mode S downlink frame receive counter.
+    /// </summary>
+    /// <returns>16-bit counter incremented by the device when a selective DF response is received.</returns>
+    Task<ushort> ReadSelectiveDfCounter();
     
     /// <summary>
     /// Selective request short UF4 short DF4

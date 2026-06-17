@@ -15,6 +15,8 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private readonly ILogger _logger;
     private int _readDfMsgFlag;
     private double _delayOffsetAc = 0;
+    private const int DefaultDfPollIntervalMs = 10;
+    private const int DefaultDfResponseTimeoutMs = 100;
     
     private const ushort ModeAResp_15_0_InternAddr          = 0x0301; // (0,0,С1,А1,С2,А2,С4,А4,Х,В1,D1,В2,D2,В4,D4,SPI) -- RD
     private const ushort ModeCResp_15_0_InternAddr          = 0x0302; // (0,0,С1,А1,С2,А2,С4,А4,Х,В1,D1,В2,D2,В4,D4,0) -- RD
@@ -71,6 +73,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private const ushort BDS_65_Air_CNT_Period_15_0 = 0x032B;  // --RD -- BDS_65_Air_CNT(7:0) & BDS_65_Air_Period(7:0)
     private const ushort BDS_65_Sur_CNT_Period_15_0 = 0x032C;  // --RD -- BDS_65_Sur_CNT(7:0) & BDS_65_Sur_Period(7:0)
     private const ushort DF11_SKW_CNT_Period_15_0 = 0x032D;    // --RD -- DF11_SKW_CNT(7:0) & DF11_SKW_Period(7:0)
+    private const ushort DF_RX_CNT = 0x032E;                    // --RD -- DFxx_CNT(15:0)
 
     private const ushort BDS_05_Ev_111_96 = 0x0400;  // --RD -- BDS_05_Ev
     private const ushort BDS_05_Ev_95_80 = 0x0401;   // --RD
@@ -361,12 +364,12 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         return ModeSHelper.GetAltitudeFromModeCAltitudeCode((ushort)((code >> 1) & 0xFFF)) ?? 0;
     }
 
-    public Task<bool> WriteUfMessage(ModeSUFormatBase msg)
+    public async Task<bool> WriteUfMessage(ModeSUFormatBase msg)
     {
-        if (Interlocked.CompareExchange(ref _readDfMsgFlag, 1, 0) != 0) return Task.FromResult(false);
+        if (Interlocked.CompareExchange(ref _readDfMsgFlag, 1, 0) != 0) return false;
         try
         {
-            return InternalWriteUfMessage(msg);
+            return await InternalWriteUfMessage(msg).ConfigureAwait(false);
         }
         finally
         {
@@ -377,18 +380,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     {
         try
         {
-            var buffer = new byte[14];
-            var span = new Span<byte>(buffer);
-            msg.Serialize(ref span);
-            var frame = new ValueTuple<ushort, ushort>[7];
-            frame[0] = new ValueTuple<ushort, ushort>(UF_TX_111_96, (ushort)((buffer[0] << 8) | buffer[1]));
-            frame[1] = new ValueTuple<ushort, ushort>(UF_TX_95_80, (ushort)((buffer[2] << 8) | buffer[3]));
-            frame[2] = new ValueTuple<ushort, ushort>(UF_TX_79_64, (ushort)((buffer[4] << 8) | buffer[5]));
-            frame[3] = new ValueTuple<ushort, ushort>(UF_TX_63_48, (ushort)((buffer[6] << 8) | buffer[7]));
-            frame[4] = new ValueTuple<ushort, ushort>(UF_TX_47_32, (ushort)((buffer[8] << 8) | buffer[9]));
-            frame[5] = new ValueTuple<ushort, ushort>(UF_TX_31_16, (ushort)((buffer[10] << 8) | buffer[11]));
-            frame[6] = new ValueTuple<ushort, ushort>(UF_TX_15_0, (ushort)((buffer[12] << 8) | buffer[13]));
-            await WriteCustomRegistersFrame(frame, DisposeCancel).ConfigureAwait(false);
+            await WriteUfFrame(CreateUfFrame(msg)).ConfigureAwait(false);
             return true;
         }
         catch (Exception)
@@ -398,48 +390,124 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         
     }
 
+    private async Task<(bool Success, ushort CounterBefore)> InternalWriteUfMessageWithCounterSnapshot(ModeSUFormatBase msg)
+    {
+        try
+        {
+            var frame = CreateUfFrame(msg);
+            ushort counterBefore = 0;
+            await AtomicEditRegister(edit =>
+            {
+                foreach (var addressValuePair in frame)
+                {
+                    WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
+                }
+
+                counterBefore = ReadCustomRegister(edit, DF_RX_CNT);
+                edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 1);
+                edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 0);
+            }, DisposeCancel).ConfigureAwait(false);
+
+            return (true, counterBefore);
+        }
+        catch (Exception)
+        {
+            return (false, 0);
+        }
+    }
+
+    private Task WriteUfFrame(ValueTuple<ushort, ushort>[] frame)
+    {
+        return WriteCustomRegistersFrame(frame, DisposeCancel);
+    }
+
+    private static ValueTuple<ushort, ushort>[] CreateUfFrame(ModeSUFormatBase msg)
+    {
+        var buffer = new byte[14];
+        var span = new Span<byte>(buffer);
+        msg.Serialize(ref span);
+        var frame = new ValueTuple<ushort, ushort>[7];
+        frame[0] = new ValueTuple<ushort, ushort>(UF_TX_111_96, (ushort)((buffer[0] << 8) | buffer[1]));
+        frame[1] = new ValueTuple<ushort, ushort>(UF_TX_95_80, (ushort)((buffer[2] << 8) | buffer[3]));
+        frame[2] = new ValueTuple<ushort, ushort>(UF_TX_79_64, (ushort)((buffer[4] << 8) | buffer[5]));
+        frame[3] = new ValueTuple<ushort, ushort>(UF_TX_63_48, (ushort)((buffer[6] << 8) | buffer[7]));
+        frame[4] = new ValueTuple<ushort, ushort>(UF_TX_47_32, (ushort)((buffer[8] << 8) | buffer[9]));
+        frame[5] = new ValueTuple<ushort, ushort>(UF_TX_31_16, (ushort)((buffer[10] << 8) | buffer[11]));
+        frame[6] = new ValueTuple<ushort, ushort>(UF_TX_15_0, (ushort)((buffer[12] << 8) | buffer[13]));
+        return frame;
+    }
+
     public async Task<ModeSDFormatBase?> ReadDfMessage(Func<ModeSDFormatBase> factory, int attempts = 3)
     {
         if (Interlocked.CompareExchange(ref _readDfMsgFlag, 1, 0) != 0) return null;
         try
         {
-            return await InternalReadDfMessage(factory, attempts).ConfigureAwait(false);
+            return await InternalReadDfMessage(factory, GetDfResponseTimeoutFromAttempts(attempts)).ConfigureAwait(false);
         }
         finally
         {
             Interlocked.Exchange(ref _readDfMsgFlag, 0);
         }
     }
-    private async Task<ModeSDFormatBase?> InternalReadDfMessage(Func<ModeSDFormatBase> factory, int attempts = 3)
+
+    private async Task<T?> InternalReadDfMessage<T>(Func<T> factory, int timeoutMs = DefaultDfResponseTimeoutMs,
+        int pollIntervalMs = DefaultDfPollIntervalMs, ushort? counterBefore = null, Func<T, bool>? isValid = null)
+        where T : ModeSDFormatBase
     {
-        var msg = factory();
-        var length = msg.GetByteSize();
-        var addrFrame = new ushort[length % 2 == 0 ? length / 2 : (length / 2) + 1];
-        for (var i = 0; i < addrFrame.Length; i++)
+        var length = factory().GetByteSize();
+        var dfRegisterCount = length % 2 == 0 ? length / 2 : (length / 2) + 1;
+        var addrFrame = new ushort[dfRegisterCount + (counterBefore.HasValue ? 1 : 0)];
+        for (var i = 0; i < dfRegisterCount; i++)
         {
             addrFrame[i] = (ushort)(DF_RX_111_96 + i);
         }
-        while (attempts-- > 0)
+        if (counterBefore.HasValue)
+        {
+            addrFrame[^1] = DF_RX_CNT;
+        }
+
+        var timeoutAt = Environment.TickCount64 + Math.Max(1, timeoutMs);
+        var lastCounter = counterBefore;
+        do
         {
             try
             {
-                await Task.Delay(10, DisposeCancel).ConfigureAwait(false);
-                var valueFrame = await ReadCustomRegistersFrame(addrFrame, DisposeCancel).ConfigureAwait(false);
-                var buffer = new byte[length];
-                for (var i = 0; i < length; i++)
+                if (pollIntervalMs > 0)
                 {
-                    var index = i / 2;
-                    buffer[i] = (byte)(i % 2 == 0 ? (valueFrame[index] >> 8) & 0xFF : valueFrame[index] & 0xFF);
+                    await Task.Delay(pollIntervalMs, DisposeCancel).ConfigureAwait(false);
                 }
+
+                var valueFrame = await ReadCustomRegistersFrame(addrFrame, DisposeCancel).ConfigureAwait(false);
+                if (lastCounter.HasValue)
+                {
+                    var counter = valueFrame[^1];
+                    if (counter == lastCounter.Value)
+                    {
+                        continue;
+                    }
+
+                    lastCounter = counter;
+                }
+
+                var buffer = ConvertRegisterFrameToBytes(valueFrame, length);
                 var span = new ReadOnlySpan<byte>(buffer);
+                var msg = factory();
                 msg.Deserialize(ref span);
-                return msg;
+                if (isValid == null || isValid(msg))
+                {
+                    return msg;
+                }
             }
             catch (InvalidDataException)
             {
                 // ignore
             }
-        }
+            catch (FormatException)
+            {
+                // ignore
+            }
+        } while (Environment.TickCount64 < timeoutAt);
+
         return null;
     }
 
@@ -448,13 +516,49 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         if (Interlocked.CompareExchange(ref _readDfMsgFlag, 1, 0) != 0) return null;
         try
         {
-            await InternalWriteUfMessage(reqMsg).ConfigureAwait(false);
-            return await InternalReadDfMessage(respFactory, attempts).ConfigureAwait(false);
+            var writeResult = await InternalWriteUfMessageWithCounterSnapshot(reqMsg).ConfigureAwait(false);
+            if (!writeResult.Success)
+            {
+                return null;
+            }
+
+            return await InternalReadDfMessage(respFactory, GetDfResponseTimeoutFromAttempts(attempts),
+                counterBefore: writeResult.CounterBefore).ConfigureAwait(false);
         }
         finally
         {
             Interlocked.Exchange(ref _readDfMsgFlag, 0);
         }
+    }
+
+    private async Task<T?> RequestDfMessage<T>(ModeSUFormatBase reqMsg, Func<T> respFactory, uint expectedIcao,
+        Func<T, bool>? isValid = null, int timeoutMs = DefaultDfResponseTimeoutMs)
+        where T : ModeSDFormatBase
+    {
+        if (Interlocked.CompareExchange(ref _readDfMsgFlag, 1, 0) != 0) return null;
+        try
+        {
+            var writeResult = await InternalWriteUfMessageWithCounterSnapshot(reqMsg).ConfigureAwait(false);
+            if (!writeResult.Success)
+            {
+                return null;
+            }
+
+            return await InternalReadDfMessage(
+                respFactory,
+                timeoutMs,
+                counterBefore: writeResult.CounterBefore,
+                isValid: msg => msg.IcaoAddress == expectedIcao && isValid?.Invoke(msg) != false).ConfigureAwait(false);
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _readDfMsgFlag, 0);
+        }
+    }
+
+    private static int GetDfResponseTimeoutFromAttempts(int attempts)
+    {
+        return Math.Max(1, attempts) * DefaultDfPollIntervalMs;
     }
 
     public async Task<(byte Counter, float Period)> ReadDf11SquitterStatistics()
@@ -607,12 +711,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         }
 
         var valueFrame = await ReadCustomRegistersFrame(addrFrame, DisposeCancel).ConfigureAwait(false);
-        var buffer = new byte[addrFrame.Length * 2];
-        for (var i = 0; i < buffer.Length; i++)
-        {
-            var index = i / 2;
-            buffer[i] = (byte)(i % 2 == 0 ? (valueFrame[index] >> 8) & 0xFF : valueFrame[index] & 0xFF);
-        }
+        var buffer = ConvertRegisterFrameToBytes(valueFrame, addrFrame.Length * 2);
 
         var span = new ReadOnlySpan<byte>(buffer);
         try
@@ -663,12 +762,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
             addrFrame[i] = (ushort)(DF11_SKW_55_40 + i);
         }
         var valueFrame = await ReadCustomRegistersFrame(addrFrame, DisposeCancel).ConfigureAwait(false);
-        var buffer = new byte[7];
-        for (var i = 0; i < buffer.Length; i++)
-        {
-            var index = i / 2;
-            buffer[i] = (byte)(i % 2 == 0 ? (valueFrame[index] >> 8) & 0xFF : valueFrame[index] & 0xFF);
-        }
+        var buffer = ConvertRegisterFrameToBytes(valueFrame, 7);
         
         var span = new ReadOnlySpan<byte>(buffer);
         ModeSDF11? msg = null;
@@ -691,130 +785,135 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         return (await ReadCustomRegister(ReplyRatioS_7_0).ConfigureAwait(false) & 0xFF) * 0.5f;
     }
 
-    public async Task<ModeSDF4?> ReadModeSDf4(uint icao)
+    public async Task<ushort> ReadSelectiveDfCounter()
     {
-        var msg = await ReadDfMessage(new ModeSUF4 { IcaoAddress = icao, RR = 0, DI = 0 }, () => new ModeSDF4());
-        if (msg == null) return null;
-        var repRatio = await ReadReplyRatioModeS().ConfigureAwait(false);
-        return repRatio > 20.0 ? (ModeSDF4)msg : null;
+        return await ReadCustomRegister(DF_RX_CNT, DisposeCancel).ConfigureAwait(false);
     }
 
-    public async Task<ModeSDF20?> ReadModeSDf20(uint icao, byte bds)
+    public Task<ModeSDF4?> ReadModeSDf4(uint icao)
     {
-        var bdsMsg = GetBdsRegister(bds);
+        return RequestDfMessage(new ModeSUF4 { IcaoAddress = icao, RR = 0, DI = 0 }, () => new ModeSDF4(), icao);
+    }
+
+    public Task<ModeSDF20?> ReadModeSDf20(uint icao, byte bds)
+    {
+        ValidateBdsRegister(bds);
         var rr = (byte)(16 + (bds >> 4));
         var rrs = (byte)(bds & 0xF);
-        var msg = await ReadDfMessage(new ModeSUF4 { IcaoAddress = icao, RR = rr, DI = 7, RRS = rrs },
-            () => new ModeSDF20 { Bds = bdsMsg });
-        if (msg == null) return null;
-        var repRatio = await ReadReplyRatioModeS().ConfigureAwait(false);
-        return repRatio > 20.0 ? (ModeSDF20)msg : null;
+        return RequestDfMessage(
+            new ModeSUF4 { IcaoAddress = icao, RR = rr, DI = 7, RRS = rrs },
+            () => new ModeSDF20 { Bds = GetBdsRegister(bds) },
+            icao,
+            msg => HasBdsDataSelector(msg, bds));
     }
 
-    public async Task<ModeSDF20?> ReadModeSDf20(uint icao, byte ads, byte bds)
+    public Task<ModeSDF20?> ReadModeSDf20(uint icao, byte ads, byte bds)
     {
-        var bdsMsg = GetBdsRegister(bds);
+        ValidateBdsRegister(bds);
         var adsMsg = GetAdsRegister(ads);
         var rr = (byte)(16 + (bds >> 4));
         var rrs = (byte)(bds & 0xF);
-        var msg = await ReadDfMessage(new ModeSUF20 { IcaoAddress = icao, RR = rr, DI = 7, RRS = rrs, Ads = adsMsg },
-            () => new ModeSDF20 { Bds = bdsMsg });
-        if (msg == null) return null;
-        var repRatio = await ReadReplyRatioModeS().ConfigureAwait(false);
-        return repRatio > 20.0 ? (ModeSDF20)msg : null;
+        return RequestDfMessage(
+            new ModeSUF20 { IcaoAddress = icao, RR = rr, DI = 7, RRS = rrs, Ads = adsMsg },
+            () => new ModeSDF20 { Bds = GetBdsRegister(bds) },
+            icao,
+            msg => HasBdsDataSelector(msg, bds));
     }
 
-    public async Task<ModeSDF4?> ReadModeSDf4(uint icao, byte ads)
+    public Task<ModeSDF4?> ReadModeSDf4(uint icao, byte ads)
     {
         var adsMsg = GetAdsRegister(ads);
-        var msg = await ReadDfMessage(new ModeSUF20 { IcaoAddress = icao, RR = 0, DI = 0, Ads = adsMsg },
-            () => new ModeSDF4());
-        if (msg == null) return null;
-        var repRatio = await ReadReplyRatioModeS().ConfigureAwait(false);
-        return repRatio > 20.0 ? (ModeSDF4)msg : null;
+        return RequestDfMessage(
+            new ModeSUF20 { IcaoAddress = icao, RR = 0, DI = 0, Ads = adsMsg },
+            () => new ModeSDF4(),
+            icao);
     }
 
-    public async Task<ModeSDF5?> ReadModeSDf5(uint icao)
+    public Task<ModeSDF5?> ReadModeSDf5(uint icao)
     {
-        var msg = await ReadDfMessage(new ModeSUF5 { IcaoAddress = icao, RR = 0, DI = 0 }, () => new ModeSDF5());
-        if (msg == null) return null;
-        var repRatio = await ReadReplyRatioModeS().ConfigureAwait(false);
-        return repRatio > 20.0 ? (ModeSDF5)msg : null;
+        return RequestDfMessage(new ModeSUF5 { IcaoAddress = icao, RR = 0, DI = 0 }, () => new ModeSDF5(), icao);
     }
 
-    public async Task<ModeSDF21?> ReadModeSDf21(uint icao, byte bds)
+    public Task<ModeSDF21?> ReadModeSDf21(uint icao, byte bds)
     {
-        var bdsMsg = GetBdsRegister(bds);
+        ValidateBdsRegister(bds);
         var rr = (byte)(16 + (bds >> 4));
         var rrs = (byte)(bds & 0xF);
-        var msg = await ReadDfMessage(new ModeSUF5 { IcaoAddress = icao, RR = rr, DI = 7, RRS = rrs },
-            () => new ModeSDF21 { Bds = bdsMsg });
-        if (msg == null) return null;
-        var repRatio = await ReadReplyRatioModeS().ConfigureAwait(false);
-        return repRatio > 20.0 ? (ModeSDF21)msg : null;
+        return RequestDfMessage(
+            new ModeSUF5 { IcaoAddress = icao, RR = rr, DI = 7, RRS = rrs },
+            () => new ModeSDF21 { Bds = GetBdsRegister(bds) },
+            icao,
+            msg => HasBdsDataSelector(msg, bds));
     }
 
-    public async Task<ModeSDF21?> ReadModeSDf21(uint icao, byte ads, byte bds)
+    public Task<ModeSDF21?> ReadModeSDf21(uint icao, byte ads, byte bds)
     {
-        var bdsMsg = GetBdsRegister(bds);
+        ValidateBdsRegister(bds);
         var adsMsg = GetAdsRegister(ads);
         var rr = (byte)(16 + (bds >> 4));
         var rrs = (byte)(bds & 0xF);
-        var msg = await ReadDfMessage(new ModeSUF21 { IcaoAddress = icao, RR = rr, DI = 7, RRS = rrs, Ads = adsMsg },
-            () => new ModeSDF21 { Bds = bdsMsg });
-        if (msg == null) return null;
-        var repRatio = await ReadReplyRatioModeS().ConfigureAwait(false);
-        return repRatio > 20.0 ? (ModeSDF21)msg : null;
+        return RequestDfMessage(
+            new ModeSUF21 { IcaoAddress = icao, RR = rr, DI = 7, RRS = rrs, Ads = adsMsg },
+            () => new ModeSDF21 { Bds = GetBdsRegister(bds) },
+            icao,
+            msg => HasBdsDataSelector(msg, bds));
     }
 
-    public async Task<ModeSDF5?> ReadModeSDf5(uint icao, byte ads)
+    public Task<ModeSDF5?> ReadModeSDf5(uint icao, byte ads)
     {
         var adsMsg = GetAdsRegister(ads);
-        var msg = await ReadDfMessage(new ModeSUF21 { IcaoAddress = icao, RR = 0, DI = 0, Ads = adsMsg },
-            () => new ModeSDF5());
-        if (msg == null) return null;
-        var repRatio = await ReadReplyRatioModeS().ConfigureAwait(false);
-        return repRatio > 20.0 ? (ModeSDF5)msg : null;
+        return RequestDfMessage(
+            new ModeSUF21 { IcaoAddress = icao, RR = 0, DI = 0, Ads = adsMsg },
+            () => new ModeSDF5(),
+            icao);
     }
 
-    public async Task<ModeSDF0?> ReadModeSDf0(uint icao)
+    public Task<ModeSDF0?> ReadModeSDf0(uint icao)
     {
-        var msg = await ReadDfMessage(new ModeSUF0 { IcaoAddress = icao, ReplyLength = 0, Acquisition = 1 }, () => new ModeSDF0());
-        if (msg == null) return null;
-        var repRatio = await ReadReplyRatioModeS().ConfigureAwait(false);
-        return repRatio > 20.0 ? (ModeSDF0)msg : null;
+        return RequestDfMessage(
+            new ModeSUF0 { IcaoAddress = icao, ReplyLength = 0, Acquisition = 1 },
+            () => new ModeSDF0(),
+            icao);
     }
 
-    public async Task<ModeSDF16?> ReadModeSDf16(uint icao, byte bds)
+    public Task<ModeSDF16?> ReadModeSDf16(uint icao, byte bds)
     {
-        var bdsMsg = GetBdsRegister(bds);
-        var msg = await ReadDfMessage(
+        ValidateBdsRegister(bds);
+        return RequestDfMessage(
             new ModeSUF0 { IcaoAddress = icao, ReplyLength = 1, Acquisition = 0, DataSelector = bds },
-            () => new ModeSDF16 { Bds = bdsMsg });
-        if (msg == null) return null;
-        var repRatio = await ReadReplyRatioModeS().ConfigureAwait(false);
-        return repRatio > 20.0 ? (ModeSDF16)msg : null;
+            () => new ModeSDF16 { Bds = GetBdsRegister(bds) },
+            icao,
+            msg => HasBdsDataSelector(msg, bds));
     }
     
-    public async Task<ModeSDF16?> ReadModeSDf16(uint icao, byte ads, byte bds)
+    public Task<ModeSDF16?> ReadModeSDf16(uint icao, byte ads, byte bds)
     {
-        var bdsMsg = GetBdsRegister(bds);
+        ValidateBdsRegister(bds);
         var adsMsg = GetAdsRegister(ads);
-        var msg = await ReadDfMessage(
-            new ModeSUF16 { IcaoAddress = icao, ReplyLength = 1, Acquisition = 0, DataSelector = bds, Ads = adsMsg},
-            () => new ModeSDF16 { Bds = bdsMsg });
-        if (msg == null) return null;
-        var repRatio = await ReadReplyRatioModeS().ConfigureAwait(false);
-        return repRatio > 20.0 ? (ModeSDF16)msg : null;
+        return RequestDfMessage(
+            new ModeSUF16 { IcaoAddress = icao, ReplyLength = 1, Acquisition = 0, DataSelector = bds, Ads = adsMsg },
+            () => new ModeSDF16 { Bds = GetBdsRegister(bds) },
+            icao,
+            msg => HasBdsDataSelector(msg, bds));
     }
     
-    public async Task<ModeSDF0?> ReadModeSDf0(uint icao, byte ads)
+    public Task<ModeSDF0?> ReadModeSDf0(uint icao, byte ads)
     {
         var adsMsg = GetAdsRegister(ads);
-        var msg = await ReadDfMessage(new ModeSUF16 { IcaoAddress = icao, ReplyLength = 0, Acquisition = 1, Ads = adsMsg}, () => new ModeSDF0());
-        if (msg == null) return null;
-        var repRatio = await ReadReplyRatioModeS().ConfigureAwait(false);
-        return repRatio > 10.0 ? (ModeSDF0)msg : null;
+        return RequestDfMessage(
+            new ModeSUF16 { IcaoAddress = icao, ReplyLength = 0, Acquisition = 1, Ads = adsMsg },
+            () => new ModeSDF0(),
+            icao);
+    }
+
+    private static bool HasBdsDataSelector(ModeSDFormatBase msg, byte bds)
+    {
+        return msg.Bds is BdsAny || msg.Bds?.DataSelector == bds;
+    }
+
+    private static void ValidateBdsRegister(byte bds)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(bds, 0x10, nameof(bds));
     }
     
     private static AdsBase GetAdsRegister(byte ads)
