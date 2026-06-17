@@ -19,6 +19,10 @@ public static class AdsbParserFactory
             yield return () => new AdsbSurfacePosition();
             yield return () => new AdsbGroundSpeed();
             yield return () => new AdsbAirspeed();
+            yield return () => new AdsbAircraftStatusNoInformation();
+            yield return () => new AdsbAircraftEmergencyStatus();
+            yield return () => new AdsbAircraftAcasRaBroadcast();
+            yield return () => new AdsbTargetStateAndStatusInformation();
             yield return () => new AdsbAircraftOperationStatusV0();
             yield return () => new AdsbAircraftOperationStatusV1();
             yield return () => new AdsbAircraftOperationStatusV2();

@@ -62,11 +62,13 @@ public static class TransponderHelper
             <= 18 => AdsbMessageTypeEnum.AirborneBarometricPosition,
             19 => AdsbMessageTypeEnum.AirborneVelocities,
             <= 22 => AdsbMessageTypeEnum.AirborneGnssPosition,
-            <= 27 => AdsbMessageTypeEnum.EventDriven,
+            23 => AdsbMessageTypeEnum.EventDriven,
+            <= 27 => AdsbMessageTypeEnum.Reserved,
             28 => AdsbMessageTypeEnum.AircraftStatus,
             29 => AdsbMessageTypeEnum.TargetStateAndStatusInformation,
+            30 => AdsbMessageTypeEnum.Reserved,
             31 => AdsbMessageTypeEnum.AircraftOperationStatus,
-            _ => AdsbMessageTypeEnum.EventDriven
+            _ => AdsbMessageTypeEnum.Reserved
         };
     }
 
@@ -300,6 +302,461 @@ public static class TransponderHelper
         }
 
         return Encoding.ASCII.GetString(src);
+    }
+
+    public static string DecodeEmergencyState(int state)
+    {
+        return state switch
+        {
+            0 => "No emergency",
+            1 => "General emergency",
+            2 => "Lifeguard or medical emergency",
+            3 => "Minimum fuel",
+            4 => "No communications",
+            5 => "Unlawful interference",
+            6 => "Downed aircraft",
+            7 => "Reserved",
+            _ => "Invalid"
+        };
+    }
+
+    public static bool GetModeAIdentityXBit(ushort identityCode)
+    {
+        return (identityCode & 0x0040) != 0;
+    }
+
+    public static ushort RemoveModeAIdentityXBit(ushort identityCode)
+    {
+        return (ushort)(((identityCode & 0x1F80) << 0) | (identityCode & 0x003F));
+    }
+
+    public static string DecodeModeAIdentityToSquawk(ushort identityCode)
+    {
+        return ModeSHelper.GetSquawk(RemoveModeAIdentityXBit(identityCode));
+    }
+
+    public static int? DecodeModeCAltitudeCode13(ushort altitudeCode)
+    {
+        altitudeCode &= 0x1FFF;
+        if (altitudeCode == 0)
+        {
+            return null;
+        }
+
+        var mBit = (altitudeCode >> 6) & 0x1;
+        var qBit = (altitudeCode >> 4) & 0x1;
+        if (mBit != 0)
+        {
+            return null;
+        }
+
+        if (qBit != 0)
+        {
+            var n = ((altitudeCode >> 2) & 0x07E0) |
+                    ((altitudeCode >> 1) & 0x0010) |
+                    (altitudeCode & 0x000F);
+            return n * 25 - 1000;
+        }
+
+        return ModeSHelper.GetAltitudeFromModeCAltitudeCode(altitudeCode);
+    }
+
+    public static string DecodeAdsbVersion(int version)
+    {
+        return version switch
+        {
+            0 => "ADS-B Version 0 / DO-260",
+            1 => "ADS-B Version 1 / DO-260A",
+            2 => "ADS-B Version 2 / DO-260B",
+            _ => "Reserved"
+        };
+    }
+
+    public static NacPInfo DecodeNacP(int code)
+    {
+        double?[] epu = [null, 18520, 7408, 3704, 1852, 926, 556, 185, 93, 30, 10, 3];
+        double?[] vepu = [null, null, null, null, null, null, null, null, null, 45, 15, 4];
+        var valid = code >= 0 && code < epu.Length;
+
+        return new NacPInfo
+        {
+            Code = code,
+            EpuMeters = valid ? epu[code] : null,
+            VepuMeters = valid ? vepu[code] : null,
+            Text = valid && epu[code].HasValue
+                ? $"95% horizontal accuracy bound EPU <= {epu[code]} m"
+                : code == 0 ? "Unknown" : "Reserved"
+        };
+    }
+
+    public static NacVInfo DecodeNacV(int code)
+    {
+        double?[] hfomr = [null, 10, 3, 1, 0.3];
+        double?[] vfomr = [null, 15.2, 4.5, 1.5, 0.46];
+        var valid = code >= 0 && code < hfomr.Length;
+
+        return new NacVInfo
+        {
+            Code = code,
+            HorizontalVelocityErrorMps = valid ? hfomr[code] : null,
+            VerticalVelocityErrorMps = valid ? vfomr[code] : null,
+            Text = valid && hfomr[code].HasValue
+                ? $"HFOMr <= {hfomr[code]} m/s, VFOMr <= {vfomr[code]} m/s"
+                : code == 0 ? "Unknown" : "Reserved"
+        };
+    }
+
+    public static SilInfo DecodeSil(int code, bool? supplement)
+    {
+        double? peRcu = code switch
+        {
+            1 => 1e-3,
+            2 => 1e-5,
+            3 => 1e-7,
+            _ => null
+        };
+
+        double? peVpl = code switch
+        {
+            1 => 1e-3,
+            2 => 1e-5,
+            3 => 2e-7,
+            _ => null
+        };
+
+        return new SilInfo
+        {
+            Code = code,
+            Supplement = supplement,
+            ProbabilityBasis = supplement.HasValue
+                ? supplement.Value ? "per sample" : "per hour"
+                : "not present",
+            ProbabilityOfExceedingRc = peRcu,
+            ProbabilityOfExceedingVpl = peVpl,
+            Text = code == 0
+                ? "Unknown or no integrity"
+                : $"P(exceeding Rc) <= {peRcu:E0}, P(exceeding VPL) <= {peVpl:E0}"
+        };
+    }
+
+    public static SdaInfo DecodeSda(int code)
+    {
+        return new SdaInfo
+        {
+            Code = code,
+            Text = code switch
+            {
+                0 => "SDA=0: no or unknown system design assurance",
+                1 => "SDA=1",
+                2 => "SDA=2",
+                3 => "SDA=3",
+                _ => "Invalid"
+            }
+        };
+    }
+
+    public static GvaInfo DecodeGva(int code)
+    {
+        return new GvaInfo
+        {
+            Code = code,
+            VerticalAccuracyMeters = code switch
+            {
+                1 => 150,
+                2 => 45,
+                _ => null
+            },
+            Text = code switch
+            {
+                0 => "Unknown or > 150 m",
+                1 => "GVA <= 150 m",
+                2 => "GVA <= 45 m",
+                3 => "Reserved",
+                _ => "Invalid"
+            }
+        };
+    }
+
+    public static AircraftLengthWidthInfo DecodeAircraftLengthWidth(int code)
+    {
+        int? length = code switch
+        {
+            1 => 15,
+            2 or 3 => 25,
+            4 or 5 => 35,
+            6 or 7 => 45,
+            8 or 9 => 55,
+            10 or 11 => 65,
+            12 or 13 => 75,
+            14 or 15 => 85,
+            _ => null
+        };
+
+        double? width = code switch
+        {
+            1 => 23,
+            2 => 28.5,
+            3 => 34,
+            4 => 33,
+            5 => 38,
+            6 => 39.5,
+            7 or 8 => 45,
+            9 => 52,
+            10 => 59.5,
+            11 => 67,
+            12 => 72.5,
+            13 or 14 => 80,
+            15 => 90,
+            _ => null
+        };
+
+        return new AircraftLengthWidthInfo
+        {
+            Code = code,
+            LengthMeters = length,
+            WidthMeters = width
+        };
+    }
+
+    public static AirborneCapabilityStatus DecodeAirborneCapability(ushort capabilityClass, int adsbVersion)
+    {
+        var targetChange = (capabilityClass & 0x00C0) >> 6;
+
+        return new AirborneCapabilityStatus
+        {
+            Raw16 = capabilityClass,
+            ReservedTop2 = (capabilityClass & 0xC000) >> 14,
+            TcasOperational = adsbVersion >= 2
+                ? (capabilityClass & 0x2000) != 0
+                : (capabilityClass & 0x2000) == 0,
+            Has1090EsIn = (capabilityClass & 0x1000) != 0,
+            ReservedBits13_14 = (capabilityClass & 0x0C00) >> 10,
+            AirReferencedVelocityReportCapability = (capabilityClass & 0x0200) != 0,
+            TargetStateReportCapability = (capabilityClass & 0x0100) != 0,
+            TargetChangeReportCapability = targetChange,
+            TargetChangeReportCapabilityText = targetChange switch
+            {
+                0 => "Not supported",
+                1 => "Supports TC+0 reports only",
+                2 => "Supports multiple trajectory-change reports",
+                3 => "Reserved",
+                _ => "Invalid"
+            },
+            HasUatIn = adsbVersion >= 2 ? (capabilityClass & 0x0020) != 0 : null,
+            ReservedLowBits = capabilityClass & 0x003F
+        };
+    }
+
+    public static SurfaceCapabilityStatus DecodeSurfaceCapability(ushort capabilityClass)
+    {
+        var nacvCode = (capabilityClass & 0x00E0) >> 5;
+
+        return new SurfaceCapabilityStatus
+        {
+            Raw16 = capabilityClass,
+            ReservedTop2 = (capabilityClass & 0xC000) >> 14,
+            PositionOffsetApplied = (capabilityClass & 0x2000) != 0,
+            Has1090EsIn = (capabilityClass & 0x1000) != 0,
+            ReservedBits = (capabilityClass & 0x0C00) >> 10,
+            LowTxPowerClassB2GroundVehicle = (capabilityClass & 0x0200) != 0,
+            HasUatIn = (capabilityClass & 0x0100) != 0,
+            NacV = DecodeNacV(nacvCode),
+            NicSupplementC = (capabilityClass & 0x0010) != 0,
+            LengthWidthCode = capabilityClass & 0x000F
+        };
+    }
+
+    public static OperationalModeStatus DecodeOperationalMode(ushort operationalMode, int adsbVersion)
+    {
+        var result = new OperationalModeStatus
+        {
+            Raw16 = operationalMode,
+            ReservedTop2 = (operationalMode & 0xC000) >> 14,
+            TcasRaActive = (operationalMode & 0x2000) != 0,
+            IdentSwitchActive = (operationalMode & 0x1000) != 0,
+            ReceivingAtcServices = (operationalMode & 0x0800) != 0
+        };
+
+        if (adsbVersion >= 2)
+        {
+            result.SingleAntenna = (operationalMode & 0x0400) != 0;
+            result.Sda = DecodeSda((operationalMode & 0x0300) >> 8);
+        }
+
+        return result;
+    }
+
+    public static AcasRaInfo DecodeAcasRaBds30(ReadOnlySpan<byte> bds30Payload)
+    {
+        var tti = GetBitU(bds30Payload, 28, 2);
+
+        var info = new AcasRaInfo
+        {
+            ThreatTypeIndicator = tti,
+            ThreatTypeIndicatorText = tti switch
+            {
+                0 => "No threat identity data",
+                1 => "Threat identity is 24-bit ICAO address",
+                2 => "Threat identity is altitude, range and bearing",
+                3 => "Reserved",
+                _ => "Invalid"
+            },
+            IssuedRa = GetBitU(bds30Payload, 8, 1) != 0,
+            Corrective = GetBitU(bds30Payload, 9, 1) != 0,
+            DownwardSense = GetBitU(bds30Payload, 10, 1) != 0,
+            IncreasedRate = GetBitU(bds30Payload, 11, 1) != 0,
+            SenseReversal = GetBitU(bds30Payload, 12, 1) != 0,
+            AltitudeCrossing = GetBitU(bds30Payload, 13, 1) != 0,
+            Positive = GetBitU(bds30Payload, 14, 1) != 0,
+            AraReserved15_21 = GetBitU(bds30Payload, 15, 7),
+            NoBelow = GetBitU(bds30Payload, 22, 1) != 0,
+            NoAbove = GetBitU(bds30Payload, 23, 1) != 0,
+            NoLeft = GetBitU(bds30Payload, 24, 1) != 0,
+            NoRight = GetBitU(bds30Payload, 25, 1) != 0,
+            RaTerminated = GetBitU(bds30Payload, 26, 1) != 0,
+            MultipleThreat = GetBitU(bds30Payload, 27, 1) != 0
+        };
+
+        if (tti == 1)
+        {
+            info.ThreatIcao = GetBitU(bds30Payload, 30, 24).ToString("X6");
+            info.ThreatIdentityReserved54_55 = GetBitU(bds30Payload, 54, 2);
+        }
+        else if (tti == 2)
+        {
+            var ac13 = GetBitU(bds30Payload, 30, 13);
+            var rangeRaw = GetBitU(bds30Payload, 43, 7);
+            var bearingRaw = GetBitU(bds30Payload, 50, 6);
+
+            info.ThreatAc13Raw = ac13;
+            info.ThreatAltitudeFt = DecodeModeCAltitudeCode13((ushort)ac13);
+            info.ThreatRangeRaw = rangeRaw;
+            info.ThreatRangeNm = rangeRaw > 0 ? (rangeRaw - 1) / 10.0 : null;
+            info.ThreatBearingRaw = bearingRaw;
+            info.ThreatBearingDeg = bearingRaw > 0 ? 6 * (bearingRaw - 1) + 3 : null;
+        }
+
+        return info;
+    }
+
+    private static int GetBitU(ReadOnlySpan<byte> buffer, int bitOffset, int bitCount)
+    {
+        var bitIndex = bitOffset;
+        return (int)SpanBitHelper.GetBitU(buffer, ref bitIndex, bitCount);
+    }
+
+    public sealed class NacPInfo
+    {
+        public int Code { get; set; }
+        public double? EpuMeters { get; set; }
+        public double? VepuMeters { get; set; }
+        public string Text { get; set; } = string.Empty;
+    }
+
+    public sealed class NacVInfo
+    {
+        public int Code { get; set; }
+        public double? HorizontalVelocityErrorMps { get; set; }
+        public double? VerticalVelocityErrorMps { get; set; }
+        public string Text { get; set; } = string.Empty;
+    }
+
+    public sealed class SilInfo
+    {
+        public int Code { get; set; }
+        public bool? Supplement { get; set; }
+        public string ProbabilityBasis { get; set; } = string.Empty;
+        public double? ProbabilityOfExceedingRc { get; set; }
+        public double? ProbabilityOfExceedingVpl { get; set; }
+        public string Text { get; set; } = string.Empty;
+    }
+
+    public sealed class SdaInfo
+    {
+        public int Code { get; set; }
+        public string Text { get; set; } = string.Empty;
+    }
+
+    public sealed class GvaInfo
+    {
+        public int Code { get; set; }
+        public int? VerticalAccuracyMeters { get; set; }
+        public string Text { get; set; } = string.Empty;
+    }
+
+    public sealed class AircraftLengthWidthInfo
+    {
+        public int Code { get; set; }
+        public int? LengthMeters { get; set; }
+        public double? WidthMeters { get; set; }
+    }
+
+    public sealed class AirborneCapabilityStatus
+    {
+        public ushort Raw16 { get; set; }
+        public int ReservedTop2 { get; set; }
+        public bool TcasOperational { get; set; }
+        public bool Has1090EsIn { get; set; }
+        public int ReservedBits13_14 { get; set; }
+        public bool AirReferencedVelocityReportCapability { get; set; }
+        public bool TargetStateReportCapability { get; set; }
+        public int TargetChangeReportCapability { get; set; }
+        public string TargetChangeReportCapabilityText { get; set; } = string.Empty;
+        public bool? HasUatIn { get; set; }
+        public int ReservedLowBits { get; set; }
+    }
+
+    public sealed class SurfaceCapabilityStatus
+    {
+        public ushort Raw16 { get; set; }
+        public int ReservedTop2 { get; set; }
+        public bool PositionOffsetApplied { get; set; }
+        public bool Has1090EsIn { get; set; }
+        public int ReservedBits { get; set; }
+        public bool LowTxPowerClassB2GroundVehicle { get; set; }
+        public bool HasUatIn { get; set; }
+        public NacVInfo NacV { get; set; } = new();
+        public bool NicSupplementC { get; set; }
+        public int LengthWidthCode { get; set; }
+    }
+
+    public sealed class OperationalModeStatus
+    {
+        public ushort Raw16 { get; set; }
+        public int ReservedTop2 { get; set; }
+        public bool TcasRaActive { get; set; }
+        public bool IdentSwitchActive { get; set; }
+        public bool ReceivingAtcServices { get; set; }
+        public bool? SingleAntenna { get; set; }
+        public SdaInfo? Sda { get; set; }
+    }
+
+    public sealed class AcasRaInfo
+    {
+        public int ThreatTypeIndicator { get; set; }
+        public string ThreatTypeIndicatorText { get; set; } = string.Empty;
+        public bool IssuedRa { get; set; }
+        public bool Corrective { get; set; }
+        public bool DownwardSense { get; set; }
+        public bool IncreasedRate { get; set; }
+        public bool SenseReversal { get; set; }
+        public bool AltitudeCrossing { get; set; }
+        public bool Positive { get; set; }
+        public int AraReserved15_21 { get; set; }
+        public bool NoBelow { get; set; }
+        public bool NoAbove { get; set; }
+        public bool NoLeft { get; set; }
+        public bool NoRight { get; set; }
+        public bool RaTerminated { get; set; }
+        public bool MultipleThreat { get; set; }
+        public string? ThreatIcao { get; set; }
+        public int? ThreatIdentityReserved54_55 { get; set; }
+        public int? ThreatAc13Raw { get; set; }
+        public int? ThreatAltitudeFt { get; set; }
+        public int? ThreatRangeRaw { get; set; }
+        public double? ThreatRangeNm { get; set; }
+        public int? ThreatBearingRaw { get; set; }
+        public int? ThreatBearingDeg { get; set; }
     }
 
     /// <summary>

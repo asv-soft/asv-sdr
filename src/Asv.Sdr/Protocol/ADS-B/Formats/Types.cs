@@ -23,7 +23,7 @@ public enum AdsbMessageTypeEnum
     SurfacePosition = 5,
     
     /// <summary>
-    /// TC = 9–18 для airborne position с баро-высотой
+    /// TC = 9–18 для airborne position BDS 0,5 с баро-высотой
     /// </summary>
     AirborneBarometricPosition = 9,
     
@@ -35,7 +35,7 @@ public enum AdsbMessageTypeEnum
     AirborneVelocities = 19,
     
     /// <summary>
-    /// TC = 20–22 для airborne position с GNSS-высотой
+    /// TC = 20–22 для airborne position BDS 0,5 с GNSS-высотой
     /// </summary>
     AirborneGnssPosition = 20,
     
@@ -44,6 +44,20 @@ public enum AdsbMessageTypeEnum
     /// </summary>
     EventDriven = 23,
     
+    /// <summary>
+    /// Статус/синхронизация наземной surveillance-системы;
+    /// Не обычный aircraft state vector, а скорее статус и индикаторы режима для наземных систем наблюдения.
+    /// </summary>
+    SurfaceSystemStatus = 24,
+
+    /// <summary>
+    /// 25 - Reserved в DO‑260B / HVA в DO‑260C;
+    /// 26 - Reserved в DO‑260B / ADS‑B Wx в DO‑260C;
+    /// 27 - Reserved for Trajectory Change;
+    /// 30 - Reserved / legacy Operational Coordination
+    /// </summary>
+    Reserved = 25,
+
     /// <summary>
     /// TC = 28 для BDS 6,1 — Extended Squitter Aircraft Status.
     /// SubType = 1 для Emergency/Priority Status,
@@ -63,7 +77,7 @@ public enum AdsbMessageTypeEnum
     /// SubType = 0 для Airborne,
     /// SubType = 1  для Surface
     /// </summary>
-    AircraftOperationStatus = 31
+    AircraftOperationStatus = 31,
 }
 
 public enum SurfacePositionTypeCodes
@@ -183,6 +197,19 @@ public enum AircraftOperationalStatusEnum
 {
     SubType1 = 0,
     SubType2 = 1,
+}
+
+public enum AircraftStatusSubTypeEnum
+{
+    NoInformation = 0,
+    EmergencyPriorityStatus = 1,
+    AcasRaBroadcast = 2
+}
+
+public enum TargetStateStatusSubTypeEnum
+{
+    Legacy = 0,
+    TargetStateAndModeStatus = 1
 }
 
 public enum NavigationUncertaintyCategoryEnum
