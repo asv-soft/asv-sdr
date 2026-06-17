@@ -238,6 +238,16 @@ namespace Asv.Sdr
         });
 
         private const double MinSignalDotUnits = 0.3;
+
+        // Schmitt-trigger hysteresis + debounce for the raw per-window AM gate.
+        // The rising edge uses _amMin; the falling edge uses a lower threshold so a tone
+        // whose AM ripples near _amMin does not chatter on/off. A state change is only
+        // committed after SignalDebounceWindows consecutive windows agree, so a single
+        // noisy/edge window cannot split an element or inject a phantom gap. Because each
+        // edge absorbs the same number of windows, element/pause durations are preserved.
+        private const double SignalOffThresholdFactor = 0.7;
+        private const int SignalDebounceWindows = 2;
+
         private const double DotDashDecisionDotUnits = 1.5;
         private const double SymbolPauseMaxDotUnits = 1.5;
         private const double CharacterPauseMaxDotUnits = 4.0;
@@ -264,6 +274,8 @@ namespace Asv.Sdr
         private double _signalTime;
         private double _noSignalTime;
         private bool _hasCodeActivity;
+        private bool _gateSignalState;
+        private int _gatePendingCount;
         private readonly List<CodeEvent> _events = new();
 
         private readonly List<char> _symbols = new();
@@ -368,7 +380,7 @@ namespace Asv.Sdr
         private void OnNext(double am)
         {
             RecordAmplitude(am);
-            var isCodeSignal = am >= _amMin && am <= _amMax;
+            var isCodeSignal = GateSignal(am);
             
             switch (_state)
             {
@@ -398,6 +410,32 @@ namespace Asv.Sdr
                     break;
 
             }
+        }
+
+        private bool GateSignal(double am)
+        {
+            // Hysteresis: once the tone is latched, hold it until the AM drops below the
+            // lower off-threshold (or exceeds _amMax); when off, require the full _amMin.
+            var inBand = _gateSignalState
+                ? am >= _amMin * SignalOffThresholdFactor && am <= _amMax
+                : am >= _amMin && am <= _amMax;
+
+            if (inBand == _gateSignalState)
+            {
+                _gatePendingCount = 0;
+                return _gateSignalState;
+            }
+
+            // Debounce: flip only after SignalDebounceWindows consecutive opposing windows.
+            // Until confirmed, the current window is absorbed into the current state, so a
+            // lone noisy window cannot split an element or inject a phantom gap.
+            if (++_gatePendingCount >= SignalDebounceWindows)
+            {
+                _gateSignalState = inBand;
+                _gatePendingCount = 0;
+            }
+
+            return _gateSignalState;
         }
 
         private void RecordAmplitude(double am)

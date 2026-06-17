@@ -25,7 +25,7 @@ namespace Asv.Sdr.Test
             Push(src, 0.0, 10);
             Push(src, 0.3, 30);
             Push(src, 0.0, 70);
-            Push(src, 0.3, 1);
+            Push(src, 0.3, 2); // >= SignalDebounceWindows so the trailing onset confirms and flushes the word
 
             Assert.True(done.WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Single(received);
@@ -50,7 +50,7 @@ namespace Asv.Sdr.Test
             Push(src, 0.0, 500);
             PushMorse(src, "... --- ... ..-", 0.3, 0.0, 15, 30, 45);
             Push(src, 0.0, 500);
-            Push(src, 0.3, 1);
+            Push(src, 0.3, 2); // >= SignalDebounceWindows so the trailing onset confirms and flushes the word
 
             Assert.True(done.WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Single(received);
@@ -77,7 +77,7 @@ namespace Asv.Sdr.Test
             Push(src, 0.0, 500);
             PushMorse(src, "... --- ... ..- ... --- ... ..-", 0.3, 0.0, 15, 30, 45);
             Push(src, 0.0, 45);
-            Push(src, 0.3, 1);
+            Push(src, 0.3, 2); // >= SignalDebounceWindows so the trailing onset confirms and flushes the word
 
             Assert.True(done.WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Single(received);
@@ -104,7 +104,7 @@ namespace Asv.Sdr.Test
             Push(src, 0.0, 500);
             PushMorse(src, "... --- ... ..-", 0.3, 0.0, 15, 30, 45);
             Push(src, 0.0, 500);
-            Push(src, 0.3, 1);
+            Push(src, 0.3, 2); // >= SignalDebounceWindows so the trailing onset confirms and flushes the word
 
             Assert.True(done.WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Single(received);
