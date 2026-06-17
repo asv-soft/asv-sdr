@@ -38,3 +38,48 @@ public abstract class AdsBase : ISizedSpanSerializable
         return 7;
     }
 }
+
+public class AdsAny : AdsBase
+{
+    public override byte Ads1 { get; }
+    public override byte Ads2 { get; }
+    
+    public byte[] Data { get; } = new byte[7];
+
+    public AdsAny(byte ads1, byte ads2)
+    {
+        Ads1 = ads1;
+        Ads2 = ads2;
+    }
+
+    public override void Deserialize(ref ReadOnlySpan<byte> buffer)
+    {
+        InternalDeserialize(ref buffer);
+    }
+
+    protected override void InternalDeserialize(ref ReadOnlySpan<byte> buffer)
+    {
+        var len = Math.Min(buffer.Length, 7);
+        for (var i = 0; i < len; i++)
+        {
+            Data[i] = buffer[i];
+        }
+        buffer = buffer[len..];
+    }
+
+    public override void Serialize(ref Span<byte> buffer)
+    {
+        InternalSerialize(ref buffer);
+    }
+
+    protected override void InternalSerialize(ref Span<byte> buffer)
+    {
+        var len = Math.Min(buffer.Length, 7);
+        for (var i = 0; i < len; i++)
+        {
+            Data[i] = buffer[i];
+            BinSerialize.WriteByte(ref buffer, Data[i]);
+        }
+        buffer = buffer[len..];
+    }
+}
