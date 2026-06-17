@@ -153,5 +153,11 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     Task<AdsbAircraftIdentification?> ReadExBds08Id();
     Task<AdsbGroundSpeed?> ReadExBds09GroundSpeed();
     Task<AdsbAirspeed?> ReadExBds09Airspeed();
-    
+    Task<AdsbAircraftEmergencyStatus?> ReadExBds61EmergencyPriorityStatus();
+    Task<AdsbAircraftAcasRaBroadcast?> ReadExBds61TcasRaBroadcast();
+    Task<AdsbTargetStateAndStatusInformation?> ReadExBds62Old();
+    Task<AdsbTargetStateAndStatusInformation?> ReadExBds62New();
+    Task<AdsbAircraftOperationStatus?> ReadExBds65Airborne();
+    Task<AdsbAircraftOperationStatus?> ReadExBds65Surface();
+
 }

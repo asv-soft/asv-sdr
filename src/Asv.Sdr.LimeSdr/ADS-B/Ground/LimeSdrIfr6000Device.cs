@@ -520,271 +520,139 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         return period == 0xFF ? float.PositiveInfinity : period * 0.2f;
     }
 
-    public async Task<AdsbAirbornePosition?> ReadExBds05Even()
+    public Task<AdsbAirbornePosition?> ReadExBds05Even()
+    {
+        return ReadExMessage(BDS_05_Ev_111_96, CreateAirbornePositionMessage);
+    }
+
+    public Task<AdsbAirbornePosition?> ReadExBds05Odd()
+    {
+        return ReadExMessage(BDS_05_Odd_111_96, CreateAirbornePositionMessage);
+    }
+
+    public Task<AdsbSurfacePosition?> ReadExBds06Even()
+    {
+        return ReadExMessage(BDS_06_Ev_111_96, () => new AdsbSurfacePosition());
+    }
+
+    public Task<AdsbSurfacePosition?> ReadExBds06Odd()
+    {
+        return ReadExMessage(BDS_06_Odd_111_96, () => new AdsbSurfacePosition());
+    }
+
+    public Task<AdsbAircraftIdentification?> ReadExBds08Id()
+    {
+        return ReadExMessage(BDS_08_111_96, () => new AdsbAircraftIdentification());
+    }
+
+    public Task<AdsbGroundSpeed?> ReadExBds09GroundSpeed()
+    {
+        return ReadExMessage(BDS_09_Vel_111_96, () => new AdsbGroundSpeed(), IsGroundSpeedMessage);
+    }
+
+    public Task<AdsbAirspeed?> ReadExBds09Airspeed()
+    {
+        return ReadExMessage(BDS_09_Air_111_96, () => new AdsbAirspeed(), IsAirspeedMessage);
+    }
+
+    public Task<AdsbAircraftEmergencyStatus?> ReadExBds61EmergencyPriorityStatus()
+    {
+        return ReadExMessage(BDS_61_E_111_96, () => new AdsbAircraftEmergencyStatus());
+    }
+
+    public Task<AdsbAircraftAcasRaBroadcast?> ReadExBds61TcasRaBroadcast()
+    {
+        return ReadExMessage(BDS_61_T_111_96, () => new AdsbAircraftAcasRaBroadcast());
+    }
+
+    public Task<AdsbTargetStateAndStatusInformation?> ReadExBds62Old()
+    {
+        return ReadExMessage(BDS_62_Old_111_96, () => new AdsbTargetStateAndStatusInformation());
+    }
+
+    public Task<AdsbTargetStateAndStatusInformation?> ReadExBds62New()
+    {
+        return ReadExMessage(BDS_62_New_111_96, () => new AdsbTargetStateAndStatusInformation());
+    }
+
+    public Task<AdsbAircraftOperationStatus?> ReadExBds65Airborne()
+    {
+        return ReadExMessage<AdsbAircraftOperationStatus>(BDS_65_Air_111_96, () => new AdsbAircraftOperationStatusV0());
+    }
+
+    public Task<AdsbAircraftOperationStatus?> ReadExBds65Surface()
+    {
+        return ReadExMessage<AdsbAircraftOperationStatus>(BDS_65_Sur_111_96, () => new AdsbAircraftOperationStatusV1());
+    }
+
+    private Task<T?> ReadExMessage<T>(ushort startAddress, Func<T> factory)
+        where T : AdsbExtendedSquitterBase
+    {
+        return ReadExMessage(startAddress, _ => factory());
+    }
+
+    private Task<T?> ReadExMessage<T>(ushort startAddress, Func<T> factory, Func<T, bool> isValid)
+        where T : AdsbExtendedSquitterBase
+    {
+        return ReadExMessage(startAddress, _ => factory(), isValid);
+    }
+
+    private async Task<T?> ReadExMessage<T>(ushort startAddress, Func<byte[], T?> factory, Func<T, bool>? isValid = null)
+        where T : AdsbExtendedSquitterBase
     {
         var addrFrame = new ushort[7];
         for (ushort i = 0; i < addrFrame.Length; i++)
         {
-            addrFrame[i] = (ushort)(BDS_05_Ev_111_96 + i);
+            addrFrame[i] = (ushort)(startAddress + i);
         }
+
         var valueFrame = await ReadCustomRegistersFrame(addrFrame, DisposeCancel).ConfigureAwait(false);
         var buffer = new byte[addrFrame.Length * 2];
-        var span = new ReadOnlySpan<byte>(buffer);
         for (var i = 0; i < buffer.Length; i++)
         {
             var index = i / 2;
             buffer[i] = (byte)(i % 2 == 0 ? (valueFrame[index] >> 8) & 0xFF : valueFrame[index] & 0xFF);
         }
 
-        AdsbAirbornePosition? msgEven = null;
+        var span = new ReadOnlySpan<byte>(buffer);
         try
         {
-            var type = TransponderHelper.GetMessageType(span);
-            AdsbAirbornePosition? even = type switch
+            var msg = factory(buffer);
+            if (msg == null)
             {
-                AdsbMessageTypeEnum.AirborneBarometricPosition => new AdsbAirbornePositionWithBaroAlt(),
-                AdsbMessageTypeEnum.AirborneGnssPosition => new AdsbAirbornePositionWithGnssAlt(),
-                _ => null
-            };
-            if (even != null)
-            {
-                even.Deserialize(ref span);
-                msgEven = even;
+                return null;
             }
+
+            msg.Deserialize(ref span);
+            return isValid == null || isValid(msg) ? msg : null;
         }
         catch (Exception)
         {
             // ignored
-        }
-        
-        return msgEven;
-    }
-    
-    public async Task<AdsbAirbornePosition?> ReadExBds05Odd()
-    {
-        var addrFrame = new ushort[7];
-        for (ushort i = 0; i < addrFrame.Length; i++)
-        {
-            addrFrame[i] = (ushort)(BDS_05_Odd_111_96 + i);
-        }
-        var valueFrame = await ReadCustomRegistersFrame(addrFrame, DisposeCancel).ConfigureAwait(false);
-        var buffer = new byte[addrFrame.Length * 2];
-        var span = new ReadOnlySpan<byte>(buffer);
-        for (var i = 0; i < buffer.Length; i++)
-        {
-            var index = i / 2;
-            buffer[i] = (byte)(i % 2 == 0 ? (valueFrame[index] >> 8) & 0xFF : valueFrame[index] & 0xFF);
         }
 
-        AdsbAirbornePosition? msgOdd = null;
-        try
-        {
-            var type = TransponderHelper.GetMessageType(span);
-            AdsbAirbornePosition? odd = type switch
-            {
-                AdsbMessageTypeEnum.AirborneBarometricPosition => new AdsbAirbornePositionWithBaroAlt(),
-                AdsbMessageTypeEnum.AirborneGnssPosition => new AdsbAirbornePositionWithGnssAlt(),
-                _ => null
-            };
-            if (odd != null)
-            {
-                odd.Deserialize(ref span);
-                msgOdd = odd;
-            }
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
-        
-        return msgOdd;
+        return null;
     }
-    
-    public async Task<AdsbSurfacePosition?> ReadExBds06Even()
-    {
-        var addrFrame = new ushort[7];
-        for (ushort i = 0; i < addrFrame.Length; i++)
-        {
-            addrFrame[i] = (ushort)(BDS_06_Ev_111_96 + i);
-        }
-        var valueFrame = await ReadCustomRegistersFrame(addrFrame, DisposeCancel).ConfigureAwait(false);
-        var buffer = new byte[addrFrame.Length * 2];
-        var span = new ReadOnlySpan<byte>(buffer);
-        for (var i = 0; i < buffer.Length; i++)
-        {
-            var index = i / 2;
-            buffer[i] = (byte)(i % 2 == 0 ? (valueFrame[index] >> 8) & 0xFF : valueFrame[index] & 0xFF);
-        }
 
-        AdsbSurfacePosition? msgEven = null;
-        try
-        {
-            var type = TransponderHelper.GetMessageType(span);
-            var even = type switch
-            {
-                AdsbMessageTypeEnum.SurfacePosition => new AdsbSurfacePosition(),
-                _ => null
-            };
-            if (even != null)
-            {
-                even.Deserialize(ref span);
-                msgEven = even;
-            }
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
-        
-        return msgEven;
-    }
-    
-    public async Task<AdsbSurfacePosition?> ReadExBds06Odd()
+    private static AdsbAirbornePosition? CreateAirbornePositionMessage(byte[] buffer)
     {
-        var addrFrame = new ushort[7];
-        for (ushort i = 0; i < addrFrame.Length; i++)
-        {
-            addrFrame[i] = (ushort)(BDS_06_Odd_111_96 + i);
-        }
-        var valueFrame = await ReadCustomRegistersFrame(addrFrame, DisposeCancel).ConfigureAwait(false);
-        var buffer = new byte[addrFrame.Length * 2];
         var span = new ReadOnlySpan<byte>(buffer);
-        for (var i = 0; i < buffer.Length; i++)
+        return TransponderHelper.GetMessageType(span) switch
         {
-            var index = i / 2;
-            buffer[i] = (byte)(i % 2 == 0 ? (valueFrame[index] >> 8) & 0xFF : valueFrame[index] & 0xFF);
-        }
+            AdsbMessageTypeEnum.AirborneBarometricPosition => new AdsbAirbornePositionWithBaroAlt(),
+            AdsbMessageTypeEnum.AirborneGnssPosition => new AdsbAirbornePositionWithGnssAlt(),
+            _ => null
+        };
+    }
 
-        AdsbSurfacePosition? msgOdd = null;
-        try
-        {
-            var type = TransponderHelper.GetMessageType(span);
-            var even = type switch
-            {
-                AdsbMessageTypeEnum.SurfacePosition => new AdsbSurfacePosition(),
-                _ => null
-            };
-            if (even != null)
-            {
-                even.Deserialize(ref span);
-                msgOdd = even;
-            }
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
-        
-        return msgOdd;
-    }
-    
-    public async Task<AdsbAircraftIdentification?> ReadExBds08Id()
+    private static bool IsGroundSpeedMessage(AdsbGroundSpeed msg)
     {
-        var addrFrame = new ushort[7];
-        for (ushort i = 0; i < addrFrame.Length; i++)
-        {
-            addrFrame[i] = (ushort)(BDS_08_111_96 + i);
-        }
-        var valueFrame = await ReadCustomRegistersFrame(addrFrame, DisposeCancel).ConfigureAwait(false);
-        var buffer = new byte[addrFrame.Length * 2];
-        for (var i = 0; i < buffer.Length; i++)
-        {
-            var index = i / 2;
-            buffer[i] = (byte)(i % 2 == 0 ? (valueFrame[index] >> 8) & 0xFF : valueFrame[index] & 0xFF);
-        }
-        
-        var span = new ReadOnlySpan<byte>(buffer);
-        AdsbAircraftIdentification? msg = null;
-        try
-        {
-            var type = TransponderHelper.GetMessageType(span);
-            msg = type switch
-            {
-                AdsbMessageTypeEnum.AircraftIdentification => new AdsbAircraftIdentification(),
-                _ => null
-            };
-            msg?.Deserialize(ref span);
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
-        
-        return msg;
+        return msg.SubType is VelocitySubTypeEnum.SubType1 or VelocitySubTypeEnum.SubType2;
     }
-    
-    public async Task<AdsbGroundSpeed?> ReadExBds09GroundSpeed()
+
+    private static bool IsAirspeedMessage(AdsbAirspeed msg)
     {
-        var addrFrame = new ushort[7];
-        for (ushort i = 0; i < addrFrame.Length; i++)
-        {
-            addrFrame[i] = (ushort)(BDS_09_Vel_111_96 + i);
-        }
-        var valueFrame = await ReadCustomRegistersFrame(addrFrame, DisposeCancel).ConfigureAwait(false);
-        var buffer = new byte[addrFrame.Length * 2];
-        for (var i = 0; i < buffer.Length; i++)
-        {
-            var index = i / 2;
-            buffer[i] = (byte)(i % 2 == 0 ? (valueFrame[index] >> 8) & 0xFF : valueFrame[index] & 0xFF);
-        }
-        
-        var span = new ReadOnlySpan<byte>(buffer);
-        AdsbGroundSpeed? msg = null;
-        try
-        {
-            var type = TransponderHelper.GetMessageType(span);
-            var subType = (VelocitySubTypeEnum)TransponderHelper.GetMessageSybType(span);
-            
-            if (type == AdsbMessageTypeEnum.AirborneVelocities && subType is VelocitySubTypeEnum.SubType1 or VelocitySubTypeEnum.SubType2)
-            {
-                msg = new AdsbGroundSpeed();
-                msg.Deserialize(ref span);
-                return msg;
-            }
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
-        
-        return msg;
-    }
-    
-    public async Task<AdsbAirspeed?> ReadExBds09Airspeed()
-    {
-        var addrFrame = new ushort[7];
-        for (ushort i = 0; i < addrFrame.Length; i++)
-        {
-            addrFrame[i] = (ushort)(BDS_09_Air_111_96 + i);
-        }
-        var valueFrame = await ReadCustomRegistersFrame(addrFrame, DisposeCancel).ConfigureAwait(false);
-        var buffer = new byte[addrFrame.Length * 2];
-        for (var i = 0; i < buffer.Length; i++)
-        {
-            var index = i / 2;
-            buffer[i] = (byte)(i % 2 == 0 ? (valueFrame[index] >> 8) & 0xFF : valueFrame[index] & 0xFF);
-        }
-        
-        var span = new ReadOnlySpan<byte>(buffer);
-        AdsbAirspeed? msg = null;
-        try
-        {
-            var type = TransponderHelper.GetMessageType(span);
-            var subType = (VelocitySubTypeEnum)TransponderHelper.GetMessageSybType(span);
-            
-            if (type == AdsbMessageTypeEnum.AirborneVelocities && subType is VelocitySubTypeEnum.SubType3 or VelocitySubTypeEnum.SubType4)
-            {
-                msg = new AdsbAirspeed();
-                msg.Deserialize(ref span);
-                return msg;
-            }
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
-        
-        return msg;
+        return msg.SubType is VelocitySubTypeEnum.SubType3 or VelocitySubTypeEnum.SubType4;
     }
     
     public async Task<ModeSDF11?> ReadDf11Squitter()
