@@ -27,8 +27,7 @@ namespace Asv.Sdr
         public static double[] None(int width)
         {
             var numArray = new double[width];
-            for (var index = 0; index < numArray.Length; ++index)
-                numArray[index] = 1;
+            Array.Fill(numArray, 1.0);
             return numArray;
         }
 

@@ -6,21 +6,28 @@ namespace Asv.Sdr
     {
         private readonly double _argMultiplier;
         private uint _increment;
-        private readonly int _size;
+        private readonly int _complexSampleCount;
 
         public ReaderIqFreqShiftDouble(IReaderIqSubject<double> input, double sampleRate,int freqHz, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
         {
             _argMultiplier = 2 * Math.PI * freqHz / sampleRate;
             _increment = 0;
-            _size = input.OutputBufferSize / 2;
+            _complexSampleCount = input.OutputBufferSize / 2;
         }
 
         protected override void Process(ReadOnlySpan<double> input, Span<double> output)
         {
-            for (var i = 0; i < _size; i++)
+            for (var i = 0; i < _complexSampleCount; i++)
             {
-                output[i * 2] = Math.Sin(_increment * _argMultiplier) * input[i * 2];
-                output[i * 2 + 1] = Math.Cos(_increment * _argMultiplier) * input[i * 2 + 1];
+                var offset = i * 2;
+                var phase = _increment * _argMultiplier;
+                var cos = Math.Cos(phase);
+                var sin = Math.Sin(phase);
+                var inputI = input[offset];
+                var inputQ = input[offset + 1];
+
+                output[offset] = inputI * cos - inputQ * sin;
+                output[offset + 1] = inputI * sin + inputQ * cos;
                 _increment++;
             }
         }
@@ -30,21 +37,28 @@ namespace Asv.Sdr
     {
         private readonly double _argMultiplier;
         private uint _increment;
-        private readonly int _size;
+        private readonly int _complexSampleCount;
 
         public ReaderIqFreqShiftFloat(IReaderIqSubject<float> input, double sampleRate, int freqHz, bool useArrayPool) : base(input, input.OutputBufferSize, useArrayPool)
         {
             _argMultiplier = 2 * Math.PI * freqHz / sampleRate;
             _increment = 0;
-            _size = input.OutputBufferSize / 2;
+            _complexSampleCount = input.OutputBufferSize / 2;
         }
 
         protected override void Process(ReadOnlySpan<float> input, Span<double> output)
         {
-            for (var i = 0; i < _size; i++)
+            for (var i = 0; i < _complexSampleCount; i++)
             {
-                output[i * 2] = Math.Sin(_increment * _argMultiplier);
-                output[i * 2] = Math.Cos(_increment * _argMultiplier);
+                var offset = i * 2;
+                var phase = _increment * _argMultiplier;
+                var cos = Math.Cos(phase);
+                var sin = Math.Sin(phase);
+                var inputI = input[offset];
+                var inputQ = input[offset + 1];
+
+                output[offset] = inputI * cos - inputQ * sin;
+                output[offset + 1] = inputI * sin + inputQ * cos;
                 _increment++;
             }
         }
