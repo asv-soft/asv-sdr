@@ -772,6 +772,72 @@ namespace Asv.Sdr
             return new ReaderIqFrequencyOffsetDoubleSubject(src);
         }
 
+        public static IObservable<ReaderIqCarrierPllResult> TrackCarrierPll(
+            this IReaderIqSubject<float> src,
+            ReaderIqCarrierPllOptions options
+        )
+        {
+            return new ReaderIqCarrierPllFloatSubject(src, options);
+        }
+
+        public static IObservable<ReaderIqCarrierPllResult> TrackCarrierPll(
+            this IReaderIqSubject<double> src,
+            ReaderIqCarrierPllOptions options
+        )
+        {
+            return new ReaderIqCarrierPllDoubleSubject(src, options);
+        }
+
+        public static IObservable<double> GetPllFrequencyOffset(
+            this IReaderIqSubject<float> src,
+            ReaderIqCarrierPllOptions options
+        )
+        {
+            return src.TrackCarrierPll(options).Select(x => x.FrequencyOffsetHz);
+        }
+
+        public static IObservable<double> GetPllFrequencyOffset(
+            this IReaderIqSubject<double> src,
+            ReaderIqCarrierPllOptions options
+        )
+        {
+            return src.TrackCarrierPll(options).Select(x => x.FrequencyOffsetHz);
+        }
+
+        public static IObservable<double> GetPllFrequencyOffset(
+            this IReaderIqSubject<float> src,
+            double sampleRate,
+            double nominalFrequencyHz,
+            double loopBandwidthHz,
+            double maxFrequencyOffsetHz = double.PositiveInfinity
+        )
+        {
+            return src.GetPllFrequencyOffset(
+                new ReaderIqCarrierPllOptions(sampleRate, nominalFrequencyHz)
+                {
+                    LoopBandwidthHz = loopBandwidthHz,
+                    MaxFrequencyOffsetHz = maxFrequencyOffsetHz,
+                }
+            );
+        }
+
+        public static IObservable<double> GetPllFrequencyOffset(
+            this IReaderIqSubject<double> src,
+            double sampleRate,
+            double nominalFrequencyHz,
+            double loopBandwidthHz,
+            double maxFrequencyOffsetHz = double.PositiveInfinity
+        )
+        {
+            return src.GetPllFrequencyOffset(
+                new ReaderIqCarrierPllOptions(sampleRate, nominalFrequencyHz)
+                {
+                    LoopBandwidthHz = loopBandwidthHz,
+                    MaxFrequencyOffsetHz = maxFrequencyOffsetHz,
+                }
+            );
+        }
+
         #endregion
 
         #region Kalman filter
