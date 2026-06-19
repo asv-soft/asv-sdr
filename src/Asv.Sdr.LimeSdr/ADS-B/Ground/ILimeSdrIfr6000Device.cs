@@ -18,7 +18,7 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
 
     Task WriteP1P3SpacingOffset(float modeAOffset, float modeCOffset);
     Task WriteModeACControl(bool modeAP2SlsPulseEn, bool modeCP2SlsPulseEn, bool modeAP2SlsPulseAtt, bool modeCP2SlsPulseAtt, bool allCallModeAC_A, bool allCallModeAC_C, bool allCallModeS_A, bool allCallModeS_C);
-
+    
     Task<(float F1, float F2)> ReadModeAPulseWidth();
     Task<(float F1, float F2)> ReadModeCPulseWidth();
     Task<(float ModeA, float ModeC)> ReadModeACPulseSpacing();
@@ -33,31 +33,122 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     
     // Mode S
 
+    Task WriteModeSControl(bool modeSP5SlsPulseEn, bool modeSP5SlsPulseAtt);
     Task<bool> WriteUfMessage(ModeSUFormatBase msg);
     Task<ModeSDFormatBase?> ReadDfMessage(Func<ModeSDFormatBase> factory, int attempts = 3);
     Task<ModeSDFormatBase?> ReadDfMessage(ModeSUFormatBase reqMsg, Func<ModeSDFormatBase> respFactory, int attempts = 3);
     
     Task<float> ReadReplyRatioModeS();
+
+    /// <summary>
+    /// Reads the selective Mode S downlink frame receive counter.
+    /// </summary>
+    /// <returns>16-bit counter incremented by the device when a selective DF response is received.</returns>
+    Task<ushort> ReadSelectiveDfCounter();
     
-    Task<(ModeSDF11 Msg, byte Req, byte Resp)> ReadModeSDf11IcaoAddress();
-    Task<ModeSDF4> ReadModeSDf4Altitude();
-    Task<ModeSDF20> ReadModeSDf20Altitude();
-    Task<ModeSDF5> ReadModeSDf5IdentityCode();
-    Task<ModeSDF21> ReadModeSDf21IdentityCode();
+    /// <summary>
+    /// Selective request short UF4 short DF4
+    /// </summary>
+    /// <param name="icao">ICAO aircraft address</param>
+    /// <returns>DF4</returns>
+    Task<ModeSDF4?> ReadModeSDf4(uint icao);
     
-    Task<(ModeSDF0 Msg, byte Req, byte Resp)> ReadModeSDf0AirAir();
-    Task<(ModeSDF16 Msg, byte Req, byte Resp)> ReadModeSDf16AirAir();
+    /// <summary>
+    /// Selective request short UF4 long DF20
+    /// </summary>
+    /// <param name="icao">ICAO aircraft address</param>
+    /// <param name="bds">Requested register number</param>
+    /// <returns>DF20</returns>
+    Task<ModeSDF20?> ReadModeSDf20(uint icao, byte bds);
     
-    Task<Bds10> ReadBds10();
+    /// <summary>
+    /// Selective request long UF20 long DF20
+    /// </summary>
+    /// <param name="icao">ICAO aircraft address</param>
+    /// <param name="ads">Transferred register number</param>
+    /// <param name="bds">Requested register number</param>
+    /// <returns>DF20</returns>
+    Task<ModeSDF20?> ReadModeSDf20(uint icao, byte ads, byte bds);
     
-    Task<Bds17> ReadBds17();
-    Task<Bds20> ReadBds20();
-    Task<Bds30> ReadBds30();
+    /// <summary>
+    /// Selective request long UF20 short DF4
+    /// </summary>
+    /// <param name="icao">ICAO aircraft address</param>
+    /// <param name="ads">Transferred register number</param>
+    /// <returns>DF4</returns>
+    Task<ModeSDF4?> ReadModeSDf4(uint icao, byte ads);
     
-    Task<Bds40> ReadBds40();
-    Task<Bds50> ReadBds50();
-    Task<Bds60> ReadBds60();
+    /// <summary>
+    /// Selective request short UF5 short DF5
+    /// </summary>
+    /// <param name="icao">ICAO aircraft address</param>
+    /// <returns>DF5</returns>
+    Task<ModeSDF5?> ReadModeSDf5(uint icao);
     
+    /// <summary>
+    /// Selective request short UF5 long DF21
+    /// </summary>
+    /// <param name="icao">ICAO aircraft address</param>
+    /// <param name="bds">Requested register number</param>
+    /// <returns>DF21</returns>
+    Task<ModeSDF21?> ReadModeSDf21(uint icao, byte bds);
+    
+    /// <summary>
+    /// Selective request long UF21 long DF21
+    /// </summary>
+    /// <param name="icao">ICAO aircraft address</param>
+    /// <param name="ads">Transferred register number</param>
+    /// <param name="bds">Requested register number</param>
+    /// <returns>DF21</returns>
+    Task<ModeSDF21?> ReadModeSDf21(uint icao, byte ads, byte bds);
+    
+    /// <summary>
+    /// Selective request long UF21 short DF5
+    /// </summary>
+    /// <param name="icao">ICAO aircraft address</param>
+    /// <param name="ads">Transferred register number</param>
+    /// <returns>DF5</returns>
+    Task<ModeSDF5?> ReadModeSDf5(uint icao, byte ads);
+    
+    /// <summary>
+    /// Selective air-air request short UF0 short DF0
+    /// </summary>
+    /// <param name="icao">ICAO aircraft address</param>
+    /// <returns>DF0</returns>
+    Task<ModeSDF0?> ReadModeSDf0(uint icao);
+    
+    /// <summary>
+    /// Selective air-air request short UF0 long DF16
+    /// </summary>
+    /// <param name="icao">ICAO aircraft address</param>
+    /// <param name="bds">Requested register number</param>
+    /// <returns>DF16</returns>
+    Task<ModeSDF16?> ReadModeSDf16(uint icao, byte bds);
+    
+    /// <summary>
+    /// Selective air-air request long UF16 long DF16
+    /// </summary>
+    /// <param name="icao">ICAO aircraft address</param>
+    /// <param name="ads">Transferred register number</param>
+    /// <param name="bds">Requested register number</param>
+    /// <returns>DF16</returns>
+    Task<ModeSDF16?> ReadModeSDf16(uint icao, byte ads, byte bds);
+    
+    /// <summary>
+    /// Selective request long UF16 short DF0
+    /// </summary>
+    /// <param name="icao">ICAO aircraft address</param>
+    /// <param name="ads">Transferred register number</param>
+    /// <returns>DF0</returns>
+    Task<ModeSDF0?> ReadModeSDf0(uint icao, byte ads);
+
+    /// <summary>
+    /// Self-generating squitter DF11
+    /// </summary>
+    /// <returns>DF11</returns>
+    Task<ModeSDF11?> ReadDf11Squitter();
+
+    Task<(byte Counter, float Period)> ReadDf11SquitterStatistics();
     
     // ADS-B Extended
     Task<ExSquitterStatistics> ReadExSquitterStatistics();
@@ -68,5 +159,11 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     Task<AdsbAircraftIdentification?> ReadExBds08Id();
     Task<AdsbGroundSpeed?> ReadExBds09GroundSpeed();
     Task<AdsbAirspeed?> ReadExBds09Airspeed();
-    
+    Task<AdsbAircraftEmergencyStatus?> ReadExBds61EmergencyPriorityStatus();
+    Task<AdsbAircraftAcasRaBroadcast?> ReadExBds61TcasRaBroadcast();
+    Task<AdsbTargetStateAndStatusInformation?> ReadExBds62Old();
+    Task<AdsbTargetStateAndStatusInformation?> ReadExBds62New();
+    Task<AdsbAircraftOperationStatus?> ReadExBds65Airborne();
+    Task<AdsbAircraftOperationStatus?> ReadExBds65Surface();
+
 }
