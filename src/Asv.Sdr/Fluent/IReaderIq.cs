@@ -34,6 +34,44 @@ namespace Asv.Sdr
             return new ReaderIqSampler<T>(src, readSize, out start, useArrayPool, priority);
         }
 
+        /// <summary>
+        /// Reads samples from a source stream and publishes them as another sample type.
+        /// </summary>
+        /// <typeparam name="TIn">The sample type produced by the source reader.</typeparam>
+        /// <typeparam name="TOut">The sample type published by the sampler.</typeparam>
+        /// <param name="src">The source reader.</param>
+        /// <param name="readSize">The number of source samples read per block.</param>
+        /// <param name="start">Starts the sampler thread.</param>
+        /// <param name="useArrayPool">True to rent the output buffer from the shared array pool.</param>
+        /// <param name="priority">The sampler thread priority.</param>
+        /// <returns>A sampled IQ stream converted to the requested output type.</returns>
+        /// <exception cref="NotSupportedException">Thrown when the requested conversion is not supported.</exception>
+        public static IReaderIqSubject<TOut> Sample<TIn, TOut>(
+            this IReaderIq<TIn> src,
+            int readSize,
+            out Action start,
+            bool useArrayPool = false,
+            ThreadPriority priority = ThreadPriority.Highest
+        )
+        {
+            if (typeof(TIn) == typeof(float) && typeof(TOut) == typeof(double))
+            {
+                return (IReaderIqSubject<TOut>)
+                    (object)
+                        new ReaderIqSamplerFloatToDouble(
+                            (IReaderIq<float>)(object)src,
+                            readSize,
+                            out start,
+                            useArrayPool,
+                            priority
+                        );
+            }
+
+            throw new NotSupportedException(
+                $"Sample conversion from {typeof(TIn).Name} to {typeof(TOut).Name} is not supported."
+            );
+        }
+
         #region Preview
         public static IReaderIqSubject<T> Preview<T>(
             this IReaderIqSubject<T> src,
