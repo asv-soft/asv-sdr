@@ -301,7 +301,19 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         if (modeSP5SlsPulseAtt) reg |= 0x200;
         await WriteCustomRegister(ModeS_Control, reg, DisposeCancel).ConfigureAwait(false);
     }
-    
+
+    public async Task<float> ReadModeSReplyDelay()
+    {
+        var reg = 5120 + (short)await ReadCustomRegister(ReplyDelayS, DisposeCancel).ConfigureAwait(false);
+        return reg * 0.025f;
+    }
+
+    public async Task<float> ReadModeSReplyJitter()
+    {
+        var reg = await ReadCustomRegister(ReplyJitterS, DisposeCancel).ConfigureAwait(false);
+        return reg * 0.025f;
+    }
+
     public async Task<(float F1, float F2)> ReadModeAPulseWidth()
     {
         var reg = await ReadCustomRegister(Width_A_F1_15_8_F2_7_0, DisposeCancel).ConfigureAwait(false);
@@ -328,13 +340,13 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
 
     public async Task<float> ReadModeAReplyDelay()
     {
-        var reg = await ReadCustomRegister(Reply_Delay_A_15_0, DisposeCancel).ConfigureAwait(false);
+        var reg = 120 + (short)await ReadCustomRegister(Reply_Delay_A_15_0, DisposeCancel).ConfigureAwait(false);
         return reg * 0.025f;
     }
     
     public async Task<float> ReadModeCReplyDelay()
     {
-        var reg = await ReadCustomRegister(Reply_Delay_C_15_0, DisposeCancel).ConfigureAwait(false);
+        var reg = 120 + (short)await ReadCustomRegister(Reply_Delay_C_15_0, DisposeCancel).ConfigureAwait(false);
         return reg * 0.025f;
     }
 
@@ -788,6 +800,12 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     public async Task<ushort> ReadSelectiveDfCounter()
     {
         return await ReadCustomRegister(DF_RX_CNT, DisposeCancel).ConfigureAwait(false);
+    }
+
+    public Task<ModeSDF11?> ReadModeSDf11(byte ic, byte cl)
+    {
+        
+        return RequestDfMessage(new ModeSUF11 { IC = ic, CL = cl}, () => new ModeSDF11(ic, cl), (uint)(((cl & 0x7) << 4) | (ic & 0xF)));
     }
 
     public Task<ModeSDF4?> ReadModeSDf4(uint icao)

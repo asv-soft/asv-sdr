@@ -34,6 +34,8 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     // Mode S
 
     Task WriteModeSControl(bool modeSP5SlsPulseEn, bool modeSP5SlsPulseAtt);
+    Task<float> ReadModeSReplyDelay();
+    Task<float> ReadModeSReplyJitter();
     Task<bool> WriteUfMessage(ModeSUFormatBase msg);
     Task<ModeSDFormatBase?> ReadDfMessage(Func<ModeSDFormatBase> factory, int attempts = 3);
     Task<ModeSDFormatBase?> ReadDfMessage(ModeSUFormatBase reqMsg, Func<ModeSDFormatBase> respFactory, int attempts = 3);
@@ -45,6 +47,14 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     /// </summary>
     /// <returns>16-bit counter incremented by the device when a selective DF response is received.</returns>
     Task<ushort> ReadSelectiveDfCounter();
+
+    /// <summary>
+    /// All-Call request short UF11 with AA=0xFFFFFF
+    /// </summary>
+    /// <param name="ic">Interrogator code</param>
+    /// <param name="cl">Code label</param>
+    /// <returns>DF4</returns>
+    Task<ModeSDF11?> ReadModeSDf11(byte ic, byte cl);
     
     /// <summary>
     /// Selective request short UF4 short DF4
