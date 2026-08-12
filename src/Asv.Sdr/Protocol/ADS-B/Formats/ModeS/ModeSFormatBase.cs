@@ -59,7 +59,7 @@ public abstract class ModeSFormatBase : ISizedSpanSerializable
         newFs.Write(newSpan);
     }
 
-    private TailNumberDecodeResult _icao24TailNumber = new TailNumberDecodeResult(
+    private TailNumberDecodeResult _icao24TailNumber = new(
         0,
         string.Empty,
         string.Empty,
@@ -72,82 +72,6 @@ public abstract class ModeSFormatBase : ISizedSpanSerializable
         return Icao24TailNumberDecoder.Decode(cap);
     }
 
-    #region Tail number resolvers
-
-    private static string ResolveRusTailNumber(uint cap)
-    {
-        return cap <= 0x15869F ? $"RA-{cap - 0x140000}" : "RA-?????";
-    }
-    private static string ResolveUsaTailNumber(uint cap)
-    {
-        throw new InvalidOperationException();
-    }
-    
-    private static string ResolveBelDnkSweTailNumber(uint cap, uint bs, string prefix)
-    {
-        ArgumentNullException.ThrowIfNull(prefix);
-        var offset = cap - bs;
-        var c1 = (offset >> 10) & 0x1F;
-        var c2 = (offset >> 5) & 0x1F;
-        var c3 = offset & 0x1F;
-
-        var letter1 = '?';
-        var letter2 = '?';
-        var letter3 = '?';
-
-        if (c1 is >= 1 and <= 26)
-        {
-            letter1 = (char)('A' + (int)c1 - 1);
-            
-        }
-        if (c2 is >= 1 and <= 26)
-        {
-            letter2 = (char)('A' + (int)c2 - 1);
-        }
-        if (c3 is >= 1 and <= 26)
-        {
-            letter3 = (char)('A' + (int)c3 - 1);
-        }
-        return $"{prefix}-{letter1}{letter2}{letter3}";
-    }
-    
-    private static string ResolveCanTailNumber(uint cap)
-    {
-        throw new InvalidOperationException();
-    }
-    
-    private static string ResolveFraTailNumber(uint cap)
-    {
-        throw new InvalidOperationException();
-    }
-    
-    private static string ResolveDeuTailNumber(uint cap)
-    {
-        throw new InvalidOperationException();
-    }
-    
-    private static string ResolvePolTailNumber(uint cap)
-    {
-        throw new InvalidOperationException();
-    }
-    
-    private static string ResolveCheTailNumber(uint cap)
-    {
-        throw new InvalidOperationException();
-    }
-    
-    private static string ResolveKorTailNumber(uint cap)
-    {
-        throw new InvalidOperationException();
-    }
-    
-    private static string ResolveAusTailNumber(uint cap)
-    {
-        throw new InvalidOperationException();
-    }
-
-    #endregion
-    
     protected abstract int FormatLength { get; }
 
     public abstract byte FormatId { get; }
