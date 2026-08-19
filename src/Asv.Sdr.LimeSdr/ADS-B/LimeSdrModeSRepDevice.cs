@@ -22,6 +22,14 @@ public interface ILimeSdrModeSRepDevice : ILimeSdrModeACRepDevice
     Task SetDf21IsEnabled(bool enabled, CancellationToken cancel = default);
     
     /// <summary>
+    /// Выбор вывода сообщения своего/всех в регистры UF4, UF5, UF11, UF20, UF21.
+    /// </summary>
+    /// <param name="enabled"></param>
+    /// <param name="cancel"></param>
+    /// <returns></returns>
+    Task SetNotOurUFsOutput(bool enabled, CancellationToken cancel = default);
+    
+    /// <summary>
     /// Read UF ADS-B message
     /// </summary>
     /// <returns>Last received UF ADS-B message</returns>
@@ -197,22 +205,6 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
     private const ushort DelayDF_InternAddr             = 0x0016; // Delay DF Reply
     private const ushort UFxxType_InternAddr            = 0x0017; // UFxx output message type registers
     
-    private const ushort BDS10_71_56_InternAddr         = 0x0039; // BDS10(71:56)
-    private const ushort BDS10_55_40_InternAddr         = 0x003A; // BDS10(55:40)
-    private const ushort BDS10_39_24_InternAddr         = 0x003B; // BDS10(39:24)
-    
-    private const ushort BDS40_71_56_InternAddr         = 0x003C; // BDS40(71:56)
-    private const ushort BDS40_55_40_InternAddr         = 0x003D; // BDS40(55:40)
-    private const ushort BDS40_39_24_InternAddr         = 0x003E; // BDS40(39:24)
-    
-    private const ushort BDS50_71_56_InternAddr         = 0x003F; // BDS50(71:56)
-    private const ushort BDS50_55_40_InternAddr         = 0x0040; // BDS50(55:40)
-    private const ushort BDS50_39_24_InternAddr         = 0x0041; // BDS50(39:24)
-    
-    private const ushort BDS60_71_56_InternAddr         = 0x0042; // BDS60(71:56)
-    private const ushort BDS60_55_40_InternAddr         = 0x0043; // BDS60(55:40)
-    private const ushort BDS60_39_24_InternAddr         = 0x0044; // BDS60(39:24)
-    
     private const ushort RecReqCnt_7_0_AllReqCnt_7_0_InternAddr= 0x0045; // Recognized Request count per/sec(7:0) & All Request count per/sec(7:0)
     
     // Read
@@ -254,6 +246,22 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
     private const ushort UF21_47_32_InternAddr          = 0x0036; // UF21(47:32)
     private const ushort UF21_31_16_InternAddr          = 0x0037; // UF21(31:16)
     private const ushort UF21_15_0_InternAddr           = 0x0038; // UF21(15:0)
+    
+    private const ushort BDS10_71_56_InternAddr         = 0x0039; // BDS10(71:56)
+    private const ushort BDS10_55_40_InternAddr         = 0x003A; // BDS10(55:40)
+    private const ushort BDS10_39_24_InternAddr         = 0x003B; // BDS10(39:24)
+    
+    private const ushort BDS40_71_56_InternAddr         = 0x003C; // BDS40(71:56)
+    private const ushort BDS40_55_40_InternAddr         = 0x003D; // BDS40(55:40)
+    private const ushort BDS40_39_24_InternAddr         = 0x003E; // BDS40(39:24)
+    
+    private const ushort BDS50_71_56_InternAddr         = 0x003F; // BDS50(71:56)
+    private const ushort BDS50_55_40_InternAddr         = 0x0040; // BDS50(55:40)
+    private const ushort BDS50_39_24_InternAddr         = 0x0041; // BDS50(39:24)
+    
+    private const ushort BDS60_71_56_InternAddr         = 0x0042; // BDS60(71:56)
+    private const ushort BDS60_55_40_InternAddr         = 0x0043; // BDS60(55:40)
+    private const ushort BDS60_39_24_InternAddr         = 0x0044; // BDS60(39:24)
     #endregion
     
     public LimeSdrModeSRepDevice(string deviceId, LimeSdrDeviceConfig config, CapabilityEnum capability, bool isAdsbEnabled = true, ILogger? logger = null) : base(deviceId, config, capability, isAdsbEnabled, logger)
@@ -295,39 +303,44 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
     public Task SetDf11ReplyIsEnabled(bool enabled, CancellationToken cancel = default)
     {
         logger.ZLogDebug($"Setting ADS-B DF11 Reply to {enabled}");
-        return this.WriteFpgaRegisterBits(CONTROL_DF_Address, 0, 1, (ushort)(enabled ? 1 : 0), cancel);
+        return this.WriteCustomRegisterBits(CONTROL_DF_Address, 0, 1, (ushort)(enabled ? 1 : 0), cancel);
     }
 
     public Task SetDf11BroadcastIsEnabled(bool enabled, CancellationToken cancel = default)
     {
         logger.ZLogDebug($"Setting ADS-B DF11 Squitter to {enabled}");
-        return this.WriteFpgaRegisterBits(CONTROL_DF_Address, 1, 1, (ushort)(enabled ? 1 : 0), cancel);
+        return this.WriteCustomRegisterBits(CONTROL_DF_Address, 1, 1, (ushort)(enabled ? 1 : 0), cancel);
     }
 
     public Task SetDf4IsEnabled(bool enabled, CancellationToken cancel = default)
     {
         logger.ZLogDebug($"Setting ADS-B DF4 Reply to {enabled}");
-        return this.WriteFpgaRegisterBits(CONTROL_DF_Address, 3, 1, (ushort)(enabled ? 1 : 0), cancel);
+        return this.WriteCustomRegisterBits(CONTROL_DF_Address, 3, 1, (ushort)(enabled ? 1 : 0), cancel);
     }
 
     public Task SetDf5IsEnabled(bool enabled, CancellationToken cancel = default)
     {
         logger.ZLogDebug($"Setting ADS-B DF5 Reply to {enabled}");
-        return this.WriteFpgaRegisterBits(CONTROL_DF_Address, 2, 1, (ushort)(enabled ? 1 : 0), cancel);
+        return this.WriteCustomRegisterBits(CONTROL_DF_Address, 2, 1, (ushort)(enabled ? 1 : 0), cancel);
     }
 
     public Task SetDf20IsEnabled(bool enabled, CancellationToken cancel = default)
     {
         logger.ZLogDebug($"Setting ADS-B DF20 Reply to {enabled}");
-        return this.WriteFpgaRegisterBits(CONTROL_DF_Address, 8, 1, (ushort)(enabled ? 1 : 0), cancel);
+        return this.WriteCustomRegisterBits(CONTROL_DF_Address, 8, 1, (ushort)(enabled ? 1 : 0), cancel);
     }
 
     public Task SetDf21IsEnabled(bool enabled, CancellationToken cancel = default)
     {
         logger.ZLogDebug($"Setting ADS-B DF21 Reply to {enabled}");
-        return this.WriteFpgaRegisterBits(CONTROL_DF_Address, 9, 1, (ushort)(enabled ? 1 : 0), cancel);
+        return this.WriteCustomRegisterBits(CONTROL_DF_Address, 9, 1, (ushort)(enabled ? 1 : 0), cancel);
     }
-    
+
+    public Task SetNotOurUFsOutput(bool enabled, CancellationToken cancel = default)
+    {
+        return this.WriteCustomRegisterBits(CONTROL_DF_Address, 7, 1, (ushort)(enabled ? 1 : 0), cancel);
+    }
+
     public async Task<byte[]> ReadAnyUFMessage(CancellationToken cancel = default)
     {
         var result = new byte[14];
@@ -779,61 +792,60 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
 
     public async Task<byte[]> GetUF4UF20Stat(CancellationToken cancel = default)
     {
-        var reg = await ReadFpgaRegister(UF4_UF20_CNT_Address, cancel).ConfigureAwait(false);
+        var reg = await ReadCustomRegister(UF4_UF20_CNT_Address, cancel).ConfigureAwait(false);
         return [(byte)((reg >> 8) & 0xFF), (byte)(reg & 0xFF)];
     }
 
     public async Task<byte[]> GetUF5UF21Stat(CancellationToken cancel = default)
     {
-        var reg = await ReadFpgaRegister(UF5_UF21_CNT_Address, cancel).ConfigureAwait(false);
+        var reg = await ReadCustomRegister(UF5_UF21_CNT_Address, cancel).ConfigureAwait(false);
         return [(byte)((reg >> 8) & 0xFF), (byte)(reg & 0xFF)];
     }
 
     public async Task<byte[]> GetUF11AnyUFStat(CancellationToken cancel = default)
     {
-        var reg = await ReadFpgaRegister(UF11_UFxx_CNT_Address, cancel).ConfigureAwait(false);
+        var reg = await ReadCustomRegister(UF11_UFxx_CNT_Address, cancel).ConfigureAwait(false);
         return [(byte)((reg >> 8) & 0xFF), (byte)(reg & 0xFF)];
     }
 
     public async Task<byte[]> GetDF4DF5Stat(CancellationToken cancel = default)
     {
-        var reg = await ReadFpgaRegister(DF4_DF5_CNT_Address, cancel).ConfigureAwait(false);
+        var reg = await ReadCustomRegister(DF4_DF5_CNT_Address, cancel).ConfigureAwait(false);
         return [(byte)((reg >> 8) & 0xFF), (byte)(reg & 0xFF)];
     }
 
     public async Task<(byte UF4, byte UF5, byte UF20, byte UF21, byte UF11, byte DF4, byte DF5, byte DF20, byte DF21, byte
         DF11)> GetAllStat(CancellationToken cancel = default)
     {
-        var regUF420 = await ReadFpgaRegister(UF4_UF20_CNT_Address, cancel).ConfigureAwait(false);
-        var regUF521 = await ReadFpgaRegister(UF5_UF21_CNT_Address, cancel).ConfigureAwait(false);
-        var regfUF11 = await ReadFpgaRegister(UF11_UFxx_CNT_Address, cancel).ConfigureAwait(false);
-        var regDF45 = await ReadFpgaRegister(DF4_DF5_CNT_Address, cancel).ConfigureAwait(false);
-        var regDF2021 = await ReadFpgaRegister(DF20_DF21_CNT_Address, cancel).ConfigureAwait(false);
-        var regDF11 = await ReadFpgaRegister(DF11_CNT_Address, cancel).ConfigureAwait(false);
+        var frame = new[]
+        {
+            UF4_UF20_CNT_Address, UF5_UF21_CNT_Address, UF11_UFxx_CNT_Address, DF4_DF5_CNT_Address, DF11_CNT_Address, DF20_DF21_CNT_Address
+        };
+        var regs = await ReadCustomRegistersFrame(frame, cancel).ConfigureAwait(false);
         
-        var uf4 = (byte)((regUF420 >> 8) & 0xFF);
-        var uf5 = (byte)((regUF521 >> 8) & 0xFF);
-        var uf20 = (byte)(regUF420 & 0xFF);
-        var uf21 = (byte)(regUF521 & 0xFF);
-        var uf11 = (byte)((regfUF11 >> 8) & 0xFF);
-        var df4 = (byte)((regDF45 >> 8) & 0xFF);
-        var df5 = (byte)(regDF45 & 0xFF);
-        var df20 = (byte)((regDF2021 >> 8) & 0xFF);
-        var df21 = (byte)(regDF2021 & 0xFF);
-        var df11 = (byte)((regDF11 >> 8) & 0xFF);
+        var uf4 = (byte)((regs[0] >> 8) & 0xFF);
+        var uf5 = (byte)((regs[1] >> 8) & 0xFF);
+        var uf20 = (byte)(regs[0] & 0xFF);
+        var uf21 = (byte)(regs[1] & 0xFF);
+        var uf11 = (byte)((regs[2] >> 8) & 0xFF);
+        var df4 = (byte)((regs[3] >> 8) & 0xFF);
+        var df5 = (byte)(regs[3] & 0xFF);
+        var df20 = (byte)((regs[5] >> 8) & 0xFF);
+        var df21 = (byte)(regs[5] & 0xFF);
+        var df11 = (byte)((regs[4] >> 8) & 0xFF);
 
         return (uf4, uf5, uf20, uf21, uf11, df4, df5, df20, df21, df11);
     }
 
     public async Task<byte[]> GetDF20DF21Stat(CancellationToken cancel = default)
     {
-        var reg = await ReadFpgaRegister(DF20_DF21_CNT_Address, cancel).ConfigureAwait(false);
+        var reg = await ReadCustomRegister(DF20_DF21_CNT_Address, cancel).ConfigureAwait(false);
         return [(byte)((reg >> 8) & 0xFF), (byte)(reg & 0xFF)];
     }
 
     public async Task<byte[]> GetDF11ReserveStat(CancellationToken cancel = default)
     {
-        var reg = await ReadFpgaRegister(DF11_CNT_Address, cancel).ConfigureAwait(false);
+        var reg = await ReadCustomRegister(DF11_CNT_Address, cancel).ConfigureAwait(false);
         return [(byte)((reg >> 8) & 0xFF), (byte)(reg & 0xFF)];
     }
 
