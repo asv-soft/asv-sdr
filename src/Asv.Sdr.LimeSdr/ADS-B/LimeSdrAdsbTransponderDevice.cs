@@ -100,10 +100,10 @@ public class LimeSdrAdsbTransponderDevice : LimeSdrCustomDevice, ILimeSdrAdsbTra
     private const ushort DF11_55_40_InternAddr          = 0x0000; // DF11(55:40)
     private const ushort DF11_39_24_InternAddr          = 0x0001; // DF11(39:24)
     
-    protected const ushort DF17_ID_79_64_InternAddr       = 0x0006; // DF17_ID(79:64)
-    protected const ushort DF17_ID_63_48_InternAddr       = 0x0007; // DF17_ID(63:48)
-    protected const ushort DF17_ID_47_32_InternAddr       = 0x0008; // DF17_ID(47:32)
-    protected const ushort DF17_ID_31_24_InternAddr       = 0x0009; // DF17_ID(31:24) & "00"
+    private const ushort DF17_ID_79_64_InternAddr       = 0x0006; // DF17_ID(79:64)
+    private const ushort DF17_ID_63_48_InternAddr       = 0x0007; // DF17_ID(63:48)
+    private const ushort DF17_ID_47_32_InternAddr       = 0x0008; // DF17_ID(47:32)
+    private const ushort DF17_ID_31_24_InternAddr       = 0x0009; // DF17_ID(31:24) & "00"
     
     private const ushort DF17_POS_EVEN_79_64_InternAddr = 0x000A; // DF17_POS_EVEN(79:64)
     private const ushort DF17_POS_EVEN_63_48_InternAddr = 0x000B; // DF17_POS_EVEN(63:48)

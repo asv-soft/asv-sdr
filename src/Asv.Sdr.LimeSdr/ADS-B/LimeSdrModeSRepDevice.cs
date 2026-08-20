@@ -64,7 +64,9 @@ public interface ILimeSdrModeSRepDevice : ILimeSdrModeACRepDevice
     Task WriteDF5Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
 
     Task WriteBDS10Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
+    Task WriteBDS17Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
     Task WriteBDS20Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
+    Task WriteBDS30Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
     Task WriteBDS40Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
     Task WriteBDS50Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
     Task WriteBDS60Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default);
@@ -80,7 +82,9 @@ public interface ILimeSdrModeSRepDevice : ILimeSdrModeACRepDevice
     Task<byte[]> ReadDF4Message(CancellationToken cancel = default);
     Task<byte[]> ReadDF5Message(CancellationToken cancel = default);
     Task<byte[]> ReadBDS10Message(CancellationToken cancel = default);
+    Task<byte[]> ReadBDS17Message(CancellationToken cancel = default);
     Task<byte[]> ReadBDS20Message(CancellationToken cancel = default);
+    Task<byte[]> ReadBDS30Message(CancellationToken cancel = default);
     Task<byte[]> ReadBDS40Message(CancellationToken cancel = default);
     Task<byte[]> ReadBDS50Message(CancellationToken cancel = default);
     Task<byte[]> ReadBDS60Message(CancellationToken cancel = default);
@@ -133,7 +137,7 @@ public interface ILimeSdrModeSRepDevice : ILimeSdrModeACRepDevice
     /// </summary>
     /// <param name="cancel"></param>
     /// <returns>[UF4, UF5, UF20, UF21, UF11, DF4, DF5, DF20, DF21, DF11] cnt</returns>
-    Task<(byte UF4, byte UF5, byte UF20, byte UF21, byte UF11, byte DF4, byte DF5, byte DF20, byte DF21, byte
+    Task<(byte UF4, byte UF5, byte UF20, byte UF21, byte UF11, byte UFxx, byte DF4, byte DF5, byte DF20, byte DF21, byte
         DF11)> GetAllStat(CancellationToken cancel = default);
     
     /// <summary>
@@ -157,14 +161,18 @@ public interface ILimeSdrModeSRepDevice : ILimeSdrModeACRepDevice
     /// <param name="df4">New df4 message</param>
     /// <param name="df5">New df5 message</param>
     /// <param name="bds10">New bds10 message</param>
+    /// <param name="bds17">New bds17 message</param>
+    /// <param name="bds20">New bds20 message</param>
+    /// <param name="bds30">New bds30 message</param>
     /// <param name="bds40">New bds40 message</param>
     /// <param name="bds50">New bds50 message</param>
     /// <param name="bds60">New bds60 message</param>
     /// <param name="df17Id">New df17Id message</param>
     /// <param name="cancel"></param>
+    
     /// <returns></returns>
     Task InitAllMessage(ReadOnlySpan<byte> df11, ReadOnlySpan<byte> df4, ReadOnlySpan<byte> df5,
-        ReadOnlySpan<byte> bds10, ReadOnlySpan<byte> bds20, ReadOnlySpan<byte> bds40, ReadOnlySpan<byte> bds50, ReadOnlySpan<byte> bds60, ReadOnlySpan<byte> df17Id, CancellationToken cancel);
+        ReadOnlySpan<byte> bds10, ReadOnlySpan<byte> bds17, ReadOnlySpan<byte> bds20, ReadOnlySpan<byte> bds30, ReadOnlySpan<byte> bds40, ReadOnlySpan<byte> bds50, ReadOnlySpan<byte> bds60, CancellationToken cancel);
     
     Task<(byte, byte)> GetRecognizedAndAllRequestsCountPerSecond(CancellationToken cancel = default);
     
@@ -178,8 +186,6 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
     private const ushort ADSB_MASK = 0x0070;
     private const ushort MODES_LEVEL1_MASK = 0x000F;
     private const ushort MODES_LEVEL2_MASK = 0x0300;
-    
-    // private const ushort ControlAddress        = 0x00D0;
     
     private const ushort CONTROL_DF_Address = 0x0046;
     private const ushort UF4_UF20_CNT_Address  = 0x0047; // Address for UF4 Cnt (7:0) | UF20 Cnt (7:0)
@@ -206,6 +212,41 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
     private const ushort UFxxType_InternAddr            = 0x0017; // UFxx output message type registers
     
     private const ushort RecReqCnt_7_0_AllReqCnt_7_0_InternAddr= 0x0045; // Recognized Request count per/sec(7:0) & All Request count per/sec(7:0)
+    
+    private const ushort BDS10_79_64_InternAddr         = 0x0039; // BDS10(79:64)
+    private const ushort BDS10_63_48_InternAddr         = 0x003A; // BDS10(63:48)
+    private const ushort BDS10_47_32_InternAddr         = 0x003B; // BDS10(47:32)
+    private const ushort BDS10_31_24_InternAddr         = 0x003C; // BDS10(31:24)
+    
+    private const ushort BDS17_79_64_InternAddr         = 0x003D; // BDS17(79:64)
+    private const ushort BDS17_63_48_InternAddr         = 0x003E; // BDS17(63:48)
+    private const ushort BDS17_47_32_InternAddr         = 0x003F; // BDS17(47:32)
+    private const ushort BDS17_31_24_InternAddr         = 0x0040; // BDS17(31:24)
+    
+    private const ushort BDS20_79_64_InternAddr         = 0x0041; // BDS20(79:64)
+    private const ushort BDS20_63_48_InternAddr         = 0x0042; // BDS20(63:48)
+    private const ushort BDS20_47_32_InternAddr         = 0x0043; // BDS20(47:32)
+    private const ushort BDS20_31_24_InternAddr         = 0x0044; // BDS20(31:24)
+    
+    private const ushort BDS30_79_64_InternAddr         = 0x0052; // BDS30(79:64)
+    private const ushort BDS30_63_48_InternAddr         = 0x0053; // BDS30(63:48)
+    private const ushort BDS30_47_32_InternAddr         = 0x0054; // BDS30(47:32)
+    private const ushort BDS30_31_24_InternAddr         = 0x0055; // BDS30(31:24)
+    
+    private const ushort BDS40_79_64_InternAddr         = 0x0056; // BDS40(79:64)
+    private const ushort BDS40_63_48_InternAddr         = 0x0057; // BDS40(63:48)
+    private const ushort BDS40_47_32_InternAddr         = 0x0058; // BDS40(47:32)
+    private const ushort BDS40_31_24_InternAddr         = 0x0059; // BDS40(31:24)
+    
+    private const ushort BDS50_79_64_InternAddr         = 0x005A; // BDS50(79:64)
+    private const ushort BDS50_63_48_InternAddr         = 0x005B; // BDS50(63:48)
+    private const ushort BDS50_47_32_InternAddr         = 0x005C; // BDS50(47:32)
+    private const ushort BDS50_31_24_InternAddr         = 0x005D; // BDS50(31:24)
+    
+    private const ushort BDS60_79_64_InternAddr         = 0x005E; // BDS60(79:64)
+    private const ushort BDS60_63_48_InternAddr         = 0x005F; // BDS60(63:48)
+    private const ushort BDS60_47_32_InternAddr         = 0x0060; // BDS60(47:32)
+    private const ushort BDS60_31_24_InternAddr         = 0x0061; // BDS60(31:24)
     
     // Read
     private const ushort UF11_55_40_InternAddr          = 0x0018; // UF11(55:40)
@@ -247,21 +288,6 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
     private const ushort UF21_31_16_InternAddr          = 0x0037; // UF21(31:16)
     private const ushort UF21_15_0_InternAddr           = 0x0038; // UF21(15:0)
     
-    private const ushort BDS10_71_56_InternAddr         = 0x0039; // BDS10(71:56)
-    private const ushort BDS10_55_40_InternAddr         = 0x003A; // BDS10(55:40)
-    private const ushort BDS10_39_24_InternAddr         = 0x003B; // BDS10(39:24)
-    
-    private const ushort BDS40_71_56_InternAddr         = 0x003C; // BDS40(71:56)
-    private const ushort BDS40_55_40_InternAddr         = 0x003D; // BDS40(55:40)
-    private const ushort BDS40_39_24_InternAddr         = 0x003E; // BDS40(39:24)
-    
-    private const ushort BDS50_71_56_InternAddr         = 0x003F; // BDS50(71:56)
-    private const ushort BDS50_55_40_InternAddr         = 0x0040; // BDS50(55:40)
-    private const ushort BDS50_39_24_InternAddr         = 0x0041; // BDS50(39:24)
-    
-    private const ushort BDS60_71_56_InternAddr         = 0x0042; // BDS60(71:56)
-    private const ushort BDS60_55_40_InternAddr         = 0x0043; // BDS60(55:40)
-    private const ushort BDS60_39_24_InternAddr         = 0x0044; // BDS60(39:24)
     #endregion
     
     public LimeSdrModeSRepDevice(string deviceId, LimeSdrDeviceConfig config, CapabilityEnum capability, bool isAdsbEnabled = true, ILogger? logger = null) : base(deviceId, config, capability, isAdsbEnabled, logger)
@@ -589,10 +615,28 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
             return Task.CompletedTask;
         }
 
-        var frame = new ValueTuple<ushort, ushort>[3];
-        frame[0] = new ValueTuple<ushort, ushort>(BDS10_71_56_InternAddr, (ushort)((message.Span[1] << 8) | message.Span[2]));
-        frame[1] = new ValueTuple<ushort, ushort>(BDS10_55_40_InternAddr, (ushort)((message.Span[3] << 8) | message.Span[4]));
-        frame[2] = new ValueTuple<ushort, ushort>(BDS10_39_24_InternAddr, (ushort)((message.Span[5] << 8) | message.Span[6]));
+        var frame = new ValueTuple<ushort, ushort>[4];
+        frame[0] = new ValueTuple<ushort, ushort>(BDS10_79_64_InternAddr, (ushort)((message.Span[0] << 8) | message.Span[1]));
+        frame[1] = new ValueTuple<ushort, ushort>(BDS10_63_48_InternAddr, (ushort)((message.Span[2] << 8) | message.Span[3]));
+        frame[2] = new ValueTuple<ushort, ushort>(BDS10_47_32_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
+        frame[4] = new ValueTuple<ushort, ushort>(BDS10_31_24_InternAddr, (ushort)((message.Span[6] << 8) | 0x0));
+        return WriteCustomRegistersFrame(frame, cancel);
+    }
+
+    public Task WriteBDS17Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default)
+    {
+        if (message.Length != 7)
+        {
+            logger.ZLogDebug(
+                $"Error writing ADS-B BDS17 register. Expected length greater than or equal to 7 bytes, but length {message.Length} bytes.");
+            return Task.CompletedTask;
+        }
+
+        var frame = new ValueTuple<ushort, ushort>[4];
+        frame[0] = new ValueTuple<ushort, ushort>(BDS17_79_64_InternAddr, (ushort)((message.Span[0] << 8) | message.Span[1]));
+        frame[1] = new ValueTuple<ushort, ushort>(BDS17_63_48_InternAddr, (ushort)((message.Span[2] << 8) | message.Span[3]));
+        frame[2] = new ValueTuple<ushort, ushort>(BDS17_47_32_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
+        frame[4] = new ValueTuple<ushort, ushort>(BDS17_31_24_InternAddr, (ushort)((message.Span[6] << 8) | 0x0));
         return WriteCustomRegistersFrame(frame, cancel);
     }
 
@@ -605,13 +649,28 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
             return;
         }
         
-        var df17FirstByte = (byte)((await ReadCustomRegister(DF17_ID_79_64_InternAddr, cancel).ConfigureAwait(false) >> 8) & 0xFF);
+        var frame = new ValueTuple<ushort, ushort>[4];
+        frame[0] = new ValueTuple<ushort, ushort>(BDS20_79_64_InternAddr, (ushort)((message.Span[0] << 8) | message.Span[1]));
+        frame[1] = new ValueTuple<ushort, ushort>(BDS20_63_48_InternAddr, (ushort)((message.Span[2] << 8) | message.Span[3]));
+        frame[2] = new ValueTuple<ushort, ushort>(BDS20_47_32_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
+        frame[3] = new ValueTuple<ushort, ushort>(BDS20_31_24_InternAddr, (ushort)(message.Span[6] << 8));
+        await WriteCustomRegistersFrame(frame, cancel);
+    }
+
+    public async Task WriteBDS30Message(ReadOnlyMemory<byte> message, CancellationToken cancel = default)
+    {
+        if (message.Length != 7)
+        {
+            logger.ZLogDebug(
+                $"Error writing ADS-B BDS30 register. Expected length greater than or equal to 7 bytes, but length {message.Length} bytes.");
+            return;
+        }
         
         var frame = new ValueTuple<ushort, ushort>[4];
-        frame[0] = new ValueTuple<ushort, ushort>(DF17_ID_79_64_InternAddr, (ushort)((df17FirstByte << 8) | message.Span[1]));
-        frame[1] = new ValueTuple<ushort, ushort>(DF17_ID_63_48_InternAddr, (ushort)((message.Span[2] << 8) | message.Span[3]));
-        frame[2] = new ValueTuple<ushort, ushort>(DF17_ID_47_32_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
-        frame[3] = new ValueTuple<ushort, ushort>(DF17_ID_31_24_InternAddr, (ushort)(message.Span[6] << 8));
+        frame[0] = new ValueTuple<ushort, ushort>(BDS30_79_64_InternAddr, (ushort)((message.Span[0] << 8) | message.Span[1]));
+        frame[1] = new ValueTuple<ushort, ushort>(BDS30_63_48_InternAddr, (ushort)((message.Span[2] << 8) | message.Span[3]));
+        frame[2] = new ValueTuple<ushort, ushort>(BDS30_47_32_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
+        frame[3] = new ValueTuple<ushort, ushort>(BDS30_31_24_InternAddr, (ushort)(message.Span[6] << 8));
         await WriteCustomRegistersFrame(frame, cancel);
     }
 
@@ -619,22 +678,42 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
     {
         var addrs = new[]
         {
-            BDS10_71_56_InternAddr, BDS10_55_40_InternAddr, BDS10_39_24_InternAddr
+            BDS10_79_64_InternAddr, BDS10_63_48_InternAddr, BDS10_47_32_InternAddr, BDS10_31_24_InternAddr,
         };
         var values = await ReadCustomRegistersFrame(addrs, cancel).ConfigureAwait(false);
-        var result = new byte[values.Length * 2 + 1];
-        result[0] = (1 << 4) | 0;
-        for (var i = 0; i < values.Length; i++)
+        var result = new byte[7];
+        for (var i = 0; i < 3; i++)
         {
-            result[2 * i + 1] = (byte)((values[i] >> 8) & 0xFF);
-            result[2 * i + 2] = (byte)(values[i] & 0xFF);
+            result[2 * i] = (byte)((values[i] >> 8) & 0xFF);
+            result[2 * i + 1] = (byte)(values[i] & 0xFF);
         }
+        result[6] = (byte)((values[3] >> 8) & 0xFF);
+        return result;
+    }
+
+    public async Task<byte[]> ReadBDS17Message(CancellationToken cancel = default)
+    {
+        var addrs = new[]
+        {
+            BDS17_79_64_InternAddr, BDS17_63_48_InternAddr, BDS17_47_32_InternAddr, BDS17_31_24_InternAddr,
+        };
+        var values = await ReadCustomRegistersFrame(addrs, cancel).ConfigureAwait(false);
+        var result = new byte[7];
+        for (var i = 0; i < 3; i++)
+        {
+            result[2 * i] = (byte)((values[i] >> 8) & 0xFF);
+            result[2 * i + 1] = (byte)(values[i] & 0xFF);
+        }
+        result[6] = (byte)((values[3] >> 8) & 0xFF);
         return result;
     }
 
     public async Task<byte[]> ReadBDS20Message(CancellationToken cancel = default)
     {
-        var addrs = new[] { DF17_ID_79_64_InternAddr, DF17_ID_63_48_InternAddr, DF17_ID_47_32_InternAddr, DF17_ID_31_24_InternAddr };
+        var addrs = new[]
+        {
+            BDS20_79_64_InternAddr, BDS20_63_48_InternAddr, BDS20_47_32_InternAddr, BDS20_31_24_InternAddr,
+        };
         var values = await ReadCustomRegistersFrame(addrs, cancel).ConfigureAwait(false);
         var result = new byte[7];
 
@@ -644,8 +723,24 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
             result[2 * i + 1] = (byte)(values[i] & 0xFF);
         }
         result[6] = (byte)((values[3] >> 8) & 0xFF);
-        result[0] = 2 << 4 | 0;
+        return result;
+    }
 
+    public async Task<byte[]> ReadBDS30Message(CancellationToken cancel = default)
+    {
+        var addrs = new[]
+        {
+            BDS30_79_64_InternAddr, BDS30_63_48_InternAddr, BDS30_47_32_InternAddr, BDS30_31_24_InternAddr,
+        };
+        var values = await ReadCustomRegistersFrame(addrs, cancel).ConfigureAwait(false);
+        var result = new byte[7];
+
+        for (var i = 0; i < 3; i++)
+        {
+            result[2 * i] = (byte)((values[i] >> 8) & 0xFF);
+            result[2 * i + 1] = (byte)(values[i] & 0xFF);
+        }
+        result[6] = (byte)((values[3] >> 8) & 0xFF);
         return result;
     }
 
@@ -658,10 +753,11 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
             return Task.CompletedTask;
         }
 
-        var frame = new ValueTuple<ushort, ushort>[3];
-        frame[0] = new ValueTuple<ushort, ushort>(BDS40_71_56_InternAddr, (ushort)((message.Span[1] << 8) | message.Span[2]));
-        frame[1] = new ValueTuple<ushort, ushort>(BDS40_55_40_InternAddr, (ushort)((message.Span[3] << 8) | message.Span[4]));
-        frame[2] = new ValueTuple<ushort, ushort>(BDS40_39_24_InternAddr, (ushort)((message.Span[5] << 8) | message.Span[6]));
+        var frame = new ValueTuple<ushort, ushort>[4];
+        frame[0] = new ValueTuple<ushort, ushort>(BDS40_79_64_InternAddr, (ushort)((message.Span[0] << 8) | message.Span[1]));
+        frame[1] = new ValueTuple<ushort, ushort>(BDS40_63_48_InternAddr, (ushort)((message.Span[2] << 8) | message.Span[3]));
+        frame[2] = new ValueTuple<ushort, ushort>(BDS40_47_32_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
+        frame[3] = new ValueTuple<ushort, ushort>(BDS40_31_24_InternAddr, (ushort)(message.Span[6] << 8));
         return WriteCustomRegistersFrame(frame, cancel);
     }
     
@@ -669,16 +765,17 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
     {
         var addrs = new[]
         {
-            BDS40_71_56_InternAddr, BDS40_55_40_InternAddr, BDS40_39_24_InternAddr
+            BDS40_79_64_InternAddr, BDS40_63_48_InternAddr, BDS40_47_32_InternAddr, BDS40_31_24_InternAddr,
         };
         var values = await ReadCustomRegistersFrame(addrs, cancel).ConfigureAwait(false);
-        var result = new byte[values.Length * 2 + 1];
-        result[0] = (4 << 4) | 0;
-        for (var i = 0; i < values.Length; i++)
+        var result = new byte[7];
+
+        for (var i = 0; i < 3; i++)
         {
-            result[2 * i + 1] = (byte)((values[i] >> 8) & 0xFF);
-            result[2 * i + 2] = (byte)(values[i] & 0xFF);
+            result[2 * i] = (byte)((values[i] >> 8) & 0xFF);
+            result[2 * i + 1] = (byte)(values[i] & 0xFF);
         }
+        result[6] = (byte)((values[3] >> 8) & 0xFF);
         return result;
     }
     
@@ -691,10 +788,11 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
             return Task.CompletedTask;
         }
 
-        var frame = new ValueTuple<ushort, ushort>[3];
-        frame[0] = new ValueTuple<ushort, ushort>(BDS50_71_56_InternAddr, (ushort)((message.Span[1] << 8) | message.Span[2]));
-        frame[1] = new ValueTuple<ushort, ushort>(BDS50_55_40_InternAddr, (ushort)((message.Span[3] << 8) | message.Span[4]));
-        frame[2] = new ValueTuple<ushort, ushort>(BDS50_39_24_InternAddr, (ushort)((message.Span[5] << 8) | message.Span[6]));
+        var frame = new ValueTuple<ushort, ushort>[4];
+        frame[0] = new ValueTuple<ushort, ushort>(BDS50_79_64_InternAddr, (ushort)((message.Span[0] << 8) | message.Span[1]));
+        frame[1] = new ValueTuple<ushort, ushort>(BDS50_63_48_InternAddr, (ushort)((message.Span[2] << 8) | message.Span[3]));
+        frame[2] = new ValueTuple<ushort, ushort>(BDS50_47_32_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
+        frame[3] = new ValueTuple<ushort, ushort>(BDS50_31_24_InternAddr, (ushort)(message.Span[6] << 8));
         return WriteCustomRegistersFrame(frame, cancel);
     }
     
@@ -702,16 +800,17 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
     {
         var addrs = new[]
         {
-            BDS50_71_56_InternAddr, BDS50_55_40_InternAddr, BDS50_39_24_InternAddr
+            BDS50_79_64_InternAddr, BDS50_63_48_InternAddr, BDS50_47_32_InternAddr, BDS50_31_24_InternAddr,
         };
         var values = await ReadCustomRegistersFrame(addrs, cancel).ConfigureAwait(false);
-        var result = new byte[values.Length * 2 + 1];
-        result[0] = (5 << 4) | 0;
-        for (var i = 0; i < values.Length; i++)
+        var result = new byte[7];
+
+        for (var i = 0; i < 3; i++)
         {
-            result[2 * i + 1] = (byte)((values[i] >> 8) & 0xFF);
-            result[2 * i + 2] = (byte)(values[i] & 0xFF);
+            result[2 * i] = (byte)((values[i] >> 8) & 0xFF);
+            result[2 * i + 1] = (byte)(values[i] & 0xFF);
         }
+        result[6] = (byte)((values[3] >> 8) & 0xFF);
         return result;
     }
     
@@ -724,10 +823,11 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
             return Task.CompletedTask;
         }
 
-        var frame = new ValueTuple<ushort, ushort>[3];
-        frame[0] = new ValueTuple<ushort, ushort>(BDS60_71_56_InternAddr, (ushort)((message.Span[1] << 8) | message.Span[2]));
-        frame[1] = new ValueTuple<ushort, ushort>(BDS60_55_40_InternAddr, (ushort)((message.Span[3] << 8) | message.Span[4]));
-        frame[2] = new ValueTuple<ushort, ushort>(BDS60_39_24_InternAddr, (ushort)((message.Span[5] << 8) | message.Span[6]));
+        var frame = new ValueTuple<ushort, ushort>[4];
+        frame[0] = new ValueTuple<ushort, ushort>(BDS60_79_64_InternAddr, (ushort)((message.Span[0] << 8) | message.Span[1]));
+        frame[1] = new ValueTuple<ushort, ushort>(BDS60_63_48_InternAddr, (ushort)((message.Span[2] << 8) | message.Span[3]));
+        frame[2] = new ValueTuple<ushort, ushort>(BDS60_47_32_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
+        frame[3] = new ValueTuple<ushort, ushort>(BDS60_31_24_InternAddr, (ushort)(message.Span[6] << 8));
         return WriteCustomRegistersFrame(frame, cancel);
     }
     
@@ -735,16 +835,17 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
     {
         var addrs = new[]
         {
-            BDS60_71_56_InternAddr, BDS60_55_40_InternAddr, BDS60_39_24_InternAddr
+            BDS60_79_64_InternAddr, BDS60_63_48_InternAddr, BDS60_47_32_InternAddr, BDS60_31_24_InternAddr,
         };
         var values = await ReadCustomRegistersFrame(addrs, cancel).ConfigureAwait(false);
-        var result = new byte[values.Length * 2 + 1];
-        result[0] = (6 << 4) | 0;
-        for (var i = 0; i < values.Length; i++)
+        var result = new byte[7];
+
+        for (var i = 0; i < 3; i++)
         {
-            result[2 * i + 1] = (byte)((values[i] >> 8) & 0xFF);
-            result[2 * i + 2] = (byte)(values[i] & 0xFF);
+            result[2 * i] = (byte)((values[i] >> 8) & 0xFF);
+            result[2 * i + 1] = (byte)(values[i] & 0xFF);
         }
+        result[6] = (byte)((values[3] >> 8) & 0xFF);
         return result;
     }
 
@@ -814,7 +915,7 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
         return [(byte)((reg >> 8) & 0xFF), (byte)(reg & 0xFF)];
     }
 
-    public async Task<(byte UF4, byte UF5, byte UF20, byte UF21, byte UF11, byte DF4, byte DF5, byte DF20, byte DF21, byte
+    public async Task<(byte UF4, byte UF5, byte UF20, byte UF21, byte UF11, byte UFxx, byte DF4, byte DF5, byte DF20, byte DF21, byte
         DF11)> GetAllStat(CancellationToken cancel = default)
     {
         var frame = new[]
@@ -828,13 +929,14 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
         var uf20 = (byte)(regs[0] & 0xFF);
         var uf21 = (byte)(regs[1] & 0xFF);
         var uf11 = (byte)((regs[2] >> 8) & 0xFF);
+        var ufxx = (byte)(regs[2] & 0xFF);
         var df4 = (byte)((regs[3] >> 8) & 0xFF);
         var df5 = (byte)(regs[3] & 0xFF);
         var df20 = (byte)((regs[5] >> 8) & 0xFF);
         var df21 = (byte)(regs[5] & 0xFF);
         var df11 = (byte)((regs[4] >> 8) & 0xFF);
 
-        return (uf4, uf5, uf20, uf21, uf11, df4, df5, df20, df21, df11);
+        return (uf4, uf5, uf20, uf21, uf11, ufxx, df4, df5, df20, df21, df11);
     }
 
     public async Task<byte[]> GetDF20DF21Stat(CancellationToken cancel = default)
@@ -849,8 +951,9 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
         return [(byte)((reg >> 8) & 0xFF), (byte)(reg & 0xFF)];
     }
 
-    public Task InitAllMessage(ReadOnlySpan<byte> df11, ReadOnlySpan<byte> df4, ReadOnlySpan<byte> df5, ReadOnlySpan<byte> bds10, ReadOnlySpan<byte> bds20,
-        ReadOnlySpan<byte> bds40, ReadOnlySpan<byte> bds50, ReadOnlySpan<byte> bds60, ReadOnlySpan<byte> df17Id, CancellationToken cancel)
+    public Task InitAllMessage(ReadOnlySpan<byte> df11, ReadOnlySpan<byte> df4, ReadOnlySpan<byte> df5,
+        ReadOnlySpan<byte> bds10, ReadOnlySpan<byte> bds17, ReadOnlySpan<byte> bds20, ReadOnlySpan<byte> bds30,
+        ReadOnlySpan<byte> bds40, ReadOnlySpan<byte> bds50, ReadOnlySpan<byte> bds60, CancellationToken cancel)
     {
         if (df11.Length != 7)
         {
@@ -892,13 +995,47 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
             return Task.CompletedTask;
         }
 
-        var bds10Frame = new ValueTuple<ushort, ushort>[3];
-        bds10Frame[0] = new ValueTuple<ushort, ushort>(BDS10_71_56_InternAddr, (ushort)((bds10[1] << 8) | bds10[2]));
-        bds10Frame[1] = new ValueTuple<ushort, ushort>(BDS10_55_40_InternAddr, (ushort)((bds10[3] << 8) | bds10[4]));
-        bds10Frame[2] = new ValueTuple<ushort, ushort>(BDS10_39_24_InternAddr, (ushort)((bds10[5] << 8) | bds10[6]));
+        var bds10Frame = new ValueTuple<ushort, ushort>[4];
+        bds10Frame[0] = new ValueTuple<ushort, ushort>(BDS10_79_64_InternAddr, (ushort)((bds10[0] << 8) | bds10[1]));
+        bds10Frame[1] = new ValueTuple<ushort, ushort>(BDS10_63_48_InternAddr, (ushort)((bds10[2] << 8) | bds10[3]));
+        bds10Frame[2] = new ValueTuple<ushort, ushort>(BDS10_47_32_InternAddr, (ushort)((bds10[4] << 8) | bds10[5]));
+        bds10Frame[3] = new ValueTuple<ushort, ushort>(BDS10_31_24_InternAddr, (ushort)((bds10[6] << 8) | 0x0));
 
-        // ToDo Если у нас будут отдельные регистры для BDS20, записываем их тоже
-        // ToDo Пока пользуемся регистрами DF17 Id
+        if (bds17.Length != 7)
+        {
+            logger.ZLogDebug(
+                $"Error writing ADS-B BDS17 register. Expected length greater than or equal to 7 bytes, but length {bds17.Length} bytes.");
+            return Task.CompletedTask;
+        }
+        var bds17Frame = new ValueTuple<ushort, ushort>[4];
+        bds17Frame[0] = new ValueTuple<ushort, ushort>(BDS17_79_64_InternAddr, (ushort)((bds17[0] << 8) | bds17[1]));
+        bds17Frame[1] = new ValueTuple<ushort, ushort>(BDS17_63_48_InternAddr, (ushort)((bds17[2] << 8) | bds17[3]));
+        bds17Frame[2] = new ValueTuple<ushort, ushort>(BDS17_47_32_InternAddr, (ushort)((bds17[4] << 8) | bds17[5]));
+        bds17Frame[3] = new ValueTuple<ushort, ushort>(BDS17_31_24_InternAddr, (ushort)((bds17[6] << 8) | 0x0));
+
+        if (bds20.Length != 7)
+        {
+            logger.ZLogDebug(
+                $"Error writing ADS-B BDS20 register. Expected length greater than or equal to 7 bytes, but length {bds20.Length} bytes.");
+            return Task.CompletedTask;
+        }
+        var bds20Frame = new ValueTuple<ushort, ushort>[4];
+        bds20Frame[0] = new ValueTuple<ushort, ushort>(BDS20_79_64_InternAddr, (ushort)((bds20[0] << 8) | bds20[1]));
+        bds20Frame[1] = new ValueTuple<ushort, ushort>(BDS20_63_48_InternAddr, (ushort)((bds20[2] << 8) | bds20[3]));
+        bds20Frame[2] = new ValueTuple<ushort, ushort>(BDS20_47_32_InternAddr, (ushort)((bds20[4] << 8) | bds20[5]));
+        bds20Frame[3] = new ValueTuple<ushort, ushort>(BDS20_31_24_InternAddr, (ushort)((bds20[6] << 8) | 0x0));
+        
+        if (bds30.Length != 7)
+        {
+            logger.ZLogDebug(
+                $"Error writing ADS-B BDS30 register. Expected length greater than or equal to 7 bytes, but length {bds30.Length} bytes.");
+            return Task.CompletedTask;
+        }
+        var bds30Frame = new ValueTuple<ushort, ushort>[4];
+        bds30Frame[0] = new ValueTuple<ushort, ushort>(BDS30_79_64_InternAddr, (ushort)((bds30[0] << 8) | bds30[1]));
+        bds30Frame[1] = new ValueTuple<ushort, ushort>(BDS30_63_48_InternAddr, (ushort)((bds30[2] << 8) | bds30[3]));
+        bds30Frame[2] = new ValueTuple<ushort, ushort>(BDS30_47_32_InternAddr, (ushort)((bds30[4] << 8) | bds30[5]));
+        bds30Frame[3] = new ValueTuple<ushort, ushort>(BDS30_31_24_InternAddr, (ushort)((bds30[6] << 8) | 0x0));
         
         if (bds40.Length != 7)
         {
@@ -906,48 +1043,51 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
                 $"Error writing ADS-B BDS40 register. Expected length greater than or equal to 7 bytes, but length {bds40.Length} bytes.");
             return Task.CompletedTask;
         }
+        var bds40Frame = new ValueTuple<ushort, ushort>[4];
+        bds40Frame[0] = new ValueTuple<ushort, ushort>(BDS40_79_64_InternAddr, (ushort)((bds40[0] << 8) | bds40[1]));
+        bds40Frame[1] = new ValueTuple<ushort, ushort>(BDS40_63_48_InternAddr, (ushort)((bds40[2] << 8) | bds40[3]));
+        bds40Frame[2] = new ValueTuple<ushort, ushort>(BDS40_47_32_InternAddr, (ushort)((bds40[4] << 8) | bds40[5]));
+        bds40Frame[3] = new ValueTuple<ushort, ushort>(BDS40_31_24_InternAddr, (ushort)((bds40[6] << 8) | 0x0));
 
-        var bds40Frame = new ValueTuple<ushort, ushort>[3];
-        bds40Frame[0] = new ValueTuple<ushort, ushort>(BDS40_71_56_InternAddr, (ushort)((bds40[1] << 8) | bds40[2]));
-        bds40Frame[1] = new ValueTuple<ushort, ushort>(BDS40_55_40_InternAddr, (ushort)((bds40[3] << 8) | bds40[4]));
-        bds40Frame[2] = new ValueTuple<ushort, ushort>(BDS40_39_24_InternAddr, (ushort)((bds40[5] << 8) | bds40[6]));
-        
         if (bds50.Length != 7)
         {
             logger.ZLogDebug(
                 $"Error writing ADS-B BDS50 register. Expected length greater than or equal to 7 bytes, but length {bds50.Length} bytes.");
             return Task.CompletedTask;
         }
+        var bds50Frame = new ValueTuple<ushort, ushort>[4];
+        bds50Frame[0] = new ValueTuple<ushort, ushort>(BDS50_79_64_InternAddr, (ushort)((bds50[0] << 8) | bds50[1]));
+        bds50Frame[1] = new ValueTuple<ushort, ushort>(BDS50_63_48_InternAddr, (ushort)((bds50[2] << 8) | bds50[3]));
+        bds50Frame[2] = new ValueTuple<ushort, ushort>(BDS50_47_32_InternAddr, (ushort)((bds50[4] << 8) | bds50[5]));
+        bds50Frame[3] = new ValueTuple<ushort, ushort>(BDS50_31_24_InternAddr, (ushort)((bds50[6] << 8) | 0x0));
 
-        var bds50Frame = new ValueTuple<ushort, ushort>[3];
-        bds50Frame[0] = new ValueTuple<ushort, ushort>(BDS50_71_56_InternAddr, (ushort)((bds50[1] << 8) | bds50[2]));
-        bds50Frame[1] = new ValueTuple<ushort, ushort>(BDS50_55_40_InternAddr, (ushort)((bds50[3] << 8) | bds50[4]));
-        bds50Frame[2] = new ValueTuple<ushort, ushort>(BDS50_39_24_InternAddr, (ushort)((bds50[5] << 8) | bds50[6]));
-        
         if (bds60.Length != 7)
         {
             logger.ZLogDebug(
                 $"Error writing ADS-B BDS60 register. Expected length greater than or equal to 7 bytes, but length {bds60.Length} bytes.");
             return Task.CompletedTask;
         }
+        var bds60Frame = new ValueTuple<ushort, ushort>[4];
+        bds60Frame[0] = new ValueTuple<ushort, ushort>(BDS60_79_64_InternAddr, (ushort)((bds60[0] << 8) | bds60[1]));
+        bds60Frame[1] = new ValueTuple<ushort, ushort>(BDS60_63_48_InternAddr, (ushort)((bds60[2] << 8) | bds60[3]));
+        bds60Frame[2] = new ValueTuple<ushort, ushort>(BDS60_47_32_InternAddr, (ushort)((bds60[4] << 8) | bds60[5]));
+        bds60Frame[3] = new ValueTuple<ushort, ushort>(BDS60_31_24_InternAddr, (ushort)((bds60[6] << 8) | 0x0));
 
-        var bds60Frame = new ValueTuple<ushort, ushort>[3];
-        bds60Frame[0] = new ValueTuple<ushort, ushort>(BDS60_71_56_InternAddr, (ushort)((bds60[1] << 8) | bds60[2]));
-        bds60Frame[1] = new ValueTuple<ushort, ushort>(BDS60_55_40_InternAddr, (ushort)((bds60[3] << 8) | bds60[4]));
-        bds60Frame[2] = new ValueTuple<ushort, ushort>(BDS60_39_24_InternAddr, (ushort)((bds60[5] << 8) | bds60[6]));
-        
-        if (df17Id.Length != 14)
-        {
-            logger.ZLogDebug(
-                $"Error writing ADS-B DF17 Identification message. Expected length greater than or equal to 14 bytes, but length {df17Id.Length} bytes.");
-            return Task.CompletedTask;
-        }
-
-        var df17IdFrame = new ValueTuple<ushort, ushort>[4];
-        df17IdFrame[0] = new ValueTuple<ushort, ushort>(DF17_ID_79_64_InternAddr, (ushort)((df17Id[4] << 8) | df17Id[5]));
-        df17IdFrame[1] = new ValueTuple<ushort, ushort>(DF17_ID_63_48_InternAddr, (ushort)((df17Id[6] << 8) | df17Id[7]));
-        df17IdFrame[2] = new ValueTuple<ushort, ushort>(DF17_ID_47_32_InternAddr, (ushort)((df17Id[8] << 8) | df17Id[9]));
-        df17IdFrame[3] = new ValueTuple<ushort, ushort>(DF17_ID_31_24_InternAddr, (ushort)(df17Id[10] << 8));
+        // if (df17Id.Length != 14)
+        // {
+        //     logger.ZLogDebug(
+        //         $"Error writing ADS-B DF17 Identification message. Expected length greater than or equal to 14 bytes, but length {df17Id.Length} bytes.");
+        //     return Task.CompletedTask;
+        // }
+        //
+        // var df17IdFrame = new ValueTuple<ushort, ushort>[4];
+        // df17IdFrame[0] =
+        //     new ValueTuple<ushort, ushort>(DF17_ID_79_64_InternAddr, (ushort)((df17Id[4] << 8) | df17Id[5]));
+        // df17IdFrame[1] =
+        //     new ValueTuple<ushort, ushort>(DF17_ID_63_48_InternAddr, (ushort)((df17Id[6] << 8) | df17Id[7]));
+        // df17IdFrame[2] =
+        //     new ValueTuple<ushort, ushort>(DF17_ID_47_32_InternAddr, (ushort)((df17Id[8] << 8) | df17Id[9]));
+        // df17IdFrame[3] = new ValueTuple<ushort, ushort>(DF17_ID_31_24_InternAddr, (ushort)(df17Id[10] << 8));
 
         return AtomicEditRegister(edit =>
         {
@@ -970,12 +1110,27 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
             {
                 WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
             }
-
-            foreach (var addressValuePair in bds40Frame)
+            
+            foreach (var addressValuePair in bds17Frame)
             {
                 WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
             }
             
+            foreach (var addressValuePair in bds20Frame)
+            {
+                WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
+            }
+
+            foreach (var addressValuePair in bds30Frame)
+            {
+                WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
+            }
+            
+            foreach (var addressValuePair in bds40Frame)
+            {
+                WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
+            }
+
             foreach (var addressValuePair in bds50Frame)
             {
                 WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
@@ -986,10 +1141,10 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
                 WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
             }
 
-            foreach (var addressValuePair in df17IdFrame)
-            {
-                WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            }
+            // foreach (var addressValuePair in df17IdFrame)
+            // {
+            //     WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
+            // }
 
             edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 1);
             edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 0);
