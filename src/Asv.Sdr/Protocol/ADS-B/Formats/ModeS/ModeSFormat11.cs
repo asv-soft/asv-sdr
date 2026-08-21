@@ -56,11 +56,6 @@ public class ModeSDF11 : ModeSDFormatBase
     
     public byte CL { get; set; }
 
-    public ModeSDF11(byte ic, byte cl)
-    {
-        IC = ic;
-        CL = cl;
-    }
     protected override void InternalDeserialize(ReadOnlySpan<byte> buffer, ref int pos)
     {
         _rawCa = (int)ModeSHelper.GetBitU(buffer, ref pos, 3);
@@ -80,6 +75,9 @@ public class ModeSDF11 : ModeSDFormatBase
 
     public override uint? GetIcao(uint calcCrc, uint originCrc)
     {
+        var sum = base.GetIcao(calcCrc, originCrc);
+        IC = (byte)(sum & 0xF)!;
+        CL = (byte)((sum >> 4) & 0x7)!;
         return IcaoAddress;
     }
 }
