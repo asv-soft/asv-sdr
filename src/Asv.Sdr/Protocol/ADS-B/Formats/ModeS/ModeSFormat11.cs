@@ -77,4 +77,9 @@ public class ModeSDF11 : ModeSDFormatBase
     {
         return (uint)(calcCrc ^ (((CL & 0x7) << 4) | (IC & 0xF)));
     }
+
+    public override uint? GetIcao(uint calcCrc, uint originCrc)
+    {
+        return IcaoAddress;
+    }
 }
