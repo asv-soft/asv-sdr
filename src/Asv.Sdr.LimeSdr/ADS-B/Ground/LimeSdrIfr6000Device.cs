@@ -13,10 +13,11 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
 {
     private readonly LimeSdrDeviceConfig _config;
     private readonly ILogger _logger;
-    private int _readDfMsgFlag;
+    private readonly SemaphoreSlim _dfRequestLock = new(1, 1);
     private double _delayOffsetAc = 0;
     private const int DefaultDfPollIntervalMs = 10;
     private const int DefaultDfResponseTimeoutMs = 100;
+    private const int UfSwitchSettleDelayMs = 12;
     
     private const ushort ModeAResp_15_0_InternAddr          = 0x0301; // (0,0,С1,А1,С2,А2,С4,А4,Х,В1,D1,В2,D2,В4,D4,SPI) -- RD
     private const ushort ModeCResp_15_0_InternAddr          = 0x0302; // (0,0,С1,А1,С2,А2,С4,А4,Х,В1,D1,В2,D2,В4,D4,0) -- RD
@@ -378,14 +379,14 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
 
     public async Task<bool> WriteUfMessage(ModeSUFormatBase msg)
     {
-        if (Interlocked.CompareExchange(ref _readDfMsgFlag, 1, 0) != 0) return false;
+        await _dfRequestLock.WaitAsync(DisposeCancel).ConfigureAwait(false);
         try
         {
             return await InternalWriteUfMessage(msg).ConfigureAwait(false);
         }
         finally
         {
-            Interlocked.Exchange(ref _readDfMsgFlag, 0);
+            _dfRequestLock.Release();
         }
     }
     private async Task<bool> InternalWriteUfMessage(ModeSUFormatBase msg)
@@ -406,8 +407,8 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     {
         try
         {
-            var frame = CreateUfFrame(msg);
-            ushort counterBefore = 0;
+            var buffer = CreateUfBuffer(msg);
+            var frame = CreateUfFrame(buffer);
             await AtomicEditRegister(edit =>
             {
                 foreach (var addressValuePair in frame)
@@ -415,11 +416,15 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
                     WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
                 }
 
-                counterBefore = ReadCustomRegister(edit, DF_RX_CNT);
                 edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 1);
                 edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 0);
             }, DisposeCancel).ConfigureAwait(false);
 
+            await Task.Delay(UfSwitchSettleDelayMs, DisposeCancel).ConfigureAwait(false);
+            var counterBefore = await ReadCustomRegister(DF_RX_CNT, DisposeCancel).ConfigureAwait(false);
+            _logger.ZLogInformation(
+                $"Mode S UF applied uf={msg.FormatId} raw={Convert.ToHexString(buffer.AsSpan(0, msg.GetByteSize()))} settle={UfSwitchSettleDelayMs}ms dfCnt={counterBefore}"
+            );
             return (true, counterBefore);
         }
         catch (Exception)
@@ -433,11 +438,21 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         return WriteCustomRegistersFrame(frame, DisposeCancel);
     }
 
-    private static ValueTuple<ushort, ushort>[] CreateUfFrame(ModeSUFormatBase msg)
+    private static byte[] CreateUfBuffer(ModeSUFormatBase msg)
     {
         var buffer = new byte[14];
         var span = new Span<byte>(buffer);
         msg.Serialize(ref span);
+        return buffer;
+    }
+
+    private static ValueTuple<ushort, ushort>[] CreateUfFrame(ModeSUFormatBase msg)
+    {
+        return CreateUfFrame(CreateUfBuffer(msg));
+    }
+
+    private static ValueTuple<ushort, ushort>[] CreateUfFrame(byte[] buffer)
+    {
         var frame = new ValueTuple<ushort, ushort>[7];
         frame[0] = new ValueTuple<ushort, ushort>(UF_TX_111_96, (ushort)((buffer[0] << 8) | buffer[1]));
         frame[1] = new ValueTuple<ushort, ushort>(UF_TX_95_80, (ushort)((buffer[2] << 8) | buffer[3]));
@@ -451,14 +466,14 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
 
     public async Task<ModeSDFormatBase?> ReadDfMessage(Func<ModeSDFormatBase> factory, int attempts = 3)
     {
-        if (Interlocked.CompareExchange(ref _readDfMsgFlag, 1, 0) != 0) return null;
+        await _dfRequestLock.WaitAsync(DisposeCancel).ConfigureAwait(false);
         try
         {
             return await InternalReadDfMessage(factory, GetDfResponseTimeoutFromAttempts(attempts)).ConfigureAwait(false);
         }
         finally
         {
-            Interlocked.Exchange(ref _readDfMsgFlag, 0);
+            _dfRequestLock.Release();
         }
     }
 
@@ -468,15 +483,13 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     {
         var length = factory().GetByteSize();
         var dfRegisterCount = length % 2 == 0 ? length / 2 : (length / 2) + 1;
-        var addrFrame = new ushort[dfRegisterCount + (counterBefore.HasValue ? 1 : 0)];
+        var addrFrame = new ushort[dfRegisterCount + 2];
+        addrFrame[0] = DF_RX_CNT;
         for (var i = 0; i < dfRegisterCount; i++)
         {
-            addrFrame[i] = (ushort)(DF_RX_111_96 + i);
+            addrFrame[i + 1] = (ushort)(DF_RX_111_96 + i);
         }
-        if (counterBefore.HasValue)
-        {
-            addrFrame[^1] = DF_RX_CNT;
-        }
+        addrFrame[^1] = DF_RX_CNT;
 
         var timeoutAt = Environment.TickCount64 + Math.Max(1, timeoutMs);
         var lastCounter = counterBefore;
@@ -490,22 +503,34 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
                 }
 
                 var valueFrame = await ReadCustomRegistersFrame(addrFrame, DisposeCancel).ConfigureAwait(false);
-                if (lastCounter.HasValue)
+                var counterAtStart = valueFrame[0];
+                var counterAtEnd = valueFrame[^1];
+                if (counterAtStart != counterAtEnd)
                 {
-                    var counter = valueFrame[^1];
-                    if (counter == lastCounter.Value)
-                    {
-                        continue;
-                    }
-
-                    lastCounter = counter;
+                    _logger.ZLogInformation(
+                        $"Mode S DF torn snapshot dfCnt={counterAtStart}->{counterAtEnd}; retry"
+                    );
+                    continue;
+                }
+                if (lastCounter.HasValue && counterAtEnd == lastCounter.Value)
+                {
+                    continue;
                 }
 
-                var buffer = ConvertRegisterFrameToBytes(valueFrame, length);
+                var dfFrame = valueFrame.AsSpan(1, dfRegisterCount).ToArray();
+                var buffer = ConvertRegisterFrameToBytes(dfFrame, length);
+                lastCounter = counterAtEnd;
+                _logger.ZLogInformation(
+                    $"Mode S DF snapshot dfCnt={counterAtEnd} raw={Convert.ToHexString(buffer)}"
+                );
                 var span = new ReadOnlySpan<byte>(buffer);
                 var msg = factory();
                 msg.Deserialize(ref span);
-                if (isValid == null || isValid(msg))
+                var valid = isValid == null || isValid(msg);
+                _logger.ZLogInformation(
+                    $"Mode S DF received dfCnt={counterAtEnd} df={msg.FormatId} icao={msg.IcaoAddress:X6} valid={valid} bdsType={msg.Bds?.GetType().Name ?? "null"} raw={Convert.ToHexString(buffer)}"
+                );
+                if (valid)
                 {
                     return msg;
                 }
@@ -525,7 +550,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
 
     public async Task<ModeSDFormatBase?> ReadDfMessage(ModeSUFormatBase reqMsg, Func<ModeSDFormatBase> respFactory, int attempts = 3)
     {
-        if (Interlocked.CompareExchange(ref _readDfMsgFlag, 1, 0) != 0) return null;
+        await _dfRequestLock.WaitAsync(DisposeCancel).ConfigureAwait(false);
         try
         {
             var writeResult = await InternalWriteUfMessageWithCounterSnapshot(reqMsg).ConfigureAwait(false);
@@ -539,7 +564,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         }
         finally
         {
-            Interlocked.Exchange(ref _readDfMsgFlag, 0);
+            _dfRequestLock.Release();
         }
     }
     
@@ -547,7 +572,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         Func<T, bool>? isValid = null, int timeoutMs = DefaultDfResponseTimeoutMs)
         where T : ModeSDFormatBase
     {
-        if (Interlocked.CompareExchange(ref _readDfMsgFlag, 1, 0) != 0) return null;
+        await _dfRequestLock.WaitAsync(DisposeCancel).ConfigureAwait(false);
         try
         {
             var writeResult = await InternalWriteUfMessageWithCounterSnapshot(reqMsg).ConfigureAwait(false);
@@ -564,7 +589,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         }
         finally
         {
-            Interlocked.Exchange(ref _readDfMsgFlag, 0);
+            _dfRequestLock.Release();
         }
     }
 
@@ -572,7 +597,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         Func<T, bool>? isValid = null, int timeoutMs = DefaultDfResponseTimeoutMs)
         where T : ModeSDFormatBase
     {
-        if (Interlocked.CompareExchange(ref _readDfMsgFlag, 1, 0) != 0) return null;
+        await _dfRequestLock.WaitAsync(DisposeCancel).ConfigureAwait(false);
         try
         {
             var writeResult = await InternalWriteUfMessageWithCounterSnapshot(reqMsg).ConfigureAwait(false);
@@ -589,7 +614,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         }
         finally
         {
-            Interlocked.Exchange(ref _readDfMsgFlag, 0);
+            _dfRequestLock.Release();
         }
     }
 
