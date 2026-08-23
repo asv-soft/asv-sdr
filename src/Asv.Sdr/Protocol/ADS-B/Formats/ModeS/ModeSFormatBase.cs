@@ -376,7 +376,7 @@ public abstract class ModeSDFormatBase : ModeSFormatBase
             try
             {
                 Bds.Deserialize(ref buff);
-                pos += (buffer.Length - buff.Length) * 8;
+                pos = (buffer.Length - buff.Length) * 8;
                 return;
             }
             catch (Exception)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Asv.IO;
 
@@ -69,12 +69,8 @@ public class BdsAny(byte bds1, byte bds2) : BdsBase
 
     protected override void InternalSerialize(ref Span<byte> buffer)
     {
-        var len = Math.Min(buffer.Length, 7);
-        for (var i = 0; i < len; i++)
-        {
-            Data[i] = buffer[i];
-            BinSerialize.WriteByte(ref buffer, Data[i]);
-        }
+        var len = Math.Min(buffer.Length, Data.Length);
+        Data.AsSpan(0, len).CopyTo(buffer);
         buffer = buffer[len..];
     }
 }

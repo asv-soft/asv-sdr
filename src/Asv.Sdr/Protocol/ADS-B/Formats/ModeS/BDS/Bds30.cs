@@ -33,6 +33,7 @@ public class Bds30 : BdsBase
                 break;
             case ThreatTypeIndicatorEnum.ModeSTransponderAddress:
                 TidAddress = ModeSHelper.GetBitU(buffer, ref pos, 24);
+                pos += 2;
                 break;
             case ThreatTypeIndicatorEnum.AltitudeRangeBearingData:
             {

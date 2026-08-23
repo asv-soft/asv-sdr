@@ -71,11 +71,30 @@ public static class ModeSHelper
     
     public static void SetBitS(Span<byte> buff, ref int pos, int len, int data)
     {
-        if (data < 0)
-            data |= 1 << len - 1;
-        else
-            data &= ~(1 << len - 1);
-        SetBitU(buff, ref pos, len, (uint) data);
+        if (len is <= 0 or >= 32)
+            throw new ArgumentOutOfRangeException(nameof(len));
+
+        var minValue = -(1 << (len - 1));
+        var maxValue = (1 << (len - 1)) - 1;
+
+        if (data < minValue || data > maxValue)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(data),
+                $"Value {data} is outside the signed {len}-bit range " +
+                $"[{minValue}, {maxValue}]");
+        }
+
+        var mask = (1U << len) - 1U;
+        var encodedValue = unchecked((uint)data) & mask;
+
+        SetBitU(buff, ref pos, len, encodedValue);
+
+        // if (data < 0)
+        //     data |= 1 << len - 1;
+        // else
+        //     data &= ~(1 << len - 1);
+        // SetBitU(buff, ref pos, len, (uint) data);
     }
 
     // Установка диапазона битов с начальной позиции и длиной
