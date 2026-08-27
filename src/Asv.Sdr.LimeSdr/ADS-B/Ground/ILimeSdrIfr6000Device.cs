@@ -33,6 +33,7 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     
     // Mode S
 
+    Task WriteDelayOffsetModeS(double offset);
     Task WriteModeSControl(bool modeSP5SlsPulseEn, bool modeSP5SlsPulseAtt);
     Task<float> ReadModeSReplyDelay();
     Task<float> ReadModeSReplyJitter();

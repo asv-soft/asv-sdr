@@ -15,6 +15,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private readonly ILogger _logger;
     private readonly SemaphoreSlim _dfRequestLock = new(1, 1);
     private double _delayOffsetAc = 0;
+    private double _delayOffsetS = 0;
     private const int DefaultDfPollIntervalMs = 10;
     private const int DefaultDfResponseTimeoutMs = 100;
     private const int UfSwitchSettleDelayMs = 12;
@@ -295,6 +296,12 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         await WriteCustomRegister(ModeA_C_Control, reg, DisposeCancel).ConfigureAwait(false);
     }
 
+    public Task WriteDelayOffsetModeS(double offset)
+    {
+        _delayOffsetS = offset;
+        return Task.CompletedTask;
+    }
+
     public async Task WriteModeSControl(bool modeSP5SlsPulseEn, bool modeSP5SlsPulseAtt)
     {
         var reg = await ReadCustomRegister(ModeS_Control, DisposeCancel).ConfigureAwait(false);
@@ -306,7 +313,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     public async Task<float> ReadModeSReplyDelay()
     {
         var reg = 5120 + (short)await ReadCustomRegister(ReplyDelayS, DisposeCancel).ConfigureAwait(false);
-        return reg * 0.025f;
+        return reg * 0.025f + (float)_delayOffsetS;
     }
 
     public async Task<float> ReadModeSReplyJitter()
@@ -342,13 +349,13 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     public async Task<float> ReadModeAReplyDelay()
     {
         var reg = 120 + (short)await ReadCustomRegister(Reply_Delay_A_15_0, DisposeCancel).ConfigureAwait(false);
-        return reg * 0.025f;
+        return reg * 0.025f + (float)_delayOffsetAc;
     }
     
     public async Task<float> ReadModeCReplyDelay()
     {
         var reg = 120 + (short)await ReadCustomRegister(Reply_Delay_C_15_0, DisposeCancel).ConfigureAwait(false);
-        return reg * 0.025f;
+        return reg * 0.025f + (float)_delayOffsetAc;
     }
 
     public async Task<float> ReadModeAReplyJitter()
