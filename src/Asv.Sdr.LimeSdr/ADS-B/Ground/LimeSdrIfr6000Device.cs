@@ -16,9 +16,11 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private readonly SemaphoreSlim _dfRequestLock = new(1, 1);
     private double _delayOffsetAc = 0;
     private double _delayOffsetS = 0;
+    private uint? _modeSExpectedIcao;
     private const int DefaultDfPollIntervalMs = 10;
     private const int DefaultDfResponseTimeoutMs = 100;
     private const int UfSwitchSettleDelayMs = 12;
+    private const uint ModeSBroadcastIcao = 0xFFFFFF;
     
     private const ushort ModeAResp_15_0_InternAddr          = 0x0301; // (0,0,С1,А1,С2,А2,С4,А4,Х,В1,D1,В2,D2,В4,D4,SPI) -- RD
     private const ushort ModeCResp_15_0_InternAddr          = 0x0302; // (0,0,С1,А1,С2,А2,С4,А4,Х,В1,D1,В2,D2,В4,D4,0) -- RD
@@ -76,6 +78,8 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private const ushort BDS_65_Sur_CNT_Period_15_0 = 0x032C;  // --RD -- BDS_65_Sur_CNT(7:0) & BDS_65_Sur_Period(7:0)
     private const ushort DF11_SKW_CNT_Period_15_0 = 0x032D;    // --RD -- DF11_SKW_CNT(7:0) & DF11_SKW_Period(7:0)
     private const ushort DF_RX_CNT = 0x032E;                    // --RD -- DFxx_CNT(15:0)
+    private const ushort ModeSExpectedIcao_23_16 = 0x032F;     // --WR -- expected ICAO[23:16] for FPGA timing filter
+    private const ushort ModeSExpectedIcao_15_0 = 0x0330;      // --WR -- expected ICAO[15:0] for FPGA timing filter
 
     private const ushort BDS_05_Ev_111_96 = 0x0400;  // --RD -- BDS_05_Ev
     private const ushort BDS_05_Ev_95_80 = 0x0401;   // --RD
@@ -400,6 +404,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     {
         try
         {
+            await UpdateModeSExpectedIcao(msg.IcaoAddress).ConfigureAwait(false);
             await WriteUfFrame(CreateUfFrame(msg)).ConfigureAwait(false);
             return true;
         }
@@ -414,6 +419,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     {
         try
         {
+            await UpdateModeSExpectedIcao(msg.IcaoAddress).ConfigureAwait(false);
             var buffer = CreateUfBuffer(msg);
             var frame = CreateUfFrame(buffer);
             await AtomicEditRegister(edit =>
@@ -539,6 +545,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
                 );
                 if (valid)
                 {
+                    await UpdateModeSExpectedIcao(msg.IcaoAddress).ConfigureAwait(false);
                     return msg;
                 }
             }
@@ -553,6 +560,24 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         } while (Environment.TickCount64 < timeoutAt);
 
         return null;
+    }
+
+    private async Task UpdateModeSExpectedIcao(uint icao)
+    {
+        if (icao == 0 || icao > ModeSBroadcastIcao || icao == ModeSBroadcastIcao ||
+            _modeSExpectedIcao == icao)
+        {
+            return;
+        }
+
+        var frame = new ValueTuple<ushort, ushort>[]
+        {
+            new(ModeSExpectedIcao_23_16, (ushort)((icao >> 16) & 0xFF)),
+            new(ModeSExpectedIcao_15_0, (ushort)(icao & 0xFFFF)),
+        };
+        await WriteCustomRegistersFrame(frame, DisposeCancel).ConfigureAwait(false);
+        _modeSExpectedIcao = icao;
+        _logger.ZLogInformation($"Mode S timing filter ICAO updated icao={icao:X6}");
     }
 
     public async Task<ModeSDFormatBase?> ReadDfMessage(ModeSUFormatBase reqMsg, Func<ModeSDFormatBase> respFactory, int attempts = 3)
