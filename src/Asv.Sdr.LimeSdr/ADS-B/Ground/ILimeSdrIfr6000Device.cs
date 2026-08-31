@@ -127,6 +127,22 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     /// <param name="icao">ICAO aircraft address</param>
     /// <returns>DF0</returns>
     Task<ModeSDF0?> ReadModeSDf0(uint icao);
+
+    /// <summary>
+    /// Selective air-air request with configurable UF0 RL, AQ and DS fields.
+    /// Returns DF0 for RL=0 or a <see cref="ModeSDF16"/> instance for RL=1.
+    /// </summary>
+    /// <param name="icao">ICAO aircraft address</param>
+    /// <param name="replyLength">UF0 RL bit: 0 requests DF0, 1 requests DF16</param>
+    /// <param name="acquisition">UF0 AQ bit</param>
+    /// <param name="dataSelector">UF0 DS field</param>
+    /// <returns>DF0 or DF16, depending on <paramref name="replyLength"/></returns>
+    Task<ModeSDF0?> ReadModeSAirAirReply(
+        uint icao,
+        byte replyLength,
+        byte acquisition,
+        byte dataSelector
+    );
     
     /// <summary>
     /// Selective air-air request short UF0 long DF16

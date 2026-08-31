@@ -970,20 +970,49 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
 
     public Task<ModeSDF0?> ReadModeSDf0(uint icao)
     {
-        return RequestDfMessage(
-            new ModeSUF0 { IcaoAddress = icao, ReplyLength = 0, Acquisition = 1 },
-            () => new ModeSDF0(),
-            icao);
+        return ReadModeSAirAirReply(icao, 0, 1, 0);
+    }
+
+    public Task<ModeSDF0?> ReadModeSAirAirReply(
+        uint icao,
+        byte replyLength,
+        byte acquisition,
+        byte dataSelector
+    )
+    {
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(replyLength, (byte)1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(acquisition, (byte)1);
+
+        var request = new ModeSUF0
+        {
+            IcaoAddress = icao,
+            ReplyLength = replyLength,
+            Acquisition = acquisition,
+            DataSelector = dataSelector,
+        };
+        if (replyLength == 0)
+        {
+            return RequestDfMessage(request, () => new ModeSDF0(), icao);
+        }
+
+        return RequestDfMessage<ModeSDF0>(
+            request,
+            () => new ModeSDF16 { Bds = GetBdsRegister(dataSelector) },
+            icao,
+            msg => msg is ModeSDF16 df16 && HasBdsDataSelector(df16, dataSelector)
+        );
     }
 
     public Task<ModeSDF16?> ReadModeSDf16(uint icao, byte bds)
     {
         ValidateBdsRegister(bds);
-        return RequestDfMessage(
-            new ModeSUF0 { IcaoAddress = icao, ReplyLength = 1, Acquisition = 0, DataSelector = bds },
-            () => new ModeSDF16 { Bds = GetBdsRegister(bds) },
-            icao,
-            msg => HasBdsDataSelector(msg, bds));
+        return ReadModeSDf16FromUf0(icao, bds);
+    }
+
+    private async Task<ModeSDF16?> ReadModeSDf16FromUf0(uint icao, byte bds)
+    {
+        return await ReadModeSAirAirReply(icao, 1, 0, bds).ConfigureAwait(false)
+            as ModeSDF16;
     }
     
     public Task<ModeSDF16?> ReadModeSDf16(uint icao, byte ads, byte bds)
@@ -1028,7 +1057,6 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     }
     private static BdsBase GetBdsRegister(byte bds)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(bds, 0x10, nameof(bds));
         switch (bds)
         {
             case 0x10:
