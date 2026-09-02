@@ -42,6 +42,7 @@ public class Bds17 : BdsBase
 
     protected override void InternalDeserialize(ref ReadOnlySpan<byte> buffer)
     {
+        Gicbs.Clear();
         var pos = 0;
         
         // ADS-B registers
@@ -99,7 +100,7 @@ public class Bds17 : BdsBase
         {
             var gicb = Gicbs.FirstOrDefault(x => x.Bds1 == 0 && x.Bds2 == i + 5);
             if (gicb != null) adsb = (byte)(adsb | adsbMask);
-            adsb = (byte)(adsb >> 1);
+            adsbMask = (byte)(adsbMask >> 1);
         }
         ModeSHelper.SetBitU(buffer, ref pos, 6, adsb);
 

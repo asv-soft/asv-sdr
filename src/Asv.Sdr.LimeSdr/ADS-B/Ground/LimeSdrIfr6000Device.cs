@@ -1063,6 +1063,16 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
                 return new Bds10();
             case 0x17:
                 return new Bds17();
+            case 0x18:
+                return new Bds18();
+            case 0x19:
+                return new Bds19();
+            case 0x1A:
+                return new Bds1A();
+            case 0x1B:
+                return new Bds1B();
+            case 0x1C:
+                return new Bds1C();
             case 0x20:
                 return new Bds20();
             case 0x30:
