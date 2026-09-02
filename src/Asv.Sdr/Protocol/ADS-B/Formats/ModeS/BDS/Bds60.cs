@@ -25,11 +25,13 @@ public class Bds60 : BdsBase
     {
         var pos = 0;
         var sb1 = ModeSHelper.GetBitU(buffer, ref pos, 1);
+        HasMagneticHeading = sb1 == 1;
         var magneticHeading = ModeSHelper.GetBitS(buffer, ref pos, 11);
         if (sb1 == 0 && magneticHeading != 0) throw new Exception("Failed to deserialize BDS 6,0 data");
         MagneticHeading = magneticHeading * (90.0 / 512);
         
         var sb2 = ModeSHelper.GetBitU(buffer, ref pos, 1);
+        HasIndicatedAirspeed = sb2 == 1;
         var indicatedAirspeed = ModeSHelper.GetBitU(buffer, ref pos, 10);
         switch (sb2)
         {
@@ -38,12 +40,12 @@ public class Bds60 : BdsBase
             case 1:
             {
                 IndicatedAirspeed = indicatedAirspeed;
-                if (IndicatedAirspeed > 500.0) throw new Exception("Failed to deserialize BDS 6,0 data");
                 break;
             }
         }
 
         var sb3 = ModeSHelper.GetBitU(buffer, ref pos, 1);
+        HasMach = sb3 == 1;
         var mach = ModeSHelper.GetBitU(buffer, ref pos, 10);
         switch (sb3)
         {
@@ -52,13 +54,13 @@ public class Bds60 : BdsBase
             case 1:
             {
                 Mach = mach * 0.004;
-                if (Mach > 1.0)  throw new Exception("Failed to deserialize BDS 6,0 data");
                 break;
             }
         }
 
 
         var sb4 = ModeSHelper.GetBitU(buffer, ref pos, 1);
+        HasBarometricAltitudeRate = sb4 == 1;
         var barometricAltitudeRate = ModeSHelper.GetBitS(buffer, ref pos, 10);
         switch (sb4)
         {
@@ -67,13 +69,13 @@ public class Bds60 : BdsBase
             case 1:
             {
                 BarometricAltitudeRate = barometricAltitudeRate * 32.0;
-                if (BarometricAltitudeRate is < -6000 or > 6000) throw new Exception("Failed to deserialize BDS 6,0 data");
                 break;
             }
         }
 
 
         var sb5 = ModeSHelper.GetBitU(buffer, ref pos, 1);
+        HasInertialVerticalVelocity = sb5 == 1;
         var inertialVerticalVelocity = ModeSHelper.GetBitS(buffer, ref pos, 10);
         switch (sb5)
         {
@@ -82,7 +84,6 @@ public class Bds60 : BdsBase
             case 1:
             {
                 InertialVerticalVelocity = inertialVerticalVelocity * 32.0;
-                if (InertialVerticalVelocity is < -6000 or > 6000) throw new Exception("Failed to deserialize BDS 6,0 data");
                 break;
             }
         }
@@ -93,28 +94,30 @@ public class Bds60 : BdsBase
     protected override void InternalSerialize(ref Span<byte> buffer)
     {
         var pos = 0;
-        ModeSHelper.SetBitU(buffer, ref pos, 1, 1);
         MagneticHeading %= 180.0;
+        if (MagneticHeading < -180.0) MagneticHeading = 180.0;
+        if (MagneticHeading > 179.82421875) MagneticHeading = 179.82421875;
+        ModeSHelper.SetBitU(buffer, ref pos, 1, 1);
         ModeSHelper.SetBitS(buffer, ref pos, 11, (int)Math.Round(MagneticHeading * (512.0 / 90.0)));
         
-        ModeSHelper.SetBitU(buffer, ref pos, 1, 1);
         if (IndicatedAirspeed < 0) IndicatedAirspeed = 0;
-        if (IndicatedAirspeed > 500.0) IndicatedAirspeed = 500.0;
+        if (IndicatedAirspeed > 1023.0) IndicatedAirspeed = 1023.0;
+        ModeSHelper.SetBitU(buffer, ref pos, 1, 1);
         ModeSHelper.SetBitU(buffer, ref pos, 10, (uint)Math.Round(IndicatedAirspeed));
         
         ModeSHelper.SetBitU(buffer, ref pos, 1, 1);
-        if (Mach < 0) Mach = 0;
-        if (Mach > 1.0) Mach = 1.0;
+        if (Mach < 0.0) Mach = 0.0;
+        if (Mach > 4.092) Mach = 4.092;
         ModeSHelper.SetBitU(buffer, ref pos, 10, (uint)Math.Round(Mach * 250));
         
         ModeSHelper.SetBitU(buffer, ref pos, 1, 1);
-        if (BarometricAltitudeRate < -6000) BarometricAltitudeRate = -6000;
-        if (BarometricAltitudeRate > 6000) BarometricAltitudeRate = 6000;
+        if (BarometricAltitudeRate < -16384.0) BarometricAltitudeRate = -16384.0;
+        if (BarometricAltitudeRate > 16352.0) BarometricAltitudeRate = 16352.0;
         ModeSHelper.SetBitS(buffer, ref pos, 10, (int)Math.Round(BarometricAltitudeRate / 32.0));
         
+        if (InertialVerticalVelocity < -16384.0) InertialVerticalVelocity = -16384.0;
+        if (InertialVerticalVelocity > 16352.0) InertialVerticalVelocity = 16352.0;
         ModeSHelper.SetBitU(buffer, ref pos, 1, 1);
-        if (InertialVerticalVelocity < -6000) InertialVerticalVelocity = -6000;
-        if (InertialVerticalVelocity > 6000) InertialVerticalVelocity = 6000;
         ModeSHelper.SetBitS(buffer, ref pos, 10, (int)Math.Round(InertialVerticalVelocity / 32.0));
         
         buffer = buffer[(pos/8)..];
@@ -126,6 +129,8 @@ public class Bds60 : BdsBase
     /// (12 bits)
     /// </summary>
     public double MagneticHeading { get; set; }
+
+    public bool HasMagneticHeading { get; private set; }
     
     /// <summary>
     /// Indicated airspeed
@@ -133,6 +138,8 @@ public class Bds60 : BdsBase
     /// (11 bits)
     /// </summary>
     public double IndicatedAirspeed { get; set; }
+
+    public bool HasIndicatedAirspeed { get; private set; }
     
     /// <summary>
     /// Mach
@@ -140,6 +147,8 @@ public class Bds60 : BdsBase
     /// (11 bits)
     /// </summary>
     public double Mach { get; set; }
+
+    public bool HasMach { get; private set; }
     
     /// <summary>
     /// Barometric altitude rate
@@ -147,6 +156,8 @@ public class Bds60 : BdsBase
     /// (11 bits)
     /// </summary>
     public double BarometricAltitudeRate { get; set; }
+
+    public bool HasBarometricAltitudeRate { get; private set; }
     
     /// <summary>
     /// Inertial vertical velocity
@@ -154,4 +165,6 @@ public class Bds60 : BdsBase
     /// (11 bits)
     /// </summary>
     public double InertialVerticalVelocity { get; set; }
+
+    public bool HasInertialVerticalVelocity { get; private set; }
 }

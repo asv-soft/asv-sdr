@@ -323,38 +323,6 @@ public abstract class ModeSUFormatBase : ModeSFormatBase
 
 public abstract class ModeSDFormatBase : ModeSFormatBase
 {
-    #region CommB
-
-    private static readonly Dictionary<byte, Func<BdsBase>> _factory = new();
-
-    private static IEnumerable<Func<BdsBase>> DefaultCommBBlocks
-    {
-        get
-        {
-            yield return () => new Bds10();
-            yield return () => new Bds20();
-            yield return () => new Bds30();
-        }
-    }
-
-    private static void RegisterDefaultCommBBlocks()
-    {
-        foreach (var func in DefaultCommBBlocks)
-        {
-            var pkt = func();
-            _factory.Add(pkt.DataSelector, func);
-        }
-    }
-
-
-    #endregion
-
-
-    static ModeSDFormatBase()
-    {
-        RegisterDefaultCommBBlocks();
-    }
-
     public override uint? GetIcao(uint calcCrc, uint originCrc)
     {
         return calcCrc ^ originCrc;
@@ -366,6 +334,8 @@ public abstract class ModeSDFormatBase : ModeSFormatBase
     }
 
     public BdsBase? Bds { get; set; }
+
+    public BdsInferenceLimits InferenceLimits { get; set; } = BdsInferenceLimits.CivilSubsonic;
 
     protected void DeserializeBds(ReadOnlySpan<byte> buffer, ref int pos)
     {
@@ -385,8 +355,13 @@ public abstract class ModeSDFormatBase : ModeSFormatBase
             }
         }
 
-        Bds = BdsFactory.GetBds(ref buff);
+        Bds = SelectCandidate(BdsFactory.GetBds(ref buff, InferenceLimits));
         pos = (buffer.Length - buff.Length) * 8;
+    }
+
+    protected virtual BdsBase SelectCandidate(List<BdsBase> candidates)
+    {
+        return candidates[0];
     }
 
     protected void SerializeBds(Span<byte> buffer, ref int pos)

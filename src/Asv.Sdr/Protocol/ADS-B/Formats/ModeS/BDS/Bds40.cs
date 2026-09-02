@@ -25,16 +25,19 @@ public class Bds40 : BdsBase
     {
         var pos = 0;
         var sb1 = ModeSHelper.GetBitU(buffer, ref pos, 1);
+        HasMcpFcuSelectedAltitude = sb1 == 1;
         var mcpFcuSelectedAltitude = (ushort)ModeSHelper.GetBitU(buffer, ref pos, 12);
         if (sb1 == 0 && mcpFcuSelectedAltitude != 0) throw new Exception("Failed to deserialize BDS 4,0 data");
         McpFcuSelectedAltitude = mcpFcuSelectedAltitude * 16.0;
         
         var sb2 = ModeSHelper.GetBitU(buffer, ref pos, 1);
+        HasFmsSelectedAltitude = sb2 == 1;
         var fmsSelectedAltitude = (ushort)ModeSHelper.GetBitU(buffer, ref pos, 12);
         if (sb2 == 0 && fmsSelectedAltitude != 0) throw new Exception("Failed to deserialize BDS 4,0 data");
         FmsSelectedAltitude = fmsSelectedAltitude * 16.0;
         
         var sb3 = ModeSHelper.GetBitU(buffer, ref pos, 1);
+        HasBarometricPressureSetting = sb3 == 1;
         var barometricPressureSetting = (ushort)ModeSHelper.GetBitU(buffer, ref pos, 12);
         if (sb3 == 0 && barometricPressureSetting != 0) throw new Exception("Failed to deserialize BDS 4,0 data");
         BarometricPressureSetting = barometricPressureSetting * 0.1 + 800;
@@ -42,6 +45,9 @@ public class Bds40 : BdsBase
         if (ModeSHelper.GetBitU(buffer, ref pos, 8) != 0) throw new Exception("Failed to deserialize BDS 4,0 data");
         
         var sb4 = ModeSHelper.GetBitU(buffer, ref pos, 1);
+        HasVnavMode = sb4 == 1;
+        HasAltHoldMode = sb4 == 1;
+        HasApproachMode = sb4 == 1;
         var mcpFcuMode = (byte)ModeSHelper.GetBitU(buffer, ref pos, 3);
         if (sb4 == 0 && mcpFcuMode != 0) throw new Exception("Failed to deserialize BDS 4,0 data");
         VnavMode = (mcpFcuMode & 0x4) != 0;
@@ -51,6 +57,7 @@ public class Bds40 : BdsBase
         if (ModeSHelper.GetBitU(buffer, ref pos, 2) != 0) throw new Exception("Failed to deserialize BDS 4,0 data");
         
         var sb5 = ModeSHelper.GetBitU(buffer, ref pos, 1);
+        HasTargetAltitudeSource = sb5 == 1;
         var targetAltitudeSource = (byte)ModeSHelper.GetBitU(buffer, ref pos, 2);
         if (sb5 == 0 && targetAltitudeSource != 0) throw new Exception("Failed to deserialize BDS 4,0 data");
         TargetAltitudeSource = (AltitudeSourceEnum)targetAltitudeSource;
@@ -68,15 +75,19 @@ public class Bds40 : BdsBase
     protected override void InternalSerialize(ref Span<byte> buffer)
     {
         var pos = 0;
+        if (McpFcuSelectedAltitude < 0.0) McpFcuSelectedAltitude = 0;
+        if (McpFcuSelectedAltitude > 65520.0) McpFcuSelectedAltitude = 65520.0;
         ModeSHelper.SetBitU(buffer, ref pos, 1, 1);
         ModeSHelper.SetBitU(buffer, ref pos, 12, (uint)Math.Round(McpFcuSelectedAltitude / 16.0));
         
+        if (FmsSelectedAltitude < 0.0) FmsSelectedAltitude = 0;
+        if (FmsSelectedAltitude > 65520.0) FmsSelectedAltitude = 65520.0;
         ModeSHelper.SetBitU(buffer, ref pos, 1, 1);
         ModeSHelper.SetBitU(buffer, ref pos, 12, (uint)Math.Round(FmsSelectedAltitude / 16.0));
         
-        ModeSHelper.SetBitU(buffer, ref pos, 1, 1);
         if (BarometricPressureSetting < 800) BarometricPressureSetting = 800;
-        if (BarometricPressureSetting > 1209) BarometricPressureSetting = 1209;
+        if (BarometricPressureSetting > 1209.5) BarometricPressureSetting = 1209.5;
+        ModeSHelper.SetBitU(buffer, ref pos, 1, 1);
         ModeSHelper.SetBitU(buffer, ref pos, 12, (uint)Math.Round((BarometricPressureSetting - 800) * 10));
         
         ModeSHelper.SetBitU(buffer, ref pos, 8, 0);
@@ -99,6 +110,8 @@ public class Bds40 : BdsBase
     /// (1 + 12 bits)
     /// </summary>
     public double McpFcuSelectedAltitude { get; set; }
+
+    public bool HasMcpFcuSelectedAltitude { get; private set; }
     
     /// <summary>
     /// FMS selected altitude
@@ -107,6 +120,8 @@ public class Bds40 : BdsBase
     /// </summary>
     public double FmsSelectedAltitude { get; set; }
 
+    public bool HasFmsSelectedAltitude { get; private set; }
+
     /// <summary>
     /// Barometric pressure setting minus 800 mb
     ///
@@ -114,12 +129,16 @@ public class Bds40 : BdsBase
     /// </summary>
     public double BarometricPressureSetting { get; set; }
 
+    public bool HasBarometricPressureSetting { get; private set; }
+
     /// <summary>
     /// VNAV mode bits
     ///
     /// (1 bits)
     /// </summary>
     public bool VnavMode { get; set; }
+
+    public bool HasVnavMode { get; private set; }
     
     
     /// <summary>
@@ -128,6 +147,8 @@ public class Bds40 : BdsBase
     /// (1 bits)
     /// </summary>
     public bool AltHoldMode { get; set; }
+
+    public bool HasAltHoldMode { get; private set; }
     
     /// <summary>
     /// VNAV mode bits
@@ -135,6 +156,8 @@ public class Bds40 : BdsBase
     /// (1 bits)
     /// </summary>
     public bool ApproachMode { get; set; }
+
+    public bool HasApproachMode { get; private set; }
     
     /// <summary>
     /// Target altitude source bits
@@ -142,5 +165,7 @@ public class Bds40 : BdsBase
     /// (1 + 2 bits)
     /// </summary>
     public AltitudeSourceEnum TargetAltitudeSource { get; set; }
+
+    public bool HasTargetAltitudeSource { get; private set; }
 
 }

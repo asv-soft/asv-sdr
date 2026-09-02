@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Asv.Sdr;
 
@@ -35,5 +36,10 @@ public class ModeSDF16 : ModeSDF0
     {
         base.InternalSerialize(buffer, ref pos);
         SerializeBds(buffer, ref pos);
+    }
+
+    protected override BdsBase SelectCandidate(List<BdsBase> candidates)
+    {
+        return BdsCandidateSelector.SelectByAltitude(candidates, Altitude);
     }
 }

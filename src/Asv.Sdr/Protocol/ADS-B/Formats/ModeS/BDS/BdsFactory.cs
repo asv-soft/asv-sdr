@@ -1,11 +1,19 @@
 using System;
+using System.Collections.Generic;
 
 namespace Asv.Sdr;
 
 public static class BdsFactory
 {
-    public static BdsBase GetBds(ref ReadOnlySpan<byte> buffer)
+    public static List<BdsBase> GetBds(ref ReadOnlySpan<byte> buffer)
     {
+        return GetBds(ref buffer, BdsInferenceLimits.CivilSubsonic);
+    }
+
+    public static List<BdsBase> GetBds(ref ReadOnlySpan<byte> buffer, BdsInferenceLimits inferenceLimits)
+    {
+        ArgumentNullException.ThrowIfNull(inferenceLimits);
+
         var pos = 0;
         var bds1 = ModeSHelper.GetBitU(buffer, ref pos, 4);
         var bds2 = ModeSHelper.GetBitU(buffer, ref pos, 4);
@@ -17,7 +25,7 @@ public static class BdsFactory
         {
             var bds10 = new Bds10();
             bds10.Deserialize(ref buffer);
-            return bds10;
+            return new List<BdsBase> { bds10 };
         }
         
         // BDS 2,0
@@ -26,7 +34,7 @@ public static class BdsFactory
         {
             var bds20 = new Bds20();
             bds20.Deserialize(ref buffer);
-            return bds20;
+            return new List<BdsBase> { bds20 };
         }
         
         // BDS 3,0
@@ -38,7 +46,7 @@ public static class BdsFactory
         {
             var bds30 = new Bds30();
             bds30.Deserialize(ref buffer);
-            return bds30;
+            return new List<BdsBase> { bds30 };
         }
         
         // BDS 1,7
@@ -50,15 +58,20 @@ public static class BdsFactory
         {
             var bds17 = new Bds17();
             bds17.Deserialize(ref buffer);
-            return bds17;
+            return new List<BdsBase> { bds17 };
         }
+
+        var candidates = new List<BdsBase>();
+        var remainingBuffer = buffer;
         
         // BDS 4,0
         var bds40 = new Bds40();
         try
         {
-            bds40.Deserialize(ref buffer);
-            return bds40;
+            var candidateBuffer = buffer;
+            bds40.Deserialize(ref candidateBuffer);
+            candidates.Add(bds40);
+            remainingBuffer = candidateBuffer;
         }
         catch (Exception)
         {
@@ -69,9 +82,13 @@ public static class BdsFactory
         var bds50 = new Bds50();
         try
         {
-            bds50.Deserialize(ref buffer);
-            if (Math.Abs(bds50.GroundSpeed - bds50.TrueAirspeed) < 200)
-                return bds50;
+            var candidateBuffer = buffer;
+            bds50.Deserialize(ref candidateBuffer);
+            if (BdsInference.Is50(bds50, inferenceLimits))
+            {
+                candidates.Add(bds50);
+                remainingBuffer = candidateBuffer;
+            }
         }
         catch (Exception)
         {
@@ -82,16 +99,28 @@ public static class BdsFactory
         var bds60 = new Bds60();
         try
         {
-            bds60.Deserialize(ref buffer);
-            return bds60;
+            var candidateBuffer = buffer;
+            bds60.Deserialize(ref candidateBuffer);
+            if (BdsInference.Is60(bds60, inferenceLimits))
+            {
+                candidates.Add(bds60);
+                remainingBuffer = candidateBuffer;
+            }
         }
         catch (Exception)
         {
             // ignored
         }
 
-        var bdsAny = new BdsAny(0, 0);
-        bdsAny.Deserialize(ref buffer);
-        return bdsAny;
+        if (candidates.Count == 0)
+        {
+            var bdsAny = new BdsAny(0, 0);
+            bdsAny.Deserialize(ref buffer);
+            candidates.Add(bdsAny);
+            return candidates;
+        }
+
+        buffer = remainingBuffer;
+        return candidates;
     }
 }
