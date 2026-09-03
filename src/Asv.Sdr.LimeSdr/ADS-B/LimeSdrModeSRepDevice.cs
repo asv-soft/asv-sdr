@@ -619,7 +619,7 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
         frame[0] = new ValueTuple<ushort, ushort>(BDS10_79_64_InternAddr, (ushort)((message.Span[0] << 8) | message.Span[1]));
         frame[1] = new ValueTuple<ushort, ushort>(BDS10_63_48_InternAddr, (ushort)((message.Span[2] << 8) | message.Span[3]));
         frame[2] = new ValueTuple<ushort, ushort>(BDS10_47_32_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
-        frame[4] = new ValueTuple<ushort, ushort>(BDS10_31_24_InternAddr, (ushort)((message.Span[6] << 8) | 0x0));
+        frame[3] = new ValueTuple<ushort, ushort>(BDS10_31_24_InternAddr, (ushort)((message.Span[6] << 8) | 0x0));
         return WriteCustomRegistersFrame(frame, cancel);
     }
 
@@ -636,7 +636,7 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
         frame[0] = new ValueTuple<ushort, ushort>(BDS17_79_64_InternAddr, (ushort)((message.Span[0] << 8) | message.Span[1]));
         frame[1] = new ValueTuple<ushort, ushort>(BDS17_63_48_InternAddr, (ushort)((message.Span[2] << 8) | message.Span[3]));
         frame[2] = new ValueTuple<ushort, ushort>(BDS17_47_32_InternAddr, (ushort)((message.Span[4] << 8) | message.Span[5]));
-        frame[4] = new ValueTuple<ushort, ushort>(BDS17_31_24_InternAddr, (ushort)((message.Span[6] << 8) | 0x0));
+        frame[3] = new ValueTuple<ushort, ushort>(BDS17_31_24_InternAddr, (ushort)((message.Span[6] << 8) | 0x0));
         return WriteCustomRegistersFrame(frame, cancel);
     }
 

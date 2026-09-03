@@ -9,11 +9,20 @@ public class Bds10 : BdsBase
 
     /// <summary>
     /// Bit 9
+    /// Ставится в true, если BDS 1,0 продолжается в BDS 1,1
     /// </summary>
-    public bool ConfigurationFlag { get; set; } = false;
+    public bool ContinuationFlag { get; set; } = false;
     
+    /// <summary>
+    /// Bit 10
+    /// Только если Overlay Command/Data Parity реально реализован. Для современного Level 2 он обязателен.
+    /// </summary>
     public bool OverlayCommandCapability { get; set; }
     
+    /// <summary>
+    /// Bits 11-15
+    /// 0 - если нет ACAS/CAS.
+    /// </summary>
     public byte Acas { get; set; }
 
     /// <summary>
@@ -29,41 +38,67 @@ public class Bds10 : BdsBase
     /// </summary>
     public byte ModeSSubnetworkVersion { get; set; } = 0;
 
+    /// <summary>
+    /// Bit 24
+    /// false означает Level 2, 3, 4
+    /// true означает Level 5
+    /// </summary>
     public bool TransponderEnhancedProtocolIndicator { get; set; }
     
     /// <summary>
     /// Bit 25
+    /// Если есть поддержка Enhanced Surveillance (BDS 4,0/5,0/6,0)
+    /// и/или Extended Squitter регистров (BDS 0,5/0,6/0,8/0,9)
+    /// а так же ACAS, AICB и Comm-A
     /// </summary>
     public bool ModeSSpecificServicesCapability { get; set; } = false;
     
+    /// <summary>
+    /// Bits 26-28
+    /// 0 - без uplink ELM
+    /// </summary>
     public uint UplinkElmAverageThroughputCapacity { get; set; }
 
+    /// <summary>
+    /// Bits 29-31
+    /// 0 - без downlink ELM
+    /// </summary>
     public uint DownlinkElmThroughput { get; set; }
     
-
     /// <summary>
     /// Bit 33
+    /// true - если реализован BDS 2,0
     /// </summary>
     public bool AircraftIdCapability { get; set; } = true;
     
     /// <summary>
     /// Bit 34
+    /// true - пока ES-регистры действительно обновляются и валидны
     /// </summary>
     public bool SquitterCapability { get; set; } = true;
     
+    /// <summary>
+    /// Bit 35
+    /// true - Если полностью реализован SI lockout. Для современного Level 2 это требуется
+    /// </summary>
     public bool SurveillanceIdentifierCode { get; set; }
 
+    /// <summary>
+    /// Bit 36
+    /// toggle-бит - Это не постоянный признак true. Он должен менять состояние при изменении BDS 1,7
+    /// </summary>
     public bool CommonUsageGicbCapabilityReport { get; set; }
 
     /// <summary>
     /// Bits 49-50
+    /// true - если есть подключенные DTE/ADS/Comm-A приложения
     /// </summary>
     public ushort DataTerminalEquipmentStatus { get; set; } = 0;
 
     protected override void InternalDeserialize(ref ReadOnlySpan<byte> buffer)
     {
         var pos = 0;
-        ConfigurationFlag = ModeSHelper.GetBitU(buffer, ref pos, 1) != 0;
+        ContinuationFlag = ModeSHelper.GetBitU(buffer, ref pos, 1) != 0;
         
         var reserved = ModeSHelper.GetBitU(buffer, ref pos, 5);
         if (reserved != 0) throw new Exception("Failed to deserialize BDS 1,0 data");
@@ -96,7 +131,7 @@ public class Bds10 : BdsBase
     protected override void InternalSerialize(ref Span<byte> buffer)
     {
         var pos = 0;
-        ModeSHelper.SetBitU(buffer, ref pos, 1, ConfigurationFlag ? 1U : 0U);
+        ModeSHelper.SetBitU(buffer, ref pos, 1, ContinuationFlag ? 1U : 0U);
         ModeSHelper.SetBitU(buffer, ref pos, 5, 0U);
         ModeSHelper.SetBitU(buffer, ref pos, 1, OverlayCommandCapability ? 1U : 0U);
         
