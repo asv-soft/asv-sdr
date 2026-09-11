@@ -13,12 +13,46 @@ public abstract class AdsbAirbornePosition : AdsbExtendedSquitterBase
     public double Longitude { get; set; } = double.NaN;
 
     public double Altitude { get; set; } = double.NaN;
+    public ushort AltitudeRaw { get; set; }
 
     public CprFormatEnum CprFormat { get; set; }
 
     public SurveillanceStatusEnum SurveillanceStatus { get; set; }
-    public bool IsSingleAntenna { get; set; } = false;
-    private uint Time { get; set; }
+
+    /// <summary>
+    /// Raw ME bit 8. It denotes a single antenna in ADS-B version 1 and NIC-B in version 2.
+    /// </summary>
+    public bool SingleAntennaOrNicSupplementB { get; set; }
+
+    public bool IsSingleAntenna
+    {
+        get => SingleAntennaOrNicSupplementB;
+        set => SingleAntennaOrNicSupplementB = value;
+    }
+
+    public bool NicSupplementB
+    {
+        get => SingleAntennaOrNicSupplementB;
+        set => SingleAntennaOrNicSupplementB = value;
+    }
+
+    public bool TimeSynchronizedWithUtc { get; set; }
+
+    /// <summary>
+    /// Interprets the position type code as NUCp or NIC for the supplied ADS-B version.
+    /// </summary>
+    public AdsbPositionQualityInfo GetPositionQuality(
+        AdsbVersionNumberEnum version,
+        bool? nicSupplementA
+    ) =>
+        TransponderHelper.DecodeAirbornePositionQuality(
+            version,
+            (byte)GetAirbornePositionType(),
+            nicSupplementA,
+            version == AdsbVersionNumberEnum.AppendixC
+                ? NicSupplementB
+                : null
+        );
 
     protected override void InternalDeserialize(ref ReadOnlySpan<byte> buffer)
     {
@@ -26,10 +60,10 @@ public abstract class AdsbAirbornePosition : AdsbExtendedSquitterBase
         var bitIndex = 0;
         SetAirbornePositionType(SpanBitHelper.GetBitU(buffer, ref bitIndex, 5));
         SurveillanceStatus = (SurveillanceStatusEnum)SpanBitHelper.GetBitU(buffer, ref bitIndex, 2);
-        IsSingleAntenna = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) == 1;
-        var alt = SpanBitHelper.GetBitU(buffer, ref bitIndex, 12);
-        Altitude = GetAltitude(alt);
-        Time = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1);
+        SingleAntennaOrNicSupplementB = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) == 1;
+        AltitudeRaw = (ushort)SpanBitHelper.GetBitU(buffer, ref bitIndex, 12);
+        Altitude = GetAltitude(AltitudeRaw);
+        TimeSynchronizedWithUtc = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) != 0;
         CprFormat = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) == 0 ? CprFormatEnum.Even : CprFormatEnum.Odd;
         NCprLat = SpanBitHelper.GetBitU(buffer, ref bitIndex, 17);
         NCprLon = SpanBitHelper.GetBitU(buffer, ref bitIndex, 17);
@@ -41,10 +75,10 @@ public abstract class AdsbAirbornePosition : AdsbExtendedSquitterBase
         var bitIndex = 0;
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 5, GetAirbornePositionType());
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 2, (uint)SurveillanceStatus);
-        SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, IsSingleAntenna ? 1 : 0);
+        SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, SingleAntennaOrNicSupplementB ? 1U : 0U);
         var nAlt = SetAltitude(Altitude);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 12, nAlt);
-        SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, Time);
+        SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, TimeSynchronizedWithUtc ? 1U : 0U);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, (uint)CprFormat);
         if (!double.IsNaN(Latitude) && !double.IsNaN(Longitude))
         {

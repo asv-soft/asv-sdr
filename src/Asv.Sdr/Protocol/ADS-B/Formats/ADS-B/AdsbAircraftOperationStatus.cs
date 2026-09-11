@@ -28,12 +28,14 @@ public class AdsbAircraftOperationStatus : AdsbExtendedSquitterBase
     public bool HorizontalReferenceDirection { get; set; }
     public string HorizontalReferenceDirectionText { get; set; } = string.Empty;
     public bool? SilSupplement { get; set; }
+    public bool ReservedBit54 { get; set; }
     public bool ReservedBit55 { get; set; }
     public TransponderHelper.OperationalModeStatus OperationalMode { get; set; } = new();
     public TransponderHelper.AirborneCapabilityStatus? AirborneCapability { get; set; }
     public TransponderHelper.SurfaceCapabilityStatus? SurfaceCapability { get; set; }
     public TransponderHelper.AircraftLengthWidthInfo? LengthWidth { get; set; }
     public byte? GpsAntennaOffsetRaw { get; set; }
+    public TransponderHelper.GpsAntennaOffsetInfo? GpsAntennaOffset { get; set; }
     public byte ReservedBits48_49 { get; set; }
     public bool Bit52Raw { get; set; }
 
@@ -51,10 +53,10 @@ public class AdsbAircraftOperationStatus : AdsbExtendedSquitterBase
         SourceIntegrityLevelCode = (byte)SpanBitHelper.GetBitU(buffer, ref bitIndex, 2);
         Bit52Raw = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) != 0;
         HorizontalReferenceDirection = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) != 0;
-        var silSupplement = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) != 0;
+        ReservedBit54 = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) != 0;
         ReservedBit55 = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) != 0;
 
-        UpdateCalculatedProperties(silSupplement);
+        UpdateCalculatedProperties(ReservedBit54);
         buffer = buffer[(bitIndex / 8)..];
     }
 
@@ -72,7 +74,10 @@ public class AdsbAircraftOperationStatus : AdsbExtendedSquitterBase
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 2, SourceIntegrityLevelCode);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, Bit52Raw ? 1 : 0);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, HorizontalReferenceDirection ? 1 : 0);
-        SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, SilSupplement == true ? 1 : 0);
+        var bit54 = AdsbVersionNumber == AdsbVersionNumberEnum.AppendixC
+            ? SilSupplement ?? ReservedBit54
+            : ReservedBit54;
+        SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, bit54 ? 1U : 0U);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, ReservedBit55 ? 1 : 0);
         buffer = buffer[(bitIndex / 8)..];
     }
@@ -91,6 +96,7 @@ public class AdsbAircraftOperationStatus : AdsbExtendedSquitterBase
         SurfaceCapability = null;
         LengthWidth = null;
         GpsAntennaOffsetRaw = null;
+        GpsAntennaOffset = null;
         BarometricAltitudeQuality = 0;
         GeometricVerticalAccuracy = null;
         BarometricAltitudeIntegrity = false;
@@ -111,31 +117,40 @@ public class AdsbAircraftOperationStatus : AdsbExtendedSquitterBase
         }
         else if (OperationStatusType == OperationStatusTypeEnum.Surface)
         {
-            SurfaceCapability = TransponderHelper.DecodeSurfaceCapability(CapabilityClass);
+            SurfaceCapability = TransponderHelper.DecodeSurfaceCapability(CapabilityClass, version);
             LengthWidth = TransponderHelper.DecodeAircraftLengthWidth(CapabilityClass & 0x000F);
             TrackAngleOrHeading = Bit52Raw;
             if (version == 2)
             {
                 GpsAntennaOffsetRaw = (byte)(OperationalModeRaw & 0x00FF);
+                GpsAntennaOffset = TransponderHelper.DecodeGpsAntennaOffset(GpsAntennaOffsetRaw.Value);
             }
         }
     }
 }
 
-public class AdsbAircraftOperationStatusV0 : AdsbAircraftOperationStatus
+public class AdsbAircraftOperationStatusAirborne : AdsbAircraftOperationStatus
 {
-    public AdsbAircraftOperationStatusV0()
+    public AdsbAircraftOperationStatusAirborne()
     {
         OperationStatusType = OperationStatusTypeEnum.Airborne;
     }
 }
 
-public class AdsbAircraftOperationStatusV1 : AdsbAircraftOperationStatus
+public class AdsbAircraftOperationStatusSurface : AdsbAircraftOperationStatus
 {
-    public AdsbAircraftOperationStatusV1()
+    public AdsbAircraftOperationStatusSurface()
     {
         OperationStatusType = OperationStatusTypeEnum.Surface;
     }
+}
+
+public class AdsbAircraftOperationStatusV0 : AdsbAircraftOperationStatusAirborne
+{
+}
+
+public class AdsbAircraftOperationStatusV1 : AdsbAircraftOperationStatusSurface
+{
 }
 
 public class AdsbAircraftOperationStatusV2 : AdsbAircraftOperationStatus

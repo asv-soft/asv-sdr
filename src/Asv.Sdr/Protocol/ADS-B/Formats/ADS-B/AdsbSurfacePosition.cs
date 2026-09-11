@@ -10,10 +10,12 @@ public class AdsbSurfacePosition : AdsbExtendedSquitterBase
         base.InternalDeserialize(ref buffer);
         var bitIndex = 0;
         SurfacePositionType = (SurfacePositionTypeCodes)SpanBitHelper.GetBitU(buffer, ref bitIndex, 5);
-        Movement = GetMovement(SpanBitHelper.GetBitU(buffer, ref bitIndex, 7));
+        MovementCode = (byte)SpanBitHelper.GetBitU(buffer, ref bitIndex, 7);
+        Movement = GetMovement(MovementCode);
         GroundTrackStatus = (GroundTrackStatusEnum)SpanBitHelper.GetBitU(buffer, ref bitIndex, 1);
-        GroundTrack = GetGroundTrack(SpanBitHelper.GetBitU(buffer, ref bitIndex, 7));
-        Time = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1);
+        GroundTrackRaw = (byte)SpanBitHelper.GetBitU(buffer, ref bitIndex, 7);
+        GroundTrack = GetGroundTrack(GroundTrackRaw);
+        TimeSynchronizedWithUtc = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) != 0;
         CprFormat = SpanBitHelper.GetBitU(buffer, ref bitIndex, 1) == 0 ? CprFormatEnum.Even : CprFormatEnum.Odd;
         NCprLat = SpanBitHelper.GetBitU(buffer, ref bitIndex, 17);
         NCprLon = SpanBitHelper.GetBitU(buffer, ref bitIndex, 17);
@@ -24,10 +26,11 @@ public class AdsbSurfacePosition : AdsbExtendedSquitterBase
     {
         var bitIndex = 0;
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 5, (uint)SurfacePositionType);
-        SpanBitHelper.SetBitU(buffer, ref bitIndex, 7, SetMovement(Movement));
+        var movementCode = MovementCode is >= 125 and <= 127 ? MovementCode : SetMovement(Movement);
+        SpanBitHelper.SetBitU(buffer, ref bitIndex, 7, movementCode);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, (uint)GroundTrackStatus);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 7, SetGroundTrack(GroundTrack));
-        SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, Time);
+        SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, TimeSynchronizedWithUtc ? 1U : 0U);
         SpanBitHelper.SetBitU(buffer, ref bitIndex, 1, (uint)CprFormat);
         if (!double.IsNaN(Latitude) && !double.IsNaN(Longitude))
         {
@@ -68,12 +71,31 @@ public class AdsbSurfacePosition : AdsbExtendedSquitterBase
         SurfacePositionTypeCodes.GroundVehicleWithVerticalRate;
 
     public double Movement { get; set; }
+    public byte MovementCode { get; set; }
+    public bool IsMovementReserved => MovementCode is >= 125 and <= 127;
+    public bool IsMovementAvailable => MovementCode is >= 1 and <= 124;
     public GroundTrackStatusEnum GroundTrackStatus { get; set; }
-    
+
     public double GroundTrack { get; set; }
-    private uint Time { get; set; }
+    public byte GroundTrackRaw { get; set; }
+    public bool TimeSynchronizedWithUtc { get; set; }
     public CprFormatEnum CprFormat { get; set; }
-    
+
+    /// <summary>
+    /// Interprets the position type code as NUCp or NIC for the supplied ADS-B version.
+    /// </summary>
+    public AdsbPositionQualityInfo GetPositionQuality(
+        AdsbVersionNumberEnum version,
+        bool? nicSupplementA,
+        bool? nicSupplementC
+    ) =>
+        TransponderHelper.DecodeSurfacePositionQuality(
+            version,
+            (byte)SurfacePositionType,
+            nicSupplementA,
+            nicSupplementC
+        );
+
     public double Latitude { get; set; } = double.NaN;
 
     public double Longitude { get; set; } = double.NaN;
@@ -125,7 +147,7 @@ public class AdsbSurfacePosition : AdsbExtendedSquitterBase
     {
         gt %= 360.0;
         if (gt < 0) gt += 360.0;
-        return (uint)Math.Round(128.0 * gt / 360.0);
+        return (uint)Math.Round(128.0 * gt / 360.0) & 0x7F;
     }
 
     #endregion

@@ -16,15 +16,22 @@ public abstract class AdsbExtendedSquitterBase : AdsbDfMessageBase
     
     public SquitterTypeEnum SquitterType { get; set; } = SquitterTypeEnum.WithTransponder;
 
+    /// <summary>
+    /// Raw five-bit extended squitter type code from the ME field.
+    /// </summary>
+    public byte TypeCode { get; protected set; }
+
     public abstract AdsbMessageTypeEnum MessageType { get; }
 
     protected override void InternalDeserialize(ref ReadOnlySpan<byte> buffer)
     {
         var tc = (buffer[0] >> 3) & 0x1F;
+        TypeCode = (byte)tc;
         var msgType = tc switch
         {
+            0 => AdsbMessageTypeEnum.Reserved,
             >= 1 and <= 4 => AdsbMessageTypeEnum.AircraftIdentification,
-            <= 8 => AdsbMessageTypeEnum.SurfacePosition,
+            >= 5 and <= 8 => AdsbMessageTypeEnum.SurfacePosition,
             <= 18 => AdsbMessageTypeEnum.AirborneBarometricPosition,
             19 => AdsbMessageTypeEnum.AirborneVelocities,
             <= 22 => AdsbMessageTypeEnum.AirborneGnssPosition,

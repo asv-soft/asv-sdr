@@ -17,8 +17,26 @@ public class AdsbAircraftIdentification : AdsbExtendedSquitterBase
             TransponderHelper.SetAircraftCategory(value, out var tc, out var ca);
             _rawMt = tc;
             _rawCa = ca;
+            TypeCode = (byte)tc;
         }
     }
+
+    /// <summary>
+    /// Raw three-bit emitter category code from the ME field.
+    /// </summary>
+    public byte CategoryCode
+    {
+        get => (byte)_rawCa;
+        set => _rawCa = value <= 7
+            ? value
+            : throw new ArgumentOutOfRangeException(nameof(value), value, "The category code must fit in three bits.");
+    }
+
+    /// <summary>
+    /// Interprets the category using the rules of the supplied ADS-B version.
+    /// </summary>
+    public AdsbAircraftCategoryInfo GetCategory(AdsbVersionNumberEnum version) =>
+        TransponderHelper.DecodeAircraftCategory(version, TypeCode, CategoryCode);
 
     public string AircraftIdentification { get; set; }
 

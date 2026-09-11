@@ -253,13 +253,14 @@ public class AdsbMessageParser : DisposableOnce
                     _readedBytes++;
                     if (_readedBytes == _msgLen)
                     {
-                        var originalCrc = ModeSHelper.CalcCrc24(_frame, _msgLen);
+                        var calculatedCrc = ModeSHelper.CalcCrc24(_frame, _msgLen - 3);
                         var sourceCrc = (uint)(_frame[_msgLen - 3] << 16) | (uint)(_frame[_msgLen - 2] << 8) |
                                         _frame[_msgLen - 1];
-                        if (originalCrc == sourceCrc)
+                        if (calculatedCrc == sourceCrc)
                         {
                             var id = TransponderHelper.GetMessageId(_frame);
-                            _onMessageRecev.OnNext($"Down link format: {(_frame[2] >> 3) & 0x1F}");
+                            var downlinkFormat = TransponderHelper.GetDownlinkFormat(_frame);
+                            _onMessageRecev.OnNext($"Down link format: {downlinkFormat}");
                             var span = new ReadOnlySpan<byte>(_frame, 0, _msgLen);
                             ParsePacket(id, ref span, true);
                             Reset();

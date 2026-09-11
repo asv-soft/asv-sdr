@@ -25,6 +25,17 @@ public abstract class AdsbDfMessageBase : ISizedSpanSerializable
         set => _rawCa = TransponderHelper.SetCapability(value);
     }
 
+    /// <summary>
+    /// Raw three-bit CA field for DF17 or CF field for DF18.
+    /// </summary>
+    public byte CapabilityOrControlField
+    {
+        get => (byte)_rawCa;
+        set => _rawCa = value <= 7
+            ? value
+            : throw new ArgumentOutOfRangeException(nameof(value), value, "The field must fit in three bits.");
+    }
+
     public int AircraftAddress { get; set; }
     
     public void Deserialize(ref ReadOnlySpan<byte> buffer)

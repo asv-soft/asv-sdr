@@ -4,7 +4,7 @@ using Asv.IO;
 
 namespace Asv.Sdr;
 
-public static class TransponderHelper
+public static partial class TransponderHelper
 {
     public static readonly byte[] Preamble = [0xA1, 0x40];
     public const int LongFrameLengthBytes = 14;
@@ -57,8 +57,9 @@ public static class TransponderHelper
         var tc = (frame[4] >> 3) & 0x1F;
         return tc switch
         {
+            0 => AdsbMessageTypeEnum.Reserved,
             >= 1 and <= 4 => AdsbMessageTypeEnum.AircraftIdentification,
-            <= 8 => AdsbMessageTypeEnum.SurfacePosition,
+            >= 5 and <= 8 => AdsbMessageTypeEnum.SurfacePosition,
             <= 18 => AdsbMessageTypeEnum.AirborneBarometricPosition,
             19 => AdsbMessageTypeEnum.AirborneVelocities,
             <= 22 => AdsbMessageTypeEnum.AirborneGnssPosition,
@@ -129,7 +130,8 @@ public static class TransponderHelper
             {
                 1 => AircraftCategoryEnum.SurfaceEmergencyVehicle,
                 2 => AircraftCategoryEnum.SurfaceServiceVehicle,
-                3 => AircraftCategoryEnum.GroundObstruction
+                3 => AircraftCategoryEnum.GroundObstruction,
+                _ => AircraftCategoryEnum.Reserved
             },
             3 => ca switch
             {
@@ -140,6 +142,7 @@ public static class TransponderHelper
                 5 => AircraftCategoryEnum.Reserved,
                 6 => AircraftCategoryEnum.UnmannedAerialVehicle,
                 7 => AircraftCategoryEnum.SpaceOrTransAtmosphericVehicle,
+                _ => AircraftCategoryEnum.Reserved
             },
             4 => ca switch
             {
@@ -150,6 +153,7 @@ public static class TransponderHelper
                 5 => AircraftCategoryEnum.Heavy,
                 6 => AircraftCategoryEnum.HighPerformanceAndHighSpeed,
                 7 => AircraftCategoryEnum.Rotorcraft,
+                _ => AircraftCategoryEnum.Reserved
             },
             _ => AircraftCategoryEnum.Reserved
         };
@@ -173,11 +177,11 @@ public static class TransponderHelper
                 break;
             case AircraftCategoryEnum.SurfaceServiceVehicle:
                 tcValue = 2;
-                caValue = 3;
+                caValue = 2;
                 break;
             case AircraftCategoryEnum.GroundObstruction:
                 tcValue = 2;
-                caValue = 7;
+                caValue = 3;
                 break;
             case AircraftCategoryEnum.GliderOrSailplane:
                 tcValue = 3;
@@ -524,12 +528,16 @@ public static class TransponderHelper
 
         return new AirborneCapabilityStatus
         {
+            AdsbVersion = adsbVersion,
             Raw16 = capabilityClass,
             ReservedTop2 = (capabilityClass & 0xC000) >> 14,
             TcasOperational = adsbVersion >= 2
                 ? (capabilityClass & 0x2000) != 0
                 : (capabilityClass & 0x2000) == 0,
             Has1090EsIn = (capabilityClass & 0x1000) != 0,
+            AcasNotOperational = adsbVersion < 2 ? (capabilityClass & 0x2000) != 0 : null,
+            CdtiOperational = adsbVersion < 2 ? (capabilityClass & 0x1000) != 0 : null,
+            Is1090EsInApplicable = adsbVersion >= 2,
             ReservedBits13_14 = (capabilityClass & 0x0C00) >> 10,
             AirReferencedVelocityReportCapability = (capabilityClass & 0x0200) != 0,
             TargetStateReportCapability = (capabilityClass & 0x0100) != 0,
@@ -543,25 +551,30 @@ public static class TransponderHelper
                 _ => "Invalid"
             },
             HasUatIn = adsbVersion >= 2 ? (capabilityClass & 0x0020) != 0 : null,
+            ReservedMe20 = (capabilityClass & 0x0010) != 0,
             ReservedLowBits = capabilityClass & 0x003F
         };
     }
 
-    public static SurfaceCapabilityStatus DecodeSurfaceCapability(ushort capabilityClass)
+    public static SurfaceCapabilityStatus DecodeSurfaceCapability(ushort capabilityClass, int adsbVersion = 2)
     {
         var nacvCode = (capabilityClass & 0x00E0) >> 5;
 
         return new SurfaceCapabilityStatus
         {
+            AdsbVersion = adsbVersion,
             Raw16 = capabilityClass,
             ReservedTop2 = (capabilityClass & 0xC000) >> 14,
             PositionOffsetApplied = (capabilityClass & 0x2000) != 0,
             Has1090EsIn = (capabilityClass & 0x1000) != 0,
+            CdtiOperational = adsbVersion < 2 ? (capabilityClass & 0x1000) != 0 : null,
+            Is1090EsInApplicable = adsbVersion >= 2,
             ReservedBits = (capabilityClass & 0x0C00) >> 10,
             LowTxPowerClassB2GroundVehicle = (capabilityClass & 0x0200) != 0,
             HasUatIn = (capabilityClass & 0x0100) != 0,
             NacV = DecodeNacV(nacvCode),
             NicSupplementC = (capabilityClass & 0x0010) != 0,
+            ReservedMe20 = (capabilityClass & 0x0010) != 0,
             LengthWidthCode = capabilityClass & 0x000F
         };
     }
@@ -570,6 +583,7 @@ public static class TransponderHelper
     {
         var result = new OperationalModeStatus
         {
+            AdsbVersion = adsbVersion,
             Raw16 = operationalMode,
             ReservedTop2 = (operationalMode & 0xC000) >> 14,
             TcasRaActive = (operationalMode & 0x2000) != 0,
@@ -586,12 +600,39 @@ public static class TransponderHelper
         return result;
     }
 
+    public static GpsAntennaOffsetInfo DecodeGpsAntennaOffset(byte raw)
+    {
+        var lateralCode = (raw >> 5) & 0x07;
+        var longitudinalCode = raw & 0x1F;
+        return new GpsAntennaOffsetInfo
+        {
+            Raw = raw,
+            LateralCode = lateralCode,
+            LateralOffsetIsRight = lateralCode >= 4,
+            LateralOffsetMeters = lateralCode switch
+            {
+                0 => null,
+                <= 3 => -2.0 * lateralCode,
+                _ => 2.0 * (lateralCode - 4)
+            },
+            LongitudinalCode = longitudinalCode,
+            LongitudinalOffsetMeters = longitudinalCode >= 2
+                ? 2.0 * (longitudinalCode - 1)
+                : null,
+            PositionOffsetApplied = longitudinalCode == 1
+        };
+    }
+
     public static AcasRaInfo DecodeAcasRaBds30(ReadOnlySpan<byte> bds30Payload)
     {
         var tti = GetBitU(bds30Payload, 28, 2);
 
         var info = new AcasRaInfo
         {
+            AdvisoryRaw = GetBitU(bds30Payload, 8, 14),
+            ComplementRaw = GetBitU(bds30Payload, 22, 4),
+            RaTerminated = GetBitU(bds30Payload, 26, 1) != 0,
+            MultipleThreat = GetBitU(bds30Payload, 27, 1) != 0,
             ThreatTypeIndicator = tti,
             ThreatTypeIndicatorText = tti switch
             {
@@ -612,9 +653,7 @@ public static class TransponderHelper
             NoBelow = GetBitU(bds30Payload, 22, 1) != 0,
             NoAbove = GetBitU(bds30Payload, 23, 1) != 0,
             NoLeft = GetBitU(bds30Payload, 24, 1) != 0,
-            NoRight = GetBitU(bds30Payload, 25, 1) != 0,
-            RaTerminated = GetBitU(bds30Payload, 26, 1) != 0,
-            MultipleThreat = GetBitU(bds30Payload, 27, 1) != 0
+            NoRight = GetBitU(bds30Payload, 25, 1) != 0
         };
 
         if (tti == 1)
@@ -693,35 +732,45 @@ public static class TransponderHelper
 
     public sealed class AirborneCapabilityStatus
     {
+        public int AdsbVersion { get; set; }
         public ushort Raw16 { get; set; }
         public int ReservedTop2 { get; set; }
         public bool TcasOperational { get; set; }
         public bool Has1090EsIn { get; set; }
+        public bool? AcasNotOperational { get; set; }
+        public bool? CdtiOperational { get; set; }
+        public bool Is1090EsInApplicable { get; set; }
         public int ReservedBits13_14 { get; set; }
         public bool AirReferencedVelocityReportCapability { get; set; }
         public bool TargetStateReportCapability { get; set; }
         public int TargetChangeReportCapability { get; set; }
         public string TargetChangeReportCapabilityText { get; set; } = string.Empty;
         public bool? HasUatIn { get; set; }
+        public bool ReservedMe20 { get; set; }
         public int ReservedLowBits { get; set; }
     }
 
     public sealed class SurfaceCapabilityStatus
     {
+        public int AdsbVersion { get; set; }
         public ushort Raw16 { get; set; }
         public int ReservedTop2 { get; set; }
         public bool PositionOffsetApplied { get; set; }
         public bool Has1090EsIn { get; set; }
+        public bool? CdtiOperational { get; set; }
+        public bool Is1090EsInApplicable { get; set; }
         public int ReservedBits { get; set; }
         public bool LowTxPowerClassB2GroundVehicle { get; set; }
         public bool HasUatIn { get; set; }
         public NacVInfo NacV { get; set; } = new();
         public bool NicSupplementC { get; set; }
+        public bool ReservedMe20 { get; set; }
         public int LengthWidthCode { get; set; }
     }
 
     public sealed class OperationalModeStatus
     {
+        public int AdsbVersion { get; set; }
         public ushort Raw16 { get; set; }
         public int ReservedTop2 { get; set; }
         public bool TcasRaActive { get; set; }
@@ -731,9 +780,27 @@ public static class TransponderHelper
         public SdaInfo? Sda { get; set; }
     }
 
+    public sealed class GpsAntennaOffsetInfo
+    {
+        public byte Raw { get; set; }
+        public int LateralCode { get; set; }
+        public bool LateralOffsetIsRight { get; set; }
+        public double? LateralOffsetMeters { get; set; }
+        public int LongitudinalCode { get; set; }
+        public double? LongitudinalOffsetMeters { get; set; }
+        public bool PositionOffsetApplied { get; set; }
+    }
+
     public sealed class AcasRaInfo
     {
+        public int AdvisoryRaw { get; set; }
+        public int ComplementRaw { get; set; }
         public int ThreatTypeIndicator { get; set; }
+        public ThreatTypeIndicatorEnum ThreatType
+        {
+            get => (ThreatTypeIndicatorEnum)ThreatTypeIndicator;
+            set => ThreatTypeIndicator = (int)value;
+        }
         public string ThreatTypeIndicatorText { get; set; } = string.Empty;
         public bool IssuedRa { get; set; }
         public bool Corrective { get; set; }

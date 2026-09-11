@@ -58,6 +58,11 @@ public class AdsbAircraftEmergencyStatus : AdsbAircraftStatus
     public override AircraftStatusSubTypeEnum AircraftStatusSubType => AircraftStatusSubTypeEnum.EmergencyPriorityStatus;
 
     public byte EmergencyState { get; set; }
+    public AdsbEmergencyStateEnum EmergencyStateValue
+    {
+        get => (AdsbEmergencyStateEnum)EmergencyState;
+        set => EmergencyState = (byte)value;
+    }
     public string EmergencyStateText { get; set; } = string.Empty;
     public ushort ModeAIdentityRaw { get; set; }
     public bool ModeAIdentityXBit { get; set; }
