@@ -192,12 +192,18 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
         var result = new ushort[address.Length];
         await AtomicEditRegister(edit =>
         {
-            SetIsHoldingFrame(edit, true);
-            for (var i = 0; i < result.Length; i++)
+            try
             {
-                result[i] = ReadCustomRegister(edit, address[i]);
+                SetIsHoldingFrame(edit, true);
+                for (var i = 0; i < result.Length; i++)
+                {
+                    result[i] = ReadCustomRegister(edit, address[i]);
+                }
             }
-            SetIsHoldingFrame(edit, false);
+            finally
+            {
+                SetIsHoldingFrame(edit, false);
+            }
         }, cancel).ConfigureAwait(false);
         
         return result;

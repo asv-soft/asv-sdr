@@ -17,6 +17,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private double _delayOffsetAc = 0;
     private double _delayOffsetS = 0;
     private uint? _modeSExpectedIcao;
+    private bool _legacyModeAcSnapshotWarning;
     private const int DefaultDfPollIntervalMs = 10;
     private const int DefaultDfResponseTimeoutMs = 100;
     private const int UfSwitchSettleDelayMs = 12;
@@ -80,6 +81,25 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private const ushort DF_RX_CNT = 0x032E;                    // --RD -- DFxx_CNT(15:0)
     private const ushort ModeSExpectedIcao_23_16 = 0x032F;     // --WR -- expected ICAO[23:16] for FPGA timing filter
     private const ushort ModeSExpectedIcao_15_0 = 0x0330;      // --WR -- expected ICAO[15:0] for FPGA timing filter
+    private const ushort ModeAcSnapshotStatus = 0x0331;       // --RD -- ready[15], signature 0x2A[14:8], generation[7:0]
+    private const ushort ModeAcDiagnosticsSignature = 0x0332;  // --RD -- 0xAC01 when diagnostics are supported
+    private const ushort ModeAcRejectedA = 0x0333;             // --RD -- saturating rejected Mode A count
+    private const ushort ModeAcRejectedC = 0x0334;             // --RD -- saturating rejected Mode C count
+    private const ushort ModeAcAbortedA = 0x0335;              // --RD -- saturating aborted Mode A count
+    private const ushort ModeAcAbortedC = 0x0336;              // --RD -- saturating aborted Mode C count
+    private const ushort ModeAcOverrun = 0x0337;               // --RD -- saturating receive overrun count
+    private const ushort ModeAcConservativeIntervals = 0x0338; // --RD -- saturating conservative interval assignments
+    private static readonly ushort[] ModeAcDiagnosticsRegisters =
+    [
+        ModeAcDiagnosticsSignature, ModeAcRejectedA, ModeAcRejectedC, ModeAcAbortedA,
+        ModeAcAbortedC, ModeAcOverrun, ModeAcConservativeIntervals,
+    ];
+    private static readonly ushort[] ModeAcSnapshotRegisters =
+    [
+        ModeAResp_15_0_InternAddr, ModeCResp_15_0_InternAddr, ReplyRatio_A_15_8_C_7_0_InternAddr,
+        Width_A_F1_15_8_F2_7_0, Width_C_F1_15_8_F2_7_0, F1_F2_Spacing_A_15_8_C_7_0,
+        Reply_Delay_A_15_0, Reply_Jitter_A_15_0, Reply_Delay_C_15_0, Reply_Jitter_C_15_0,
+    ];
 
     private const ushort BDS_05_Ev_111_96 = 0x0400;  // --RD -- BDS_05_Ev
     private const ushort BDS_05_Ev_95_80 = 0x0401;   // --RD
@@ -272,6 +292,62 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         return (ModeA: (rRatio >> 8) * 0.5f, ModeC: (rRatio & 0xFF) * 0.5f);
     }
 
+    public async Task<Ifr6000ModeAcSnapshot> ReadModeAcSnapshot(CancellationToken cancel = default)
+    {
+        using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancel, DisposeCancel);
+        var readCancel = linked.Token;
+        var startedAt = Environment.TickCount64;
+        var words = new ushort[Ifr6000ModeAcSnapshot.RegisterCount];
+        var diagnosticWords = new ushort[Ifr6000ModeAcDiagnostics.RegisterCount];
+        do
+        {
+            ushort before = 0, after = 0;
+            // Do not use global HOLD: the shared BDS RAM writer can continue while HOLD suppresses writes.
+            await AtomicEditRegister(edit =>
+            {
+                before = ReadCustomRegister(edit, ModeAcSnapshotStatus);
+                for (var i = 0; i < words.Length; i++)
+                {
+                    readCancel.ThrowIfCancellationRequested();
+                    words[i] = ReadCustomRegister(edit, ModeAcSnapshotRegisters[i]);
+                }
+                for (var i = 0; i < diagnosticWords.Length; i++)
+                {
+                    readCancel.ThrowIfCancellationRequested();
+                    diagnosticWords[i] = ReadCustomRegister(edit, ModeAcDiagnosticsRegisters[i]);
+                }
+                after = ReadCustomRegister(edit, ModeAcSnapshotStatus);
+            }, readCancel).ConfigureAwait(false);
+            readCancel.ThrowIfCancellationRequested();
+            var raw = string.Join(" ", Array.ConvertAll(words, word => word.ToString("X4")));
+            var diagnosticRaw = string.Join(" ", Array.ConvertAll(diagnosticWords, word => word.ToString("X4")));
+            var diagnostics = Ifr6000ModeAcDiagnostics.Decode(diagnosticWords);
+            var diagnosticsLog = diagnostics is null
+                ? $"diagSignature={diagnosticWords[0]:X4} diagSupported=False diagRaw={diagnosticRaw}"
+                : $"diagSignature={diagnostics.SchemaSignature:X4} diagSupported=True " +
+                  $"diagRejectedA={diagnostics.RejectedModeACount} diagRejectedC={diagnostics.RejectedModeCCount} " +
+                  $"diagAbortedA={diagnostics.AbortedModeACount} diagAbortedC={diagnostics.AbortedModeCCount} " +
+                  $"diagOverrun={diagnostics.OverrunCount} " +
+                  $"diagConservativeIntervals={diagnostics.ConservativeIntervalAssignmentCount} diagRaw={diagnosticRaw}";
+            if (before == 0 && after == 0)
+            {
+                if (!_legacyModeAcSnapshotWarning)
+                {
+                    _legacyModeAcSnapshotWarning = true;
+                    _logger.ZLogWarning($"A/C snapshot generation is not supported by FPGA; legacy timing reads are not coherent");
+                }
+                _logger.ZLogDebug($"A/C snapshot coherent=False status={before:X4}->{after:X4} raw={raw} reason=legacy elapsedMs={Environment.TickCount64 - startedAt} generation=none {diagnosticsLog}");
+                return Ifr6000ModeAcSnapshot.DecodeLegacy(words, _delayOffsetAc);
+            }
+            var accepted = Ifr6000ModeAcSnapshot.TryDecode(before, words, after, _delayOffsetAc,
+                out var snapshot, out var reason, diagnostics);
+            _logger.ZLogDebug($"A/C snapshot coherent={accepted} status={before:X4}->{after:X4} raw={raw} reason={reason} elapsedMs={Environment.TickCount64 - startedAt} generation={(byte)before}->{(byte)after} {diagnosticsLog}");
+            if (accepted) return snapshot!;
+            await Task.Delay(20, readCancel).ConfigureAwait(false);
+        } while (Environment.TickCount64 - startedAt < 6000);
+        throw new TimeoutException("A/C FPGA snapshot did not become ready and generation-consistent within 6000 ms.");
+    }
+
     public Task WriteP1P3SpacingOffset(float modeAOffset, float modeCOffset)
     {
         var aOffset = (int)Math.Round(modeAOffset * 40);
@@ -377,15 +453,13 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     public async Task<(string Squawk, bool Spi)> ReadModeASquawkCode()
     {
         var code = await ReadCustomRegister(ModeAResp_15_0_InternAddr, DisposeCancel).ConfigureAwait(false);
-        var spi = (code & 0x1) != 0;
-        var squawk = ModeSHelper.GetSquawk((ushort)((code >> 1) & 0xFFF));
-        return (squawk, spi);
+        return ModeAcReplyDecoder.DecodeSquawk(code);
     }
 
     public async Task<int> ReadModeCAltitude()
     {
         var code = await ReadCustomRegister(ModeCResp_15_0_InternAddr, DisposeCancel).ConfigureAwait(false);
-        return ModeSHelper.GetAltitudeFromModeCAltitudeCode((ushort)((code >> 1) & 0xFFF)) ?? 0;
+        return ModeAcReplyDecoder.DecodeAltitude(code) ?? 0;
     }
 
     public async Task<bool> WriteUfMessage(ModeSUFormatBase msg)
@@ -435,7 +509,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
 
             await Task.Delay(UfSwitchSettleDelayMs, DisposeCancel).ConfigureAwait(false);
             var counterBefore = await ReadCustomRegister(DF_RX_CNT, DisposeCancel).ConfigureAwait(false);
-            _logger.ZLogInformation(
+            _logger.ZLogDebug(
                 $"Mode S UF applied uf={msg.FormatId} raw={Convert.ToHexString(buffer.AsSpan(0, msg.GetByteSize()))} settle={UfSwitchSettleDelayMs}ms dfCnt={counterBefore}"
             );
             return (true, counterBefore);
@@ -520,7 +594,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
                 var counterAtEnd = valueFrame[^1];
                 if (counterAtStart != counterAtEnd)
                 {
-                    _logger.ZLogInformation(
+                    _logger.ZLogDebug(
                         $"Mode S DF torn snapshot dfCnt={counterAtStart}->{counterAtEnd}; retry"
                     );
                     continue;
@@ -533,14 +607,14 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
                 var dfFrame = valueFrame.AsSpan(1, dfRegisterCount).ToArray();
                 var buffer = ConvertRegisterFrameToBytes(dfFrame, length);
                 lastCounter = counterAtEnd;
-                _logger.ZLogInformation(
+                _logger.ZLogDebug(
                     $"Mode S DF snapshot dfCnt={counterAtEnd} raw={Convert.ToHexString(buffer)}"
                 );
                 var span = new ReadOnlySpan<byte>(buffer);
                 var msg = factory();
                 msg.Deserialize(ref span);
                 var valid = isValid == null || isValid(msg);
-                _logger.ZLogInformation(
+                _logger.ZLogDebug(
                     $"Mode S DF received dfCnt={counterAtEnd} df={msg.FormatId} icao={msg.IcaoAddress:X6} valid={valid} bdsType={msg.Bds?.GetType().Name ?? "null"} raw={Convert.ToHexString(buffer)}"
                 );
                 if (valid)
@@ -848,30 +922,73 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         return msg.SubType is VelocitySubTypeEnum.SubType3 or VelocitySubTypeEnum.SubType4;
     }
     
-    public async Task<ModeSDF11?> ReadDf11Squitter()
+    public Task<ModeSDF11?> ReadDf11Squitter()
     {
-        var addrFrame = new ushort[4];
-        for (ushort i = 0; i < addrFrame.Length; i++)
-        {
-            addrFrame[i] = (ushort)(DF11_SKW_55_40 + i);
-        }
-        var valueFrame = await ReadCustomRegistersFrame(addrFrame, DisposeCancel).ConfigureAwait(false);
-        var buffer = ConvertRegisterFrameToBytes(valueFrame, 7);
-        
-        var span = new ReadOnlySpan<byte>(buffer);
-        ModeSDF11? msg = null;
+        return ReadDf11SquitterSnapshot(null, DisposeCancel);
+    }
+
+    public Task<ModeSDF11?> ReadDf11Squitter(byte counterBefore, CancellationToken cancel = default)
+    {
+        return ReadDf11SquitterSnapshot(counterBefore, cancel);
+    }
+
+    private async Task<ModeSDF11?> ReadDf11SquitterSnapshot(byte? counterBefore, CancellationToken cancel)
+    {
+        // A fresh shared-slot DF11 can arrive only at the next squitter (about 1.2 s).
+        // Allow acquisition/read margin without accepting the unchanged baseline frame.
+        var timeoutMs = counterBefore.HasValue ? 2500 : 1000;
+        using var linkedCancel = CancellationTokenSource.CreateLinkedTokenSource(cancel, DisposeCancel);
+        var readCancel = linkedCancel.Token;
+        await _dfRequestLock.WaitAsync(readCancel).ConfigureAwait(false);
         try
         {
-            msg = new ModeSDF11();
-            msg.Deserialize(ref span);
-            return msg;
+            var startedAt = Environment.TickCount64;
+            do
+            {
+                readCancel.ThrowIfCancellationRequested();
+                var samples = new ushort[Ifr6000Df11Snapshot.SampleLength * 2];
+                await AtomicEditRegister(edit =>
+                {
+                    // HOLD_FRAME can interrupt the FPGA RAM writer. Read live samples instead.
+                    for (var sample = 0; sample < 2; sample++)
+                    {
+                        var offset = sample * Ifr6000Df11Snapshot.SampleLength;
+                        readCancel.ThrowIfCancellationRequested();
+                        samples[offset] = ReadCustomRegister(edit, DF11_SKW_CNT_Period_15_0);
+                        for (var word = 0; word < 4; word++)
+                        {
+                            readCancel.ThrowIfCancellationRequested();
+                            samples[offset + word + 1] = ReadCustomRegister(edit, (ushort)(DF11_SKW_55_40 + word));
+                        }
+                        samples[offset + 5] = ReadCustomRegister(edit, DF11_SKW_CNT_Period_15_0);
+                    }
+                }, readCancel).ConfigureAwait(false);
+                readCancel.ThrowIfCancellationRequested();
+
+                var first = samples.AsSpan(0, Ifr6000Df11Snapshot.SampleLength);
+                var second = samples.AsSpan(Ifr6000Df11Snapshot.SampleLength);
+                var accepted = Ifr6000Df11Snapshot.TryDecode(first, second, counterBefore, out var message, out var reason);
+                var raw = ConvertRegisterFrameToBytes(first.Slice(1, 4).ToArray(), 7);
+                var confirmRaw = ConvertRegisterFrameToBytes(second.Slice(1, 4).ToArray(), 7);
+                var residual = ModeSHelper.CalcCrc24(raw, 4) ^ (uint)((raw[4] << 16) | (raw[5] << 8) | raw[6]);
+                _logger.ZLogDebug(
+                    $"DF11 shared snapshot accepted={accepted} baseline={counterBefore?.ToString() ?? "none"} counter={first[0] >> 8}->{first[5] >> 8}/{second[0] >> 8}->{second[5] >> 8} raw={Convert.ToHexString(raw)} confirmRaw={Convert.ToHexString(confirmRaw)} crcResidual={residual:X6} icao={message?.IcaoAddress ?? 0:X6} ic={message?.IC} cl={message?.CL} reason={reason} elapsedMs={Environment.TickCount64 - startedAt}"
+                );
+                if (accepted)
+                {
+                    return message;
+                }
+
+                await Task.Delay(2, readCancel).ConfigureAwait(false);
+            } while (Environment.TickCount64 - startedAt < timeoutMs);
+
+            _logger.ZLogWarning($"DF11 shared snapshot timeout baseline={counterBefore?.ToString() ?? "none"} timeoutMs={timeoutMs}");
+            return null;
         }
-        catch (Exception)
+        finally
         {
-            // ignored
+            _dfRequestLock.Release();
         }
-        
-        return msg;
     }
 
     public async Task<float> ReadReplyRatioModeS()

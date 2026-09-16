@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +19,7 @@ namespace Asv.Sdr.LimeSdr
         #region Static
 
         private static readonly LogCallBack _callback;
+        private static readonly AsyncLocal<NativeOperationScope?> CurrentNativeOperation = new();
         static LimeSdrDevice()
         {
             _callback = OnLmsLog;
@@ -54,7 +57,7 @@ namespace Asv.Sdr.LimeSdr
         public static unsafe string GetApiVersion()
         {
             var str = LMS_GetLibraryVersion();
-            return Encoding.ASCII.GetString((byte*)str, 50);
+            return str == null ? string.Empty : Marshal.PtrToStringAnsi((IntPtr)str) ?? string.Empty;
         }
         
 
@@ -80,6 +83,7 @@ namespace Asv.Sdr.LimeSdr
             _registerEditor = new LmsRegisterEditor(this);
             _logger = logger;
             DeviceId = deviceId;
+            _device = IntPtr.Zero;
             _isThreadSafe = isThreadSave;
             _ignoreLogLmsParams = new HashSet<string>(ignoreLogLmsParams.Select(x=>x.name),StringComparer.InvariantCultureIgnoreCase);
             
@@ -91,63 +95,141 @@ namespace Asv.Sdr.LimeSdr
                 {
                     stream.Dispose();
                 }
-                // Check(LMS_Reset(_device), nameof(LMS_Reset));
-                Check(LMS_Close(_device), nameof(LMS_Close));
+                if (_device != IntPtr.Zero)
+                {
+                    Check(LMS_Close(_device), nameof(LMS_Close));
+                }
             });
 
             _taskFactory = isThreadSave
                 ? new TaskFactory(
                     new SingleThreadTaskScheduler($"LMS device stream {deviceId}").DisposeItWith(Disposable))
                 : Task.Factory;
-            var errInitCnt = 0;
-            while (true) // BUG in Lime SDR. Try open\close 3 times. If error => throw exception
+            for (var attempt = 1; ; attempt++)
             {
-                if (LMS_Open(out _device, deviceId, null) != 0)
+                var initialization = TryInitializeDevice(attempt);
+                if (initialization.Failure is null)
                 {
-                    throw new Exception("Cannot open LimeSDR device. Is the device locked somewhere?");
+                    _device = initialization.Device;
+                    break;
                 }
 
-                var err = LMS_Reset(_device);
-                if (err == 0)
+                var failure = initialization.Failure.Value;
+                var retryDelay = LimeSdrNativeOperationPolicy.GetRetryDelay(
+                    failure.ResultCode,
+                    attempt
+                );
+                if (retryDelay is null)
                 {
-                    err = LMS_Init(_device);
-                    if (err == 0) break;
+                    throw CreateNativeOperationException(failure);
                 }
-                ++errInitCnt;
-                LMS_Close(_device);
-                if (errInitCnt > 3)
-                {
-                    Check(err,nameof(LMS_Close)); // error to init device
-                }
+
+                LogRetry(failure, retryDelay.Value);
+                Thread.Sleep(retryDelay.Value);
             }
-          
-            // Check(LMS_Init(_device),nameof(LMS_Init));
-            //Check(LMS_Reset(_device), nameof(LMS_Reset));
-
-            
         }
 
         private static void OnLmsLog(LogLevel level, string msg)
         {
+            var context = CurrentNativeOperation.Value;
+            context?.Capture(level, msg);
+            var logMessage = context is null
+                ? msg
+                : $"[LMS operation={context.Operation} device={context.DeviceId} attempt={context.Attempt} details={context.Details}] {msg}";
+
             switch (level)
             {
                 case LogLevel.LOG_LEVEL_CRITICAL:
-                    LmsLogManager.Logger.ZLogCritical($"{msg}");
+                    LmsLogManager.Logger.ZLogCritical($"{logMessage}");
                     break;
                 case LogLevel.LOG_LEVEL_ERROR:
-                    LmsLogManager.Logger.ZLogError($"{msg}");
+                    LmsLogManager.Logger.ZLogError($"{logMessage}");
                     break;
                 case LogLevel.LOG_LEVEL_WARNING:
-                    LmsLogManager.Logger.ZLogWarning($"{msg}");
+                    LmsLogManager.Logger.ZLogWarning($"{logMessage}");
                     break;
                 case LogLevel.LOG_LEVEL_INFO:
-                    LmsLogManager.Logger.ZLogInformation($"{msg}");
+                    LmsLogManager.Logger.ZLogInformation($"{logMessage}");
                     break;
                 case LogLevel.LOG_LEVEL_DEBUG:
                 default:
-                    LmsLogManager.Logger.ZLogTrace($"{msg}");
+                    LmsLogManager.Logger.ZLogTrace($"{logMessage}");
                     break;
-                    //throw new ArgumentOutOfRangeException(nameof(level), level, null);
+            }
+        }
+
+        private DeviceInitializationAttempt TryInitializeDevice(int attempt)
+        {
+            var candidate = IntPtr.Zero;
+            var details = $"constructorAttempt={attempt}";
+            var openResult = ExecuteNativeOperation(
+                nameof(LMS_Open),
+                details,
+                attempt,
+                () => LMS_Open(out candidate, DeviceId, null)
+            );
+            if (openResult.ResultCode != 0)
+            {
+                return new DeviceInitializationAttempt(IntPtr.Zero, openResult);
+            }
+
+            var resetResult = ExecuteNativeOperation(
+                nameof(LMS_Reset),
+                details,
+                attempt,
+                () => LMS_Reset(candidate)
+            );
+            if (resetResult.ResultCode != 0)
+            {
+                CloseFailedInitialization(candidate, attempt, details);
+                return new DeviceInitializationAttempt(IntPtr.Zero, resetResult);
+            }
+
+            var initResult = ExecuteNativeOperation(
+                nameof(LMS_Init),
+                details,
+                attempt,
+                () => LMS_Init(candidate)
+            );
+            if (initResult.ResultCode != 0)
+            {
+                CloseFailedInitialization(candidate, attempt, details);
+                return new DeviceInitializationAttempt(IntPtr.Zero, initResult);
+            }
+
+            var readbackFailure = ReadAndLogSampleRates(
+                candidate,
+                nameof(LMS_Init),
+                details,
+                attempt,
+                null,
+                null
+            );
+            if (readbackFailure is not null)
+            {
+                CloseFailedInitialization(candidate, attempt, details);
+                return new DeviceInitializationAttempt(IntPtr.Zero, readbackFailure);
+            }
+
+            return new DeviceInitializationAttempt(candidate, null);
+        }
+
+        private void CloseFailedInitialization(IntPtr candidate, int attempt, string details)
+        {
+            var closeResult = ExecuteNativeOperation(
+                nameof(LMS_Close),
+                $"{details} cleanup=true",
+                attempt,
+                () => LMS_Close(candidate)
+            );
+            if (closeResult.ResultCode != 0)
+            {
+                _logger.LogError(
+                    "Failed to close LimeSDR after an initialization error: device={DeviceId} resultCode={ResultCode} nativeError={NativeError}",
+                    DeviceId,
+                    closeResult.ResultCode,
+                    closeResult.NativeError
+                );
             }
         }
 
@@ -242,7 +324,7 @@ namespace Asv.Sdr.LimeSdr
             {
                 if (IsDisposed) return;
                 _logger.ZLogInformation($"Set sample rate {rate} with oversample {oversample}");
-                Check(LMS_SetSampleRate(_device, rate, oversample),nameof(LMS_SetSampleRate));
+                SetSampleRateWithDiagnostics(null, rate, oversample, cancel);
             }, cancel);
         }
 
@@ -252,8 +334,165 @@ namespace Asv.Sdr.LimeSdr
             {
                 if (IsDisposed) return;
                 _logger.ZLogInformation($"Set sample rate for {type:G} {rate} with oversample {oversample}");
-                Check(LMS_SetSampleRateDir(_device, type == LmsChannel.Tx, rate, oversample), nameof(LMS_SetSampleRateDir));
+                SetSampleRateWithDiagnostics(type, rate, oversample, cancel);
             }, cancel);
+        }
+
+        private void SetSampleRateWithDiagnostics(
+            LmsChannel? direction,
+            double rate,
+            uint oversample,
+            CancellationToken cancel
+        )
+        {
+            var operation = direction is null
+                ? nameof(LMS_SetSampleRate)
+                : nameof(LMS_SetSampleRateDir);
+            var details = direction is null
+                ? $"rateHz={rate:R} oversample={oversample}"
+                : $"direction={direction:G} rateHz={rate:R} oversample={oversample}";
+
+            for (var attempt = 1; ; attempt++)
+            {
+                cancel.ThrowIfCancellationRequested();
+                var setResult = ExecuteNativeOperation(
+                    operation,
+                    details,
+                    attempt,
+                    () => direction is null
+                        ? LMS_SetSampleRate(_device, rate, oversample)
+                        : LMS_SetSampleRateDir(
+                            _device,
+                            direction == LmsChannel.Tx,
+                            rate,
+                            oversample
+                        )
+                );
+
+                var failure = setResult.ResultCode == 0
+                    ? ReadAndLogSampleRates(
+                        _device,
+                        operation,
+                        details,
+                        attempt,
+                        rate,
+                        direction
+                    )
+                    : setResult;
+                if (failure is null)
+                {
+                    return;
+                }
+
+                var retryDelay = LimeSdrNativeOperationPolicy.GetRetryDelay(
+                    failure.Value.ResultCode,
+                    attempt
+                );
+                if (retryDelay is null)
+                {
+                    throw CreateNativeOperationException(failure.Value);
+                }
+
+                LogRetry(failure.Value, retryDelay.Value);
+                if (cancel.WaitHandle.WaitOne(retryDelay.Value))
+                {
+                    cancel.ThrowIfCancellationRequested();
+                }
+            }
+        }
+
+        private NativeOperationResult? ReadAndLogSampleRates(
+            IntPtr device,
+            string sourceOperation,
+            string sourceDetails,
+            int attempt,
+            double? requestedRate,
+            LmsChannel? requestedDirection
+        )
+        {
+            var rxHostHz = double.NaN;
+            var rxRfHz = double.NaN;
+            var rxResult = ExecuteNativeOperation(
+                nameof(LMS_GetSampleRate),
+                $"source={sourceOperation} direction=Rx {sourceDetails}",
+                attempt,
+                () => LMS_GetSampleRate(device, false, 0, ref rxHostHz, ref rxRfHz)
+            );
+            if (rxResult.ResultCode != 0)
+            {
+                return rxResult;
+            }
+
+            var txHostHz = double.NaN;
+            var txRfHz = double.NaN;
+            var txResult = ExecuteNativeOperation(
+                nameof(LMS_GetSampleRate),
+                $"source={sourceOperation} direction=Tx {sourceDetails}",
+                attempt,
+                () => LMS_GetSampleRate(device, true, 0, ref txHostHz, ref txRfHz)
+            );
+            if (txResult.ResultCode != 0)
+            {
+                return txResult;
+            }
+
+            var valuesAreFinite = double.IsFinite(rxHostHz)
+                && double.IsFinite(rxRfHz)
+                && double.IsFinite(txHostHz)
+                && double.IsFinite(txRfHz);
+            var requestedRateMatches = requestedRate is null
+                || requestedDirection switch
+                {
+                    LmsChannel.Rx => NearlyEqual(rxHostHz, requestedRate.Value),
+                    LmsChannel.Tx => NearlyEqual(txHostHz, requestedRate.Value),
+                    null => NearlyEqual(rxHostHz, requestedRate.Value)
+                        && NearlyEqual(txHostHz, requestedRate.Value),
+                    _ => false,
+                };
+
+            _logger.LogDebug(
+                "LMS sample-rate readback: source={SourceOperation} device={DeviceId} attempt={Attempt} requestedRateHz={RequestedRateHz} requestedDirection={RequestedDirection} rxHostHz={RxHostHz} rxRfHz={RxRfHz} txHostHz={TxHostHz} txRfHz={TxRfHz} finite={Finite} requestedRateMatches={RequestedRateMatches}",
+                sourceOperation,
+                DeviceId,
+                attempt,
+                requestedRate,
+                requestedDirection?.ToString() ?? "Both",
+                rxHostHz,
+                rxRfHz,
+                txHostHz,
+                txRfHz,
+                valuesAreFinite,
+                requestedRateMatches
+            );
+
+            if (!valuesAreFinite || !requestedRateMatches)
+            {
+                _logger.LogWarning(
+                    "Unexpected LMS sample-rate readback after successful native call: source={SourceOperation} device={DeviceId} finite={Finite} requestedRateMatches={RequestedRateMatches} requestedRateHz={RequestedRateHz} requestedDirection={RequestedDirection} rxHostHz={RxHostHz} rxRfHz={RxRfHz} txHostHz={TxHostHz} txRfHz={TxRfHz}",
+                    sourceOperation,
+                    DeviceId,
+                    valuesAreFinite,
+                    requestedRateMatches,
+                    requestedRate,
+                    requestedDirection?.ToString() ?? "Both",
+                    rxHostHz,
+                    rxRfHz,
+                    txHostHz,
+                    txRfHz
+                );
+            }
+
+            return null;
+        }
+
+        private static bool NearlyEqual(double actual, double expected)
+        {
+            if (!double.IsFinite(actual) || !double.IsFinite(expected))
+            {
+                return false;
+            }
+
+            return Math.Abs(actual - expected) <= Math.Max(1.0, Math.Abs(expected) * 0.001);
         }
 
         #endregion
@@ -603,6 +842,196 @@ namespace Asv.Sdr.LimeSdr
             if (resultCode != 0)
             {
                 throw new Exception($"Call {methodName} error: {limesdr_strerror()}");
+            }
+        }
+
+        private NativeOperationResult ExecuteNativeOperation(
+            string operation,
+            string details,
+            int attempt,
+            Func<int> nativeCall
+        )
+        {
+            using var scope = new NativeOperationScope(operation, DeviceId, details, attempt);
+            var stopwatch = Stopwatch.StartNew();
+            int resultCode;
+            try
+            {
+                resultCode = nativeCall();
+            }
+            catch (Exception e)
+            {
+                stopwatch.Stop();
+                _logger.LogError(
+                    e,
+                    "LMS native operation threw: operation={Operation} device={DeviceId} attempt={Attempt} elapsedMs={ElapsedMilliseconds} details={Details}",
+                    operation,
+                    DeviceId,
+                    attempt,
+                    stopwatch.Elapsed.TotalMilliseconds,
+                    details
+                );
+                throw;
+            }
+
+            stopwatch.Stop();
+            var nativeError = resultCode == 0 ? string.Empty : limesdr_strerror();
+            var operationResult = new NativeOperationResult(
+                operation,
+                details,
+                attempt,
+                resultCode,
+                nativeError,
+                stopwatch.Elapsed,
+                scope.CallbackErrorCount,
+                scope.CallbackWarningCount,
+                scope.PllPhaseSearchTimeoutCount
+            );
+
+            if (resultCode != 0)
+            {
+                _logger.LogWarning(
+                    "LMS native operation failed: operation={Operation} device={DeviceId} attempt={Attempt} resultCode={ResultCode} elapsedMs={ElapsedMilliseconds} callbackErrors={CallbackErrors} callbackWarnings={CallbackWarnings} pllPhaseTimeouts={PllPhaseTimeouts} nativeError={NativeError} details={Details}",
+                    operation,
+                    DeviceId,
+                    attempt,
+                    resultCode,
+                    stopwatch.Elapsed.TotalMilliseconds,
+                    scope.CallbackErrorCount,
+                    scope.CallbackWarningCount,
+                    scope.PllPhaseSearchTimeoutCount,
+                    nativeError,
+                    details
+                );
+            }
+            else if (scope.CallbackErrorCount != 0 || scope.PllPhaseSearchTimeoutCount != 0)
+            {
+                _logger.LogWarning(
+                    "LMS native operation recovered after transient native diagnostics: operation={Operation} device={DeviceId} attempt={Attempt} resultCode=0 elapsedMs={ElapsedMilliseconds} callbackErrors={CallbackErrors} callbackWarnings={CallbackWarnings} pllPhaseTimeouts={PllPhaseTimeouts} details={Details}",
+                    operation,
+                    DeviceId,
+                    attempt,
+                    stopwatch.Elapsed.TotalMilliseconds,
+                    scope.CallbackErrorCount,
+                    scope.CallbackWarningCount,
+                    scope.PllPhaseSearchTimeoutCount,
+                    details
+                );
+            }
+            else
+            {
+                _logger.LogDebug(
+                    "LMS native operation completed: operation={Operation} device={DeviceId} attempt={Attempt} resultCode=0 elapsedMs={ElapsedMilliseconds} callbackErrors={CallbackErrors} callbackWarnings={CallbackWarnings} pllPhaseTimeouts={PllPhaseTimeouts} details={Details}",
+                    operation,
+                    DeviceId,
+                    attempt,
+                    stopwatch.Elapsed.TotalMilliseconds,
+                    scope.CallbackErrorCount,
+                    scope.CallbackWarningCount,
+                    scope.PllPhaseSearchTimeoutCount,
+                    details
+                );
+            }
+
+            return operationResult;
+        }
+
+        private void LogRetry(NativeOperationResult failure, TimeSpan retryDelay)
+        {
+            _logger.LogWarning(
+                "Retrying LMS native operation after nonzero result: operation={Operation} device={DeviceId} completedAttempt={Attempt} resultCode={ResultCode} retryDelayMs={RetryDelayMilliseconds} nativeError={NativeError} details={Details}",
+                failure.Operation,
+                DeviceId,
+                failure.Attempt,
+                failure.ResultCode,
+                retryDelay.TotalMilliseconds,
+                failure.NativeError,
+                failure.Details
+            );
+        }
+
+        private Exception CreateNativeOperationException(NativeOperationResult failure)
+        {
+            return new Exception(
+                $"Call {failure.Operation} error for LimeSDR '{DeviceId}' "
+                    + $"after attempt {failure.Attempt} ({failure.Details}): {failure.NativeError}"
+            );
+        }
+
+        private readonly record struct DeviceInitializationAttempt(
+            IntPtr Device,
+            NativeOperationResult? Failure
+        );
+
+        private readonly record struct NativeOperationResult(
+            string Operation,
+            string Details,
+            int Attempt,
+            int ResultCode,
+            string NativeError,
+            TimeSpan Elapsed,
+            int CallbackErrorCount,
+            int CallbackWarningCount,
+            int PllPhaseSearchTimeoutCount
+        );
+
+        private sealed class NativeOperationScope : IDisposable
+        {
+            private readonly NativeOperationScope? _previous;
+            private int _callbackErrorCount;
+            private int _callbackWarningCount;
+            private int _pllPhaseSearchTimeoutCount;
+
+            public NativeOperationScope(
+                string operation,
+                string deviceId,
+                string details,
+                int attempt
+            )
+            {
+                Operation = operation;
+                DeviceId = deviceId;
+                Details = details;
+                Attempt = attempt;
+                _previous = CurrentNativeOperation.Value;
+                CurrentNativeOperation.Value = this;
+            }
+
+            public string Operation { get; }
+            public string DeviceId { get; }
+            public string Details { get; }
+            public int Attempt { get; }
+            public int CallbackErrorCount => Volatile.Read(ref _callbackErrorCount);
+            public int CallbackWarningCount => Volatile.Read(ref _callbackWarningCount);
+            public int PllPhaseSearchTimeoutCount => Volatile.Read(
+                ref _pllPhaseSearchTimeoutCount
+            );
+
+            public void Capture(LogLevel level, string message)
+            {
+                if (
+                    level is LogLevel.LOG_LEVEL_CRITICAL or LogLevel.LOG_LEVEL_ERROR
+                )
+                {
+                    Interlocked.Increment(ref _callbackErrorCount);
+                }
+                else if (level == LogLevel.LOG_LEVEL_WARNING)
+                {
+                    Interlocked.Increment(ref _callbackWarningCount);
+                }
+
+                if (LimeSdrNativeOperationPolicy.IsPllPhaseSearchTimeout(message))
+                {
+                    Interlocked.Increment(ref _pllPhaseSearchTimeoutCount);
+                }
+            }
+
+            public void Dispose()
+            {
+                if (ReferenceEquals(CurrentNativeOperation.Value, this))
+                {
+                    CurrentNativeOperation.Value = _previous;
+                }
             }
         }
 

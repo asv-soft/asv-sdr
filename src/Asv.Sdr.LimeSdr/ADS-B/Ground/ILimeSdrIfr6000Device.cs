@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Asv.Sdr.LimeSdr;
@@ -14,6 +15,8 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     
     // Mode A/C
     Task WriteDelayOffsetModeAC(double offset);
+    /// <summary>Reads a generation-guarded A/C batch, or an explicitly non-coherent legacy snapshot.</summary>
+    Task<Ifr6000ModeAcSnapshot> ReadModeAcSnapshot(CancellationToken cancel = default);
     Task<(float ModeA, float ModeC)> ReadReplyRatioModeAC();
 
     Task WriteP1P3SpacingOffset(float modeAOffset, float modeCOffset);
@@ -174,6 +177,14 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     /// </summary>
     /// <returns>DF11</returns>
     Task<ModeSDF11?> ReadDf11Squitter();
+
+    /// <summary>
+    /// Waits for a validated DF11 snapshot whose counter differs from the supplied baseline.
+    /// The FPGA slot is shared by unsolicited and intermode all-call DF11 messages.
+    /// Acquisition is bounded to 2.5 seconds, excluding lock acquisition and pending device I/O.
+    /// Freshness does not identify the interrogation that caused the received message.
+    /// </summary>
+    Task<ModeSDF11?> ReadDf11Squitter(byte counterBefore, CancellationToken cancel = default);
 
     Task<(byte Counter, float Period)> ReadDf11SquitterStatistics();
     
