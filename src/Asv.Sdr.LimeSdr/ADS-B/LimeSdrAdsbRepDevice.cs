@@ -18,6 +18,28 @@ public class LimeSdrDeviceConfig
     public double RxLevelOffset { get; set; }
     public uint TxLevelOffset { get; set; }
 
+    /// <summary>
+    /// Common IFR6000 RX/TX path loss in dB between the LimeSDR ports and the
+    /// measurement reference plane (attenuator, cables and adapters).
+    /// This is separate from the RX/TX gain calibration offsets.
+    /// </summary>
+    public double RfPathAttenuationDb
+    {
+        get => _rfPathAttenuationDb;
+        set
+        {
+            if (double.IsNaN(value) || double.IsInfinity(value) || value < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(RfPathAttenuationDb),
+                    value, "RF path attenuation must be finite and non-negative.");
+            }
+
+            _rfPathAttenuationDb = value;
+        }
+    }
+
+    private double _rfPathAttenuationDb = 0.0;
+
 }
 
 
