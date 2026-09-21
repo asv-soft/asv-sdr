@@ -15,7 +15,7 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     
     // Mode A/C
     Task WriteDelayOffsetModeAC(double offset);
-    /// <summary>Reads a generation-guarded A/C batch, or an explicitly non-coherent legacy snapshot.</summary>
+    /// <summary>Reads legacy A/C registers without generation or diagnostics registers; hardware atomicity is not guaranteed.</summary>
     Task<Ifr6000ModeAcSnapshot> ReadModeAcSnapshot(CancellationToken cancel = default);
     Task<(float ModeA, float ModeC)> ReadReplyRatioModeAC();
 

@@ -40,7 +40,7 @@ public sealed class Ifr6000ModeAcDiagnostics
     }
 }
 
-/// <summary>A/C measurements from one pair of 200-interrogation batches.</summary>
+/// <summary>A/C register measurements. Legacy snapshots do not guarantee a shared acquisition generation.</summary>
 public sealed class Ifr6000ModeAcSnapshot
 {
     internal const int RegisterCount = 10;

@@ -17,7 +17,6 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private double _delayOffsetAc = 0;
     private double _delayOffsetS = 0;
     private uint? _modeSExpectedIcao;
-    private bool _legacyModeAcSnapshotWarning;
     private const int DefaultDfPollIntervalMs = 10;
     private const int DefaultDfResponseTimeoutMs = 100;
     private const int UfSwitchSettleDelayMs = 12;
@@ -81,19 +80,6 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private const ushort DF_RX_CNT = 0x032E;                    // --RD -- DFxx_CNT(15:0)
     private const ushort ModeSExpectedIcao_23_16 = 0x032F;     // --WR -- expected ICAO[23:16] for FPGA timing filter
     private const ushort ModeSExpectedIcao_15_0 = 0x0330;      // --WR -- expected ICAO[15:0] for FPGA timing filter
-    private const ushort ModeAcSnapshotStatus = 0x0331;       // --RD -- ready[15], signature 0x2A[14:8], generation[7:0]
-    private const ushort ModeAcDiagnosticsSignature = 0x0332;  // --RD -- 0xAC01 when diagnostics are supported
-    private const ushort ModeAcRejectedA = 0x0333;             // --RD -- saturating rejected Mode A count
-    private const ushort ModeAcRejectedC = 0x0334;             // --RD -- saturating rejected Mode C count
-    private const ushort ModeAcAbortedA = 0x0335;              // --RD -- saturating aborted Mode A count
-    private const ushort ModeAcAbortedC = 0x0336;              // --RD -- saturating aborted Mode C count
-    private const ushort ModeAcOverrun = 0x0337;               // --RD -- saturating receive overrun count
-    private const ushort ModeAcConservativeIntervals = 0x0338; // --RD -- saturating conservative interval assignments
-    private static readonly ushort[] ModeAcDiagnosticsRegisters =
-    [
-        ModeAcDiagnosticsSignature, ModeAcRejectedA, ModeAcRejectedC, ModeAcAbortedA,
-        ModeAcAbortedC, ModeAcOverrun, ModeAcConservativeIntervals,
-    ];
     private static readonly ushort[] ModeAcSnapshotRegisters =
     [
         ModeAResp_15_0_InternAddr, ModeCResp_15_0_InternAddr, ReplyRatio_A_15_8_C_7_0_InternAddr,
@@ -298,54 +284,21 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         var readCancel = linked.Token;
         var startedAt = Environment.TickCount64;
         var words = new ushort[Ifr6000ModeAcSnapshot.RegisterCount];
-        var diagnosticWords = new ushort[Ifr6000ModeAcDiagnostics.RegisterCount];
-        do
+        // The current FPGA exposes only legacy A/C registers; do not probe 0x0331..0x0338.
+        // The host lock protects register selection, not the acquisition generation.
+        // Do not use global HOLD: the shared BDS RAM writer can continue while HOLD suppresses writes.
+        await AtomicEditRegister(edit =>
         {
-            ushort before = 0, after = 0;
-            // Do not use global HOLD: the shared BDS RAM writer can continue while HOLD suppresses writes.
-            await AtomicEditRegister(edit =>
+            for (var i = 0; i < words.Length; i++)
             {
-                before = ReadCustomRegister(edit, ModeAcSnapshotStatus);
-                for (var i = 0; i < words.Length; i++)
-                {
-                    readCancel.ThrowIfCancellationRequested();
-                    words[i] = ReadCustomRegister(edit, ModeAcSnapshotRegisters[i]);
-                }
-                for (var i = 0; i < diagnosticWords.Length; i++)
-                {
-                    readCancel.ThrowIfCancellationRequested();
-                    diagnosticWords[i] = ReadCustomRegister(edit, ModeAcDiagnosticsRegisters[i]);
-                }
-                after = ReadCustomRegister(edit, ModeAcSnapshotStatus);
-            }, readCancel).ConfigureAwait(false);
-            readCancel.ThrowIfCancellationRequested();
-            var raw = string.Join(" ", Array.ConvertAll(words, word => word.ToString("X4")));
-            var diagnosticRaw = string.Join(" ", Array.ConvertAll(diagnosticWords, word => word.ToString("X4")));
-            var diagnostics = Ifr6000ModeAcDiagnostics.Decode(diagnosticWords);
-            var diagnosticsLog = diagnostics is null
-                ? $"diagSignature={diagnosticWords[0]:X4} diagSupported=False diagRaw={diagnosticRaw}"
-                : $"diagSignature={diagnostics.SchemaSignature:X4} diagSupported=True " +
-                  $"diagRejectedA={diagnostics.RejectedModeACount} diagRejectedC={diagnostics.RejectedModeCCount} " +
-                  $"diagAbortedA={diagnostics.AbortedModeACount} diagAbortedC={diagnostics.AbortedModeCCount} " +
-                  $"diagOverrun={diagnostics.OverrunCount} " +
-                  $"diagConservativeIntervals={diagnostics.ConservativeIntervalAssignmentCount} diagRaw={diagnosticRaw}";
-            if (before == 0 && after == 0)
-            {
-                if (!_legacyModeAcSnapshotWarning)
-                {
-                    _legacyModeAcSnapshotWarning = true;
-                    _logger.ZLogWarning($"A/C snapshot generation is not supported by FPGA; legacy timing reads are not coherent");
-                }
-                _logger.ZLogDebug($"A/C snapshot coherent=False status={before:X4}->{after:X4} raw={raw} reason=legacy elapsedMs={Environment.TickCount64 - startedAt} generation=none {diagnosticsLog}");
-                return Ifr6000ModeAcSnapshot.DecodeLegacy(words, _delayOffsetAc);
+                readCancel.ThrowIfCancellationRequested();
+                words[i] = ReadCustomRegister(edit, ModeAcSnapshotRegisters[i]);
             }
-            var accepted = Ifr6000ModeAcSnapshot.TryDecode(before, words, after, _delayOffsetAc,
-                out var snapshot, out var reason, diagnostics);
-            _logger.ZLogDebug($"A/C snapshot coherent={accepted} status={before:X4}->{after:X4} raw={raw} reason={reason} elapsedMs={Environment.TickCount64 - startedAt} generation={(byte)before}->{(byte)after} {diagnosticsLog}");
-            if (accepted) return snapshot!;
-            await Task.Delay(20, readCancel).ConfigureAwait(false);
-        } while (Environment.TickCount64 - startedAt < 6000);
-        throw new TimeoutException("A/C FPGA snapshot did not become ready and generation-consistent within 6000 ms.");
+        }, readCancel).ConfigureAwait(false);
+        readCancel.ThrowIfCancellationRequested();
+        var raw = string.Join(" ", Array.ConvertAll(words, word => word.ToString("X4")));
+        _logger.ZLogDebug($"A/C snapshot coherent=False raw={raw} reason=legacy elapsedMs={Environment.TickCount64 - startedAt} generation=none");
+        return Ifr6000ModeAcSnapshot.DecodeLegacy(words, _delayOffsetAc);
     }
 
     public Task WriteP1P3SpacingOffset(float modeAOffset, float modeCOffset)
