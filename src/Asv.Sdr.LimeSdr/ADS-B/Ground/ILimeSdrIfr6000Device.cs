@@ -6,6 +6,7 @@ namespace Asv.Sdr.LimeSdr;
 
 public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
 {
+    Ifr6000MeasurementProfile MeasurementProfile { get; }
 
     Task<bool> IsTurnOn();
     Task TurnOn();

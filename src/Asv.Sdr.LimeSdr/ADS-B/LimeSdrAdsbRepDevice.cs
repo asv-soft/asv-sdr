@@ -18,6 +18,9 @@ public class LimeSdrDeviceConfig
     public double RxLevelOffset { get; set; }
     public uint TxLevelOffset { get; set; }
 
+    /// <summary>Host interpretation of IFR6000 FPGA batches; must match the installed firmware.</summary>
+    public Ifr6000MeasurementProfile Ifr6000Measurement { get; set; } = new();
+
     /// <summary>
     /// Common IFR6000 RX/TX path loss in dB between the LimeSDR ports and the
     /// measurement reference plane (attenuator, cables and adapters).

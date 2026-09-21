@@ -25,7 +25,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private const ushort ModeAResp_15_0_InternAddr          = 0x0301; // (0,0,С1,А1,С2,А2,С4,А4,Х,В1,D1,В2,D2,В4,D4,SPI) -- RD
     private const ushort ModeCResp_15_0_InternAddr          = 0x0302; // (0,0,С1,А1,С2,А2,С4,А4,Х,В1,D1,В2,D2,В4,D4,0) -- RD
     private const ushort DelayOffsetAC_15_0_InternAddr      = 0x0303; // калибровочный коэффициент по дальности принятых сообщений A/C, signed -- WR
-    private const ushort ReplyRatio_A_15_8_C_7_0_InternAddr = 0x0304; // процент ответов A/C	(по 0,5% т.е. количество ответов на 200 запросов) -- RD
+    private const ushort ReplyRatio_A_15_8_C_7_0_InternAddr = 0x0304; // Raw A/C reply counts for the configured FPGA batch size -- RD
     
     private const ushort P1_P3_SpacingOffset_A_15_8_C_7_0_InternAddr = 0x0305; // Отклонение от кодового расстояния 8/21 мкс кода A/C для запросов, signed, в тактах, один такт 0,025 мкс  -- WR
     
@@ -207,10 +207,24 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     
     
     
-    public LimeSdrIfr6000Device(string deviceId, LimeSdrDeviceConfig config, ILogger? logger = null) : base(deviceId, logger)
+    public LimeSdrIfr6000Device(string deviceId, LimeSdrDeviceConfig config, ILogger? logger = null)
+        : base(ValidateConfiguration(deviceId, config), logger)
     {
         _config = config;
+        MeasurementProfile = config.Ifr6000Measurement;
         _logger = logger ?? NullLogger.Instance;
+    }
+
+    public Ifr6000MeasurementProfile MeasurementProfile { get; }
+
+    private static string ValidateConfiguration(string deviceId, LimeSdrDeviceConfig config)
+    {
+        // Reject invalid profiles before the base constructor opens a native device.
+        ArgumentNullException.ThrowIfNull(config);
+        var profile = config.Ifr6000Measurement
+            ?? throw new ArgumentException("An IFR6000 measurement profile is required.", nameof(config));
+        profile.Validate();
+        return deviceId;
     }
 
 
@@ -275,7 +289,8 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     public async Task<(float ModeA, float ModeC)> ReadReplyRatioModeAC()
     {
         var rRatio = await ReadCustomRegister(ReplyRatio_A_15_8_C_7_0_InternAddr, DisposeCancel).ConfigureAwait(false);
-        return (ModeA: (rRatio >> 8) * 0.5f, ModeC: (rRatio & 0xFF) * 0.5f);
+        return (ModeA: MeasurementProfile.ToReplyRatioPercent(rRatio >> 8),
+            ModeC: MeasurementProfile.ToReplyRatioPercent(rRatio & 0xFF));
     }
 
     public async Task<Ifr6000ModeAcSnapshot> ReadModeAcSnapshot(CancellationToken cancel = default)
@@ -298,7 +313,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         readCancel.ThrowIfCancellationRequested();
         var raw = string.Join(" ", Array.ConvertAll(words, word => word.ToString("X4")));
         _logger.ZLogDebug($"A/C snapshot coherent=False raw={raw} reason=legacy elapsedMs={Environment.TickCount64 - startedAt} generation=none");
-        return Ifr6000ModeAcSnapshot.DecodeLegacy(words, _delayOffsetAc);
+        return Ifr6000ModeAcSnapshot.DecodeLegacy(words, _delayOffsetAc, MeasurementProfile);
     }
 
     public Task WriteP1P3SpacingOffset(float modeAOffset, float modeCOffset)
@@ -946,7 +961,8 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
 
     public async Task<float> ReadReplyRatioModeS()
     {
-        return (await ReadCustomRegister(ReplyRatioS_7_0).ConfigureAwait(false) & 0xFF) * 0.5f;
+        var receivedCount = await ReadCustomRegister(ReplyRatioS_7_0).ConfigureAwait(false) & 0xFF;
+        return MeasurementProfile.ToReplyRatioPercent(receivedCount);
     }
 
     public async Task<ushort> ReadSelectiveDfCounter()

@@ -49,7 +49,7 @@ public sealed class Ifr6000ModeAcSnapshot
     private const ushort ReadyMask = 0x8000;
 
     private Ifr6000ModeAcSnapshot(ReadOnlySpan<ushort> registers, byte? generation,
-        double delayOffsetUs, Ifr6000ModeAcDiagnostics? diagnostics)
+        double delayOffsetUs, Ifr6000ModeAcDiagnostics? diagnostics, Ifr6000MeasurementProfile profile)
     {
         IsCoherent = generation.HasValue;
         Generation = generation;
@@ -58,7 +58,7 @@ public sealed class Ifr6000ModeAcSnapshot
         RawModeC = registers[1];
         var modeAReplyCount = registers[2] >> 8;
         var modeCReplyCount = registers[2] & 0xFF;
-        ReplyRatio = (modeAReplyCount * 0.5f, modeCReplyCount * 0.5f);
+        ReplyRatio = (profile.ToReplyRatioPercent(modeAReplyCount), profile.ToReplyRatioPercent(modeCReplyCount));
         ModeA = ModeAcReplyDecoder.DecodeSquawk(RawModeA);
         ModeCAltitude = ModeAcReplyDecoder.DecodeAltitude(RawModeC);
         ModeAPulseWidth = DecodeWidths(registers[3]);
@@ -108,24 +108,27 @@ public sealed class Ifr6000ModeAcSnapshot
 
     internal static bool TryDecode(ushort before, ReadOnlySpan<ushort> registers, ushort after,
         double delayOffsetUs, out Ifr6000ModeAcSnapshot? snapshot, out string reason,
-        Ifr6000ModeAcDiagnostics? diagnostics = null)
+        Ifr6000ModeAcDiagnostics? diagnostics = null, Ifr6000MeasurementProfile? profile = null)
     {
         snapshot = null;
         if (registers.Length != RegisterCount) { reason = "register-count"; return false; }
         if (!IsSupported(before) || !IsSupported(after)) { reason = "unsupported"; return false; }
         if ((before & ReadyMask) == 0 || (after & ReadyMask) == 0) { reason = "not-ready"; return false; }
         if (before != after) { reason = "generation-changed"; return false; }
-        snapshot = new Ifr6000ModeAcSnapshot(registers, (byte)before, delayOffsetUs, diagnostics);
+        snapshot = new Ifr6000ModeAcSnapshot(registers, (byte)before, delayOffsetUs, diagnostics,
+            profile ?? Ifr6000MeasurementProfile.Default);
         // Preserve impossible raw counts as evidence; never clamp to a plausible percentage.
         reason = snapshot.ReplyRatio.ModeA > 100 || snapshot.ReplyRatio.ModeC > 100
             ? "count-out-of-range" : "accepted";
         return true;
     }
 
-    internal static Ifr6000ModeAcSnapshot DecodeLegacy(ReadOnlySpan<ushort> registers, double delayOffsetUs)
+    internal static Ifr6000ModeAcSnapshot DecodeLegacy(ReadOnlySpan<ushort> registers, double delayOffsetUs,
+        Ifr6000MeasurementProfile? profile = null)
     {
         if (registers.Length != RegisterCount) throw new ArgumentException("Expected ten A/C registers.", nameof(registers));
-        return new Ifr6000ModeAcSnapshot(registers, null, delayOffsetUs, null);
+        return new Ifr6000ModeAcSnapshot(registers, null, delayOffsetUs, null,
+            profile ?? Ifr6000MeasurementProfile.Default);
     }
 
     private static (float F1, float F2) DecodeWidths(ushort word) => ((word >> 8) * 0.025f, (word & 0xFF) * 0.025f);
