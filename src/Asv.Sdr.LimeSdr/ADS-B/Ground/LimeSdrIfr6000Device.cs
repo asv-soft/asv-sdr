@@ -207,23 +207,24 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     
     
     
-    public LimeSdrIfr6000Device(string deviceId, LimeSdrDeviceConfig config, ILogger? logger = null)
-        : base(ValidateConfiguration(deviceId, config), logger)
+    public LimeSdrIfr6000Device(string deviceId, LimeSdrDeviceConfig config,
+        Ifr6000MeasurementProfile measurementProfile, ILogger? logger = null)
+        : base(ValidateConfiguration(deviceId, config, measurementProfile), logger)
     {
         _config = config;
-        MeasurementProfile = config.Ifr6000Measurement;
+        MeasurementProfile = measurementProfile;
         _logger = logger ?? NullLogger.Instance;
     }
 
     public Ifr6000MeasurementProfile MeasurementProfile { get; }
 
-    private static string ValidateConfiguration(string deviceId, LimeSdrDeviceConfig config)
+    private static string ValidateConfiguration(string deviceId, LimeSdrDeviceConfig config,
+        Ifr6000MeasurementProfile measurementProfile)
     {
         // Reject invalid profiles before the base constructor opens a native device.
         ArgumentNullException.ThrowIfNull(config);
-        var profile = config.Ifr6000Measurement
-            ?? throw new ArgumentException("An IFR6000 measurement profile is required.", nameof(config));
-        profile.Validate();
+        ArgumentNullException.ThrowIfNull(measurementProfile);
+        measurementProfile.Validate();
         return deviceId;
     }
 
