@@ -361,7 +361,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
 
     public async Task<float> ReadModeSReplyDelay()
     {
-        var reg = 5120 + (short)await ReadCustomRegister(ReplyDelayS, DisposeCancel).ConfigureAwait(false);
+        var reg = /* 5120 */ + (short)await ReadCustomRegister(ReplyDelayS, DisposeCancel).ConfigureAwait(false);
         return reg * 0.025f + (float)_delayOffsetS;
     }
 
@@ -397,13 +397,13 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
 
     public async Task<float> ReadModeAReplyDelay()
     {
-        var reg = 120 + (short)await ReadCustomRegister(Reply_Delay_A_15_0, DisposeCancel).ConfigureAwait(false);
+        var reg = /* 120 */ + (short)await ReadCustomRegister(Reply_Delay_A_15_0, DisposeCancel).ConfigureAwait(false);
         return reg * 0.025f + (float)_delayOffsetAc;
     }
     
     public async Task<float> ReadModeCReplyDelay()
     {
-        var reg = 120 + (short)await ReadCustomRegister(Reply_Delay_C_15_0, DisposeCancel).ConfigureAwait(false);
+        var reg = /* 120 */ + (short)await ReadCustomRegister(Reply_Delay_C_15_0, DisposeCancel).ConfigureAwait(false);
         return reg * 0.025f + (float)_delayOffsetAc;
     }
 

@@ -64,9 +64,9 @@ public sealed class Ifr6000ModeAcSnapshot
         ModeAPulseWidth = DecodeWidths(registers[3]);
         ModeCPulseWidth = DecodeWidths(registers[4]);
         PulseSpacing = ((sbyte)(registers[5] >> 8) * 0.025f, (sbyte)registers[5] * 0.025f);
-        ModeAReplyDelay = (120 + (short)registers[6]) * 0.025f + (float)delayOffsetUs;
+        ModeAReplyDelay = (/* 120 */ + (short)registers[6]) * 0.025f + (float)delayOffsetUs;
         ModeAReplyJitter = registers[7] * 0.025f;
-        ModeCReplyDelay = (120 + (short)registers[8]) * 0.025f + (float)delayOffsetUs;
+        ModeCReplyDelay = (/* 120 */ + (short)registers[8]) * 0.025f + (float)delayOffsetUs;
         ModeCReplyJitter = registers[9] * 0.025f;
         // A zero reply count means there is no timing measurement, not a zero-jitter PASS.
         if (modeAReplyCount == 0)
