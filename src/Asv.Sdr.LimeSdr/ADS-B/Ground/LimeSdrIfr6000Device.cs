@@ -77,9 +77,12 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private const ushort BDS_65_Air_CNT_Period_15_0 = 0x032B;  // --RD -- BDS_65_Air_CNT(7:0) & BDS_65_Air_Period(7:0)
     private const ushort BDS_65_Sur_CNT_Period_15_0 = 0x032C;  // --RD -- BDS_65_Sur_CNT(7:0) & BDS_65_Sur_Period(7:0)
     private const ushort DF11_SKW_CNT_Period_15_0 = 0x032D;    // --RD -- DF11_SKW_CNT(7:0) & DF11_SKW_Period(7:0)
-    private const ushort DF_RX_CNT = 0x032E;                    // --RD -- DFxx_CNT(15:0)
+    private const ushort DF_RX_CNT = 0x032E;                   // --RD -- DFxx_CNT(15:0)
     private const ushort ModeSExpectedIcao_23_16 = 0x032F;     // --WR -- expected ICAO[23:16] for FPGA timing filter
     private const ushort ModeSExpectedIcao_15_0 = 0x0330;      // --WR -- expected ICAO[15:0] for FPGA timing filter
+    private const ushort ModeAcWindowOffset_15_0 = 0x0331;      // --WR -- Window Offset for Mode A/C [15:0]
+    private const ushort ModeSWindowOffset_15_0 = 0x0332;       // --WR -- Window Offset for Mode A/C [15:0]
+    
     private static readonly ushort[] ModeAcSnapshotRegisters =
     [
         ModeAResp_15_0_InternAddr, ModeCResp_15_0_InternAddr, ReplyRatio_A_15_8_C_7_0_InternAddr,
@@ -345,6 +348,14 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         await WriteCustomRegister(ModeA_C_Control, reg, DisposeCancel).ConfigureAwait(false);
     }
 
+    public Task SetModeAcWindowOffset(double offsetUs)
+    {
+        if (offsetUs < -3.0) offsetUs = -3.0;
+        if (offsetUs > 256.0) offsetUs = 256.0;
+        var reg = (ushort)(short)(offsetUs * 40);
+        return WriteCustomRegister(ModeAcWindowOffset_15_0, reg, DisposeCancel);
+    }
+
     public Task WriteDelayOffsetModeS(double offset)
     {
         _delayOffsetS = offset;
@@ -369,6 +380,14 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     {
         var reg = await ReadCustomRegister(ReplyJitterS, DisposeCancel).ConfigureAwait(false);
         return reg * 0.025f;
+    }
+
+    public Task SetModeSWindowOffset(double offsetUs)
+    {
+        if (offsetUs < -128.0) offsetUs = -128.0;
+        if (offsetUs > 256.0) offsetUs = 256.0;
+        var reg = (ushort)(short)Math.Round(offsetUs * 40);
+        return WriteCustomRegister(ModeSWindowOffset_15_0, reg, DisposeCancel);
     }
 
     public async Task<(float F1, float F2)> ReadModeAPulseWidth()

@@ -33,6 +33,7 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     
     Task<(string Squawk, bool Spi)> ReadModeASquawkCode();
     Task<int> ReadModeCAltitude();
+    Task SetModeAcWindowOffset(double offsetUs);
     
     
     // Mode S
@@ -41,6 +42,7 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     Task WriteModeSControl(bool modeSP5SlsPulseEn, bool modeSP5SlsPulseAtt);
     Task<float> ReadModeSReplyDelay();
     Task<float> ReadModeSReplyJitter();
+    Task SetModeSWindowOffset(double offsetUs);
     Task<bool> WriteUfMessage(ModeSUFormatBase msg);
     Task<ModeSDFormatBase?> ReadDfMessage(Func<ModeSDFormatBase> factory, int attempts = 3);
     Task<ModeSDFormatBase?> ReadDfMessage(ModeSUFormatBase reqMsg, Func<ModeSDFormatBase> respFactory, int attempts = 3);
