@@ -80,8 +80,8 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private const ushort DF_RX_CNT = 0x032E;                   // --RD -- DFxx_CNT(15:0)
     private const ushort ModeSExpectedIcao_23_16 = 0x032F;     // --WR -- expected ICAO[23:16] for FPGA timing filter
     private const ushort ModeSExpectedIcao_15_0 = 0x0330;      // --WR -- expected ICAO[15:0] for FPGA timing filter
-    private const ushort ModeAcWindowOffset_15_0 = 0x0331;      // --WR -- Window Offset for Mode A/C [15:0]
-    private const ushort ModeSWindowOffset_15_0 = 0x0332;       // --WR -- Window Offset for Mode A/C [15:0]
+    // private const ushort ModeAcWindowOffset_15_0 = 0x0331;      // --WR -- Window Offset for Mode A/C [15:0]
+    private const ushort ModeSWindowOffset_15_0 = 0x0331;       // --WR -- Window Offset for Mode A/C [15:0]
     
     private static readonly ushort[] ModeAcSnapshotRegisters =
     [
@@ -348,13 +348,13 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         await WriteCustomRegister(ModeA_C_Control, reg, DisposeCancel).ConfigureAwait(false);
     }
 
-    public Task SetModeAcWindowOffset(double offsetUs)
-    {
-        if (offsetUs < -3.0) offsetUs = -3.0;
-        if (offsetUs > 256.0) offsetUs = 256.0;
-        var reg = (ushort)(short)(offsetUs * 40);
-        return WriteCustomRegister(ModeAcWindowOffset_15_0, reg, DisposeCancel);
-    }
+    // public Task SetModeAcWindowOffset(double offsetUs)
+    // {
+    //     if (offsetUs < -3.0) offsetUs = -3.0;
+    //     if (offsetUs > 256.0) offsetUs = 256.0;
+    //     var reg = (ushort)(short)(offsetUs * 40);
+    //     return WriteCustomRegister(ModeAcWindowOffset_15_0, reg, DisposeCancel);
+    // }
 
     public Task WriteDelayOffsetModeS(double offset)
     {

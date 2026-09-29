@@ -33,7 +33,7 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     
     Task<(string Squawk, bool Spi)> ReadModeASquawkCode();
     Task<int> ReadModeCAltitude();
-    Task SetModeAcWindowOffset(double offsetUs);
+    // Task SetModeAcWindowOffset(double offsetUs);
     
     
     // Mode S
