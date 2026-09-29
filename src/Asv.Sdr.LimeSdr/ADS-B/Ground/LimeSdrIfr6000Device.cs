@@ -409,8 +409,8 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     public async Task<(float ModeA, float ModeC)> ReadModeACPulseSpacing()
     {
         var reg = await ReadCustomRegister(F1_F2_Spacing_A_15_8_C_7_0, DisposeCancel).ConfigureAwait(false);
-        var a = (sbyte)(reg >> 8) * 0.025f;
-        var c = (sbyte)(reg & 0xFF) * 0.025f;
+        var a = 20.3f + (sbyte)(reg >> 8) * 0.025f;
+        var c = 20.3f + (sbyte)(reg & 0xFF) * 0.025f;
         return (a, c);
     }
 
