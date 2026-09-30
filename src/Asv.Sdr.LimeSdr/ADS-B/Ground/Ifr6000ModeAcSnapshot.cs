@@ -63,7 +63,7 @@ public sealed class Ifr6000ModeAcSnapshot
         ModeCAltitude = ModeAcReplyDecoder.DecodeAltitude(RawModeC);
         ModeAPulseWidth = DecodeWidths(registers[3]);
         ModeCPulseWidth = DecodeWidths(registers[4]);
-        PulseSpacing = ((sbyte)(registers[5] >> 8) * 0.025f, (sbyte)registers[5] * 0.025f);
+        PulseSpacing = (20.3f + (sbyte)(byte)(registers[5] >> 8) * 0.025f, 20.3f + (sbyte)(byte)(registers[5] & 0xFF) * 0.025f);
         ModeAReplyDelay = (/* 120 */ + (short)registers[6]) * 0.025f + (float)delayOffsetUs;
         ModeAReplyJitter = registers[7] * 0.025f;
         ModeCReplyDelay = (/* 120 */ + (short)registers[8]) * 0.025f + (float)delayOffsetUs;

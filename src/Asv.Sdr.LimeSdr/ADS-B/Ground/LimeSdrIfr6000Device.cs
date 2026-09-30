@@ -302,18 +302,11 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancel, DisposeCancel);
         var readCancel = linked.Token;
         var startedAt = Environment.TickCount64;
-        var words = new ushort[Ifr6000ModeAcSnapshot.RegisterCount];
+        
         // The current FPGA exposes only legacy A/C registers; do not probe 0x0331..0x0338.
         // The host lock protects register selection, not the acquisition generation.
         // Do not use global HOLD: the shared BDS RAM writer can continue while HOLD suppresses writes.
-        await AtomicEditRegister(edit =>
-        {
-            for (var i = 0; i < words.Length; i++)
-            {
-                readCancel.ThrowIfCancellationRequested();
-                words[i] = ReadCustomRegister(edit, ModeAcSnapshotRegisters[i]);
-            }
-        }, readCancel).ConfigureAwait(false);
+        var words = await ReadCustomRegistersFrame(ModeAcSnapshotRegisters, readCancel).ConfigureAwait(false);
         readCancel.ThrowIfCancellationRequested();
         var raw = string.Join(" ", Array.ConvertAll(words, word => word.ToString("X4")));
         _logger.ZLogDebug($"A/C snapshot coherent=False raw={raw} reason=legacy elapsedMs={Environment.TickCount64 - startedAt} generation=none");

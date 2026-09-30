@@ -180,6 +180,7 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
         {
             foreach (var addressValuePair in addressValuePairs)
             {
+                cancel.ThrowIfCancellationRequested();
                 WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
             }
             edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 1);
@@ -197,6 +198,7 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
                 SetIsHoldingFrame(edit, true);
                 for (var i = 0; i < result.Length; i++)
                 {
+                    cancel.ThrowIfCancellationRequested();
                     result[i] = ReadCustomRegister(edit, address[i]);
                 }
             }
