@@ -532,12 +532,13 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         return frame;
     }
 
-    public async Task<ModeSDFormatBase?> ReadDfMessage(Func<ModeSDFormatBase> factory, int attempts = 3)
+    public async Task<ModeSDFormatBase?> ReadDfMessage(Func<ModeSDFormatBase> factory,
+        int attempts = ILimeSdrIfr6000Device.DefaultDfReadAttempts)
     {
         await _dfRequestLock.WaitAsync(DisposeCancel).ConfigureAwait(false);
         try
         {
-            return await InternalReadDfMessage(factory, GetDfResponseTimeoutFromAttempts(attempts)).ConfigureAwait(false);
+            return await InternalReadDfMessage(factory, attempts: attempts).ConfigureAwait(false);
         }
         finally
         {
@@ -546,7 +547,8 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     }
 
     private async Task<T?> InternalReadDfMessage<T>(Func<T> factory, int timeoutMs = DefaultDfResponseTimeoutMs,
-        int pollIntervalMs = DefaultDfPollIntervalMs, ushort? counterBefore = null, Func<T, bool>? isValid = null)
+        int pollIntervalMs = DefaultDfPollIntervalMs, ushort? counterBefore = null, Func<T, bool>? isValid = null,
+        int? attempts = null)
         where T : ModeSDFormatBase
     {
         var length = factory().GetByteSize();
@@ -559,9 +561,9 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         }
         addrFrame[^1] = DF_RX_CNT;
 
-        var timeoutAt = Environment.TickCount64 + Math.Max(1, timeoutMs);
+        var budget = new Ifr6000DfReadBudget(Environment.TickCount64, timeoutMs, attempts);
         var lastCounter = counterBefore;
-        do
+        while (budget.TryBeginRead(Environment.TickCount64))
         {
             try
             {
@@ -573,6 +575,9 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
                 var valueFrame = await ReadCustomRegistersFrame(addrFrame, DisposeCancel).ConfigureAwait(false);
                 var counterAtStart = valueFrame[0];
                 var counterAtEnd = valueFrame[^1];
+                _logger.ZLogDebug(
+                    $"Mode S DF read attempt={budget.ReadsStarted} dfCnt={counterAtStart}->{counterAtEnd} baseline={lastCounter} raw={Convert.ToHexString(ConvertRegisterFrameToBytes(valueFrame.AsSpan(1, dfRegisterCount).ToArray(), length))}"
+                );
                 if (counterAtStart != counterAtEnd)
                 {
                     _logger.ZLogDebug(
@@ -612,7 +617,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
             {
                 // ignore
             }
-        } while (Environment.TickCount64 < timeoutAt);
+        }
 
         return null;
     }
@@ -635,7 +640,8 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         _logger.ZLogInformation($"Mode S timing filter ICAO updated icao={icao:X6}");
     }
 
-    public async Task<ModeSDFormatBase?> ReadDfMessage(ModeSUFormatBase reqMsg, Func<ModeSDFormatBase> respFactory, int attempts = 3)
+    public async Task<ModeSDFormatBase?> ReadDfMessage(ModeSUFormatBase reqMsg, Func<ModeSDFormatBase> respFactory,
+        int attempts = ILimeSdrIfr6000Device.DefaultDfReadAttempts)
     {
         await _dfRequestLock.WaitAsync(DisposeCancel).ConfigureAwait(false);
         try
@@ -646,8 +652,8 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
                 return null;
             }
 
-            return await InternalReadDfMessage(respFactory, GetDfResponseTimeoutFromAttempts(attempts),
-                counterBefore: writeResult.CounterBefore).ConfigureAwait(false);
+            return await InternalReadDfMessage(respFactory,
+                counterBefore: writeResult.CounterBefore, attempts: attempts).ConfigureAwait(false);
         }
         finally
         {
@@ -656,7 +662,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     }
     
     private async Task<T?> RequestDfMessage<T>(ModeSUFormatBase reqMsg, Func<T> respFactory,
-        Func<T, bool>? isValid = null, int timeoutMs = DefaultDfResponseTimeoutMs)
+        Func<T, bool>? isValid = null, int attempts = ILimeSdrIfr6000Device.DefaultDfReadAttempts)
         where T : ModeSDFormatBase
     {
         await _dfRequestLock.WaitAsync(DisposeCancel).ConfigureAwait(false);
@@ -670,9 +676,9 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
 
             return await InternalReadDfMessage(
                 respFactory,
-                timeoutMs,
                 counterBefore: writeResult.CounterBefore,
-                isValid: msg => isValid?.Invoke(msg) != false).ConfigureAwait(false);
+                isValid: msg => isValid?.Invoke(msg) != false,
+                attempts: attempts).ConfigureAwait(false);
         }
         finally
         {
@@ -681,7 +687,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     }
 
     private async Task<T?> RequestDfMessage<T>(ModeSUFormatBase reqMsg, Func<T> respFactory, uint expectedIcao,
-        Func<T, bool>? isValid = null, int timeoutMs = DefaultDfResponseTimeoutMs)
+        Func<T, bool>? isValid = null, int attempts = ILimeSdrIfr6000Device.DefaultDfReadAttempts)
         where T : ModeSDFormatBase
     {
         await _dfRequestLock.WaitAsync(DisposeCancel).ConfigureAwait(false);
@@ -695,19 +701,14 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
 
             return await InternalReadDfMessage(
                 respFactory,
-                timeoutMs,
                 counterBefore: writeResult.CounterBefore,
-                isValid: msg => msg.IcaoAddress == expectedIcao && isValid?.Invoke(msg) != false).ConfigureAwait(false);
+                isValid: msg => msg.IcaoAddress == expectedIcao && isValid?.Invoke(msg) != false,
+                attempts: attempts).ConfigureAwait(false);
         }
         finally
         {
             _dfRequestLock.Release();
         }
-    }
-
-    private static int GetDfResponseTimeoutFromAttempts(int attempts)
-    {
-        return Math.Max(1, attempts) * DefaultDfPollIntervalMs;
     }
 
     public async Task<(byte Counter, float Period)> ReadDf11SquitterStatistics()

@@ -6,6 +6,8 @@ namespace Asv.Sdr.LimeSdr;
 
 public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
 {
+    const int DefaultDfReadAttempts = 10;
+
     Ifr6000MeasurementProfile MeasurementProfile { get; }
 
     Task<bool> IsTurnOn();
@@ -44,15 +46,15 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     Task<float> ReadModeSReplyJitter();
     Task SetModeSWindowOffset(double offsetUs);
     Task<bool> WriteUfMessage(ModeSUFormatBase msg);
-    Task<ModeSDFormatBase?> ReadDfMessage(Func<ModeSDFormatBase> factory, int attempts = 3);
-    Task<ModeSDFormatBase?> ReadDfMessage(ModeSUFormatBase reqMsg, Func<ModeSDFormatBase> respFactory, int attempts = 3);
+    Task<ModeSDFormatBase?> ReadDfMessage(Func<ModeSDFormatBase> factory, int attempts = DefaultDfReadAttempts);
+    Task<ModeSDFormatBase?> ReadDfMessage(ModeSUFormatBase reqMsg, Func<ModeSDFormatBase> respFactory, int attempts = DefaultDfReadAttempts);
     
     Task<float> ReadReplyRatioModeS();
 
     /// <summary>
-    /// Reads the selective Mode S downlink frame receive counter.
+    /// Reads the main Mode S downlink candidate counter, not a validity indicator.
     /// </summary>
-    /// <returns>16-bit counter incremented by the device when a selective DF response is received.</returns>
+    /// <returns>16-bit counter incremented when the FPGA stores a DF candidate, including wrong-format or bad-CRC frames.</returns>
     Task<ushort> ReadSelectiveDfCounter();
 
     /// <summary>
