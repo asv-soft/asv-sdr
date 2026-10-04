@@ -43,5 +43,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Asv.Sdr\Asv.Sdr.csproj" />
+    <InternalsVisibleTo Include="Asv.Sdr.LimeSdr.Tests" />
   </ItemGroup>
 </Project>

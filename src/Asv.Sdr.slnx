@@ -19,6 +19,7 @@
     <File Path=".aiassistant/rules/comments.md" />
     <File Path="Directory.Build.props" />
   </Folder>
+  <Project Path="Asv.Sdr.LimeSdr.Tests/Asv.Sdr.LimeSdr.Tests.csproj" />
   <Project Path="Asv.Sdr.Test/Asv.Sdr.Test.csproj" />
   <Project Path="Asv.Sdr/Asv.Sdr.csproj" />
 </Solution>
