@@ -21,6 +21,9 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     /// <summary>Reads legacy A/C registers without generation or diagnostics registers; hardware atomicity is not guaranteed.</summary>
     Task<Ifr6000ModeAcSnapshot> ReadModeAcSnapshot(CancellationToken cancel = default);
     Task<(float ModeA, float ModeC)> ReadReplyRatioModeAC();
+    Task<double> ReadModeAcFrequencyMHz();
+    Task<double> ReadModeAPulseVariationDb();
+    Task<double> ReadModeCPulseVariationDb();
 
     Task WriteP1P3SpacingOffset(float modeAOffset, float modeCOffset);
     Task WriteModeACControl(bool modeAP2SlsPulseEn, bool modeCP2SlsPulseEn, bool modeAP2SlsPulseAtt, bool modeCP2SlsPulseAtt, bool allCallModeAC_A, bool allCallModeAC_C, bool allCallModeS_A, bool allCallModeS_C);
@@ -41,6 +44,9 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     // Mode S
 
     Task WriteDelayOffsetModeS(double offset);
+    Task<double> ReadModeSFrequencyMHz();
+    Task<double> ReadModeSShortPulseVariationDb();
+    Task<double> ReadModeSLongPulseVariationDb();
     Task WriteModeSControl(bool modeSP5SlsPulseEn, bool modeSP5SlsPulseAtt);
     Task<float> ReadModeSReplyDelay();
     Task<float> ReadModeSReplyJitter();

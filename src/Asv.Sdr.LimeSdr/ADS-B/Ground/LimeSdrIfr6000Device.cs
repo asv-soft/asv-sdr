@@ -22,9 +22,10 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private const int UfSwitchSettleDelayMs = 12;
     private const uint ModeSBroadcastIcao = 0xFFFFFF;
     
+    private const ushort ModeAcFreqOffset_15_0              = 0x0300; // Отклонение частоты RF ответов от 1090 МГц// в килогерцах // -- RD // signed
     private const ushort ModeAResp_15_0_InternAddr          = 0x0301; // (0,0,С1,А1,С2,А2,С4,А4,Х,В1,D1,В2,D2,В4,D4,SPI) -- RD
     private const ushort ModeCResp_15_0_InternAddr          = 0x0302; // (0,0,С1,А1,С2,А2,С4,А4,Х,В1,D1,В2,D2,В4,D4,0) -- RD
-    private const ushort DelayOffsetAC_15_0_InternAddr      = 0x0303; // калибровочный коэффициент по дальности принятых сообщений A/C, signed -- WR
+    private const ushort ModeSFreqOffset_15_0               = 0x0303; // Отклонение частоты RF ответов от 1090 МГц// в килогерцах // -- RD // signed
     private const ushort ReplyRatio_A_15_8_C_7_0_InternAddr = 0x0304; // Raw A/C reply counts for the configured FPGA batch size -- RD
     
     private const ushort P1_P3_SpacingOffset_A_15_8_C_7_0_InternAddr = 0x0305; // Отклонение от кодового расстояния 8/21 мкс кода A/C для запросов, signed, в тактах, один такт 0,025 мкс  -- WR
@@ -82,12 +83,22 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private const ushort ModeSExpectedIcao_15_0 = 0x0330;      // --WR -- expected ICAO[15:0] for FPGA timing filter
     // private const ushort ModeAcWindowOffset_15_0 = 0x0331;      // --WR -- Window Offset for Mode A/C [15:0]
     private const ushort ModeSWindowOffset_15_0 = 0x0331;       // --WR -- Window Offset for Mode A/C [15:0]
+    private const ushort PulseAmpVarModeAMin_15_0 = 0x0332;
+    private const ushort PulseAmpVarModeAMax_15_0 = 0x0333;
+    private const ushort PulseAmpVarModeCMin_15_0 = 0x0334;
+    private const ushort PulseAmpVarModeCMax_15_0 = 0x0335;
+    private const ushort PulseAmpVarModeSShortMin_15_0 = 0x0336;
+    private const ushort PulseAmpVarModeSShortMax_15_0 = 0x0337;
+    private const ushort PulseAmpVarModeSLongMin_15_0 = 0x0338;
+    private const ushort PulseAmpVarModeSLongMax_15_0 = 0x0339;
+
     
     private static readonly ushort[] ModeAcSnapshotRegisters =
     [
         ModeAResp_15_0_InternAddr, ModeCResp_15_0_InternAddr, ReplyRatio_A_15_8_C_7_0_InternAddr,
         Width_A_F1_15_8_F2_7_0, Width_C_F1_15_8_F2_7_0, F1_F2_Spacing_A_15_8_C_7_0,
-        Reply_Delay_A_15_0, Reply_Jitter_A_15_0, Reply_Delay_C_15_0, Reply_Jitter_C_15_0,
+        Reply_Delay_A_15_0, Reply_Jitter_A_15_0, Reply_Delay_C_15_0, Reply_Jitter_C_15_0, ModeAcFreqOffset_15_0,
+        PulseAmpVarModeAMin_15_0, PulseAmpVarModeAMax_15_0, PulseAmpVarModeCMin_15_0, PulseAmpVarModeCMax_15_0
     ];
 
     private const ushort BDS_05_Ev_111_96 = 0x0400;  // --RD -- BDS_05_Ev
@@ -297,15 +308,23 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
             ModeC: MeasurementProfile.ToReplyRatioPercent(rRatio & 0xFF));
     }
 
+    public Task<double> ReadModeAcFrequencyMHz() =>
+        Ifr6000RfMeasurements.ReadFrequencyMHzAsync(this, ModeAcFreqOffset_15_0, DisposeCancel);
+
+    public Task<double> ReadModeAPulseVariationDb() =>
+        Ifr6000RfMeasurements.ReadPulseVariationDbAsync(this, PulseAmpVarModeAMin_15_0, PulseAmpVarModeAMax_15_0, DisposeCancel);
+
+    public Task<double> ReadModeCPulseVariationDb() =>
+        Ifr6000RfMeasurements.ReadPulseVariationDbAsync(this, PulseAmpVarModeCMin_15_0, PulseAmpVarModeCMax_15_0, DisposeCancel);
+
     public async Task<Ifr6000ModeAcSnapshot> ReadModeAcSnapshot(CancellationToken cancel = default)
     {
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancel, DisposeCancel);
         var readCancel = linked.Token;
         var startedAt = Environment.TickCount64;
         
-        // The current FPGA exposes only legacy A/C registers; do not probe 0x0331..0x0338.
+        // Include frequency and both amplitude min/max pairs in the A/C frame.
         // The host lock protects register selection, not the acquisition generation.
-        // Do not use global HOLD: the shared BDS RAM writer can continue while HOLD suppresses writes.
         var words = await ReadCustomRegistersFrame(ModeAcSnapshotRegisters, readCancel).ConfigureAwait(false);
         readCancel.ThrowIfCancellationRequested();
         var raw = string.Join(" ", Array.ConvertAll(words, word => word.ToString("X4")));
@@ -354,6 +373,15 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         _delayOffsetS = offset;
         return Task.CompletedTask;
     }
+
+    public Task<double> ReadModeSFrequencyMHz() =>
+        Ifr6000RfMeasurements.ReadFrequencyMHzAsync(this, ModeSFreqOffset_15_0, DisposeCancel);
+
+    public Task<double> ReadModeSShortPulseVariationDb() =>
+        Ifr6000RfMeasurements.ReadPulseVariationDbAsync(this, PulseAmpVarModeSShortMin_15_0, PulseAmpVarModeSShortMax_15_0, DisposeCancel);
+
+    public Task<double> ReadModeSLongPulseVariationDb() =>
+        Ifr6000RfMeasurements.ReadPulseVariationDbAsync(this, PulseAmpVarModeSLongMin_15_0, PulseAmpVarModeSLongMax_15_0, DisposeCancel);
 
     public async Task WriteModeSControl(bool modeSP5SlsPulseEn, bool modeSP5SlsPulseAtt)
     {

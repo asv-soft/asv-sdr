@@ -43,7 +43,7 @@ public sealed class Ifr6000ModeAcDiagnostics
 /// <summary>A/C register measurements. Legacy snapshots do not guarantee a shared acquisition generation.</summary>
 public sealed class Ifr6000ModeAcSnapshot
 {
-    internal const int RegisterCount = 10;
+    internal const int RegisterCount = 15;
     private const ushort SignatureMask = 0x7F00;
     private const ushort Signature = 0x2A00;
     private const ushort ReadyMask = 0x8000;
@@ -68,6 +68,9 @@ public sealed class Ifr6000ModeAcSnapshot
         ModeAReplyJitter = registers[7] * 0.025f;
         ModeCReplyDelay = (/* 120 */ + (short)registers[8]) * 0.025f + (float)delayOffsetUs;
         ModeCReplyJitter = registers[9] * 0.025f;
+        ModeAcFreqOffsetkHz = unchecked((short)registers[10]);
+        ModeAPulseVariation = Ifr6000RfMeasurements.ToPulseVariationTenthsDb(registers[11], registers[12]);
+        ModeCPulseVariation = Ifr6000RfMeasurements.ToPulseVariationTenthsDb(registers[13], registers[14]);
         // A zero reply count means there is no timing measurement, not a zero-jitter PASS.
         if (modeAReplyCount == 0)
         {
@@ -81,6 +84,10 @@ public sealed class Ifr6000ModeAcSnapshot
             ModeCPulseWidth = (float.NaN, float.NaN);
             PulseSpacing = (PulseSpacing.ModeA, float.NaN);
         }
+        if (modeAReplyCount == 0 && modeCReplyCount == 0)
+        {
+            ModeAcFreqOffsetkHz = null;
+        }
         // Jitter is a spread between samples and requires at least two accepted replies.
         if (modeAReplyCount < 2)
             ModeAReplyJitter = float.NaN;
@@ -88,6 +95,9 @@ public sealed class Ifr6000ModeAcSnapshot
             ModeCReplyJitter = float.NaN;
     }
 
+    public short? ModeAcFreqOffsetkHz { get; set; }
+    public byte? ModeAPulseVariation { get; set; }
+    public byte? ModeCPulseVariation { get; set; }
     public bool IsCoherent { get; }
     public byte? Generation { get; }
     public Ifr6000ModeAcDiagnostics? Diagnostics { get; }
@@ -126,7 +136,7 @@ public sealed class Ifr6000ModeAcSnapshot
     internal static Ifr6000ModeAcSnapshot DecodeLegacy(ReadOnlySpan<ushort> registers, double delayOffsetUs,
         Ifr6000MeasurementProfile? profile = null)
     {
-        if (registers.Length != RegisterCount) throw new ArgumentException("Expected ten A/C registers.", nameof(registers));
+        if (registers.Length != RegisterCount) throw new ArgumentException("Expected fifteen A/C registers.", nameof(registers));
         return new Ifr6000ModeAcSnapshot(registers, null, delayOffsetUs, null,
             profile ?? Ifr6000MeasurementProfile.Default);
     }

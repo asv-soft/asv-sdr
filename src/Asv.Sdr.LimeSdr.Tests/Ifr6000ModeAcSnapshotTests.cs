@@ -7,7 +7,43 @@ public class Ifr6000ModeAcSnapshotTests
 {
     // Delay words encode signed 0.025 us ticks directly: -20 ticks for A and
     // +40 ticks for C. Only the explicit host calibration offset is added.
-    private static ushort[] Frame() => [0x2A7F, 0, 0xC8C7, 0x1213, 0x1415, 0xFF02, 0xFFEC, 3, 40, 2];
+    private static ushort[] Frame() =>
+        [0x2A7F, 0, 0xC8C7, 0x1213, 0x1415, 0xFF02, 0xFFEC, 3, 40, 2,
+            unchecked((ushort)-1234), 99, 118, 99, 199];
+
+    [Theory]
+    [InlineData(short.MinValue)]
+    [InlineData(-1234)]
+    [InlineData(0)]
+    [InlineData(short.MaxValue)]
+    public void Decode_RfMeasurements_PreservesSignedKhzAndAlreadyScaledPulseVariations(short offset)
+    {
+        var words = Frame();
+        words[10] = unchecked((ushort)offset);
+        var snapshot = Ifr6000ModeAcSnapshot.DecodeLegacy(words, 0);
+
+        Assert.Equal(offset, snapshot.ModeAcFreqOffsetkHz);
+        Assert.Equal((byte)15, snapshot.ModeAPulseVariation);
+        Assert.Equal((byte)60, snapshot.ModeCPulseVariation);
+        Assert.Equal(100f, snapshot.ReplyRatio.ModeA);
+        Assert.Equal(-0.5f, snapshot.ModeAReplyDelay, 5);
+    }
+
+    [Fact]
+    public void Decode_InvalidAndLargePulseRanges_PreservesIndependentNullableResultsWithoutOverflow()
+    {
+        var words = Frame();
+        words[11] = 101;
+        words[12] = 100;
+        words[13] = 0;
+        words[14] = ushort.MaxValue;
+
+        var snapshot = Ifr6000ModeAcSnapshot.DecodeLegacy(words, 0);
+
+        Assert.Null(snapshot.ModeAPulseVariation);
+        Assert.Equal(byte.MaxValue, snapshot.ModeCPulseVariation);
+        Assert.Equal((short)-1234, snapshot.ModeAcFreqOffsetkHz);
+    }
 
     [Fact]
     public void TryDecode_StableReadyGeneration_DecodesOneCalibratedBatch()
@@ -177,6 +213,7 @@ public class Ifr6000ModeAcSnapshotTests
         Assert.True(float.IsNaN(sample.ModeAPulseWidth.F1));
         Assert.True(float.IsNaN(sample.ModeCPulseWidth.F2));
         Assert.Equal((0f, 0f), sample.ReplyRatio);
+        Assert.Null(sample.ModeAcFreqOffsetkHz);
     }
 
     [Theory]
