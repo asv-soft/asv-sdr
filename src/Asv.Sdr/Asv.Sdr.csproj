@@ -2,7 +2,7 @@
   <ItemGroup>
     <PackageReference Include="Asv.Common" Version="$(AsvCommonVersion)" />
     <PackageReference Include="Asv.IO" Version="$(AsvCommonVersion)" />
-    <PackageReference Include="System.Reactive" Version="6.1.0" />
+    <PackageReference Include="System.Reactive" Version="7.0.0" />
     <PackageReference Include="MathNet.Filtering" Version="0.7.0" />
   </ItemGroup>
 </Project>

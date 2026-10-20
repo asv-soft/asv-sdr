@@ -1,5 +1,10 @@
 # asv-sdr
 
+[![NuGet version](https://img.shields.io/nuget/v/Asv.Sdr)](https://www.nuget.org/packages/Asv.Sdr)
+[![Build and tests](https://github.com/asv-soft/asv-sdr/actions/workflows/code-quality.yml/badge.svg?branch=main)](https://github.com/asv-soft/asv-sdr/actions/workflows/code-quality.yml)
+[![Documentation](https://github.com/asv-soft/asv-sdr/actions/workflows/docs.yml/badge.svg?branch=main)](https://asv.me/asv-sdr/)
+[![GitHub Packages](https://img.shields.io/badge/GitHub-Packages-blue?logo=github)](https://github.com/orgs/asv-soft/packages/nuget/package/Asv.Sdr)
+
 `asv-sdr` is a set of .NET libraries for software-defined radio (SDR), IQ stream
 processing, digital filters, ADS-B/Mode-S parsing, simulation, and selected SDR
 hardware integrations.
@@ -7,6 +12,11 @@ hardware integrations.
 The core package provides a fluent, observable-style processing pipeline for IQ
 samples. Device-specific projects add bindings and helpers for supported SDR
 hardware.
+
+## Documentation
+
+Read the [Asv.Sdr documentation](https://asv.me/asv-sdr/) for the project overview,
+installation, development, and documentation publishing instructions.
 
 ## Features
 
@@ -61,21 +71,21 @@ dotnet add package Asv.Sdr.LimeSdr
 dotnet add package Asv.Sdr.SignalHound
 ```
 
-For local development, reference the projects from `src/Asv.Sdr.sln`.
+For local development, reference the projects from `src/Asv.Sdr.slnx`.
 
 ## Build
 
 From the repository root:
 
 ```bash
-dotnet restore src/Asv.Sdr.sln
-dotnet build src/Asv.Sdr.sln -c Release
+dotnet restore src/Asv.Sdr.slnx
+dotnet build src/Asv.Sdr.slnx -c Release
 ```
 
 Run tests:
 
 ```bash
-dotnet test src/Asv.Sdr.Test/Asv.Sdr.Test.csproj -c Release
+dotnet test --solution src/Asv.Sdr.slnx -c Release
 ```
 
 Create NuGet packages:
@@ -92,36 +102,13 @@ versions from the latest Git tag, restores, builds, and packs the main packages.
 
 ## Quick Start
 
-The example below uses the simulator package to create an IQ source and process
-90 Hz / 150 Hz AM components through the fluent API.
+Read the [Getting Started guide](https://asv.me/asv-sdr/getting-started.html) for a
+complete hardware-free example. The [FFT and Measurements guide](https://asv.me/asv-sdr/fft-measurements.html)
+shows streaming AM extraction with explicit stage disposal.
 
-```csharp
-using System;
-using Asv.Sdr;
-using Asv.Sdr.Simulate;
-
-const int sampleRate = 86_000;
-
-var source = new VirtualReaderIqIls1F(
-    sampleRate,
-    ddm: 0.40,
-    sdm: 0.90,
-    type: DdmSdmType.AM90_150);
-
-var sampler = source.Sample(sampleRate, out var start).Parallel();
-
-var am90 = sampler.GetAm(sampleRate, 90);
-var am150 = sampler.GetAm(sampleRate, 150);
-
-using var subscription = am90
-    .GetDdm(am150)
-    .AverageFilter(windowSize: 8)
-    .Subscribe(ddm => Console.WriteLine($"DDM: {ddm:F6}"));
-
-start();
-
-Console.ReadLine();
-```
+`GetAm` expects FFT coefficients. Use the processing order
+`source.Sample(...)` → `Fft1d()` → `GetAm(sampleRate, 90, 150)`.
+Sampler block sizes count scalar values; each IQ pair occupies two values.
 
 ## FFT Backend
 
@@ -150,26 +137,13 @@ Available implementations:
 ## ADS-B Processing
 
 `Asv.Sdr` includes helpers for building an ADS-B processing chain from IQ
-magnitude samples:
+magnitude samples.
 
-```csharp
-using Asv.Sdr;
-
-var parser = new AdsbMessageParser()
-    .RegisterDefaultMessages();
-
-using var messages = parser.OnMessage.Subscribe(message =>
-{
-    Console.WriteLine(message);
-});
-
-// Typical processing stages:
-// iq.Magnitude()
-//   .AdsbPulseDetector(sampleRate)
-//   .AdsbNormalize(sampleRate)
-//   .AdsbPulseTruncate(sampleRate)
-//   .Subscribe(bits => { foreach (var bit in bits.Span) parser.ProcessSample(bit); });
-```
+See [ADS-B and Mode-S](https://asv.me/asv-sdr/adsb.html) for parser setup, sample-rate
+constraints, and a complete chain attachment example. `Magnitude()` preserves
+interleaved `(magnitude, 0)` values; the pulse detector reads the even indices
+and emits a packed scalar pulse buffer. `ProcessSample` consumes 0/1 half-bit
+decisions including the preamble, rather than packed frame bytes.
 
 ## Repository Layout
 
@@ -187,14 +161,16 @@ using var messages = parser.OnMessage.Subscribe(message =>
 |   |-- Asv.Sdr.Gspn1
 |   |-- Asv.Sdr.AdSdr
 |   |-- Asv.Sdr.Test
-|   `-- Asv.Sdr.sln
+|   `-- Asv.Sdr.slnx
 `-- LICENSE
 ```
 
 ## Versioning
 
 Package versions are defined in project files and shared build properties under
-`src/Directory.Build.props`. The current `ProductVersion` is `1.5.34`.
+`src/Directory.Build.props`. The documentation build reads `ProductVersion` from
+that file and displays it as the documentation version. Changes to the file
+trigger the documentation workflow.
 
 The Windows build script uses the latest Git tag via `git describe --tags` and
 the `dotnet-setversion` tool before packing the main packages.

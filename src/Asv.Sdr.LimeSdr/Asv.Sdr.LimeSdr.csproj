@@ -25,7 +25,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Asv.Common" Version="$(AsvCommonVersion)" />
-    <PackageReference Include="System.Reactive" Version="6.1.0" />
+    <PackageReference Include="System.Reactive" Version="7.0.0" />
     <PackageReference Include="ZLogger" Version="2.5.10" />
   </ItemGroup>
   <ItemGroup>
