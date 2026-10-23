@@ -14,7 +14,16 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     Task TurnOn();
     Task TurnOff();
     Task RfRelaySelectOutput(bool isTx);
-    
+
+    Task TurnOnOffAllModes(bool isOn);
+    Task TurnOnOffModeA(bool isOn);
+    Task TurnOnOffModeC(bool isOn);
+    Task TurnOnOffModeS(bool isOn);
+
+    Task ResetAllStatistics();
+    Task ResetModeAStatistics();
+    Task ResetModeCStatistics();
+    Task ResetModeSStatistics();
     
     // Mode A/C
     Task WriteDelayOffsetModeAC(double offset);
