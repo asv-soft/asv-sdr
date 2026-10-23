@@ -288,6 +288,87 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         await WriteGpio(arr, DisposeCancel);
     }
 
+    private async Task TurnOnOffMode(bool isOn, ushort modeMask)
+    {
+        var reg = await ReadCustomRegister(ModeA_C_Control, DisposeCancel).ConfigureAwait(false);
+        if (isOn)
+        {
+            reg &= unchecked((ushort)~modeMask);
+        }
+        else
+        {
+            reg |= modeMask;
+        }
+        await WriteCustomRegister(ModeA_C_Control, reg, DisposeCancel).ConfigureAwait(false);
+    }
+
+    public Task TurnOnOffAllModes(bool isOn)
+    {
+        return TurnOnOffMode(isOn, 0x1C00);
+    }
+
+    public Task TurnOnOffModeA(bool isOn)
+    {
+        return TurnOnOffMode(isOn, 0x400);
+    }
+
+    public Task TurnOnOffModeC(bool isOn)
+    {
+        return TurnOnOffMode(isOn, 0x800);
+    }
+
+    public async Task TurnOnOffModeS(bool isOn)
+    {
+        const ushort modeMask = 0x1000;
+        var reg = await ReadCustomRegister(ModeA_C_Control, DisposeCancel).ConfigureAwait(false);
+        
+        // If the command is to turn off,
+        // but either mode A or mode C is active (0x400 - Mode A or 0x800 - Mode C),
+        // and an inter-mode request is enabled for at least one of them (0xC0): exit.
+        if (!isOn && ((reg & 0x400) == 0 || (reg & 0x800) == 0) && (reg & 0xC0) != 0) return;
+        
+        if (isOn)
+        {
+            reg &= unchecked((ushort)~modeMask);
+        }
+        else
+        {
+            reg |= modeMask;
+        }
+        if ((reg & 0xC0) != 0) return;
+        await WriteCustomRegister(ModeA_C_Control, reg, DisposeCancel).ConfigureAwait(false);
+    }
+
+    private async Task ResetStatistics(ushort modeMask)
+    {
+        var reg = await ReadCustomRegister(ModeA_C_Control, DisposeCancel).ConfigureAwait(false);
+        reg ^= modeMask;
+        await WriteCustomRegister(ModeA_C_Control, reg, DisposeCancel).ConfigureAwait(false);
+        await Task.Delay(10, DisposeCancel).ConfigureAwait(false);
+        reg ^= modeMask;
+        await WriteCustomRegister(ModeA_C_Control, reg, DisposeCancel).ConfigureAwait(false);
+    }
+    
+    public Task ResetAllStatistics()
+    {
+        return ResetStatistics(0x1C00);
+    }
+
+    public Task ResetModeAStatistics()
+    {
+        return ResetStatistics(0x400);
+    }
+
+    public Task ResetModeCStatistics()
+    {
+        return ResetStatistics(0x800);
+    }
+
+    public Task ResetModeSStatistics()
+    {
+        return ResetStatistics(0x1000);
+    }
+
     public Task WriteDelayOffsetModeAC(double offset)
     {
         _delayOffsetAc = offset;
@@ -355,8 +436,20 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         if (modeCP2SlsPulseAtt) reg |= 0x8;
         if (allCallModeAC_A) reg |= 0x10;
         if (allCallModeAC_C) reg |= 0x20;
-        if (allCallModeS_A) reg |= 0x40;
-        if (allCallModeS_C) reg |= 0x80;
+        if (allCallModeS_A)
+        {
+            reg |= 0x40;
+            // Turn on Mode A and Mode S
+            reg &= unchecked((ushort)~0x400);
+            reg &= unchecked((ushort)~0x1000);
+        }
+        if (allCallModeS_C)
+        {
+            reg |= 0x80;
+            // Turn on Mode C and Mode S
+            reg &= unchecked((ushort)~0x800);
+            reg &= unchecked((ushort)~0x1000);
+        }
         await WriteCustomRegister(ModeA_C_Control, reg, DisposeCancel).ConfigureAwait(false);
     }
 
