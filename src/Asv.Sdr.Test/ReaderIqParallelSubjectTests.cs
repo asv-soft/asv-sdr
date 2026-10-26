@@ -192,13 +192,18 @@ namespace Asv.Sdr.Test
                 })
             );
 
-            var firstPublishTask = Task.Run(
+            // Both publishers block at a barrier and need independent threads.
+            var firstPublishTask = Task.Factory.StartNew(
                 () => first.OnNext(10),
-                TestContext.Current.CancellationToken
+                TestContext.Current.CancellationToken,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default
             );
-            var secondPublishTask = Task.Run(
+            var secondPublishTask = Task.Factory.StartNew(
                 () => second.OnNext(32),
-                TestContext.Current.CancellationToken
+                TestContext.Current.CancellationToken,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default
             );
 
             var output = await AssertCompletes(received.Task);
