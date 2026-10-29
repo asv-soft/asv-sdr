@@ -83,14 +83,17 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private const ushort ModeSExpectedIcao_15_0 = 0x0330;      // --WR -- expected ICAO[15:0] for FPGA timing filter
     // private const ushort ModeAcWindowOffset_15_0 = 0x0331;      // --WR -- Window Offset for Mode A/C [15:0]
     private const ushort ModeSWindowOffset_15_0 = 0x0331;       // --WR -- Window Offset for Mode A/C [15:0]
-    private const ushort PulseAmpVarModeAMin_15_0 = 0x0332;
-    private const ushort PulseAmpVarModeAMax_15_0 = 0x0333;
-    private const ushort PulseAmpVarModeCMin_15_0 = 0x0334;
-    private const ushort PulseAmpVarModeCMax_15_0 = 0x0335;
-    private const ushort PulseAmpVarModeSShortMin_15_0 = 0x0336;
-    private const ushort PulseAmpVarModeSShortMax_15_0 = 0x0337;
-    private const ushort PulseAmpVarModeSLongMin_15_0 = 0x0338;
-    private const ushort PulseAmpVarModeSLongMax_15_0 = 0x0339;
+    
+    private const ushort PulseSWidthAndSpacing = 0x0332;
+    
+    private const ushort PulseAmpVarModeAMin_15_0 = 0x0333;
+    private const ushort PulseAmpVarModeAMax_15_0 = 0x0334;
+    private const ushort PulseAmpVarModeCMin_15_0 = 0x0335;
+    private const ushort PulseAmpVarModeCMax_15_0 = 0x0336;
+    private const ushort PulseAmpVarModeSShortMin_15_0 = 0x0337;
+    private const ushort PulseAmpVarModeSShortMax_15_0 =0x0338; 
+    private const ushort PulseAmpVarModeSLongMin_15_0 = 0x0339;
+    private const ushort PulseAmpVarModeSLongMax_15_0 = 0x033A;
 
     
     private static readonly ushort[] ModeAcSnapshotRegisters =
@@ -494,6 +497,12 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     {
         var reg = await ReadCustomRegister(ReplyJitterS, DisposeCancel).ConfigureAwait(false);
         return reg * 0.025f;
+    }
+
+    public async Task<(bool Width, bool Spacing)> ReadModeSReplyWidthAndSpacing()
+    {
+        var reg = await ReadCustomRegister(PulseSWidthAndSpacing, DisposeCancel).ConfigureAwait(false);
+        return ((reg & 0x2) != 0, (reg & 0x1) != 0);
     }
 
     public Task SetModeSWindowOffset(double offsetUs)

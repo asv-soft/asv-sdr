@@ -59,6 +59,7 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     Task WriteModeSControl(bool modeSP5SlsPulseEn, bool modeSP5SlsPulseAtt);
     Task<float> ReadModeSReplyDelay();
     Task<float> ReadModeSReplyJitter();
+    Task<(bool Width, bool Spacing)> ReadModeSReplyWidthAndSpacing();
     Task SetModeSWindowOffset(double offsetUs);
     Task<bool> WriteUfMessage(ModeSUFormatBase msg);
     Task<ModeSDFormatBase?> ReadDfMessage(Func<ModeSDFormatBase> factory, int attempts = DefaultDfReadAttempts);
