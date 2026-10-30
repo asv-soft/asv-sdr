@@ -9,15 +9,14 @@ internal static class Ifr6000RfMeasurements
     internal static double ToFrequencyMHz(ushort offsetKhz) =>
         1090.0 + unchecked((short)offsetKhz) * 0.001;
 
-    internal static double ToPulseVariationDb(ushort min, ushort max) =>
-        min > max ? double.NaN : 20.0 * Math.Log10((max + 1.0) / (min + 1.0));
+    // RatioAmpDb_* registers are decoded directly as unsigned Q12.4 dB.
+    internal static double ToPulseVariationDb(ushort value) => value / 16.0;
 
-    internal static byte? ToPulseVariationTenthsDb(ushort min, ushort max)
+    internal static byte ToPulseVariationTenthsDb(ushort value)
     {
-        var variationDb = ToPulseVariationDb(min, max);
         // Snapshot values are tenths of a dB. Saturate instead of wrapping a large variation.
-        return double.IsNaN(variationDb) ? null
-            : (byte?)Math.Min(byte.MaxValue, Math.Round(variationDb * 10.0, MidpointRounding.AwayFromZero));
+        return (byte)Math.Min(byte.MaxValue,
+            Math.Round(ToPulseVariationDb(value) * 10.0, MidpointRounding.AwayFromZero));
     }
 
     internal static async Task<double> ReadFrequencyMHzAsync(
@@ -28,9 +27,9 @@ internal static class Ifr6000RfMeasurements
     }
 
     internal static async Task<double> ReadPulseVariationDbAsync(
-        ILimeSdrCustomDevice device, ushort minAddress, ushort maxAddress, CancellationToken cancel)
+        ILimeSdrCustomDevice device, ushort address, CancellationToken cancel)
     {
-        var values = await device.ReadCustomRegistersFrame([minAddress, maxAddress], cancel).ConfigureAwait(false);
-        return ToPulseVariationDb(values[0], values[1]);
+        var value = await device.ReadCustomRegister(address, cancel).ConfigureAwait(false);
+        return ToPulseVariationDb(value);
     }
 }

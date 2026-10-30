@@ -31,7 +31,9 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
     Task<Ifr6000ModeAcSnapshot> ReadModeAcSnapshot(CancellationToken cancel = default);
     Task<(float ModeA, float ModeC)> ReadReplyRatioModeAC();
     Task<double> ReadModeAcFrequencyMHz();
+    /// <summary>Reads the worst within-reply amplitude variation in a 200-interrogation Mode A batch, in dB.</summary>
     Task<double> ReadModeAPulseVariationDb();
+    /// <summary>Reads the worst within-reply amplitude variation in a 200-interrogation Mode C batch, in dB.</summary>
     Task<double> ReadModeCPulseVariationDb();
 
     Task WriteP1P3SpacingOffset(float modeAOffset, float modeCOffset);
@@ -54,8 +56,9 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
 
     Task WriteDelayOffsetModeS(double offset);
     Task<double> ReadModeSFrequencyMHz();
-    Task<double> ReadModeSShortPulseVariationDb();
-    Task<double> ReadModeSLongPulseVariationDb();
+    /// <summary>Reads Mode S pulse amplitude variation from the shared register, in dB.</summary>
+    /// <remarks>The caller selects short or long replies before acquisition. Zero is returned as zero dB.</remarks>
+    Task<double> ReadModeSPulseVariationDb();
     Task WriteModeSControl(bool modeSP5SlsPulseEn, bool modeSP5SlsPulseAtt);
     Task<float> ReadModeSReplyDelay();
     Task<float> ReadModeSReplyJitter();

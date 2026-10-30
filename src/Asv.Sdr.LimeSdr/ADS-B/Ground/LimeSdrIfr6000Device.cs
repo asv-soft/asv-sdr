@@ -86,14 +86,9 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     
     private const ushort PulseSWidthAndSpacing = 0x0332;
     
-    private const ushort PulseAmpVarModeAMin_15_0 = 0x0333;
-    private const ushort PulseAmpVarModeAMax_15_0 = 0x0334;
-    private const ushort PulseAmpVarModeCMin_15_0 = 0x0335;
-    private const ushort PulseAmpVarModeCMax_15_0 = 0x0336;
-    private const ushort PulseAmpVarModeSShortMin_15_0 = 0x0337;
-    private const ushort PulseAmpVarModeSShortMax_15_0 =0x0338; 
-    private const ushort PulseAmpVarModeSLongMin_15_0 = 0x0339;
-    private const ushort PulseAmpVarModeSLongMax_15_0 = 0x033A;
+    private const ushort RatioAmpDbA_15_0 = 0x0333;
+    private const ushort RatioAmpDbC_15_0 = 0x0334;
+    private const ushort RatioAmpDbS_15_0 = 0x0335;
 
     
     private static readonly ushort[] ModeAcSnapshotRegisters =
@@ -101,7 +96,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         ModeAResp_15_0_InternAddr, ModeCResp_15_0_InternAddr, ReplyRatio_A_15_8_C_7_0_InternAddr,
         Width_A_F1_15_8_F2_7_0, Width_C_F1_15_8_F2_7_0, F1_F2_Spacing_A_15_8_C_7_0,
         Reply_Delay_A_15_0, Reply_Jitter_A_15_0, Reply_Delay_C_15_0, Reply_Jitter_C_15_0, ModeAcFreqOffset_15_0,
-        PulseAmpVarModeAMin_15_0, PulseAmpVarModeAMax_15_0, PulseAmpVarModeCMin_15_0, PulseAmpVarModeCMax_15_0
+        RatioAmpDbA_15_0, RatioAmpDbC_15_0
     ];
 
     private const ushort BDS_05_Ev_111_96 = 0x0400;  // --RD -- BDS_05_Ev
@@ -396,10 +391,10 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         Ifr6000RfMeasurements.ReadFrequencyMHzAsync(this, ModeAcFreqOffset_15_0, DisposeCancel);
 
     public Task<double> ReadModeAPulseVariationDb() =>
-        Ifr6000RfMeasurements.ReadPulseVariationDbAsync(this, PulseAmpVarModeAMin_15_0, PulseAmpVarModeAMax_15_0, DisposeCancel);
+        Ifr6000RfMeasurements.ReadPulseVariationDbAsync(this, RatioAmpDbA_15_0, DisposeCancel);
 
     public Task<double> ReadModeCPulseVariationDb() =>
-        Ifr6000RfMeasurements.ReadPulseVariationDbAsync(this, PulseAmpVarModeCMin_15_0, PulseAmpVarModeCMax_15_0, DisposeCancel);
+        Ifr6000RfMeasurements.ReadPulseVariationDbAsync(this, RatioAmpDbC_15_0, DisposeCancel);
 
     public async Task<Ifr6000ModeAcSnapshot> ReadModeAcSnapshot(CancellationToken cancel = default)
     {
@@ -407,7 +402,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         var readCancel = linked.Token;
         var startedAt = Environment.TickCount64;
         
-        // Include frequency and both amplitude min/max pairs in the A/C frame.
+        // Include frequency and both Q12.4 amplitude ratios in the A/C frame.
         // The host lock protects register selection, not the acquisition generation.
         var words = await ReadCustomRegistersFrame(ModeAcSnapshotRegisters, readCancel).ConfigureAwait(false);
         readCancel.ThrowIfCancellationRequested();
@@ -473,11 +468,8 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     public Task<double> ReadModeSFrequencyMHz() =>
         Ifr6000RfMeasurements.ReadFrequencyMHzAsync(this, ModeSFreqOffset_15_0, DisposeCancel);
 
-    public Task<double> ReadModeSShortPulseVariationDb() =>
-        Ifr6000RfMeasurements.ReadPulseVariationDbAsync(this, PulseAmpVarModeSShortMin_15_0, PulseAmpVarModeSShortMax_15_0, DisposeCancel);
-
-    public Task<double> ReadModeSLongPulseVariationDb() =>
-        Ifr6000RfMeasurements.ReadPulseVariationDbAsync(this, PulseAmpVarModeSLongMin_15_0, PulseAmpVarModeSLongMax_15_0, DisposeCancel);
+    public Task<double> ReadModeSPulseVariationDb() =>
+        Ifr6000RfMeasurements.ReadPulseVariationDbAsync(this, RatioAmpDbS_15_0, DisposeCancel);
 
     public async Task WriteModeSControl(bool modeSP5SlsPulseEn, bool modeSP5SlsPulseAtt)
     {

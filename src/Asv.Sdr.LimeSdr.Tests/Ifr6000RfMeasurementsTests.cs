@@ -6,52 +6,61 @@ namespace Asv.Sdr.LimeSdr.Tests;
 public sealed class Ifr6000RfMeasurementsTests
 {
     [Theory]
-    [InlineData(0, 0, 0)]
-    [InlineData(50, 50, 0)]
-    [InlineData(0, 1, 60)]
-    [InlineData(99, 118, 15)]
-    [InlineData(99, 199, 60)]
-    [InlineData(0, 17, 251)]
-    [InlineData(0, 18, 255)]
-    [InlineData(0, 65535, 255)]
-    [InlineData(65535, 65535, 0)]
-    [InlineData(101, 100, null)]
-    [InlineData(65535, 0, null)]
-    public void ToPulseVariationTenthsDb_Endpoints_UsesPlusOneAndSaturatesWithoutWrapping(
-        ushort min, ushort max, int? expected) =>
-        Assert.Equal(expected.HasValue ? (byte?)expected.Value : null,
-            Ifr6000RfMeasurements.ToPulseVariationTenthsDb(min, max));
+    [InlineData(0, 0)]
+    [InlineData(1, 1)]
+    [InlineData(3, 2)]
+    [InlineData(4, 3)]
+    [InlineData(24, 15)]
+    [InlineData(32, 20)]
+    [InlineData(33, 21)]
+    [InlineData(96, 60)]
+    [InlineData(404, 253)]
+    [InlineData(405, 253)]
+    [InlineData(406, 254)]
+    [InlineData(407, 254)]
+    [InlineData(408, 255)]
+    [InlineData(65535, 255)]
+    public void ToPulseVariationTenthsDb_Q12_4_RoundsOnceAndSaturates(ushort value, byte expected) =>
+        Assert.Equal(expected, Ifr6000RfMeasurements.ToPulseVariationTenthsDb(value));
 
     [Theory]
-    [InlineData(0, 0, 0.0)]
-    [InlineData(0, 1, 6.020599913)]
-    [InlineData(99, 118, 1.510939228)]
-    [InlineData(99, 199, 6.020599913)]
-    [InlineData(0, 65535, 96.329598612)]
-    public void ToPulseVariationDb_Endpoints_ReturnsFullPrecisionWithoutTelemetryClipping(
-        ushort min, ushort max, double expected) =>
-        Assert.Equal(expected, Ifr6000RfMeasurements.ToPulseVariationDb(min, max), 6);
+    [InlineData(0, 0.0)]
+    [InlineData(1, 0.0625)]
+    [InlineData(4, 0.25)]
+    [InlineData(16, 1.0)]
+    [InlineData(24, 1.5)]
+    [InlineData(31, 1.9375)]
+    [InlineData(32, 2.0)]
+    [InlineData(33, 2.0625)]
+    [InlineData(48, 3.0)]
+    [InlineData(96, 6.0)]
+    [InlineData(192, 12.0)]
+    [InlineData(408, 25.5)]
+    [InlineData(65535, 4095.9375)]
+    public void ToPulseVariationDb_Q12_4_PreservesFullPrecision(ushort value, double expected) =>
+        Assert.Equal(expected, Ifr6000RfMeasurements.ToPulseVariationDb(value));
 
     [Theory]
-    [InlineData(0x0332, 0x0333)]
-    [InlineData(0x0334, 0x0335)]
-    [InlineData(0x0336, 0x0337)]
-    [InlineData(0x0338, 0x0339)]
-    public async Task ReadPulseVariationDbAsync_EachReplyKind_ReadsMinMaxInOneFrame(
-        ushort minAddress, ushort maxAddress)
+    [InlineData(0x0333, 33, 2.0625)]
+    [InlineData(0x0334, 33, 2.0625)]
+    [InlineData(0x0335, 0, 0.0)]
+    [InlineData(0x0335, 24, 1.5)]
+    [InlineData(0x0335, 65535, 4095.9375)]
+    public async Task ReadPulseVariationDbAsync_AssignedRegister_ReadsActualValueIncludingZero(
+        ushort address, ushort raw, double expected)
     {
         var device = DispatchProxy.Create<ILimeSdrCustomDevice, RegisterProxy>();
         var proxy = (RegisterProxy)(object)device;
         using var cancellation = new CancellationTokenSource();
-        proxy.Values = [99, 118];
+        proxy.Values = [raw];
 
         var result = await Ifr6000RfMeasurements.ReadPulseVariationDbAsync(
-            device, minAddress, maxAddress, cancellation.Token);
+            device, address, cancellation.Token);
 
-        Assert.Equal(1.510939228, result, 6);
-        Assert.Equal([minAddress, maxAddress], proxy.Addresses!);
-        Assert.Equal(1, proxy.FrameReads);
-        Assert.Equal(0, proxy.SingleReads);
+        Assert.Equal(expected, result);
+        Assert.Equal([address], proxy.Addresses!);
+        Assert.Equal(0, proxy.FrameReads);
+        Assert.Equal(1, proxy.SingleReads);
         Assert.Equal(cancellation.Token, proxy.Token);
     }
 
@@ -89,19 +98,25 @@ public sealed class Ifr6000RfMeasurementsTests
 
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => frequency
             ? Ifr6000RfMeasurements.ReadFrequencyMHzAsync(device, 0x0300, cancellation.Token)
-            : Ifr6000RfMeasurements.ReadPulseVariationDbAsync(device, 0x0332, 0x0333, cancellation.Token));
+            : Ifr6000RfMeasurements.ReadPulseVariationDbAsync(device, 0x0333, cancellation.Token));
     }
 
     [Fact]
-    public async Task ReadPulseVariationDbAsync_InvalidRange_ReturnsUnavailable()
+    public void ModeSPulseVariationApi_ExposesOneReaderAndAssignedRegister()
     {
-        var device = DispatchProxy.Create<ILimeSdrCustomDevice, RegisterProxy>();
-        ((RegisterProxy)(object)device).Values = [101, 100];
-
-        var result = await Ifr6000RfMeasurements.ReadPulseVariationDbAsync(
-            device, 0x0332, 0x0333, TestContext.Current.CancellationToken);
-
-        Assert.True(double.IsNaN(result));
+        foreach (var type in new[] { typeof(ILimeSdrIfr6000Device), typeof(LimeSdrIfr6000Device) })
+        {
+            var reader = Assert.Single(type.GetMethods(), method =>
+                method.Name.StartsWith("ReadModeS", StringComparison.Ordinal)
+                && method.Name.Contains("PulseVariation", StringComparison.Ordinal));
+            Assert.Equal("ReadModeSPulseVariationDb", reader.Name);
+            Assert.Equal(typeof(Task<double>), reader.ReturnType);
+            Assert.Empty(reader.GetParameters());
+        }
+        var register = typeof(LimeSdrIfr6000Device)
+            .GetField("RatioAmpDbS_15_0", BindingFlags.Static | BindingFlags.NonPublic);
+        Assert.NotNull(register);
+        Assert.Equal((ushort)0x0335, register.GetRawConstantValue());
     }
 
     public class RegisterProxy : DispatchProxy

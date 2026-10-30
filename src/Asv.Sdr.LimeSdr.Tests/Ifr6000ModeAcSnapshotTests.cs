@@ -1,3 +1,4 @@
+using System.Reflection;
 using Asv.Sdr.LimeSdr;
 using Xunit;
 
@@ -9,7 +10,7 @@ public class Ifr6000ModeAcSnapshotTests
     // +40 ticks for C. Only the explicit host calibration offset is added.
     private static ushort[] Frame() =>
         [0x2A7F, 0, 0xC8C7, 0x1213, 0x1415, 0xFF02, 0xFFEC, 3, 40, 2,
-            unchecked((ushort)-1234), 99, 118, 99, 199];
+            unchecked((ushort)-1234), 24, 96];
 
     [Theory]
     [InlineData(short.MinValue)]
@@ -30,19 +31,42 @@ public class Ifr6000ModeAcSnapshotTests
     }
 
     [Fact]
-    public void Decode_InvalidAndLargePulseRanges_PreservesIndependentNullableResultsWithoutOverflow()
+    public void Decode_Q12_4PulseRatios_ZeroAndLargeValuesDoNotWrap()
     {
         var words = Frame();
-        words[11] = 101;
-        words[12] = 100;
-        words[13] = 0;
-        words[14] = ushort.MaxValue;
+        words[11] = 0;
+        words[12] = ushort.MaxValue;
 
         var snapshot = Ifr6000ModeAcSnapshot.DecodeLegacy(words, 0);
 
-        Assert.Null(snapshot.ModeAPulseVariation);
+        Assert.Equal((byte)0, snapshot.ModeAPulseVariation);
         Assert.Equal(byte.MaxValue, snapshot.ModeCPulseVariation);
         Assert.Equal((short)-1234, snapshot.ModeAcFreqOffsetkHz);
+    }
+
+    [Theory]
+    [InlineData(0x00C8, null, 60)]
+    [InlineData(0xC800, 15, null)]
+    [InlineData(0x0000, null, null)]
+    public void Decode_NoReplies_LeavesOnlyThatModesVariationUnavailable(ushort replies, int? modeA, int? modeC)
+    {
+        var words = Frame();
+        words[2] = replies;
+
+        var snapshot = Ifr6000ModeAcSnapshot.DecodeLegacy(words, 0);
+
+        Assert.Equal(modeA.HasValue ? (byte?)modeA.Value : null, snapshot.ModeAPulseVariation);
+        Assert.Equal(modeC.HasValue ? (byte?)modeC.Value : null, snapshot.ModeCPulseVariation);
+    }
+
+    [Fact]
+    public void SnapshotRegisters_UseThirteenWordsWithAssignedAcRatioRegisters()
+    {
+        var registers = (ushort[])typeof(LimeSdrIfr6000Device)
+            .GetField("ModeAcSnapshotRegisters", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+
+        Assert.Equal(13, registers.Length);
+        Assert.Equal(new ushort[] { 0x0300, 0x0333, 0x0334 }, registers[10..]);
     }
 
     [Fact]
@@ -290,6 +314,9 @@ public class Ifr6000ModeAcSnapshotTests
     [Theory]
     [InlineData(9)]
     [InlineData(11)]
+    [InlineData(12)]
+    [InlineData(14)]
+    [InlineData(15)]
     public void DecodeLegacy_IncorrectRegisterCount_RejectsSnapshot(int count)
     {
         Assert.Throws<ArgumentException>(() => Ifr6000ModeAcSnapshot.DecodeLegacy(new ushort[count], 0));
