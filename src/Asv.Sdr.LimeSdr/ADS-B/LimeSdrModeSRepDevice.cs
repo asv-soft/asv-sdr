@@ -1089,66 +1089,11 @@ public class LimeSdrModeSRepDevice : LimeSdrModeACRepDevice, ILimeSdrModeSRepDev
         //     new ValueTuple<ushort, ushort>(DF17_ID_47_32_InternAddr, (ushort)((df17Id[8] << 8) | df17Id[9]));
         // df17IdFrame[3] = new ValueTuple<ushort, ushort>(DF17_ID_31_24_InternAddr, (ushort)(df17Id[10] << 8));
 
-        return AtomicEditRegister(edit =>
-        {
-            foreach (var addressValuePair in df11Frame)
-            {
-                WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            }
-
-            foreach (var addressValuePair in df4Frame)
-            {
-                WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            }
-
-            foreach (var addressValuePair in df5Frame)
-            {
-                WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            }
-
-            foreach (var addressValuePair in bds10Frame)
-            {
-                WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            }
-            
-            foreach (var addressValuePair in bds17Frame)
-            {
-                WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            }
-            
-            foreach (var addressValuePair in bds20Frame)
-            {
-                WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            }
-
-            foreach (var addressValuePair in bds30Frame)
-            {
-                WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            }
-            
-            foreach (var addressValuePair in bds40Frame)
-            {
-                WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            }
-
-            foreach (var addressValuePair in bds50Frame)
-            {
-                WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            }
-
-            foreach (var addressValuePair in bds60Frame)
-            {
-                WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            }
-
-            // foreach (var addressValuePair in df17IdFrame)
-            // {
-            //     WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-            // }
-
-            edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 1);
-            edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 0);
-        }, cancel);
+        return WriteCustomRegistersFrame([
+            .. df11Frame, .. df4Frame, .. df5Frame,
+            .. bds10Frame, .. bds17Frame, .. bds20Frame, .. bds30Frame,
+            .. bds40Frame, .. bds50Frame, .. bds60Frame
+        ], cancel);
     }
 
     public async Task<(byte, byte)> GetRecognizedAndAllRequestsCountPerSecond(CancellationToken cancel = default)
