@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Asv.Common;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using ZLogger;
 
 using static Asv.Sdr.LimeSdr.NativeMethods;
@@ -18,19 +19,23 @@ namespace Asv.Sdr.LimeSdr
     {
         #region Static
 
-        private static readonly LogCallBack _callback;
+        private static readonly LogCallBack _callback = OnLmsLog;
+        private static readonly Lazy<bool> NativeLoggingInitialized = new(() =>
+        {
+            LMS_RegisterLogHandler(_callback);
+            return true;
+        });
         private static readonly AsyncLocal<NativeOperationScope?> CurrentNativeOperation = new();
         static LimeSdrDevice()
         {
-            _callback = OnLmsLog;
             GC.KeepAlive(_callback);
-            LMS_RegisterLogHandler(_callback);
         }
 
         private static readonly object Sync = new();
 
         public static unsafe IReadOnlyList<string> GetAvailableDevices()
         {
+            _ = NativeLoggingInitialized.Value;
             lock (Sync)
             {
                 var buff = new byte[256 * 8];
@@ -56,6 +61,7 @@ namespace Asv.Sdr.LimeSdr
         
         public static unsafe string GetApiVersion()
         {
+            _ = NativeLoggingInitialized.Value;
             var str = LMS_GetLibraryVersion();
             return str == null ? string.Empty : Marshal.PtrToStringAnsi((IntPtr)str) ?? string.Empty;
         }
@@ -71,6 +77,17 @@ namespace Asv.Sdr.LimeSdr
         private readonly ILogger _logger;
         private readonly ILmsRegisterEditor _registerEditor;
 
+        internal LimeSdrDevice(TaskFactory taskFactory, ILmsRegisterEditor registerEditor)
+        {
+            ArgumentNullException.ThrowIfNull(taskFactory);
+            ArgumentNullException.ThrowIfNull(registerEditor);
+            _taskFactory = taskFactory;
+            _registerEditor = registerEditor;
+            _logger = NullLogger.Instance;
+            _ignoreLogLmsParams = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            _isThreadSafe = true;
+            DeviceId = string.Empty;
+        }
 
         public LimeSdrDevice(string deviceId, bool isThreadSave = true, ILoggerFactory? logFactory = null)
             :this(deviceId,isThreadSave,logFactory?.CreateLogger<LimeSdrDevice>() ?? LmsLogManager.GetLogger(nameof(LimeSdrDevice)),LimeSdrParams.LMS7_CAPSEL,LimeSdrParams.LMS7_CAPTURE)
@@ -80,6 +97,7 @@ namespace Asv.Sdr.LimeSdr
         public LimeSdrDevice(string deviceId, bool isThreadSave,ILogger logger, params LMS7Parameter[] ignoreLogLmsParams)
         {
             ArgumentNullException.ThrowIfNull(logger);
+            _ = NativeLoggingInitialized.Value;
             _registerEditor = new LmsRegisterEditor(this);
             _logger = logger;
             DeviceId = deviceId;

@@ -30,6 +30,12 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
         _logger = logger ?? NullLogger.Instance;
     }
 
+    internal LimeSdrCustomDevice(TaskFactory taskFactory, ILmsRegisterEditor registerEditor)
+        : base(taskFactory, registerEditor)
+    {
+        _logger = NullLogger.Instance;
+    }
+
     public async Task<bool> IsModeEnabled(CancellationToken cancel = default)
     {
         var reg = await this.ReadFpgaRegisterBits(ControlAddress, 0, 1, cancel).ConfigureAwait(false);
@@ -148,8 +154,6 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
         return AtomicEditRegister(edit =>
         {
             WriteCustomRegisterBits(edit, address, index, length, value);
-            edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 1);
-            edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 0);
         }, cancel);
     }
 
@@ -169,8 +173,6 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
         return AtomicEditRegister(edit =>
         {
             WriteCustomRegister(edit, address, value);
-            edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 1);
-            edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 0);
         }, cancel);
     }
 
@@ -181,7 +183,7 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
             foreach (var addressValuePair in addressValuePairs)
             {
                 cancel.ThrowIfCancellationRequested();
-                WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
+                WriteSingleCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
             }
             edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 1);
             edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 0);
@@ -238,6 +240,14 @@ public abstract class LimeSdrCustomDevice : LimeSdrDevice, ILimeSdrCustomDevice
     }
 
     protected void WriteCustomRegister(ILmsRegisterEditor edit, ushort address, ushort value)
+    {
+        WriteSingleCustomRegister(edit, address, value);
+        edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 1);
+        edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 0);
+    }
+
+    // Stage one word; the caller applies the completed frame separately.
+    private void WriteSingleCustomRegister(ILmsRegisterEditor edit, ushort address, ushort value)
     {
         edit.WriteFPGAReg(ADDRESS_WR_Address, address);
         edit.WriteFPGAReg(DATA_WR_Address, value);
