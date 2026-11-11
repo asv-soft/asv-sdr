@@ -31,7 +31,8 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     private const ushort P1_P3_SpacingOffset_A_15_8_C_7_0_InternAddr = 0x0305; // Отклонение от кодового расстояния 8/21 мкс кода A/C для запросов, signed, в тактах, один такт 0,025 мкс  -- WR
     
     private const ushort ModeA_C_Control = 0x0306; // 
-    private const ushort ModeS_Control = 0x0306; // 
+    private const ushort ModeS_Control = 0x0306;
+    private const ushort AdsB_Control = 0x0306;
     
     private const ushort Width_A_F1_15_8_F2_7_0 = 0x0307;  // средняя ширина ответных кадрирующих импульсов для кода A, в тактах, один такт 0,025 мкс	-- RD
     private const ushort Width_C_F1_15_8_F2_7_0 = 0x0308;  // ширина ответных кадрирующих импульсов для кода C, в тактах, один такт 0,025 мкс	-- RD
@@ -230,6 +231,14 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
 
     public Ifr6000MeasurementProfile MeasurementProfile { get; }
 
+    internal LimeSdrIfr6000Device(TaskFactory taskFactory, ILmsRegisterEditor registerEditor)
+        : base(taskFactory, registerEditor)
+    {
+        _config = new LimeSdrDeviceConfig();
+        MeasurementProfile = new Ifr6000MeasurementProfile();
+        _logger = NullLogger.Instance;
+    }
+
     private static string ValidateConfiguration(string deviceId, LimeSdrDeviceConfig config,
         Ifr6000MeasurementProfile measurementProfile)
     {
@@ -286,18 +295,21 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         await WriteGpio(arr, DisposeCancel);
     }
 
-    private async Task TurnOnOffMode(bool isOn, ushort modeMask)
+    private Task TurnOnOffMode(bool isOn, ushort modeMask)
     {
-        var reg = await ReadCustomRegister(ModeA_C_Control, DisposeCancel).ConfigureAwait(false);
-        if (isOn)
+        return AtomicEditRegister(edit =>
         {
-            reg &= unchecked((ushort)~modeMask);
-        }
-        else
-        {
-            reg |= modeMask;
-        }
-        await WriteCustomRegister(ModeA_C_Control, reg, DisposeCancel).ConfigureAwait(false);
+            var reg = ReadCustomRegister(edit, ModeA_C_Control);
+            if (isOn)
+            {
+                reg &= unchecked((ushort)~modeMask);
+            }
+            else
+            {
+                reg |= modeMask;
+            }
+            WriteCustomRegister(edit, ModeA_C_Control, reg);
+        }, DisposeCancel);
     }
 
     public Task TurnOnOffAllModes(bool isOn)
@@ -315,36 +327,46 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         return TurnOnOffMode(isOn, 0x800);
     }
 
-    public async Task TurnOnOffModeS(bool isOn)
+    public Task TurnOnOffModeS(bool isOn)
     {
         const ushort modeMask = 0x1000;
-        var reg = await ReadCustomRegister(ModeA_C_Control, DisposeCancel).ConfigureAwait(false);
         
-        // If the command is to turn off,
-        // but either mode A or mode C is active (0x400 - Mode A or 0x800 - Mode C),
-        // and an inter-mode request is enabled for at least one of them (0xC0): exit.
-        if (!isOn && ((reg & 0x400) == 0 || (reg & 0x800) == 0) && (reg & 0xC0) != 0) return;
-        
-        if (isOn)
+        return AtomicEditRegister(edit =>
         {
-            reg &= unchecked((ushort)~modeMask);
-        }
-        else
-        {
-            reg |= modeMask;
-        }
-        if ((reg & 0xC0) != 0) return;
-        await WriteCustomRegister(ModeA_C_Control, reg, DisposeCancel).ConfigureAwait(false);
+            var reg = ReadCustomRegister(edit, ModeS_Control);
+
+            // If the command is to turn off,
+            // but either mode A or mode C is active (0x400 - Mode A or 0x800 - Mode C),
+            // and an inter-mode request is enabled for at least one of them (0xC0): exit.
+            if (!isOn && ((reg & 0x400) == 0 || (reg & 0x800) == 0) && (reg & 0xC0) != 0) return;
+
+            if (isOn)
+            {
+                reg &= unchecked((ushort)~modeMask);
+            }
+            else
+            {
+                reg |= modeMask;
+            }
+            if ((reg & 0xC0) != 0) return;
+            WriteCustomRegister(edit, ModeS_Control, reg);
+        }, DisposeCancel);
     }
 
-    private async Task ResetStatistics(ushort modeMask)
+    private Task ResetStatistics(ushort modeMask)
     {
-        var reg = await ReadCustomRegister(ModeA_C_Control, DisposeCancel).ConfigureAwait(false);
-        reg ^= modeMask;
-        await WriteCustomRegister(ModeA_C_Control, reg, DisposeCancel).ConfigureAwait(false);
-        await Task.Delay(10, DisposeCancel).ConfigureAwait(false);
-        reg ^= modeMask;
-        await WriteCustomRegister(ModeA_C_Control, reg, DisposeCancel).ConfigureAwait(false);
+        var cancel = DisposeCancel;
+        return AtomicEditRegister(edit =>
+        {
+            var reg = ReadCustomRegister(edit, ModeA_C_Control);
+            reg ^= modeMask;
+            WriteCustomRegister(edit, ModeA_C_Control, reg);
+            // Keep both reset edges on the device thread without yielding its queue.
+            Thread.Sleep(10);
+            cancel.ThrowIfCancellationRequested();
+            reg ^= modeMask;
+            WriteCustomRegister(edit, ModeA_C_Control, reg);
+        }, cancel);
     }
     
     public Task ResetAllStatistics()
@@ -424,31 +446,91 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         return WriteCustomRegister(P1_P3_SpacingOffset_A_15_8_C_7_0_InternAddr, reg,  DisposeCancel);
     }
 
-    public async Task WriteModeACControl(bool modeAP2SlsPulseEn, bool modeCP2SlsPulseEn, bool modeAP2SlsPulseAtt,
+    public Task WriteModeACControl(bool modeAP2SlsPulseEn, bool modeCP2SlsPulseEn, bool modeAP2SlsPulseAtt,
         bool modeCP2SlsPulseAtt, bool allCallModeAC_A, bool allCallModeAC_C, bool allCallModeS_A, bool allCallModeS_C)
     {
-        var reg = await ReadCustomRegister(ModeA_C_Control, DisposeCancel).ConfigureAwait(false);
-        if (modeAP2SlsPulseEn) reg |= 0x1;
-        if (modeCP2SlsPulseEn) reg |= 0x2;
-        if (modeAP2SlsPulseAtt) reg |= 0x4;
-        if (modeCP2SlsPulseAtt) reg |= 0x8;
-        if (allCallModeAC_A) reg |= 0x10;
-        if (allCallModeAC_C) reg |= 0x20;
-        if (allCallModeS_A)
+        return AtomicEditRegister(edit =>
         {
-            reg |= 0x40;
-            // Turn on Mode A and Mode S
-            reg &= unchecked((ushort)~0x400);
-            reg &= unchecked((ushort)~0x1000);
-        }
-        if (allCallModeS_C)
-        {
-            reg |= 0x80;
-            // Turn on Mode C and Mode S
-            reg &= unchecked((ushort)~0x800);
-            reg &= unchecked((ushort)~0x1000);
-        }
-        await WriteCustomRegister(ModeA_C_Control, reg, DisposeCancel).ConfigureAwait(false);
+            var reg = ReadCustomRegister(edit, ModeA_C_Control);
+            if (modeAP2SlsPulseEn)
+            {
+                reg |= 0x1;
+            }
+            else
+            {
+                reg &= unchecked((ushort)~0x1);
+            }
+
+            if (modeCP2SlsPulseEn)
+            {
+                reg |= 0x2;
+            }
+            else
+            {
+                reg &= unchecked((ushort)~0x2);
+            }
+
+            if (modeAP2SlsPulseAtt)
+            {
+                reg |= 0x4;
+            }
+            else
+            {
+                reg &= unchecked((ushort)~0x4);
+            }
+
+            if (modeCP2SlsPulseAtt)
+            {
+                reg |= 0x8;
+            }
+            else
+            {
+                reg &= unchecked((ushort)~0x8);
+            }
+
+            if (allCallModeAC_A)
+            {
+                reg |= 0x10;
+            }
+            else
+            {
+                reg &= unchecked((ushort)~0x10);
+            }
+
+            if (allCallModeAC_C)
+            {
+                reg |= 0x20;
+            }
+            else
+            {
+                reg &= unchecked((ushort)~0x20);
+            }
+
+            if (allCallModeS_A)
+            {
+                reg |= 0x40;
+                // Turn on Mode A and Mode S
+                reg &= unchecked((ushort)~0x400);
+                reg &= unchecked((ushort)~0x1000);
+            }
+            else
+            {
+                reg &= unchecked((ushort)~0x40);
+            }
+
+            if (allCallModeS_C)
+            {
+                reg |= 0x80;
+                // Turn on Mode C and Mode S
+                reg &= unchecked((ushort)~0x800);
+                reg &= unchecked((ushort)~0x1000);
+            }
+            else
+            {
+                reg &= unchecked((ushort)~0x80);
+            }
+            WriteCustomRegister(edit, ModeA_C_Control, reg);
+        }, DisposeCancel);
     }
 
     // public Task SetModeAcWindowOffset(double offsetUs)
@@ -471,12 +553,86 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     public Task<double> ReadModeSPulseVariationDb() =>
         Ifr6000RfMeasurements.ReadPulseVariationDbAsync(this, RatioAmpDbS_15_0, DisposeCancel);
 
-    public async Task WriteModeSControl(bool modeSP5SlsPulseEn, bool modeSP5SlsPulseAtt)
+    public Task WriteModeSControl(bool modeSP5SlsPulseEn, bool modeSP5SlsPulseAtt)
     {
-        var reg = await ReadCustomRegister(ModeS_Control, DisposeCancel).ConfigureAwait(false);
-        if (modeSP5SlsPulseEn) reg |= 0x100;
-        if (modeSP5SlsPulseAtt) reg |= 0x200;
-        await WriteCustomRegister(ModeS_Control, reg, DisposeCancel).ConfigureAwait(false);
+        return AtomicEditRegister(edit =>
+        {
+            var reg = ReadCustomRegister(edit, ModeS_Control);
+            if (modeSP5SlsPulseEn)
+            {
+                reg |= 0x100;
+            }
+            else
+            {
+                reg &= unchecked((ushort)~0x100);
+            }
+            if (modeSP5SlsPulseAtt)
+            {
+                reg |= 0x200;
+            }
+            else
+            {
+                reg &= unchecked((ushort)~0x200);
+            }
+            WriteCustomRegister(edit, ModeS_Control, reg);
+        }, DisposeCancel);
+    }
+
+    public Task ResetAdsBStatistics()
+    {
+        var cancel = DisposeCancel;
+        return AtomicEditRegister(edit =>
+        {
+            var reg = ReadCustomRegister(edit, AdsB_Control);
+            const ushort mask = 0x2000;
+            if ((reg & mask) == 0) // DF17
+            {
+                reg |= mask;
+                WriteCustomRegister(edit, AdsB_Control, reg);
+                reg &= unchecked((ushort)~mask);
+            }
+            else // DF18
+            {
+                reg ^= mask;
+                WriteCustomRegister(edit, AdsB_Control, reg);
+                reg ^= mask;
+            }
+            Thread.Sleep(10);
+            cancel.ThrowIfCancellationRequested();
+            WriteCustomRegister(edit, AdsB_Control, reg);
+        }, cancel);
+    }
+
+    public Task SwitchDf17Df18(bool isDf17)
+    {
+        var cancel = DisposeCancel;
+        return AtomicEditRegister(edit =>
+        {
+            var reg = ReadCustomRegister(edit, AdsB_Control);
+            const ushort mask = 0x2000;
+            if (isDf17)
+            {
+                if ((reg & mask) == 0) // before DF17 => reset statistics
+                {
+                    reg |= mask;
+                    WriteCustomRegister(edit, AdsB_Control, reg);
+                }
+                reg &= unchecked((ushort)~0x2000);
+            }
+            else
+            {
+                if ((reg & mask) != 0) // before DF18 => reset statistics
+                {
+                    reg ^= mask;
+                    WriteCustomRegister(edit, AdsB_Control, reg);
+                }
+                reg |= 0x2000;
+            }
+
+            Thread.Sleep(10);
+            cancel.ThrowIfCancellationRequested();
+            WriteCustomRegister(edit, AdsB_Control, reg);
+        }, cancel);
     }
 
     public async Task<float> ReadModeSReplyDelay()
@@ -599,16 +755,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
             await UpdateModeSExpectedIcao(msg.IcaoAddress).ConfigureAwait(false);
             var buffer = CreateUfBuffer(msg);
             var frame = CreateUfFrame(buffer);
-            await AtomicEditRegister(edit =>
-            {
-                foreach (var addressValuePair in frame)
-                {
-                    WriteCustomRegister(edit, addressValuePair.Item1, addressValuePair.Item2);
-                }
-
-                edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 1);
-                edit.InternalWriteFpgaRegisterBits(CONTROL_WR_Address, 1, 1, 0);
-            }, DisposeCancel).ConfigureAwait(false);
+            await WriteUfFrame(frame).ConfigureAwait(false);
 
             await Task.Delay(UfSwitchSettleDelayMs, DisposeCancel).ConfigureAwait(false);
             var counterBefore = await ReadCustomRegister(DF_RX_CNT, DisposeCancel).ConfigureAwait(false);
@@ -744,7 +891,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
         return null;
     }
 
-    private async Task UpdateModeSExpectedIcao(uint icao)
+    public async Task UpdateModeSExpectedIcao(uint icao)
     {
         if (icao == 0 || icao > ModeSBroadcastIcao || icao == ModeSBroadcastIcao ||
             _modeSExpectedIcao == icao)

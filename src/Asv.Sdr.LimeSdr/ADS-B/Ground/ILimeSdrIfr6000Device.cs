@@ -212,7 +212,11 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
 
     Task<(byte Counter, float Period)> ReadDf11SquitterStatistics();
     
+    Task UpdateModeSExpectedIcao(uint icao);
+
     // ADS-B Extended
+    Task ResetAdsBStatistics();
+    Task SwitchDf17Df18(bool isDf17);
     Task<ExSquitterStatistics> ReadExSquitterStatistics();
     Task<AdsbAirbornePosition?> ReadExBds05Even();
     Task<AdsbAirbornePosition?> ReadExBds05Odd();
