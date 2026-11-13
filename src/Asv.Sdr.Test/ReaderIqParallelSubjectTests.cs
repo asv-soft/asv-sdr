@@ -64,17 +64,25 @@ namespace Asv.Sdr.Test
                 secondReceived.TrySetResult();
             }));
 
-            var publishTask = Task.Run(
+            // Publishing blocks until both subscribers finish and needs an independent thread.
+            var publishTask = Task.Factory.StartNew(
                 () => source.Publish(new double[] { 1, 0 }),
-                TestContext.Current.CancellationToken
+                TestContext.Current.CancellationToken,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default
             );
 
-            await AssertCompletes(firstStarted.Task);
-            await AssertCompletes(secondReceived.Task);
-            Assert.False(publishTask.IsCompleted);
-
-            firstCanFinish.Set();
-            await AssertCompletes(publishTask);
+            try
+            {
+                await AssertCompletes(firstStarted.Task);
+                await AssertCompletes(secondReceived.Task);
+                Assert.False(publishTask.IsCompleted);
+            }
+            finally
+            {
+                firstCanFinish.Set();
+                await AssertCompletes(publishTask);
+            }
         }
 
         [Fact]
