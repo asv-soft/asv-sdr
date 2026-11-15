@@ -11,7 +11,8 @@ public enum CustomWorkMode
     DmeGround = 2,
     AdsBModeSRep = 3,
     AdsBModeACRep = 4,
-    Ifr6000 = 5
+    Ifr6000 = 5,
+    Uvd = 6
 }
 
 public interface ILimeSdrCustomDevice : ILimeSdrDevice
