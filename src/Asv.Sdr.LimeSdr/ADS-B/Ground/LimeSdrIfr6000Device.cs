@@ -737,7 +737,11 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     {
         try
         {
-            await UpdateModeSExpectedIcao(msg.IcaoAddress).ConfigureAwait(false);
+            // A broadcast UF11 destination must not replace the receive filter.
+            if (msg is not ModeSUF11 || msg.IcaoAddress != ModeSBroadcastIcao)
+            {
+                await UpdateModeSExpectedIcao(msg.IcaoAddress).ConfigureAwait(false);
+            }
             await WriteUfFrame(CreateUfFrame(msg)).ConfigureAwait(false);
             return true;
         }
@@ -752,7 +756,10 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
     {
         try
         {
-            await UpdateModeSExpectedIcao(msg.IcaoAddress).ConfigureAwait(false);
+            if (msg is not ModeSUF11 || msg.IcaoAddress != ModeSBroadcastIcao)
+            {
+                await UpdateModeSExpectedIcao(msg.IcaoAddress).ConfigureAwait(false);
+            }
             var buffer = CreateUfBuffer(msg);
             var frame = CreateUfFrame(buffer);
             await WriteUfFrame(frame).ConfigureAwait(false);
@@ -874,7 +881,12 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
                 );
                 if (valid)
                 {
-                    await UpdateModeSExpectedIcao(msg.IcaoAddress).ConfigureAwait(false);
+                    // Discovery must not adopt a reserved address as an aircraft identity.
+                    // Explicit filter writes and selective requests allow every 24-bit value.
+                    if (msg.IcaoAddress is > 0 and < ModeSBroadcastIcao)
+                    {
+                        await UpdateModeSExpectedIcao(msg.IcaoAddress).ConfigureAwait(false);
+                    }
                     return msg;
                 }
             }
@@ -893,7 +905,7 @@ public class LimeSdrIfr6000Device : LimeSdrCustomDevice, ILimeSdrIfr6000Device
 
     public async Task UpdateModeSExpectedIcao(uint icao)
     {
-        if (icao == 0 || icao > ModeSBroadcastIcao || icao == ModeSBroadcastIcao ||
+        if (icao > ModeSBroadcastIcao ||
             _modeSExpectedIcao == icao)
         {
             return;

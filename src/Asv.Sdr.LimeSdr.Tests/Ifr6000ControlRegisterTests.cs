@@ -225,10 +225,12 @@ public sealed class Ifr6000ControlRegisterTests
     }
 
     [Theory]
+    [InlineData(0u)]
     [InlineData(0x000001u)]
     [InlineData(0x010000u)]
     [InlineData(0xABCDEFu)]
     [InlineData(0xFFFFFEu)]
+    [InlineData(0xFFFFFFu)]
     public async Task UpdateModeSExpectedIcao_WritesBothAddressWordsAndCachesSuccessfulWrite(uint address)
     {
         using var fixture = new Fixture(0xF5A5);
@@ -251,17 +253,15 @@ public sealed class Ifr6000ControlRegisterTests
 
         Assert.Empty(fixture.Registers.Writes);
         Assert.Empty(fixture.Registers.Frames);
-        await device.UpdateModeSExpectedIcao(address == 1 ? 2 : address - 1);
+        await device.UpdateModeSExpectedIcao(address <= 1 ? 2 : address - 1);
         Assert.Equal(2, fixture.Registers.Writes.Count);
         Assert.Single(fixture.Registers.Frames);
     }
 
     [Theory]
-    [InlineData(0u)]
-    [InlineData(0xFFFFFFu)]
     [InlineData(0x1000000u)]
     [InlineData(uint.MaxValue)]
-    public async Task UpdateModeSExpectedIcao_InvalidOrBroadcastAddress_DoesNotWrite(uint address)
+    public async Task UpdateModeSExpectedIcao_OutOfRangeAddress_DoesNotWrite(uint address)
     {
         using var fixture = new Fixture(0xF5A5);
 
@@ -363,6 +363,54 @@ public sealed class Ifr6000ControlRegisterTests
         Assert.Equal(0x2000, ufFrame[0].Value);
         Assert.All(ufFrame, word => Assert.Equal(word.Value, fixture.Registers.Read(word.Address)));
         Assert.Equal(0x80, fixture.Registers.Control);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task BroadcastUf11_BothWritePaths_PreserveExplicitFilter(bool readReply)
+    {
+        using var fixture = new Fixture(0xF5A5);
+        await fixture.Device.UpdateModeSExpectedIcao(0x123456);
+        fixture.Registers.ClearTrace();
+        var request = new ModeSUF11 { IcaoAddress = 0xFFFFFF };
+
+        if (readReply)
+            Assert.Null(await fixture.Device.ReadDfMessage(request, () => new ModeSDF11(), attempts: 1));
+        else
+            Assert.True(await fixture.Device.WriteUfMessage(request));
+
+        Assert.Equal(7, Assert.Single(fixture.Registers.Frames).Length);
+        Assert.DoesNotContain(fixture.Registers.Writes, word => word.Address is 0x032F or 0x0330);
+        Assert.Equal(0x12, fixture.Registers.Read(0x032F));
+        Assert.Equal(0x3456, fixture.Registers.Read(0x0330));
+    }
+
+    [Theory]
+    [InlineData(0u, false, 0x80665F)]
+    [InlineData(0u, true, 0x80665F)]
+    [InlineData(0xFFFFFFu, false, 0x2ACA58)]
+    [InlineData(0xFFFFFFu, true, 0x2ACA58)]
+    public async Task ReservedUf4_BothWritePaths_ApplyExactAddressAndUplink(uint address, bool readReply, uint parity)
+    {
+        using var fixture = new Fixture(0xF5A5);
+        var request = new ModeSUF4 { IcaoAddress = address, RR = 0, DI = 0 };
+
+        if (readReply)
+            Assert.Null(await fixture.Device.ReadDfMessage(request, () => new ModeSDF4(), attempts: 1));
+        else
+            Assert.True(await fixture.Device.WriteUfMessage(request));
+
+        Assert.Equal(2, fixture.Registers.Frames.Count);
+        Assert.Equal(new (ushort, ushort)[] { (0x032F, (ushort)(address >> 16)), (0x0330, (ushort)address) },
+            fixture.Registers.Frames[0]);
+        var uf = fixture.Registers.Frames[1];
+        Assert.Equal(7, uf.Length);
+        Assert.Equal(0x2000, uf[0].Value);
+        Assert.Equal(0, uf[1].Value);
+        Assert.Equal((ushort)(parity >> 8), uf[2].Value);
+        Assert.Equal((ushort)((parity & 0xFF) << 8), uf[3].Value);
+        Assert.All(uf.Skip(4), word => Assert.Equal(0, word.Value));
     }
 
     private static Task ExecuteReset(string mode, ILimeSdrIfr6000Device device) => mode switch

@@ -212,6 +212,11 @@ public interface ILimeSdrIfr6000Device : ILimeSdrCustomDevice
 
     Task<(byte Counter, float Period)> ReadDf11SquitterStatistics();
     
+    /// <summary>
+    /// Sets the FPGA address filter to an explicit 24-bit value, including
+    /// reserved values 000000 and FFFFFF for test requests. This does not confirm
+    /// reception from an aircraft. Values exceeding 24 bits are ignored.
+    /// </summary>
     Task UpdateModeSExpectedIcao(uint icao);
 
     // ADS-B Extended
